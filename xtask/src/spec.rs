@@ -645,13 +645,15 @@ impl Spec {
                         transport.id, field.name
                     ));
                 }
-                if let Some(id) = &field.encoding
-                    && !self.encodings.iter().any(|e| &e.id == id)
-                {
-                    return Err(format!(
-                        "mapping.toml: {} field {} uses unknown encoding {id}",
-                        transport.id, field.name
-                    ));
+                // A let chain would read better but needs Rust 1.88; see the
+                // rust-version in Cargo.toml.
+                if let Some(id) = &field.encoding {
+                    if !self.encodings.iter().any(|e| &e.id == id) {
+                        return Err(format!(
+                            "mapping.toml: {} field {} uses unknown encoding {id}",
+                            transport.id, field.name
+                        ));
+                    }
                 }
             }
             for placeholder in transport.pattern.split('<').skip(1) {

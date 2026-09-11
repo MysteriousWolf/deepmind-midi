@@ -37,7 +37,11 @@ firmware 1.0 and 1.1.
 cargo test --workspace --all-features
 cargo clippy --workspace --all-targets --all-features
 cargo fmt --all --check
+cargo +1.85.0 check --workspace --all-features   # the MSRV, which CI also checks
 ```
+
+A current toolchain accepts things 1.85 does not, so the last line is worth
+running before pushing.
 
 Documentation and diagrams are generated from `spec/`:
 
