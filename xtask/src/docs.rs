@@ -118,6 +118,26 @@ fn write_drawings(root: &Path, all: &[fx::Drawing], check: bool) -> Result<bool,
                 .map_err(|e| format!("{}: {e}", path.display()))?;
         }
     }
+
+    // A drawing whose effect was renamed leaves its old file behind, and a
+    // stale panel in the directory is worse than no panel.
+    let wanted: Vec<String> = all.iter().map(|d| format!("{}.svg", d.id)).collect();
+    if let Ok(entries) = std::fs::read_dir(&dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().is_none_or(|e| e != "svg") {
+                continue;
+            }
+            let name = entry.file_name().to_string_lossy().into_owned();
+            if wanted.contains(&name) {
+                continue;
+            }
+            stale = true;
+            if !check {
+                std::fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+            }
+        }
+    }
     Ok(stale)
 }
 
@@ -609,10 +629,10 @@ fn render_effect_index(spec: &Spec) -> String {
                 .collect();
             let _ = writeln!(
                 out,
-                "| {} | [{}](#fx-{}) | {} | {} | {} | {} |",
+                "| {} | [{}](#{}) | {} | {} | {} | {} |",
                 layout.r#type,
                 cell(&effect.name),
-                layout.r#type,
+                fx::stem(effect.r#type, &effect.full_name),
                 cell(&effect.full_name),
                 effect.parameters.len(),
                 match rows.len() {
@@ -633,11 +653,12 @@ fn render_effects(spec: &Spec, drawings: &[fx::Drawing]) -> String {
     for effect in &spec.effects {
         let layout = spec.layouts.iter().find(|l| l.r#type == effect.r#type);
         let panel = spec.panels.iter().find(|p| p.r#type == effect.r#type);
-        let drawing = drawings.iter().find(|d| d.id == fx::slug(&effect.name));
+        let stem = fx::stem(effect.r#type, &effect.full_name);
+        let drawing = drawings.iter().find(|d| d.id == stem);
         let _ = write!(
             out,
-            "\n<a id=\"fx-{}\"></a>\n\n### {} ({})\n\n",
-            effect.r#type,
+            "\n<a id=\"{}\"></a>\n\n### {} ({})\n\n",
+            stem,
             cell(&effect.full_name),
             cell(&effect.name),
         );
@@ -710,9 +731,9 @@ fn render_effect_corrections(spec: &Spec) -> String {
             any = true;
             let _ = writeln!(
                 out,
-                "| [{}](#fx-{}) | {} | {} | {} |",
+                "| [{}](#{}) | {} | {} | {} |",
                 cell(&effect.name),
-                effect.r#type,
+                fx::stem(effect.r#type, &effect.full_name),
                 parameter.slot,
                 cell(&parameter.name),
                 cell(correction),

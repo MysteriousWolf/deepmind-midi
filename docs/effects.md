@@ -51,6 +51,12 @@ vertical faders on a cream surface, and the Vintage Room Reverb is numeric
 displays. The colours are sampled from the same picture. All of it lives in
 [`spec/layout.toml`](../spec/layout.toml), which records how each was taken.
 
+Each drawing is filed and linked under the `FX Type` value and the manual's full
+name, so `31-moog-type-filter` is the Mood Filter. The number is not decoration:
+the manual's effects table gives types 32 and 33 the same full name, Dual Pitch
+Shifter, and only their short names - `DualPitch` and `Vintage Pitch` - tell
+them apart.
+
 The drawings say what is on the page, not what a patch sounds like:
 
 | Mark | Meaning |
@@ -95,56 +101,56 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 | `FX Type` | Effect | Name | Slots | Page | Panel |
 |---|---|---|---|---|---|
-| 0 | [TC-DeepVRB](#fx-0) | TC Deep Reverb | 5 | one row of 5 | knob |
-| 1 | [AmbVerb](#fx-1) | Ambient Reverb | 10 | rows of 6 and 4 | fader |
-| 2 | [RoomRev](#fx-2) | Room Reverb | 12 | rows of 6 and 6 | fader |
-| 3 | [VintageRev](#fx-3) | Vintage Room Reverb | 12 | rows of 6 and 6 | display |
-| 4 | [HallRev](#fx-4) | Hall Reverb | 12 | rows of 6 and 6 | fader |
-| 5 | [ChamberRev](#fx-5) | Chamber Reverb | 12 | rows of 6 and 6 | fader |
-| 6 | [PlateRev](#fx-6) | Plate Reverb | 12 | rows of 6 and 6 | knob |
-| 7 | [RichPltRev](#fx-7) | Rich Plate Reverb | 12 | rows of 6 and 6 | fader |
-| 8 | [GatedRev](#fx-8) | Gated Reverb | 10 | rows of 6 and 4 | knob |
-| 9 | [Reverse](#fx-9) | Reverse Reverb | 9 | rows of 6 and 3 | knob |
-| 10 | [ChorusVerb](#fx-10) | Chorus and Reverb | 12 | rows of 6 and 6 | knob |
-| 11 | [DelayVerb](#fx-11) | Delay and Reverb | 12 | rows of 6 and 6 | knob |
-| 12 | [FlangVerb](#fx-12) | Flanger and Reverb | 12 | rows of 6 and 6 | knob |
+| 0 | [TC-DeepVRB](#00-tc-deep-reverb) | TC Deep Reverb | 5 | one row of 5 | knob |
+| 1 | [AmbVerb](#01-ambient-reverb) | Ambient Reverb | 10 | rows of 6 and 4 | fader |
+| 2 | [RoomRev](#02-room-reverb) | Room Reverb | 12 | rows of 6 and 6 | fader |
+| 3 | [VintageRev](#03-vintage-room-reverb) | Vintage Room Reverb | 12 | rows of 6 and 6 | display |
+| 4 | [HallRev](#04-hall-reverb) | Hall Reverb | 12 | rows of 6 and 6 | fader |
+| 5 | [ChamberRev](#05-chamber-reverb) | Chamber Reverb | 12 | rows of 6 and 6 | fader |
+| 6 | [PlateRev](#06-plate-reverb) | Plate Reverb | 12 | rows of 6 and 6 | knob |
+| 7 | [RichPltRev](#07-rich-plate-reverb) | Rich Plate Reverb | 12 | rows of 6 and 6 | fader |
+| 8 | [GatedRev](#08-gated-reverb) | Gated Reverb | 10 | rows of 6 and 4 | knob |
+| 9 | [Reverse](#09-reverse-reverb) | Reverse Reverb | 9 | rows of 6 and 3 | knob |
+| 10 | [ChorusVerb](#10-chorus-and-reverb) | Chorus and Reverb | 12 | rows of 6 and 6 | knob |
+| 11 | [DelayVerb](#11-delay-and-reverb) | Delay and Reverb | 12 | rows of 6 and 6 | knob |
+| 12 | [FlangVerb](#12-flanger-and-reverb) | Flanger and Reverb | 12 | rows of 6 and 6 | knob |
 
 ### Processing
 
 | `FX Type` | Effect | Name | Slots | Page | Panel |
 |---|---|---|---|---|---|
-| 13 | [MidasEQ](#fx-13) | Midas Equaliser | 11 | rows of 6 and 5 | knob |
-| 14 | [Enhancer](#fx-14) | Enhancing EQ | 9 | rows of 6 and 3 | knob |
-| 15 | [FairComp](#fx-15) | Compressor | 12 | rows of 6 and 6 | knob |
-| 16 | [MulBndDist](#fx-16) | Multiband Distortion | 12 | rows of 6 and 6 | knob |
-| 17 | [RackAmp](#fx-17) | Rack Amplifier | 9 | rows of 6 and 3 | knob |
-| 18 | [EdisonEX1](#fx-18) | Stereo Imaging | 8 | rows of 6 and 2 | knob |
-| 19 | [Auto Pan](#fx-19) | Auto Panning | 9 | rows of 6 and 3 | knob |
-| 20 | [NoiseGate](#fx-20) | Noise Gate | 8 | rows of 6 and 2 | knob |
+| 13 | [MidasEQ](#13-midas-equaliser) | Midas Equaliser | 11 | rows of 6 and 5 | knob |
+| 14 | [Enhancer](#14-enhancing-eq) | Enhancing EQ | 9 | rows of 6 and 3 | knob |
+| 15 | [FairComp](#15-compressor) | Compressor | 12 | rows of 6 and 6 | knob |
+| 16 | [MulBndDist](#16-multiband-distortion) | Multiband Distortion | 12 | rows of 6 and 6 | knob |
+| 17 | [RackAmp](#17-rack-amplifier) | Rack Amplifier | 9 | rows of 6 and 3 | knob |
+| 18 | [EdisonEX1](#18-stereo-imaging) | Stereo Imaging | 8 | rows of 6 and 2 | knob |
+| 19 | [Auto Pan](#19-auto-panning) | Auto Panning | 9 | rows of 6 and 3 | knob |
+| 20 | [NoiseGate](#20-noise-gate) | Noise Gate | 8 | rows of 6 and 2 | knob |
 
 ### Delay
 
 | `FX Type` | Effect | Name | Slots | Page | Panel |
 |---|---|---|---|---|---|
-| 21 | [Delay](#fx-21) | Stereo Delay | 12 | rows of 6 and 6 | knob |
-| 22 | [3TapDelay](#fx-22) | 3-Tap Delay | 12 | rows of 6 and 6 | knob |
-| 23 | [4TapDelay](#fx-23) | 4-Tap Delay | 12 | rows of 6 and 6 | knob |
-| 24 | [T-RayDelay](#fx-24) | Tel-Ray Delay | 5 | one row of 5 | knob |
-| 25 | [DecimDelay](#fx-25) | Decimator Delay | 12 | rows of 6 and 6 | knob |
-| 26 | [ModDlyRev](#fx-26) | Modulation, Delay and Reverb | 12 | rows of 6 and 6 | knob |
+| 21 | [Delay](#21-stereo-delay) | Stereo Delay | 12 | rows of 6 and 6 | knob |
+| 22 | [3TapDelay](#22-3-tap-delay) | 3-Tap Delay | 12 | rows of 6 and 6 | knob |
+| 23 | [4TapDelay](#23-4-tap-delay) | 4-Tap Delay | 12 | rows of 6 and 6 | knob |
+| 24 | [T-RayDelay](#24-tel-ray-delay) | Tel-Ray Delay | 5 | one row of 5 | knob |
+| 25 | [DecimDelay](#25-decimator-delay) | Decimator Delay | 12 | rows of 6 and 6 | knob |
+| 26 | [ModDlyRev](#26-modulation-delay-and-reverb) | Modulation, Delay and Reverb | 12 | rows of 6 and 6 | knob |
 
 ### Creative
 
 | `FX Type` | Effect | Name | Slots | Page | Panel |
 |---|---|---|---|---|---|
-| 27 | [Chorus](#fx-27) | Stereo Chorus | 11 | rows of 6 and 5 | knob |
-| 28 | [Chorus-D](#fx-28) | Dimensional Chorus | 7 | rows of 6 and 1 | knob |
-| 29 | [Flanger](#fx-29) | Stereo Flanger | 12 | rows of 6 and 6 | knob |
-| 30 | [Phaser](#fx-30) | Stereo Phaser | 12 | rows of 6 and 6 | knob |
-| 31 | [MoodFilter](#fx-31) | Moog-Type Filter | 12 | rows of 6 and 6 | knob |
-| 32 | [DualPitch](#fx-32) | Dual Pitch Shifter | 12 | rows of 6 and 6 | knob |
-| 33 | [Vintage Pitch](#fx-33) | Dual Pitch Shifter | 12 | rows of 6 and 6 | knob |
-| 34 | [RotarySpkr](#fx-34) | Rotary Speaker | 8 | rows of 6 and 2 | knob |
+| 27 | [Chorus](#27-stereo-chorus) | Stereo Chorus | 11 | rows of 6 and 5 | knob |
+| 28 | [Chorus-D](#28-dimensional-chorus) | Dimensional Chorus | 7 | rows of 6 and 1 | knob |
+| 29 | [Flanger](#29-stereo-flanger) | Stereo Flanger | 12 | rows of 6 and 6 | knob |
+| 30 | [Phaser](#30-stereo-phaser) | Stereo Phaser | 12 | rows of 6 and 6 | knob |
+| 31 | [MoodFilter](#31-moog-type-filter) | Moog-Type Filter | 12 | rows of 6 and 6 | knob |
+| 32 | [DualPitch](#32-dual-pitch-shifter) | Dual Pitch Shifter | 12 | rows of 6 and 6 | knob |
+| 33 | [Vintage Pitch](#33-dual-pitch-shifter) | Dual Pitch Shifter | 12 | rows of 6 and 6 | knob |
+| 34 | [RotarySpkr](#34-rotary-speaker) | Rotary Speaker | 8 | rows of 6 and 2 | knob |
 
 <!-- /generated:effect-index -->
 
@@ -152,11 +158,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <!-- generated:effects -->
 
-<a id="fx-0"></a>
+<a id="00-tc-deep-reverb"></a>
 
 ### TC Deep Reverb (TC-DeepVRB)
 
-<img src="diagrams/fx/tc-deepvrb.svg" alt="TC Deep Reverb front panel" width="720">
+<img src="diagrams/fx/00-tc-deep-reverb.svg" alt="TC Deep Reverb front panel" width="720">
 
 `FX Type` 0, reverb. 5 slots, drawn as knobs.
 
@@ -168,11 +174,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 4 | `PDY` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
 | 5 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
 
-<a id="fx-1"></a>
+<a id="01-ambient-reverb"></a>
 
 ### Ambient Reverb (AmbVerb)
 
-<img src="diagrams/fx/ambverb.svg" alt="Ambient Reverb front panel" width="720">
+<img src="diagrams/fx/01-ambient-reverb.svg" alt="Ambient Reverb front panel" width="720">
 
 `FX Type` 1, reverb. 10 slots, drawn as faders.
 
@@ -189,11 +195,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 9 | `MOD` | Mod | Modulation Depth | continuous |  | 0.0 to 100 % |  | Controls the reverb tail modulation depth. |
 | 10 | `TGN` | TailGain | Tail Gain | continuous |  | 0.0 to 100 % | yes | Adjusts the volume of the reverb tail. |
 
-<a id="fx-2"></a>
+<a id="02-room-reverb"></a>
 
 ### Room Reverb (RoomRev)
 
-<img src="diagrams/fx/roomrev.svg" alt="Room Reverb front panel" width="720">
+<img src="diagrams/fx/02-room-reverb.svg" alt="Room Reverb front panel" width="720">
 
 `FX Type` 2, reverb. 12 slots, drawn as faders.
 
@@ -212,11 +218,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `SHP` | Shape | Shape | continuous |  | 0.0 to 250.0 | yes | Adjusts the contour of the reverberation envelope. |
 | 12 | `SPI` | Spin | Spin | continuous |  | 0.0 to 100 % |  | Controls randomization / modulation effects within the reverb. |
 
-<a id="fx-3"></a>
+<a id="03-vintage-room-reverb"></a>
 
 ### Vintage Room Reverb (VintageRev)
 
-<img src="diagrams/fx/vintagerev.svg" alt="Vintage Room Reverb front panel" width="720">
+<img src="diagrams/fx/03-vintage-room-reverb.svg" alt="Vintage Room Reverb front panel" width="720">
 
 `FX Type` 3, reverb. 12 slots, drawn as displays.
 
@@ -235,11 +241,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
 | 12 | `FRZ` | Freeze | Freeze | switch |  | OFF to ON | yes | Applies freeze mode and blends signals into a continuous response. |
 
-<a id="fx-4"></a>
+<a id="04-hall-reverb"></a>
 
 ### Hall Reverb (HallRev)
 
-<img src="diagrams/fx/hallrev.svg" alt="Hall Reverb front panel" width="720">
+<img src="diagrams/fx/04-hall-reverb.svg" alt="Hall Reverb front panel" width="720">
 
 `FX Type` 4, reverb. 12 slots, drawn as faders.
 
@@ -258,11 +264,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `SHP` | Shape | Shape | continuous |  | 0.0 to 250.0 | yes | Adjusts the contour of the reverberation envelope. |
 | 12 | `MOD` | ModSpeed | Modulation Speed | continuous |  | 0.0 to 100.0 |  | Controls the reverb tail modulation rate . |
 
-<a id="fx-5"></a>
+<a id="05-chamber-reverb"></a>
 
 ### Chamber Reverb (ChamberRev)
 
-<img src="diagrams/fx/chamberrev.svg" alt="Chamber Reverb front panel" width="720">
+<img src="diagrams/fx/05-chamber-reverb.svg" alt="Chamber Reverb front panel" width="720">
 
 `FX Type` 5, reverb. 12 slots, drawn as faders.
 
@@ -281,11 +287,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `SHP` | Shape | Shape | continuous |  | 0.0 to 250.0 | yes | Adjusts the contour of the reverberation envelope. |
 | 12 | `SPI` | Spin | Spin | continuous |  | 0.0 to 100 % |  | Controls randomization / modulation effects within the reverb. |
 
-<a id="fx-6"></a>
+<a id="06-plate-reverb"></a>
 
 ### Plate Reverb (PlateRev)
 
-<img src="diagrams/fx/platerev.svg" alt="Plate Reverb front panel" width="720">
+<img src="diagrams/fx/06-plate-reverb.svg" alt="Plate Reverb front panel" width="720">
 
 `FX Type` 6, reverb. 12 slots, drawn as knobs.
 
@@ -304,11 +310,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `MOD` | ModDepth | Modulation Depth | continuous |  | 1.0 to 50.0 |  | Controls the reverb tail modulation depth. |
 | 12 | `MDS` | ModSpeed | Modulation Speed | continuous |  | 0.0 to 100.0 |  | Controls the reverb tail modulation rate. |
 
-<a id="fx-7"></a>
+<a id="07-rich-plate-reverb"></a>
 
 ### Rich Plate Reverb (RichPltRev)
 
-<img src="diagrams/fx/richpltrev.svg" alt="Rich Plate Reverb front panel" width="720">
+<img src="diagrams/fx/07-rich-plate-reverb.svg" alt="Rich Plate Reverb front panel" width="720">
 
 `FX Type` 7, reverb. 12 slots, drawn as faders.
 
@@ -327,11 +333,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `ATK` | Attack | Attack | continuous |  | 0.0 to 100.0 | yes | Adjusts the contour of the reverberation envelope. |
 | 12 | `SPN` | Spin | Spin | continuous |  | 0.0 to 100 % | yes | Controls randomization / modulation effects within the reverb. |
 
-<a id="fx-8"></a>
+<a id="08-gated-reverb"></a>
 
 ### Gated Reverb (GatedRev)
 
-<img src="diagrams/fx/gatedrev.svg" alt="Gated Reverb front panel" width="720">
+<img src="diagrams/fx/08-gated-reverb.svg" alt="Gated Reverb front panel" width="720">
 
 `FX Type` 8, reverb. 10 slots, drawn as knobs.
 
@@ -348,11 +354,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 9 | `HIG` | HiSvGain | High Shelf Gain | continuous |  | -30.0 to 0.0 dB | yes | Adjusts the gain of a Hi-Shelving filter at the input of the reverb effect. |
 | 10 | `DIF` | Diffusion | Diffusion | continuous |  | 0.0 to 100 % |  | Controls the initial reflection density . |
 
-<a id="fx-9"></a>
+<a id="09-reverse-reverb"></a>
 
 ### Reverse Reverb (Reverse)
 
-<img src="diagrams/fx/reverse.svg" alt="Reverse Reverb front panel" width="720">
+<img src="diagrams/fx/09-reverse-reverb.svg" alt="Reverse Reverb front panel" width="720">
 
 `FX Type` 9, reverb. 9 slots, drawn as knobs.
 
@@ -368,11 +374,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 8 | `HIF` | HiSvFreq | High Shelf Frequency | continuous |  | 200.0 to 20000.0 Hz | yes | Adjusts the frequency of a Hi-Shelving filter at the input of the reverb effect. |
 | 9 | `HIG` | HiSvGain | High Shelf Gain | continuous |  | -30.0 to 0.0 dB | yes | Adjusts the gain of a Hi-Shelving filter at the input of the reverb effect. |
 
-<a id="fx-10"></a>
+<a id="10-chorus-and-reverb"></a>
 
 ### Chorus and Reverb (ChorusVerb)
 
-<img src="diagrams/fx/chorusverb.svg" alt="Chorus and Reverb front panel" width="720">
+<img src="diagrams/fx/10-chorus-and-reverb.svg" alt="Chorus and Reverb front panel" width="720">
 
 `FX Type` 10, reverb. 12 slots, drawn as knobs.
 
@@ -391,11 +397,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Excludes low frequencies below the value . |
 | 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
 
-<a id="fx-11"></a>
+<a id="11-delay-and-reverb"></a>
 
 ### Delay and Reverb (DelayVerb)
 
-<img src="diagrams/fx/delayverb.svg" alt="Delay and Reverb front panel" width="720">
+<img src="diagrams/fx/11-delay-and-reverb.svg" alt="Delay and Reverb front panel" width="720">
 
 `FX Type` 11, reverb. 12 slots, drawn as knobs.
 
@@ -414,11 +420,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Excludes low frequencies below the value . |
 | 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
 
-<a id="fx-12"></a>
+<a id="12-flanger-and-reverb"></a>
 
 ### Flanger and Reverb (FlangVerb)
 
-<img src="diagrams/fx/flangverb.svg" alt="Flanger and Reverb front panel" width="720">
+<img src="diagrams/fx/12-flanger-and-reverb.svg" alt="Flanger and Reverb front panel" width="720">
 
 `FX Type` 12, reverb. 12 slots, drawn as knobs.
 
@@ -437,11 +443,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Excludes low frequencies below the value . |
 | 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
 
-<a id="fx-13"></a>
+<a id="13-midas-equaliser"></a>
 
 ### Midas Equaliser (MidasEQ)
 
-<img src="diagrams/fx/midaseq.svg" alt="Midas Equaliser front panel" width="720">
+<img src="diagrams/fx/13-midas-equaliser.svg" alt="Midas Equaliser front panel" width="720">
 
 `FX Type` 13, processing. 11 slots, drawn as knobs.
 
@@ -459,11 +465,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 10 | `HSF` | HiShelfFreq | High Shelf Frequency | continuous | high | 30.0 to 20000.0 Hz | yes | Adjusts the frequency of the high band. |
 | 11 | `EQ` | EQ | EQ In or Out | switch |  | IN, OUT | yes | INOUTAdjusts the frequency of the high band. |
 
-<a id="fx-14"></a>
+<a id="14-enhancing-eq"></a>
 
 ### Enhancing EQ (Enhancer)
 
-<img src="diagrams/fx/enhancer.svg" alt="Enhancing EQ front panel" width="720">
+<img src="diagrams/fx/14-enhancing-eq.svg" alt="Enhancing EQ front panel" width="720">
 
 `FX Type` 14, processing. 9 slots, drawn as knobs.
 
@@ -479,11 +485,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 8 | `HIF` | HiFreq | High Frequency | continuous | high | 1.0 to 50.0 | yes | Adjusts the frequency of the high band. |
 | 9 | `SOL` | Solo | Solo | switch |  | OFF, ON |  | Solo mode - used to isolate only the audio resulting from the effect. |
 
-<a id="fx-15"></a>
+<a id="15-compressor"></a>
 
 ### Compressor (FairComp)
 
-<img src="diagrams/fx/faircomp.svg" alt="Compressor front panel" width="720">
+<img src="diagrams/fx/15-compressor.svg" alt="Compressor front panel" width="720">
 
 `FX Type` 15, processing. 12 slots, drawn as knobs.
 
@@ -502,11 +508,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `DCR` | DC Bias R/S | DC Bias, right/side | continuous | right-side | 0.0 to 100 % | yes | Adjust the ratio and knee of the compression curve for the Right/Side signal. |
 | 12 | `OGR` | OutGain R/S | Output Gain, right/side | continuous | right-side | -18.0 to 6.0 dB | yes | Controls the output gain for the Right/Side signal. |
 
-<a id="fx-16"></a>
+<a id="16-multiband-distortion"></a>
 
 ### Multiband Distortion (MulBndDist)
 
-<img src="diagrams/fx/mulbnddist.svg" alt="Multiband Distortion front panel" width="720">
+<img src="diagrams/fx/16-multiband-distortion.svg" alt="Multiband Distortion front panel" width="720">
 
 `FX Type` 16, processing. 12 slots, drawn as knobs.
 
@@ -525,11 +531,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `CAB` | Cabinet | Cabinet | selector |  | OFF, VTw, VBs, A10, Mid, BFC, B60, V30, S78, Oax, Ac1, Ac2 |  | Cabinet Type: OFF, VTw, VBs, A10, Mid, BFC, B60, V30, S78, Oax, A12, Rck. (See Table Above). |
 | 12 | `OPG` | OutputGain | Output Gain | continuous |  | -12.0 to 12.0 dB | yes | Controls the amount of output gain applied to the signal. |
 
-<a id="fx-17"></a>
+<a id="17-rack-amplifier"></a>
 
 ### Rack Amplifier (RackAmp)
 
-<img src="diagrams/fx/rackamp.svg" alt="Rack Amplifier front panel" width="720">
+<img src="diagrams/fx/17-rack-amplifier.svg" alt="Rack Amplifier front panel" width="720">
 
 `FX Type` 17, processing. 9 slots, drawn as knobs.
 
@@ -545,11 +551,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 8 | `HI` | High | High Tone | continuous |  | 0.0 to 10.0 | yes | EQ adjustment of the high frequencies, independent of distortion content. |
 | 9 | `CAB` | Cabinet | Cabinet | switch |  | OFF to ON |  | Turns the cabinet simulation on or off. |
 
-<a id="fx-18"></a>
+<a id="18-stereo-imaging"></a>
 
 ### Stereo Imaging (EdisonEX1)
 
-<img src="diagrams/fx/edisonex1.svg" alt="Stereo Imaging front panel" width="720">
+<img src="diagrams/fx/18-stereo-imaging.svg" alt="Stereo Imaging front panel" width="720">
 
 `FX Type` 18, processing. 8 slots, drawn as knobs.
 
@@ -564,11 +570,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 7 | `CNT` | CntrDist | Centre Distance | continuous |  | -50.0 to 50.0 | yes | Allows the mono content to be panned. |
 | 8 | `GN` | Gain | Gain | continuous |  | -12.0 to 12.0 dB | yes | Controls the amount of output gain applied to the signal. |
 
-<a id="fx-19"></a>
+<a id="19-auto-panning"></a>
 
 ### Auto Panning (Auto Pan)
 
-<img src="diagrams/fx/auto-pan.svg" alt="Auto Panning front panel" width="720">
+<img src="diagrams/fx/19-auto-panning.svg" alt="Auto Panning front panel" width="720">
 
 `FX Type` 19, processing. 9 slots, drawn as knobs.
 
@@ -584,11 +590,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 8 | `HLD` | Hold | Hold | continuous |  | 1.0 to 2000.0 ms | yes | Controls the envelope hold stage time. |
 | 9 | `REL` | Release | Release | continuous |  | 10.0 to 1000.0 ms | yes | Controls the envelope release stage time. |
 
-<a id="fx-20"></a>
+<a id="20-noise-gate"></a>
 
 ### Noise Gate (NoiseGate)
 
-<img src="diagrams/fx/noisegate.svg" alt="Noise Gate front panel" width="720">
+<img src="diagrams/fx/20-noise-gate.svg" alt="Noise Gate front panel" width="720">
 
 `FX Type` 20, processing. 8 slots, drawn as knobs.
 
@@ -603,11 +609,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 7 | `MOD` | Mode | Mode | selector |  | GAT, TRN, DUC |  | GAT (Gate), TRN (Transient Gate), DUC (Ducker). |
 | 8 | `PWR` | Power | Power | continuous |  | ON to OFF |  | Enables gate in the signal path. When switched off, gate is bypassed. |
 
-<a id="fx-21"></a>
+<a id="21-stereo-delay"></a>
 
 ### Stereo Delay (Delay)
 
-<img src="diagrams/fx/delay.svg" alt="Stereo Delay front panel" width="720">
+<img src="diagrams/fx/21-stereo-delay.svg" alt="Stereo Delay front panel" width="720">
 
 `FX Type` 21, delay. 12 slots, drawn as knobs.
 
@@ -626,11 +632,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `FBR` | FeedR | Feedback, right | continuous |  | 0.0 to 100 % | yes | Control the amount of feedback for the right channel. |
 | 12 | `FHC` | FeedHC | Feedback High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Adjusts the high cut filter frequency in the feedback paths. |
 
-<a id="fx-22"></a>
+<a id="22-3-tap-delay"></a>
 
 ### 3-Tap Delay (3TapDelay)
 
-<img src="diagrams/fx/3tapdelay.svg" alt="3-Tap Delay front panel" width="720">
+<img src="diagrams/fx/22-3-tap-delay.svg" alt="3-Tap Delay front panel" width="720">
 
 `FX Type` 22, delay. 12 slots, drawn as knobs.
 
@@ -649,11 +655,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `XFD` | X-Feed | Cross-Feedback | switch |  | OFF to ON |  | Turns the stereo cross-feedback of the delays On or Off . |
 | 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
 
-<a id="fx-23"></a>
+<a id="23-4-tap-delay"></a>
 
 ### 4-Tap Delay (4TapDelay)
 
-<img src="diagrams/fx/4tapdelay.svg" alt="4-Tap Delay front panel" width="720">
+<img src="diagrams/fx/23-4-tap-delay.svg" alt="4-Tap Delay front panel" width="720">
 
 `FX Type` 23, delay. 12 slots, drawn as knobs.
 
@@ -672,11 +678,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `XFD` | X-Feed | Cross-Feedback | continuous |  | 0.0 to 1.0 |  | Turns the stereo cross-feedback of the delays On or Off. |
 | 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
 
-<a id="fx-24"></a>
+<a id="24-tel-ray-delay"></a>
 
 ### Tel-Ray Delay (T-RayDelay)
 
-<img src="diagrams/fx/t-raydelay.svg" alt="Tel-Ray Delay front panel" width="720">
+<img src="diagrams/fx/24-tel-ray-delay.svg" alt="Tel-Ray Delay front panel" width="720">
 
 `FX Type` 24, delay. 5 slots, drawn as knobs.
 
@@ -688,11 +694,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 4 | `WOB` | Wobble | Wobble | continuous |  | 0.0 to 100 % | yes | Adjusts the amount of wobble caused by age and quality of build/materials. |
 | 5 | `TON` | Tone | Tone | continuous |  | 0.0 to 100 % | yes | Controls the tone of the delays. |
 
-<a id="fx-25"></a>
+<a id="25-decimator-delay"></a>
 
 ### Decimator Delay (DecimDelay)
 
-<img src="diagrams/fx/decimdelay.svg" alt="Decimator Delay front panel" width="720">
+<img src="diagrams/fx/25-decimator-delay.svg" alt="Decimator Delay front panel" width="720">
 
 `FX Type` 25, delay. 12 slots, drawn as knobs.
 
@@ -711,11 +717,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `FBR` | FeedR | Feedback, right | continuous |  | 0.00 to 100.00 % | yes | Controls the amount of feedback for the right channel. |
 | 12 | `DMT` | Decimate | Decimation Point | switch |  | PRE, POST |  | It sets the decimation on the input signal (PRE) or only on the delay (POST). |
 
-<a id="fx-26"></a>
+<a id="26-modulation-delay-and-reverb"></a>
 
 ### Modulation, Delay and Reverb (ModDlyRev)
 
-<img src="diagrams/fx/moddlyrev.svg" alt="Modulation, Delay and Reverb front panel" width="720">
+<img src="diagrams/fx/26-modulation-delay-and-reverb.svg" alt="Modulation, Delay and Reverb front panel" width="720">
 
 `FX Type` 26, delay. 12 slots, drawn as knobs.
 
@@ -734,11 +740,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `BAL` | Balance | Balance | continuous |  | -100.0 to 100.0 | yes | Adjusts ratio of the delay signal to the reverb signal. |
 | 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals |
 
-<a id="fx-27"></a>
+<a id="27-stereo-chorus"></a>
 
 ### Stereo Chorus (Chorus)
 
-<img src="diagrams/fx/chorus.svg" alt="Stereo Chorus front panel" width="720">
+<img src="diagrams/fx/27-stereo-chorus.svg" alt="Stereo Chorus front panel" width="720">
 
 `FX Type` 27, creative. 11 slots, drawn as knobs.
 
@@ -756,11 +762,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 10 | `WAV` | Wave | Wave | continuous |  | 0.0 to 100 % |  | Blends between the digital triangular chorus sound and the classic analog sine wave. |
 | 11 | `SPR` | Spread | Spread | continuous |  | 0.0 to 100 % | yes | Adjusts how much of the left channel is mixed into the right and vice versa. |
 
-<a id="fx-28"></a>
+<a id="28-dimensional-chorus"></a>
 
 ### Dimensional Chorus (Chorus-D)
 
-<img src="diagrams/fx/chorus-d.svg" alt="Dimensional Chorus front panel" width="720">
+<img src="diagrams/fx/28-dimensional-chorus.svg" alt="Dimensional Chorus front panel" width="720">
 
 `FX Type` 28, creative. 7 slots, drawn as knobs.
 
@@ -774,11 +780,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 6 | `SW3` | Sw3 | Switch 3 | switch |  | OFF to ON |  | Engages level three intensity. |
 | 7 | `SW4` | Sw4 | Switch 4 | switch |  | OFF to ON |  | Engages level four intensity (maximum). |
 
-<a id="fx-29"></a>
+<a id="29-stereo-flanger"></a>
 
 ### Stereo Flanger (Flanger)
 
-<img src="diagrams/fx/flanger.svg" alt="Stereo Flanger front panel" width="720">
+<img src="diagrams/fx/29-stereo-flanger.svg" alt="Stereo Flanger front panel" width="720">
 
 `FX Type` 29, creative. 12 slots, drawn as knobs.
 
@@ -797,11 +803,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `FHC` | FeedHC | Feedback High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Adjusts the high cut filter frequency in the feedback path. |
 | 12 | `FD` | Feed | Feedback | continuous |  | -90.0 to 90.0 % | yes | Controls the percentage of positive or negative feedback. |
 
-<a id="fx-30"></a>
+<a id="30-stereo-phaser"></a>
 
 ### Stereo Phaser (Phaser)
 
-<img src="diagrams/fx/phaser.svg" alt="Stereo Phaser front panel" width="720">
+<img src="diagrams/fx/30-stereo-phaser.svg" alt="Stereo Phaser front panel" width="720">
 
 `FX Type` 30, creative. 12 slots, drawn as knobs.
 
@@ -820,11 +826,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `HLD` | Hold | Hold | continuous |  | 1.0 to 2000.0 ms | yes | Controls the envelope hold stage time. |
 | 12 | `REL` | Release | Release | continuous |  | 10.0 to 1000.0 ms | yes | Controls the envelope release stage time. |
 
-<a id="fx-31"></a>
+<a id="31-moog-type-filter"></a>
 
 ### Moog-Type Filter (MoodFilter)
 
-<img src="diagrams/fx/moodfilter.svg" alt="Moog-Type Filter front panel" width="720">
+<img src="diagrams/fx/31-moog-type-filter.svg" alt="Moog-Type Filter front panel" width="720">
 
 `FX Type` 31, creative. 12 slots, drawn as knobs.
 
@@ -843,11 +849,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `DRV` | Drive | Drive | continuous |  | 0.0 to 100 % | yes | Adjusts the level, also introduces an overdrive effect if pushed hard. |
 | 12 | `4P` | 4-Pole | 4-Pole | switch |  | 2P, 4P |  | Adjusts the slope of the filter from 2-pole to 4-pole (steeper). |
 
-<a id="fx-32"></a>
+<a id="32-dual-pitch-shifter"></a>
 
 ### Dual Pitch Shifter (DualPitch)
 
-<img src="diagrams/fx/dualpitch.svg" alt="Dual Pitch Shifter front panel" width="720">
+<img src="diagrams/fx/32-dual-pitch-shifter.svg" alt="Dual Pitch Shifter front panel" width="720">
 
 `FX Type` 32, creative. 12 slots, drawn as knobs.
 
@@ -866,11 +872,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `PN2` | Pan2 | Pan, channel 2 | continuous | channel-2 | -100.0 to 100 % | yes | Allows panning of the second channel. |
 | 12 | `HIC` | HiCut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies affected by the pitch shifting to be reduced. |
 
-<a id="fx-33"></a>
+<a id="33-dual-pitch-shifter"></a>
 
 ### Dual Pitch Shifter (Vintage Pitch)
 
-<img src="diagrams/fx/vintage-pitch.svg" alt="Dual Pitch Shifter front panel" width="720">
+<img src="diagrams/fx/33-dual-pitch-shifter.svg" alt="Dual Pitch Shifter front panel" width="720">
 
 `FX Type` 33, creative. 12 slots, drawn as knobs.
 
@@ -889,11 +895,11 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 11 | `PN2` | Pan2 | Pan, channel 2 | continuous | channel-2 | -100.0 to 100 % | yes | Allows panning of the second channel. |
 | 12 | `HIC` | HiCut | High Cut | continuous |  | 2000 to 20000 k Hz | yes | Allows the high frequencies affected by the pitch shifting to be reduced. |
 
-<a id="fx-34"></a>
+<a id="34-rotary-speaker"></a>
 
 ### Rotary Speaker (RotarySpkr)
 
-<img src="diagrams/fx/rotaryspkr.svg" alt="Rotary Speaker front panel" width="720">
+<img src="diagrams/fx/34-rotary-speaker.svg" alt="Rotary Speaker front panel" width="720">
 
 `FX Type` 34, creative. 8 slots, drawn as knobs.
 
@@ -920,7 +926,7 @@ about it. Corrections to the rest of the specification are in
 
 | Effect | Slot | Parameter | Correction |
 |---|---|---|---|
-| [MoodFilter](#fx-31) | 5 | Type | The options were read off the first three words of the description and lost Notch. The manual states four; the table cell states none. |
-| [MoodFilter](#fx-31) | 12 | 4-Pole | The manual's own table is malformed for this row: MIN reads "2P 4P" and MAX reads "100.0". Read as a two-state 2P to 4P, which is what the FX page screenshot beside the table shows, labelled POL and reading 4P. |
+| [MoodFilter](#31-moog-type-filter) | 5 | Type | The options were read off the first three words of the description and lost Notch. The manual states four; the table cell states none. |
+| [MoodFilter](#31-moog-type-filter) | 12 | 4-Pole | The manual's own table is malformed for this row: MIN reads "2P 4P" and MAX reads "100.0". Read as a two-state 2P to 4P, which is what the FX page screenshot beside the table shows, labelled POL and reading 4P. |
 
 <!-- /generated:effect-corrections -->

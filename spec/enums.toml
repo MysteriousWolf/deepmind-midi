@@ -576,7 +576,7 @@ entries = [
     { value = 30, name = "Phaser", description = "Phaser (Creative)" },
     { value = 31, name = "MoodFilter", description = "Mood Filter (Creative)" },
     { value = 32, name = "DualPitch", description = "Dual Pitch Shifter (Creative)" },
-    { value = 33, name = "Vintage Pitch", description = "Vintage Dual Pitch Shifter (Creative)" },
+    { value = 33, name = "Vintage Pitch", description = "Dual Pitch Shifter (Creative)" },
     { value = 34, name = "RotarySpkr", description = "Rotary Speaker (Creative)" },
 ]
 

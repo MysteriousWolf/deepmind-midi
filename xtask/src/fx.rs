@@ -47,7 +47,8 @@ const HANDLE: &str = "middle of travel, which carries no meaning";
 /// One effect's drawing.
 #[derive(Debug)]
 pub struct Drawing {
-    /// File stem, used for `docs/diagrams/fx/<id>.svg`.
+    /// File stem, used for `docs/diagrams/fx/<id>.svg` and as the anchor the
+    /// generated document links to.
     pub id: String,
     /// Effect name, used as the figure's caption.
     pub title: String,
@@ -78,7 +79,7 @@ pub fn all(spec: &Spec) -> Result<Vec<Drawing>, String> {
                 .find(|l| l.r#type == effect.r#type)
                 .ok_or_else(|| format!("no layout for {}", effect.name))?;
             Ok(Drawing {
-                id: slug(&effect.name),
+                id: stem(effect.r#type, &effect.full_name),
                 title: effect.full_name.clone(),
                 source: draw(spec, layout)?,
             })
@@ -86,9 +87,20 @@ pub fn all(spec: &Spec) -> Result<Vec<Drawing>, String> {
         .collect()
 }
 
-/// Returns the file stem for an effect name.
+/// Returns the file stem and anchor for an effect.
+///
+/// The manual's full name, which is what a person reads, behind the `FX Type`
+/// value, which is what makes it unique and sorts the directory into the order
+/// the manual lists them. The number is needed: the manual gives types 32 and
+/// 33 the same name, Dual Pitch Shifter, and only the short names tell them
+/// apart.
 #[must_use]
-pub fn slug(name: &str) -> String {
+pub fn stem(r#type: u16, full_name: &str) -> String {
+    format!("{:02}-{}", r#type, slug(full_name))
+}
+
+/// Returns a name as lowercase words joined by hyphens.
+fn slug(name: &str) -> String {
     let mut out = String::new();
     for c in name.chars() {
         if c.is_ascii_alphanumeric() {
@@ -593,13 +605,26 @@ fn draw(spec: &Spec, layout: &Layout) -> Result<String, String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{slug, wrap};
+    use super::{stem, wrap};
 
     #[test]
-    fn slugs_are_url_safe() {
-        assert_eq!(slug("TC-DeepVRB"), "tc-deepvrb");
-        assert_eq!(slug("Vintage Pitch"), "vintage-pitch");
-        assert_eq!(slug("3TapDelay"), "3tapdelay");
+    fn stems_are_readable_and_url_safe() {
+        assert_eq!(stem(0, "TC Deep Reverb"), "00-tc-deep-reverb");
+        assert_eq!(stem(7, "Rich Plate Reverb"), "07-rich-plate-reverb");
+        assert_eq!(
+            stem(26, "Modulation, Delay and Reverb"),
+            "26-modulation-delay-and-reverb"
+        );
+    }
+
+    /// The two pitch shifters share a name in the manual, so only the type
+    /// value keeps their files and anchors apart.
+    #[test]
+    fn stems_separate_the_two_pitch_shifters() {
+        assert_ne!(
+            stem(32, "Dual Pitch Shifter"),
+            stem(33, "Dual Pitch Shifter")
+        );
     }
 
     #[test]

@@ -1453,7 +1453,7 @@ Firmware 1.1+.
 | 30 | Phaser | Phaser (Creative) |
 | 31 | MoodFilter | Mood Filter (Creative) |
 | 32 | DualPitch | Dual Pitch Shifter (Creative) |
-| 33 | Vintage Pitch | Vintage Dual Pitch Shifter (Creative) |
+| 33 | Vintage Pitch | Dual Pitch Shifter (Creative) |
 | 34 | RotarySpkr | Rotary Speaker (Creative) |
 
 <a id="mod_destination-fw10"></a>
