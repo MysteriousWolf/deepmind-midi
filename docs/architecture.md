@@ -128,6 +128,18 @@ diagram sources in `docs/diagrams/*.mmd`, and a panel drawing per effect in
 `docs/diagrams/fx/*.svg`. The Mermaid diagrams are embedded inline as well, from
 the same strings, so nothing needs a build step to read.
 
+`cargo xtask codegen` renders the parameter table itself into
+`deepmind-midi/src/param/generated.rs`: the 242 parameters as an enum whose
+discriminant is the NRPN number, their groups and ranges, the value tables with
+the firmware each belongs to, and the controller map. The library cannot read
+TOML on a target with no filesystem and no allocator, so the specification is
+compiled in rather than parsed.
+
+Only data is generated. The types it fills and everything that acts on them are
+hand-written beside it, so a specification change arrives in review as a changed
+table rather than as changed logic, and a behaviour change cannot hide in a
+regenerated file.
+
 The same files will generate the `Program` struct, its typed fields and its
 conversions. A correction gets made once.
 
@@ -137,8 +149,12 @@ The failure mode is silent, so it is caught twice:
 
 - `generated_documentation_is_current` compares the checked-in document against a
   fresh render, so a stale checkout fails `cargo test`.
-- `cargo xtask docs --check` does the same without writing, and names the command
-  to run. CI runs it for the clearer error.
+- `generated_code_is_current` does the same for the library's parameter tables,
+  so a spec file edited without regenerating fails the build rather than
+  shipping a library that disagrees with its own specification.
+- `cargo xtask docs --check` and `cargo xtask codegen --check` do the same
+  without writing, and name the command to run. CI runs both for the clearer
+  error.
 
 CI does not regenerate and commit. Auto-committing to contributor branches is
 worse than a failure that says what to run.
@@ -418,11 +434,18 @@ built-in token; any failure there leaves the generated notes alone.
 | 7 | `transport`: the blocking adapter |
 | 8 | `deepmind-cli` |
 
-Steps 1 to 3 have landed.
+Steps 1 to 4 have landed.
 
-### Next: the parameter layer
+### Next: programs
 
-`param`: the 242 parameters, their NRPN numbers, ranges and value tables,
-generated from `spec/` rather than written out again. The wire is now readable
-and writable, so what is missing is meaning: a program dump arrives as 242 bytes
-that nothing yet names.
+`program`: the `Program` struct, its typed fields, and decoding and encoding
+between it and the 242 bytes a dump carries. The parameter layer names every one
+of those bytes and says what its values mean; what is missing is the shape a host
+holds them in, grouped like the front panel rather than addressed by offset, and
+the `.syx` files they are stored in.
+
+Two things the parameter layer deliberately left for it. The value tables are
+data, not types: `LfoShape::Triangle` belongs on the field it is assigned to, and
+generating 28 enums before there is anywhere to put them would be generating
+them twice. And nothing converts a raw value into the number the synthesizer
+displays, for the reason the scaling section above gives.

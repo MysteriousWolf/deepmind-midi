@@ -64,6 +64,21 @@ impl Version {
         }
     }
 
+    /// Returns whether this version is `major.minor` or later.
+    ///
+    /// Value tables in the parameter layer declare the firmware they describe as
+    /// a version and later, so selecting one is this comparison.
+    #[must_use]
+    pub const fn at_least(self, major: u8, minor: u8) -> bool {
+        self.major > major || (self.major == major && self.minor >= minor)
+    }
+
+    /// Returns whether this version is exactly `major.minor`.
+    #[must_use]
+    pub const fn is(self, major: u8, minor: u8) -> bool {
+        self.major == major && self.minor == minor
+    }
+
     /// Returns the packed byte for this version.
     #[must_use]
     pub const fn to_packed(self) -> u8 {

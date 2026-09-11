@@ -16,6 +16,7 @@
 //! | [`error`] | Crate-wide error type                                        |
 //! | [`wire`]  | MIDI bytes: running status, channel messages, `SysEx` reassembly |
 //! | [`sysex`] | `DeepMind` framing, the packed MS-bit codec, typed messages   |
+//! | [`param`] | The 242 program parameters: names, ranges, value tables, NRPN |
 //!
 //! Each layer depends only on those above it: [`wire`] does not know what a
 //! `DeepMind` is, and [`sysex`] does not know where its bytes came from.
@@ -36,10 +37,10 @@
 //! });
 //! ```
 //!
-//! Further layers (`param`, `program`, `device`, `syx`) land in subsequent
-//! changes, generated where possible from the machine-readable specification in
-//! `spec/`. See `docs/architecture.md` for the design and `docs/midi-spec.md`
-//! for the protocol itself.
+//! Further layers (`program`, `device`, `syx`) land in subsequent changes,
+//! generated where possible from the machine-readable specification in `spec/`.
+//! See `docs/architecture.md` for the design and `docs/midi-spec.md` for the
+//! protocol itself.
 //!
 //! # Feature flags
 //!
@@ -55,10 +56,12 @@ extern crate alloc;
 
 pub mod error;
 pub mod ids;
+pub mod param;
 pub mod sysex;
 pub mod wire;
 
 pub use error::{Error, Result};
 pub use ids::{Bank, DeviceId, Model, PatternNumber, ProgramNumber, ProtocolVersion};
+pub use param::{Group, NrpnEdit, ParamId};
 pub use sysex::{Command, Frame, Message};
 pub use wire::{Channel, ChannelMessage, Decoder};

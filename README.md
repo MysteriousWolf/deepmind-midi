@@ -11,8 +11,8 @@ DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 ```
 
 **Status: early.** The protocol is reverse-engineered, verified and written
-down. The code layers are landing one at a time: MIDI decoding and SysEx are in,
-parameters and programs are not. Not yet usable.
+down. The code layers are landing one at a time: MIDI decoding, SysEx and the
+parameter table are in; programs and device state are not. Not yet usable.
 
 ## Documentation
 
@@ -45,12 +45,14 @@ cargo +1.85.0 check --workspace --all-features   # the MSRV, which CI also check
 A current toolchain accepts things 1.85 does not, so the last line is worth
 running before pushing.
 
-Documentation, diagrams and the effect panel drawings are generated from
-`spec/`:
+Documentation, diagrams, the effect panel drawings and the library's parameter
+tables are generated from `spec/`:
 
 ```sh
-cargo xtask docs            # regenerate
-cargo xtask docs --check    # fail if stale
+cargo xtask docs               # regenerate docs/
+cargo xtask docs --check       # fail if stale
+cargo xtask codegen            # regenerate deepmind-midi/src/param/generated.rs
+cargo xtask codegen --check    # fail if stale
 ```
 
 Editing a spec file without regenerating fails `cargo test`.
