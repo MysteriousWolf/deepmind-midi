@@ -57,6 +57,44 @@ pub struct EnumEntry {
     pub description: Option<String>,
 }
 
+/// A firmware version that changes the protocol.
+#[derive(Debug, Deserialize)]
+pub struct Firmware {
+    /// Dotted version as a device inquiry reports it, such as `"1.1"`.
+    pub version: String,
+    /// `true` for the version assumed when a caller names none.
+    #[serde(default)]
+    pub default: bool,
+    /// What this version changed.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+impl Firmware {
+    /// Parses a dotted version into comparable parts.
+    fn parts(version: &str) -> (u32, u32) {
+        let mut split = version.split('.');
+        let major = split.next().and_then(|p| p.parse().ok()).unwrap_or(0);
+        let minor = split.next().and_then(|p| p.parse().ok()).unwrap_or(0);
+        (major, minor)
+    }
+
+    /// Returns whether `range` covers `version`.
+    ///
+    /// A range is a bare version for exactly that one, a version with a
+    /// trailing `+` for that one and later, or absent for every version.
+    #[must_use]
+    pub fn range_covers(range: Option<&str>, version: &str) -> bool {
+        match range {
+            None => true,
+            Some(range) => match range.strip_suffix('+') {
+                Some(from) => Self::parts(version) >= Self::parts(from),
+                None => range == version,
+            },
+        }
+    }
+}
+
 /// A named table of parameter values.
 #[derive(Debug, Deserialize)]
 pub struct ValueTable {
@@ -64,7 +102,10 @@ pub struct ValueTable {
     pub id: String,
     /// Human-readable table name.
     pub name: String,
-    /// Free-form note, typically firmware differences.
+    /// Which firmware versions this table describes. See [`Firmware::range_covers`].
+    #[serde(default)]
+    pub firmware: Option<String>,
+    /// Free-form note.
     #[serde(default)]
     pub note: Option<String>,
     /// `false` when the mapping is inferred and still needs hardware confirmation.
@@ -215,6 +256,11 @@ struct Controllers {
 }
 
 #[derive(Debug, Deserialize)]
+struct Firmwares {
+    firmware: Vec<Firmware>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Effects {
     effect: Vec<Effect>,
 }
@@ -240,6 +286,8 @@ pub struct Spec {
     pub controllers: Vec<Controller>,
     /// Effect algorithms, ordered by `FX Type` value.
     pub effects: Vec<Effect>,
+    /// Firmware versions that change the protocol, oldest first.
+    pub firmwares: Vec<Firmware>,
 }
 
 impl Spec {
@@ -259,6 +307,7 @@ impl Spec {
         let globals: Globals = read(&spec.join("globals.toml"))?;
         let controllers: Controllers = read(&spec.join("controllers.toml"))?;
         let effects: Effects = read(&spec.join("effects.toml"))?;
+        let firmwares: Firmwares = read(&spec.join("firmware.toml"))?;
 
         let this = Self {
             parameters: parameters.parameter,
@@ -267,22 +316,84 @@ impl Spec {
             globals: globals.globals,
             controllers: controllers.controller,
             effects: effects.effect,
+            firmwares: firmwares.firmware,
         };
         this.validate()?;
         Ok(this)
     }
 
-    /// Returns the value table with this identifier, if it exists.
+    /// Returns the firmware version used when a caller names none.
+    ///
+    /// The one marked `default` in `firmware.toml`, or the last listed.
+    #[must_use]
+    pub fn default_firmware(&self) -> &str {
+        self.firmwares
+            .iter()
+            .find(|f| f.default)
+            .or_else(|| self.firmwares.last())
+            .map_or("", |f| f.version.as_str())
+    }
+
+    /// Returns the value table with this identifier as of `firmware`.
+    ///
+    /// Several tables may share an identifier when firmware renumbered their
+    /// entries; the one whose firmware range covers `firmware` is the right one.
+    #[must_use]
+    pub fn table_for(&self, id: &str, firmware: &str) -> Option<&ValueTable> {
+        self.tables
+            .iter()
+            .find(|t| t.id == id && Firmware::range_covers(t.firmware.as_deref(), firmware))
+    }
+
+    /// Returns the value table with this identifier on the default firmware.
     #[must_use]
     pub fn table(&self, id: &str) -> Option<&ValueTable> {
-        self.tables.iter().find(|table| table.id == id)
+        self.table_for(id, self.default_firmware())
     }
 
     fn validate(&self) -> Result<(), String> {
+        self.validate_firmware()?;
         self.validate_parameters()?;
         self.validate_controllers()?;
         self.validate_effects()?;
         self.validate_messages()
+    }
+
+    /// Checks that every table identifier resolves for every known firmware.
+    ///
+    /// A table that covers no version is unreachable; two that cover the same
+    /// version make lookup depend on file order, which is how a renumbering
+    /// silently goes wrong.
+    fn validate_firmware(&self) -> Result<(), String> {
+        if self.firmwares.is_empty() {
+            return Err("firmware.toml: no versions listed".to_owned());
+        }
+        if self.firmwares.iter().filter(|f| f.default).count() > 1 {
+            return Err("firmware.toml: more than one version marked default".to_owned());
+        }
+
+        let mut ids: Vec<&str> = self.tables.iter().map(|t| t.id.as_str()).collect();
+        ids.sort_unstable();
+        ids.dedup();
+        for id in ids {
+            for firmware in &self.firmwares {
+                let matches = self
+                    .tables
+                    .iter()
+                    .filter(|t| {
+                        t.id == id
+                            && Firmware::range_covers(t.firmware.as_deref(), &firmware.version)
+                    })
+                    .count();
+                if matches != 1 {
+                    return Err(format!(
+                        "enums.toml: table {id} has {matches} definitions for firmware {}, want 1",
+                        firmware.version
+                    ));
+                }
+            }
+        }
+        Ok(())
     }
 
     fn validate_parameters(&self) -> Result<(), String> {
@@ -300,6 +411,8 @@ impl Spec {
             let Some(id) = &parameter.value_table else {
                 continue;
             };
+            // A parameter's stated maximum is the one for the default firmware.
+            // Older firmware reaches a lower maximum through its own table.
             let table = self.table(id).ok_or_else(|| {
                 format!(
                     "parameter {} references unknown table {id}",

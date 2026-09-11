@@ -1,0 +1,34 @@
+# DeepMind firmware versions that change the protocol.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# Firmware version and comms protocol version are independent. This file is the
+# firmware one, reported by a device inquiry. The protocol version is stamped
+# into every dump and decides how many bytes of program data it carries; see
+# `ProtocolVersion` in the library.
+#
+# Value tables in enums.toml carry a `firmware` range saying which versions they
+# describe: "1.0" for exactly that version, "1.1+" for that version and later,
+# and no field at all for a table that has never changed. Every table id must
+# resolve to exactly one table for every version listed here, which is checked
+# on load.
+
+[meta]
+note = """
+Firmware 1.1 renumbered three value tables rather than only appending to them, \
+so a program written on one version means something else on the other. Anything \
+that decodes a stored program has to know which version wrote it."""
+
+[[firmware]]
+version = "1.0"
+note = "The version the DeepMind 12 shipped with, and the one the manual's NRPN appendix describes."
+
+[[firmware]]
+version = "1.1"
+default = true
+note = """
+Added Expression and Uni Voice as modulation sources, three fine-tune \
+modulation destinations, and the Vintage Pitch effect. Each insertion \
+renumbered every entry after it. Also moved the modulation matrix CC axes from \
+CC 114-116 to CC 115-117."""

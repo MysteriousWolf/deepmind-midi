@@ -19,6 +19,7 @@ by hand: change the spec and run `cargo xtask docs`.
 - [Continuous controllers](#continuous-controllers)
 - [Program data layout](#program-data-layout)
 - [Program parameters](#program-parameters)
+- [Firmware versions](#firmware-versions)
 - [Value tables](#value-tables)
 - [Global settings](#global-settings)
 - [Effect parameters](#effect-parameters)
@@ -728,6 +729,25 @@ sends an NRPN edit and wants confirmation has to re-request the edit buffer.
 
 <!-- /generated:parameters -->
 
+## Firmware versions
+
+Firmware version and comms protocol version are independent. This is the
+firmware one, read with a device inquiry.
+
+Firmware 1.1 renumbered three value tables rather than only appending to them,
+so the same stored value means different things depending on which version
+wrote it. Tables below carry the firmware they describe; where a version is not
+named, the table has never changed.
+
+<!-- generated:firmware -->
+
+| Version | Notes |
+|---|---|
+| 1.0 | The version the DeepMind 12 shipped with, and the one the manual's NRPN appendix describes. |
+| 1.1 (assumed by default) | Added Expression and Uni Voice as modulation sources, three fine-tune modulation destinations, and the Vintage Pitch effect. Each insertion renumbered every entry after it. Also moved the modulation matrix CC axes from CC 114-116 to CC 115-117. |
+
+<!-- /generated:firmware -->
+
 ## Value tables
 
 <!-- generated:value-tables -->
@@ -1097,7 +1117,7 @@ Section 8.2.4. When LFO Arp Sync is on, the LFO rate parameter selects one of th
 
 #### Modulation Matrix Source
 
-Value 0 selects Off. Firmware 1.1 inserted Expression at 6 and Uni Voice at 21, renumbering everything after each, and moved the CC axes from CC 114-116 to CC 115-117. See mod_source_fw10 for the earlier ordering.
+Firmware 1.1+.
 
 | Value | Name | Notes |
 |---|---|---|
@@ -1127,11 +1147,13 @@ Value 0 selects Off. Firmware 1.1 inserted Expression at 6 and Uni Voice at 21, 
 | 23 | CC Y (116) | Continuous controller Y axis, CC 116 |
 | 24 | CC Z (117) | Continuous controller Z axis, CC 117 |
 
-<a id="mod_source_fw10"></a>
+<a id="mod_source-fw10"></a>
 
 #### Modulation Matrix Source (firmware 1.0)
 
-Superseded by mod_source on firmware 1.1 and later. Value 0 selects Off.
+Firmware 1.0.
+
+Value 0 selects Off.
 
 | Value | Name | Notes |
 |---|---|---|
@@ -1163,7 +1185,7 @@ Superseded by mod_source on firmware 1.1 and later. Value 0 selects Off.
 
 #### Modulation Matrix Destination
 
-Value 0 selects Off. Firmware 1.0 had 129 destinations; firmware 1.1 inserted OSC1+2 Fine, OSC1 Fine and OSC2 Fine at values 10, 12 and 14. To read a firmware 1.0 value: 1-9 are unchanged, 10 becomes 11, 11 becomes 13, and 12 or above gain 3.
+Firmware 1.1+.
 
 | Value | Name | Notes |
 |---|---|---|
@@ -1305,7 +1327,7 @@ Value 0 selects Off. Firmware 1.0 had 129 destinations; firmware 1.1 inserted OS
 
 #### FX Type
 
-Firmware 1.1 added Vintage Pitch at value 33, shifting Rotary Speaker to 34. Firmware 1.0 stopped at 33.
+Firmware 1.1+.
 
 | Value | Name | Notes |
 |---|---|---|
@@ -1344,6 +1366,196 @@ Firmware 1.1 added Vintage Pitch at value 33, shifting Rotary Speaker to 34. Fir
 | 32 | DualPitch | Dual Pitch Shifter (Creative) |
 | 33 | Vintage Pitch | Vintage Dual Pitch Shifter (Creative) |
 | 34 | RotarySpkr | Rotary Speaker (Creative) |
+
+<a id="mod_destination-fw10"></a>
+
+#### Modulation Matrix Destination (firmware 1.0)
+
+Firmware 1.0.
+
+Value 0 selects Off. Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual.
+
+> Unconfirmed. This mapping is inferred and needs checking against hardware.
+
+| Value | Name | Notes |
+|---|---|---|
+| 0 | Off |  |
+| 1 | LFO1 Rate |  |
+| 2 | LFO1 Delay |  |
+| 3 | LFO1 Slew |  |
+| 4 | LFO1 Shape |  |
+| 5 | LFO2 Rate |  |
+| 6 | LFO2 Delay |  |
+| 7 | LFO2 Slew |  |
+| 8 | LFO2 Shape |  |
+| 9 | OSC1+2 Pit |  |
+| 10 | OSC1 Pitch |  |
+| 11 | OSC2 Pitch |  |
+| 12 | OSC1 PM Dep |  |
+| 13 | PWM Depth |  |
+| 14 | TMod Depth |  |
+| 15 | OSC2 PM Dep |  |
+| 16 | Porta Time |  |
+| 17 | VCF Freq |  |
+| 18 | VCF Res |  |
+| 19 | VCF Env |  |
+| 20 | VCF LFO |  |
+| 21 | Env Rates |  |
+| 22 | All Attack |  |
+| 23 | All Decay |  |
+| 24 | All Sus |  |
+| 25 | All Rel |  |
+| 26 | Env1 Rates |  |
+| 27 | Env2 Rates |  |
+| 28 | Env3 Rates |  |
+| 29 | Env1CurveS |  |
+| 30 | Env2CurveS |  |
+| 31 | Env3CurveS |  |
+| 32 | Env1 Attack |  |
+| 33 | Env1 Decay |  |
+| 34 | Env1 Sus |  |
+| 35 | Env1 Rel |  |
+| 36 | Env1 AtCur |  |
+| 37 | Env1 DcyCur |  |
+| 38 | Env1 SuSCur |  |
+| 39 | Env1 RelCur |  |
+| 40 | Env2 Attack |  |
+| 41 | Env2 Decay |  |
+| 42 | Env2 Sus |  |
+| 43 | Env2 Rel |  |
+| 44 | Env2 AtCur |  |
+| 45 | Env2 DcyCur |  |
+| 46 | Env2 SuSCur |  |
+| 47 | Env2 RelCur |  |
+| 48 | Env3 Attack |  |
+| 49 | Env3 Decay |  |
+| 50 | Env3 Sus |  |
+| 51 | Env3 Rel |  |
+| 52 | Env3 AtCur |  |
+| 53 | Env3 DcyCur |  |
+| 54 | Env3 SuSCur |  |
+| 55 | Env3 RelCur |  |
+| 56 | VCA All |  |
+| 57 | VCA Active |  |
+| 58 | VCA EnvDep |  |
+| 59 | Pan Spread |  |
+| 60 | VCA Pan |  |
+| 61 | OSC2 Lvl |  |
+| 62 | Noise Lvl |  |
+| 63 | HP Freq |  |
+| 64 | Uni Detune |  |
+| 65 | OSC Drift |  |
+| 66 | Param Drift |  |
+| 67 | Drift Rate |  |
+| 68 | Arp Gate |  |
+| 69 | Seq Slew |  |
+| 70 | Mod 1 Dep |  |
+| 71 | Mod 2 Dep |  |
+| 72 | Mod 3 Dep |  |
+| 73 | Mod 4 Dep |  |
+| 74 | Mod 5 Dep |  |
+| 75 | Mod 6 Dep |  |
+| 76 | Mod 7 Dep |  |
+| 77 | Mod 8 Dep |  |
+| 78 | Fx 1 Param 1 |  |
+| 79 | Fx 1 Param 2 |  |
+| 80 | Fx 1 Param 3 |  |
+| 81 | Fx 1 Param 4 |  |
+| 82 | Fx 1 Param 5 |  |
+| 83 | Fx 1 Param 6 |  |
+| 84 | Fx 1 Param 7 |  |
+| 85 | Fx 1 Param 8 |  |
+| 86 | Fx 1 Param 9 |  |
+| 87 | Fx 1 Param 10 |  |
+| 88 | Fx 1 Param 11 |  |
+| 89 | Fx 1 Param 12 |  |
+| 90 | Fx 2 Param 1 |  |
+| 91 | Fx 2 Param 2 |  |
+| 92 | Fx 2 Param 3 |  |
+| 93 | Fx 2 Param 4 |  |
+| 94 | Fx 2 Param 5 |  |
+| 95 | Fx 2 Param 6 |  |
+| 96 | Fx 2 Param 7 |  |
+| 97 | Fx 2 Param 8 |  |
+| 98 | Fx 2 Param 9 |  |
+| 99 | Fx 2 Param 10 |  |
+| 100 | Fx 2 Param 11 |  |
+| 101 | Fx 2 Param 12 |  |
+| 102 | Fx 3 Param 1 |  |
+| 103 | Fx 3 Param 2 |  |
+| 104 | Fx 3 Param 3 |  |
+| 105 | Fx 3 Param 4 |  |
+| 106 | Fx 3 Param 5 |  |
+| 107 | Fx 3 Param 6 |  |
+| 108 | Fx 3 Param 7 |  |
+| 109 | Fx 3 Param 8 |  |
+| 110 | Fx 3 Param 9 |  |
+| 111 | Fx 3 Param 10 |  |
+| 112 | Fx 3 Param 11 |  |
+| 113 | Fx 3 Param 12 |  |
+| 114 | Fx 4 Param 1 |  |
+| 115 | Fx 4 Param 2 |  |
+| 116 | Fx 4 Param 3 |  |
+| 117 | Fx 4 Param 4 |  |
+| 118 | Fx 4 Param 5 |  |
+| 119 | Fx 4 Param 6 |  |
+| 120 | Fx 4 Param 7 |  |
+| 121 | Fx 4 Param 8 |  |
+| 122 | Fx 4 Param 9 |  |
+| 123 | Fx 4 Param 10 |  |
+| 124 | Fx 4 Param 11 |  |
+| 125 | Fx 4 Param 12 |  |
+| 126 | Fx 1 Level |  |
+| 127 | Fx 2 Level |  |
+| 128 | Fx 3 Level |  |
+| 129 | Fx 4 Level |  |
+
+<a id="fx_type-fw10"></a>
+
+#### FX Type (firmware 1.0)
+
+Firmware 1.0.
+
+Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual.
+
+> Unconfirmed. This mapping is inferred and needs checking against hardware.
+
+| Value | Name | Notes |
+|---|---|---|
+| 0 | TC-DeepVRB | TC Deep Reverb (Reverb) |
+| 1 | AmbVerb | Ambient Reverb (Reverb) |
+| 2 | RoomRev | Room Reverb (Reverb) |
+| 3 | VintageRev | Vintage Room Reverb (Reverb) |
+| 4 | HallRev | Hall Reverb (Reverb) |
+| 5 | ChamberRev | Chamber Reverb (Reverb) |
+| 6 | PlateRev | Plate Reverb (Reverb) |
+| 7 | RichPltRev | Rich Plate Reverb (Reverb) |
+| 8 | GatedRev | Gated Reverb (Reverb) |
+| 9 | Reverse | Reverse Reverb (Reverb) |
+| 10 | ChorusVerb | Chorus and Reverb (Reverb) |
+| 11 | DelayVerb | Delay and Reverb (Reverb) |
+| 12 | FlangVerb | Flange and Reverb (Reverb) |
+| 13 | MidasEQ | Midas Equaliser (Processing) |
+| 14 | Enhancer | Enhancer (Processing) |
+| 15 | FairComp | Fair Compressor (Processing) |
+| 16 | MulBndDist | Multi-Band Distortion (Processing) |
+| 17 | RackAmp | Rack Amplifier (Processing) |
+| 18 | EdisonEX1 | Stereo Imaging (Processing) |
+| 19 | Auto Pan | Auto-Panning (Processing) |
+| 20 | NoiseGate | Noise Gate (Processing) |
+| 21 | Delay | Delay (Delay) |
+| 22 | 3TapDelay | 3-Tap Delay (Delay) |
+| 23 | 4TapDelay | 4-Tap Delay (Delay) |
+| 24 | T-RayDelay | Tel-Ray Delay (Delay) |
+| 25 | DecimDelay | Decimator Delay (Delay) |
+| 26 | ModDlyRev | Mod, Delay and Reverb (Delay) |
+| 27 | Chorus | Chorus (Creative) |
+| 28 | Chorus-D | Chorus D (Creative) |
+| 29 | Flanger | Flanger (Creative) |
+| 30 | Phaser | Phaser (Creative) |
+| 31 | MoodFilter | Mood Filter (Creative) |
+| 32 | DualPitch | Dual Pitch Shifter (Creative) |
+| 33 | RotarySpkr | Rotary Speaker (Creative) |
 
 <!-- /generated:value-tables -->
 

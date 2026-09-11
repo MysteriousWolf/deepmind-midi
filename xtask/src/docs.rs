@@ -51,6 +51,7 @@ pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
         ("structure", render_structure(&spec, &diagrams)?),
         ("messages", render_messages(&spec)),
         ("parameters", render_parameters(&spec)),
+        ("firmware", render_firmware(&spec)),
         ("value-tables", render_value_tables(&spec)),
         ("globals", render_globals(&spec)),
         ("controllers", render_controllers(&spec)),
@@ -277,14 +278,49 @@ fn render_parameters(spec: &Spec) -> String {
     out
 }
 
+/// Renders the firmware list and what each version changed.
+fn render_firmware(spec: &Spec) -> String {
+    let default = spec.default_firmware();
+    let mut out = String::from("| Version | Notes |\n|---|---|\n");
+    for firmware in &spec.firmwares {
+        let marker = if firmware.version == default {
+            " (assumed by default)"
+        } else {
+            ""
+        };
+        let _ = writeln!(
+            out,
+            "| {}{marker} | {} |",
+            cell(&firmware.version),
+            cell(firmware.note.as_deref().unwrap_or(""))
+        );
+    }
+    out
+}
+
+/// Anchor for a value table, kept unique when firmware split it in two.
+fn table_anchor(table: &crate::spec::ValueTable, default: &str) -> String {
+    match &table.firmware {
+        Some(range) if !crate::spec::Firmware::range_covers(Some(range), default) => {
+            format!("{}-fw{}", table.id, range.replace(['.', '+'], ""))
+        }
+        _ => table.id.clone(),
+    }
+}
+
 fn render_value_tables(spec: &Spec) -> String {
+    let default = spec.default_firmware();
     let mut out = String::new();
     for table in &spec.tables {
         let _ = write!(
             out,
             "\n<a id=\"{}\"></a>\n\n#### {}\n\n",
-            table.id, table.name
+            table_anchor(table, default),
+            table.name
         );
+        if let Some(range) = &table.firmware {
+            let _ = write!(out, "Firmware {range}.\n\n");
+        }
         if let Some(note) = &table.note {
             let _ = write!(out, "{note}\n\n");
         }
