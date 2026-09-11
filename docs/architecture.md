@@ -211,22 +211,48 @@ repository holds a small synthetic fixture plus expected checksums.
 `YY.RELEASE.PATCH`: `26.1.0` is the first release of 2026, `26.1.1` its first
 patch, `26.2.0` the second release of the year. The year rolls over on its own.
 
-Releasing is one click in the Actions tab. The workflow verifies the build,
-bumps the version, tags, writes release notes, and publishes. Both of its
-secrets are optional: without `CARGO_REGISTRY_TOKEN` it skips the crates.io
-publish, without `ANTHROPIC_API_KEY` it ships GitHub's generated notes without a
-prose summary on top. Either way it warns and carries on rather than failing
-halfway through a release.
+**A human owns the version.** Nothing bumps it automatically. What keeps it from
+going stale is a CI check: `cargo xtask version --check` fails when the version
+in `Cargo.toml` is not ahead of the newest release tag, so the first pull request
+merged after a release has to move it. `cargo xtask release --bump patch` makes
+that edit locally, and never runs in CI.
+
+The alternative, having the release workflow bump and commit, means the version
+in the tree is a lie between releases and the workflow needs write access to the
+default branch. This way the tree always states the version it will release next,
+and the release job only reads.
+
+Releasing is one click in the Actions tab. The workflow verifies the build, reads
+the version, refuses to proceed if that tag already exists, then tags, releases
+and publishes. Release notes come from GitHub's own generator, categorised by
+label through `.github/release.yml`; an optional opening paragraph is written by
+a small model on GitHub Models using the built-in token, and any failure there
+leaves the generated notes untouched. `CARGO_REGISTRY_TOKEN` is optional: without
+it the crates.io publish is skipped with a warning rather than failing the run.
 
 ## Roadmap
 
 | Step | Contents |
 |---|---|
 | 1 | Workspace, CI, lint policy, the specification, generation and release tooling |
-| 2 | `wire` and `sysex`: framing, packed MS-bit codec, typed messages |
-| 3 | `param`: code generated from `spec/`, typed values |
-| 4 | `program`: decode and encode, `.syx` import and export |
-| 5 | `device`: the state machine, events, timeouts, provenance |
-| 6 | `transport`: the blocking adapter |
-| 7 | `deepmind-cli` |
-| 8 | Per-effect parameter names, from section 9 of the manual |
+| 2 | **`spec/effects.toml`: per-effect parameter names.** See below |
+| 3 | `wire` and `sysex`: framing, packed MS-bit codec, typed messages |
+| 4 | `param`: code generated from `spec/`, typed values |
+| 5 | `program`: decode and encode, `.syx` import and export |
+| 6 | `device`: the state machine, events, timeouts, provenance |
+| 7 | `transport`: the blocking adapter |
+| 8 | `deepmind-cli` |
+
+### Next: per-effect parameter names
+
+Each of the four FX slots has 12 raw parameters at offsets 167-178, 180-191,
+193-204 and 206-217. Their meaning depends on that slot's algorithm, so
+`FX 1 Param 3` is Size on a Room Reverb and something else on a Phaser. Without
+this table the FX section of a program is 48 unlabelled bytes, which defeats the
+point of a human-readable interface.
+
+Section 9.3 of the manual documents all 35 algorithms with a short reference, a
+full name, units, minimum, maximum, a description, and a marker for the ones that
+are also modulation destinations. Roughly 350 rows. It goes in
+`spec/effects.toml` keyed by FX type value, and the generator gains an effects
+section and per-slot parameter labelling.

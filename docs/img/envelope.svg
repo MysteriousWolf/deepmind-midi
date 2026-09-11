@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" width="720" height="300"
+     font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" role="img"
+     aria-label="ADSR envelope showing attack, decay, sustain and release segments with their curve controls">
+  <title>DeepMind envelope shape</title>
+
+  <!-- Axes. Mid grey reads on both light and dark backgrounds. -->
+  <g stroke="#8b8b8b" stroke-width="1" fill="none">
+    <path d="M60 30 L60 215"/>
+    <path d="M60 215 L690 215"/>
+  </g>
+  <g fill="#8b8b8b" font-size="11">
+    <text x="14" y="35">max</text>
+    <text x="22" y="219">0</text>
+    <text x="640" y="234">time</text>
+  </g>
+
+  <!-- Segment boundaries. -->
+  <g stroke="#8b8b8b" stroke-width="1" stroke-dasharray="2 4" opacity="0.6">
+    <path d="M190 30 L190 215"/>
+    <path d="M300 110 L300 215"/>
+    <path d="M480 110 L480 215"/>
+    <path d="M60 110 L300 110"/>
+  </g>
+
+  <!-- Alternative attack shapes, set by the attack curve parameter. -->
+  <g stroke="#c98a2e" stroke-width="1.5" fill="none" stroke-dasharray="5 4">
+    <path d="M60 215 Q60 30 190 30"/>
+    <path d="M60 215 Q190 215 190 30"/>
+  </g>
+
+  <!-- The envelope itself. -->
+  <path d="M60 215 L190 30 L300 110 L480 110 L620 215"
+        stroke="#3b82c4" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+
+  <!-- Gate. -->
+  <g>
+    <path d="M60 262 L480 262" stroke="#6aa84f" stroke-width="3" fill="none"/>
+    <path d="M60 256 L60 268 M480 256 L480 268" stroke="#6aa84f" stroke-width="2"/>
+    <text x="240" y="282" fill="#6aa84f" font-size="11" text-anchor="middle">key held</text>
+  </g>
+
+  <!-- Segment labels with their offsets in the VCA envelope block. -->
+  <g fill="#8b8b8b" text-anchor="middle" font-size="11">
+    <text x="125" y="245">attack</text>
+    <text x="125" y="258" font-size="10">53 / 58</text>
+    <text x="245" y="245">decay</text>
+    <text x="245" y="258" font-size="10">54 / 59</text>
+    <text x="390" y="130">sustain</text>
+    <text x="390" y="143" font-size="10">55 / 60</text>
+    <text x="550" y="245">release</text>
+    <text x="550" y="258" font-size="10">56 / 61</text>
+  </g>
+
+  <text x="700" y="46" fill="#c98a2e" font-size="11" text-anchor="end">
+    dashed: the same attack at two curve settings
+  </text>
+</svg>

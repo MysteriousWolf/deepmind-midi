@@ -45,6 +45,7 @@ pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
 
     let mut updated = current.clone();
     for (marker, body) in [
+        ("structure", render_structure(&spec)?),
         ("messages", render_messages(&spec)),
         ("parameters", render_parameters(&spec)),
         ("value-tables", render_value_tables(&spec)),
@@ -88,6 +89,120 @@ fn splice(document: &str, marker: &str, body: &str) -> Result<String, String> {
 /// Escapes the characters that would otherwise break out of a table cell.
 fn cell(text: &str) -> String {
     text.replace('|', "\\|").replace('\n', " ")
+}
+
+/// Renders the voice signal path and the modulation matrix as Mermaid diagrams.
+///
+/// Offset ranges and table sizes come from the spec rather than being written
+/// out, so the diagrams cannot drift from the parameter table.
+///
+/// # Errors
+///
+/// Returns a message when a group named in the signal path has no parameters, or
+/// when a value table the diagram counts is missing.
+fn render_structure(spec: &Spec) -> Result<String, String> {
+    let range = |group: &str| -> Result<String, String> {
+        let offsets: Vec<u16> = spec
+            .parameters
+            .iter()
+            .filter(|p| p.group == group)
+            .map(|p| p.offset)
+            .collect();
+        match (offsets.first(), offsets.last()) {
+            (Some(first), Some(last)) => Ok(format!("{first}-{last}")),
+            _ => Err(format!("no parameters in group {group}")),
+        }
+    };
+    let size = |id: &str| -> Result<usize, String> {
+        // Value 0 is Off in both routing tables, so it is not a choice.
+        Ok(spec
+            .table(id)
+            .ok_or_else(|| format!("missing value table {id}"))?
+            .entries
+            .len()
+            - 1)
+    };
+
+    let mut out = String::from(
+        "### Voice signal path\n\nEach block is a parameter group, labelled with its offsets.\n\n```mermaid\nflowchart LR\n",
+    );
+    for (id, label, group) in [
+        ("OSC", "OSC 1 + OSC 2<br>noise", "Oscillators"),
+        ("VCF", "VCF<br>low pass + high pass", "VCF"),
+        ("VCA", "VCA", "VCA"),
+        ("FX", "FX<br>4 slots", "Effects"),
+    ] {
+        let _ = writeln!(
+            out,
+            "    {id}[\"{label}<br><small>{}</small>\"]",
+            range(group)?
+        );
+    }
+    out.push_str("    OUT([output])\n");
+    out.push_str("    OSC --> VCF --> VCA --> FX --> OUT\n\n");
+    for (id, label, group) in [
+        ("VCAENV", "VCA envelope", "VCA Envelope"),
+        ("VCFENV", "VCF envelope", "VCF Envelope"),
+        ("MODENV", "mod envelope", "Mod Envelope"),
+        ("LFO1", "LFO 1", "LFO 1"),
+        ("LFO2", "LFO 2", "LFO 2"),
+        ("SEQ", "control sequencer", "Control Sequencer"),
+    ] {
+        let _ = writeln!(
+            out,
+            "    {id}(\"{label}<br><small>{}</small>\")",
+            range(group)?
+        );
+    }
+    out.push_str("    VCAENV -.-> VCA\n    VCFENV -.-> VCF\n");
+    let _ = writeln!(
+        out,
+        "    MODENV -.-> MOD\n    LFO1 -.-> MOD\n    LFO2 -.-> MOD\n    SEQ -.-> MOD"
+    );
+    let _ = writeln!(
+        out,
+        "    MOD{{{{\"mod matrix<br>8 busses<br><small>{}</small>\"}}}}",
+        range("Mod Matrix")?
+    );
+    out.push_str("    MOD -.-> OSC\n    MOD -.-> VCF\n    MOD -.-> VCA\n    MOD -.-> FX\n```\n\n");
+    out.push_str("Solid arrows carry audio, dashed arrows carry modulation.\n\n");
+
+    out.push_str("### Modulation matrix\n\n");
+    let _ = writeln!(
+        out,
+        "Eight independent busses, each a source, a destination and a signed depth. \
+         {} sources and {} destinations give {} routings per bus.\n",
+        size("mod_source")?,
+        size("mod_destination")?,
+        size("mod_source")? * size("mod_destination")?
+    );
+    out.push_str("```mermaid\nflowchart LR\n    SRC[\"source<br><small>0 = off</small>\"] --> DEPTH[\"depth<br><small>-128 to +127</small>\"] --> DST[\"destination<br><small>0 = off</small>\"]\n```\n\n");
+    let mut busses = spec
+        .parameters
+        .iter()
+        .filter(|p| p.group == "Mod Matrix")
+        .map(|p| p.offset);
+    let first = busses.next().unwrap_or(0);
+    let _ = writeln!(
+        out,
+        "Bus *n* occupies three consecutive offsets starting at {}: source, destination, \
+         depth. So bus 1 is {first}, {}, {}, and bus 8 is {}, {}, {}.",
+        first,
+        first + 1,
+        first + 2,
+        first + 21,
+        first + 22,
+        first + 23
+    );
+
+    out.push_str("\n### Envelopes\n\nThree identical envelopes: VCA, VCF and mod. Each has the four familiar \
+        stages plus a curve control per stage, which bends the segment between \
+        linear and exponential.\n\n![Envelope shape, showing the four stages and the effect of the attack curve control](img/envelope.svg)\n\n\
+        The offsets under each stage are the time or level first, then its curve. \
+        The numbers shown are the VCA envelope; the VCF envelope repeats the same \
+        layout nine offsets later, and the mod envelope nine after that.\n");
+
+    Ok(out)
 }
 
 fn render_messages(spec: &Spec) -> String {

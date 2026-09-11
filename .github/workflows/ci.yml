@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # check_ahead_of_tags reads release tags from the local checkout.
+          fetch-depth: 0
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -33,6 +36,10 @@ jobs:
 
       - name: Generated documentation is current
         run: cargo xtask docs --check
+
+      # The first change merged after a release has to move the version.
+      - name: Version is ahead of the last release
+        run: cargo xtask version --check
 
   features:
     name: feature combinations

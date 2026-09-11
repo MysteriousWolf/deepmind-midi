@@ -10,6 +10,7 @@ change the spec and run `cargo xtask docs`.
 
 ## Contents
 
+- [Synth structure](#synth-structure)
 - [Addressing](#addressing)
 - [Packed MS-bit encoding](#packed-ms-bit-encoding)
 - [SysEx messages](#sysex-messages)
@@ -21,6 +22,68 @@ change the spec and run `cargo xtask docs`.
 - [Global settings](#global-settings)
 - [Corrections to the manual](#corrections-to-the-manual)
 - [Open questions](#open-questions)
+
+## Synth structure
+
+Where the parameters sit in the instrument, so an offset means something before
+you reach for the tables.
+
+<!-- generated:structure -->
+
+### Voice signal path
+
+Each block is a parameter group, labelled with its offsets.
+
+```mermaid
+flowchart LR
+    OSC["OSC 1 + OSC 2<br>noise<br><small>14-38</small>"]
+    VCF["VCF<br>low pass + high pass<br><small>39-52</small>"]
+    VCA["VCA<br><small>80-83</small>"]
+    FX["FX<br>4 slots<br><small>165-222</small>"]
+    OUT([output])
+    OSC --> VCF --> VCA --> FX --> OUT
+
+    VCAENV("VCA envelope<br><small>53-61</small>")
+    VCFENV("VCF envelope<br><small>62-70</small>")
+    MODENV("mod envelope<br><small>71-79</small>")
+    LFO1("LFO 1<br><small>0-6</small>")
+    LFO2("LFO 2<br><small>7-13</small>")
+    SEQ("control sequencer<br><small>117-154</small>")
+    VCAENV -.-> VCA
+    VCFENV -.-> VCF
+    MODENV -.-> MOD
+    LFO1 -.-> MOD
+    LFO2 -.-> MOD
+    SEQ -.-> MOD
+    MOD{{"mod matrix<br>8 busses<br><small>93-116</small>"}}
+    MOD -.-> OSC
+    MOD -.-> VCF
+    MOD -.-> VCA
+    MOD -.-> FX
+```
+
+Solid arrows carry audio, dashed arrows carry modulation.
+
+### Modulation matrix
+
+Eight independent busses, each a source, a destination and a signed depth. 24 sources and 132 destinations give 3168 routings per bus.
+
+```mermaid
+flowchart LR
+    SRC["source<br><small>0 = off</small>"] --> DEPTH["depth<br><small>-128 to +127</small>"] --> DST["destination<br><small>0 = off</small>"]
+```
+
+Bus *n* occupies three consecutive offsets starting at 93: source, destination, depth. So bus 1 is 93, 94, 95, and bus 8 is 114, 115, 116.
+
+### Envelopes
+
+Three identical envelopes: VCA, VCF and mod. Each has the four familiar stages plus a curve control per stage, which bends the segment between linear and exponential.
+
+![Envelope shape, showing the four stages and the effect of the attack curve control](img/envelope.svg)
+
+The offsets under each stage are the time or level first, then its curve. The numbers shown are the VCA envelope; the VCF envelope repeats the same layout nine offsets later, and the mod envelope nine after that.
+
+<!-- /generated:structure -->
 
 ## Addressing
 
@@ -1161,8 +1224,11 @@ Things the manual does not answer and that need a hardware session to settle.
 - **Swing endpoints.** Offsets 120 and 163 are 0-255 parameters whose notes give
   the top of the range as 25, which looks like a dropped digit.
 - **Per-effect parameter meanings.** Each FX slot has 12 raw 0-255 parameters
-  whose meaning depends on the slot's algorithm. Section 9 of the manual
-  documents all 35, and transcribing them is tracked separately.
+  whose meaning depends on the slot's algorithm, so offsets 167-178, 180-191,
+  193-204 and 206-217 are 48 unlabelled bytes until this is filled in. Section
+  9.3 of the manual documents all 35 algorithms with units and ranges. This is
+  the next piece of work: it goes in `spec/effects.toml` and is tracked in
+  `docs/architecture.md`.
 
 ## Sources
 

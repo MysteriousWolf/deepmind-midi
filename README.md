@@ -20,7 +20,7 @@ layers are landing one at a time. Not yet usable.
 
 | Document | Contents |
 |---|---|
-| [`docs/midi-spec.md`](docs/midi-spec.md) | The protocol: SysEx, NRPN, all 242 parameters, value tables |
+| [`docs/midi-spec.md`](docs/midi-spec.md) | The protocol: signal path, SysEx, NRPN, all 242 parameters, value tables |
 | [`docs/architecture.md`](docs/architecture.md) | Design, layering, roadmap |
 | `cargo doc --open` | API reference |
 
@@ -55,9 +55,18 @@ Editing a spec file without regenerating fails `cargo test`.
 
 ## Releasing
 
-Actions tab, Release workflow, pick `patch` or `release`. Versions are
-`YY.RELEASE.PATCH`, so `26.1.0` is the first release of 2026 and `26.1.1` its
-first patch. `Cargo.toml` is the only place the version lives.
+The version lives in `Cargo.toml` and a human bumps it, in a pull request:
+
+```sh
+cargo xtask release --bump patch     # 26.1.0 -> 26.1.1
+cargo xtask release --bump release   # 26.1.3 -> 26.2.0, or 27.1.0 in a new year
+```
+
+CI fails any pull request whose version is not ahead of the newest release tag,
+so the first one merged after a release has to move it.
+
+Releasing is then one click: Actions tab, Release workflow. It tags and publishes
+whatever `Cargo.toml` holds.
 
 ## License
 

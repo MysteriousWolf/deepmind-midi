@@ -1,10 +1,16 @@
-//! Version bumping for the release workflow.
+//! The workspace version, and the check that keeps it moving.
 //!
-//! The workspace `Cargo.toml` is the single source of truth for the version.
-//! Versions are calendar-flavoured: `YY.RELEASE.PATCH`, where `YY` is the
-//! two-digit year, `RELEASE` counts releases within that year from 1, and
-//! `PATCH` counts patches to that release from 0. So `26.1.0` is the first
-//! release of 2026 and `26.1.1` its first patch.
+//! The workspace `Cargo.toml` is the single source of truth for the version, and
+//! a human owns it. Nothing bumps it automatically. Versions are calendar
+//! flavoured: `YY.RELEASE.PATCH`, where `YY` is the two-digit year, `RELEASE`
+//! counts releases within that year from 1, and `PATCH` counts patches to that
+//! release from 0. So `26.1.0` is the first release of 2026 and `26.1.1` its
+//! first patch.
+//!
+//! [`check_ahead_of_tags`] is what stops the version going stale: it fails when
+//! `Cargo.toml` is not ahead of the newest release tag, so the first pull
+//! request merged after a release has to move it. `cargo xtask release --bump`
+//! exists to do that edit locally; it is never run in CI.
 
 use std::path::Path;
 
@@ -18,7 +24,7 @@ pub enum Bump {
 }
 
 /// A parsed `YY.RELEASE.PATCH` version.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
     /// Two-digit year.
     pub year: u16,
@@ -123,6 +129,56 @@ fn version_line(text: &str) -> Option<&str> {
         .find_map(|line| line.strip_prefix("version = \"")?.strip_suffix('"'))
 }
 
+/// Fails when the workspace version is not ahead of the newest release tag.
+///
+/// Tags are read from the local checkout, so CI has to fetch them. A repository
+/// with no release tags yet passes: there is nothing to be behind.
+///
+/// # Errors
+///
+/// Returns a message when the version cannot be read, when `git` cannot be run,
+/// or when the version is not greater than the newest tag.
+pub fn check_ahead_of_tags(root: &Path) -> Result<(), String> {
+    let version = current(root)?;
+    let Some(latest) = latest_tag(root)? else {
+        println!("{version} (no release tags yet)");
+        return Ok(());
+    };
+
+    if version > latest {
+        println!("{version} is ahead of the last release, v{latest}");
+        return Ok(());
+    }
+    Err(format!(
+        "Cargo.toml is at {version} but v{latest} is already released. Bump the \
+         workspace version before merging: `cargo xtask release --bump patch` for \
+         a patch, or `--bump release` to start a new release."
+    ))
+}
+
+/// Returns the highest `vYY.RELEASE.PATCH` tag in the checkout, if any.
+///
+/// Tags that do not parse are ignored rather than failing the check, so a stray
+/// tag cannot block every pull request.
+fn latest_tag(root: &Path) -> Result<Option<Version>, String> {
+    let output = std::process::Command::new("git")
+        .args(["tag", "--list", "v*"])
+        .current_dir(root)
+        .output()
+        .map_err(|e| format!("could not run git: {e}"))?;
+    if !output.status.success() {
+        return Err(format!(
+            "git tag failed: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
+    }
+
+    Ok(String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .filter_map(|line| Version::parse(line.trim().strip_prefix('v')?).ok())
+        .max())
+}
+
 /// Returns the current two-digit year from the system clock (UTC).
 #[must_use]
 pub fn current_year() -> u16 {
@@ -170,6 +226,15 @@ mod tests {
         assert_eq!(v.next(Bump::Release, 27).to_string(), "27.1.0");
         // A patch in a new year still belongs to the old release.
         assert_eq!(v.next(Bump::Patch, 27).to_string(), "26.4.3");
+    }
+
+    #[test]
+    fn versions_order_by_year_then_release_then_patch() {
+        let parse = |text: &str| Version::parse(text).expect("valid version");
+        assert!(parse("26.1.1") > parse("26.1.0"));
+        assert!(parse("26.2.0") > parse("26.1.9"));
+        assert!(parse("27.1.0") > parse("26.9.9"));
+        assert!(parse("26.1.0") == parse("26.1.0"));
     }
 
     #[test]

@@ -3,7 +3,8 @@
 //! ```text
 //! cargo xtask docs [--check]        regenerate docs/midi-spec.md, or verify it
 //! cargo xtask hooks install        install a pre-commit hook that regenerates
-//! cargo xtask version              print the current workspace version
+//! cargo xtask version [--check]    print the workspace version, or verify it is
+//!                                  ahead of the newest release tag
 //! cargo xtask release --bump KIND  bump the workspace version (release|patch)
 //! ```
 //!
@@ -31,7 +32,7 @@ fn main() -> ExitCode {
         }
         "docs" => docs_command(flags.iter().any(|f| f == "--check")),
         "hooks" => hooks_command(flags),
-        "version" => version_command(),
+        "version" => version_command(flags.iter().any(|f| f == "--check")),
         "release" => release_command(flags),
         other => Err(format!("unknown command: {other}")),
     };
@@ -53,8 +54,11 @@ fn usage() {
     println!("                         report whether it is current without writing");
     println!("  hooks install          install a pre-commit hook that regenerates the");
     println!("                         documentation and stages it before each commit");
-    println!("  version                print the current workspace version");
-    println!("  release --bump KIND    bump the workspace version, KIND is release or patch");
+    println!("  version [--check]      print the workspace version, or verify it is ahead");
+    println!("                         of the newest release tag and fail if it is not");
+    println!("  release --bump KIND    bump the workspace version locally, KIND is");
+    println!("                         release or patch. Never run in CI: a human owns");
+    println!("                         the version");
     println!("  help                   show this message");
 }
 
@@ -127,8 +131,12 @@ fn hooks_command(flags: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-fn version_command() -> Result<(), String> {
-    println!("{}", release::current(&root())?);
+fn version_command(check: bool) -> Result<(), String> {
+    let root = root();
+    if check {
+        return release::check_ahead_of_tags(&root);
+    }
+    println!("{}", release::current(&root)?);
     Ok(())
 }
 
@@ -153,14 +161,6 @@ fn release_command(flags: &[String]) -> Result<(), String> {
     let next = current.next(bump, release::current_year());
     release::write(&root, next)?;
     println!("{current} -> {next}");
-    // Consumed by the release workflow to tag and name the release.
-    if let Ok(output) = std::env::var("GITHUB_OUTPUT") {
-        use std::io::Write as _;
-        let mut file = std::fs::OpenOptions::new()
-            .append(true)
-            .open(output)
-            .map_err(|e| format!("GITHUB_OUTPUT: {e}"))?;
-        writeln!(file, "version={next}").map_err(|e| format!("GITHUB_OUTPUT: {e}"))?;
-    }
+    println!("Commit the change; the release workflow reads the version from Cargo.toml.");
     Ok(())
 }
