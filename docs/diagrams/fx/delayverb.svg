@@ -7,10 +7,12 @@
   <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">TIM</text>
   <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="13.50" cy="26.35" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="13.50" y1="25.16" x2="13.50" y2="21.71" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#8c8c8c">Time</text>
   <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">PAT</text>
   <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="33.50" cy="26.35" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="33.50" y1="25.16" x2="33.50" y2="21.71" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <line x1="30.99" y1="28.86" x2="29.93" y2="29.92" stroke="#0059e9" stroke-width="0.7" stroke-linecap="round"/>
   <line x1="36.01" y1="28.86" x2="37.07" y2="29.92" stroke="#0059e9" stroke-width="0.7" stroke-linecap="round"/>
   <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#8c8c8c">Delay</text>
@@ -18,50 +20,60 @@
   <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">FHC</text>
   <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="53.50" cy="26.35" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="53.50" y1="25.16" x2="53.50" y2="21.71" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="59.76" cy="19.40" r="0.9" fill="#0059e9"/>
   <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#8c8c8c">Feedback</text>
   <text x="53.50" y="41.10" font-size="3" text-anchor="middle" fill="#8c8c8c">High Cut</text>
   <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">FBK</text>
   <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="73.50" cy="26.35" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="73.50" y1="25.16" x2="73.50" y2="21.71" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="79.76" cy="19.40" r="0.9" fill="#0059e9"/>
   <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#8c8c8c">Feedback</text>
   <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">XFD</text>
   <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="93.50" cy="26.35" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="93.50" y1="25.16" x2="93.50" y2="21.71" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="99.76" cy="19.40" r="0.9" fill="#0059e9"/>
   <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#8c8c8c" textLength="17.0" lengthAdjust="spacingAndGlyphs">Cross-Feedback</text>
   <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">BAL</text>
   <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="113.50" cy="26.35" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="113.50" y1="25.16" x2="113.50" y2="21.71" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="119.76" cy="19.40" r="0.9" fill="#0059e9"/>
   <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#8c8c8c">Balance</text>
   <text x="13.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">PRE</text>
   <path d="M 8.02 61.53 A 7.75 7.75 0 1 1 18.98 61.53" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="13.50" cy="56.05" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="13.50" y1="54.86" x2="13.50" y2="51.41" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <text x="13.50" y="66.60" font-size="3" text-anchor="middle" fill="#8c8c8c">Pre-Delay</text>
   <text x="33.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">DCY</text>
   <path d="M 28.02 61.53 A 7.75 7.75 0 1 1 38.98 61.53" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="33.50" cy="56.05" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="33.50" y1="54.86" x2="33.50" y2="51.41" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="39.76" cy="49.10" r="0.9" fill="#0059e9"/>
   <text x="33.50" y="66.60" font-size="3" text-anchor="middle" fill="#8c8c8c">Decay</text>
   <text x="53.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">SIZ</text>
   <path d="M 48.02 61.53 A 7.75 7.75 0 1 1 58.98 61.53" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="53.50" cy="56.05" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="53.50" y1="54.86" x2="53.50" y2="51.41" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <text x="53.50" y="66.60" font-size="3" text-anchor="middle" fill="#8c8c8c">Size</text>
   <text x="73.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">DMP</text>
   <path d="M 68.02 61.53 A 7.75 7.75 0 1 1 78.98 61.53" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="73.50" cy="56.05" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="73.50" y1="54.86" x2="73.50" y2="51.41" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="79.76" cy="49.10" r="0.9" fill="#0059e9"/>
   <text x="73.50" y="66.60" font-size="3" text-anchor="middle" fill="#8c8c8c">Damping</text>
   <text x="93.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">LC</text>
   <path d="M 88.02 61.53 A 7.75 7.75 0 1 1 98.98 61.53" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="93.50" cy="56.05" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="93.50" y1="54.86" x2="93.50" y2="51.41" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="99.76" cy="49.10" r="0.9" fill="#0059e9"/>
   <text x="93.50" y="66.60" font-size="3" text-anchor="middle" fill="#8c8c8c">Low Cut</text>
   <text x="113.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">MIX</text>
   <path d="M 108.02 61.53 A 7.75 7.75 0 1 1 118.98 61.53" fill="none" stroke="#8c8c8c" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="113.50" cy="56.05" r="5.95" fill="#5d5f5f" stroke="#959797" stroke-width="0.6"/>
+  <line x1="113.50" y1="54.86" x2="113.50" y2="51.41" stroke="#959797" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="119.76" cy="49.10" r="0.9" fill="#0059e9"/>
   <text x="113.50" y="66.60" font-size="3" text-anchor="middle" fill="#8c8c8c">Mix</text>
 </svg>

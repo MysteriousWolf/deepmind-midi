@@ -574,8 +574,10 @@ fn render_grid(spec: &Spec) -> String {
          the synthesizer has room for a three-letter label and these have room for the \
          parameter's name. Everything across a row is as measured. The shape at each \
          position is not: the FX page draws every slot as a circle, and the drawings \
-         use what the effect's own panel uses instead.\n",
-        grid.row_pitch
+         use what the effect's own panel uses instead. Every handle is drawn at the \
+         {}.\n",
+        grid.row_pitch,
+        fx::handle_note(),
     );
     out
 }

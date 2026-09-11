@@ -6,10 +6,8 @@
 //! `effects.toml` and `panels.toml`. Nothing here is drawn by hand, so a
 //! correction to the specification redraws all 35.
 //!
-//! The drawing is a map of the page, not a snapshot of a patch. Control
-//! positions are deliberately absent: the specification has no default value
-//! for an effect parameter, and a pointer sitting at some arbitrary angle would
-//! claim one.
+//! The drawing is a map of the page, not a snapshot of a patch. See `HANDLE`
+//! for what that means for where a control is drawn pointing.
 
 use std::fmt::Write as _;
 
@@ -35,6 +33,17 @@ const GAP: f32 = 3.0;
 /// Longest sweep an arc track covers, in degrees either side of straight up.
 const SWEEP: f32 = 135.0;
 
+/// Why every control is drawn at the middle of its travel.
+///
+/// The specification holds no default value for an effect parameter, so there
+/// is no position to draw. Leaving the handle off entirely was tried first and
+/// read badly: a fader without a cap is a line with ticks beside it, and the
+/// five fader panels came out looking like ladders. A handle at the middle is
+/// the one position that claims nothing, since it is the same for every slot on
+/// every page and so carries no information at all. The legend in
+/// `docs/effects.md` says so.
+const HANDLE: &str = "middle of travel, which carries no meaning";
+
 /// One effect's drawing.
 #[derive(Debug)]
 pub struct Drawing {
@@ -44,6 +53,12 @@ pub struct Drawing {
     pub title: String,
     /// The SVG document.
     pub source: String,
+}
+
+/// Returns the note the generated legend prints about handle positions.
+#[must_use]
+pub fn handle_note() -> &'static str {
+    HANDLE
 }
 
 /// Draws every effect.
@@ -262,6 +277,15 @@ fn knob(cx: f32, cy: f32, radius: f32, count: usize, colours: &Palette) -> Strin
         colours.cap,
         colours.edge,
     );
+    // The pointer, at the middle of the travel. See `HANDLE`.
+    let (px, py) = point(cx, cy, radius * 0.78, 0.0);
+    let _ = write!(
+        out,
+        "\n  <line x1=\"{cx:.2}\" y1=\"{:.2}\" x2=\"{px:.2}\" y2=\"{py:.2}\" \
+         stroke=\"{}\" stroke-width=\"0.8\" stroke-linecap=\"round\"/>",
+        cy - radius * 0.2,
+        colours.edge,
+    );
     for index in 0..count {
         let fraction = if count == 1 {
             0.5
@@ -287,44 +311,71 @@ fn knob(cx: f32, cy: f32, radius: f32, count: usize, colours: &Palette) -> Strin
 /// so the rungs are the travel here too. Marked positions replace them, in the
 /// accent colour, which keeps a switch and a selector readable at this size.
 fn fader(cx: f32, cy: f32, radius: f32, count: usize, colours: &Palette) -> String {
-    let half = radius * 1.15;
+    // The same vertical extent as a knob, so a page of faders and a page of
+    // knobs sit on the same grid and their labels start at the same height.
+    let half = radius;
     let slot = 0.9;
-    let reach = radius * 1.0;
+    let tick_in = 3.0;
+    let tick_out = radius * 0.88;
+
     let mut out = format!(
         "\n  <rect x=\"{:.2}\" y=\"{:.2}\" width=\"{slot:.2}\" height=\"{:.2}\" \
-         rx=\"{:.2}\" fill=\"{}\" stroke=\"{}\" stroke-width=\"0.3\"/>",
+         rx=\"{:.2}\" fill=\"{}\"/>",
         cx - slot / 2.0,
         cy - half,
         half * 2.0,
         slot / 2.0,
-        colours.cap,
         colours.edge,
     );
-    let rungs = if count == 0 { 7 } else { count };
-    let colour = if count == 0 {
-        &colours.faint
+
+    // A continuous fader gets a plain scale; a switch or a selector gets one
+    // mark per position, in the accent colour and reaching further, so marked
+    // positions are not mistaken for scale divisions. No panel that uses faders
+    // has a switch on it today, so only the first branch is exercised.
+    let (steps, colour, width, out_x) = if count == 0 {
+        (5, &colours.faint, 0.4, tick_out)
     } else {
-        &colours.accent
+        (count, &colours.accent, 0.6, tick_out * 1.15)
     };
-    for index in 0..rungs {
-        let fraction = if rungs == 1 {
+    for index in 0..steps {
+        let fraction = if steps == 1 {
             0.5
         } else {
-            units(index) / units(rungs - 1)
+            units(index) / units(steps - 1)
         };
         let y = cy + half - fraction * half * 2.0;
         let _ = write!(
             out,
             "\n  <line x1=\"{:.2}\" y1=\"{y:.2}\" x2=\"{:.2}\" y2=\"{y:.2}\" \
-             stroke=\"{colour}\" stroke-width=\"0.6\" stroke-linecap=\"round\"/>\
+             stroke=\"{colour}\" stroke-width=\"{width}\" stroke-linecap=\"round\"/>\
              \n  <line x1=\"{:.2}\" y1=\"{y:.2}\" x2=\"{:.2}\" y2=\"{y:.2}\" \
-             stroke=\"{colour}\" stroke-width=\"0.6\" stroke-linecap=\"round\"/>",
-            cx - reach,
-            cx - slot * 1.8,
-            cx + slot * 1.8,
-            cx + reach,
+             stroke=\"{colour}\" stroke-width=\"{width}\" stroke-linecap=\"round\"/>",
+            cx - out_x,
+            cx - tick_in,
+            cx + tick_in,
+            cx + out_x,
         );
     }
+
+    // The cap, at the middle of the travel. See `HANDLE`.
+    let cap_w = radius * 0.40;
+    let cap_h = 1.1;
+    let _ = write!(
+        out,
+        "\n  <rect x=\"{:.2}\" y=\"{:.2}\" width=\"{:.2}\" height=\"{:.2}\" rx=\"0.5\" \
+         fill=\"{}\" stroke=\"{}\" stroke-width=\"0.4\"/>\
+         \n  <line x1=\"{:.2}\" y1=\"{cy:.2}\" x2=\"{:.2}\" y2=\"{cy:.2}\" stroke=\"{}\" \
+         stroke-width=\"0.4\" stroke-linecap=\"round\"/>",
+        cx - cap_w,
+        cy - cap_h,
+        cap_w * 2.0,
+        cap_h * 2.0,
+        colours.cap,
+        colours.edge,
+        cx - cap_w * 0.55,
+        cx + cap_w * 0.55,
+        colours.edge,
+    );
     out
 }
 
@@ -438,7 +489,12 @@ fn draw_slot(
     });
 
     if parameter.mod_dest {
-        let (mx, my) = point(cx, cy, radius + 3.4, 42.0);
+        // Just clear of the control, wherever the control's own edge is.
+        let (mx, my) = match layout.control.as_str() {
+            "fader" => (cx + radius * 1.05, cy - radius * 0.92),
+            "display" => (cx + radius * 1.42, cy - radius * 0.8),
+            _ => point(cx, cy, radius + 3.4, 42.0),
+        };
         let _ = write!(
             out,
             "\n  <circle cx=\"{mx:.2}\" cy=\"{my:.2}\" r=\"0.9\" fill=\"{}\"/>",

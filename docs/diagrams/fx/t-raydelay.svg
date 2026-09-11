@@ -7,26 +7,31 @@
   <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">MIX</text>
   <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="13.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <line x1="13.50" y1="25.16" x2="13.50" y2="21.71" stroke="#161617" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="19.76" cy="19.40" r="0.9" fill="#ababab"/>
   <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Mix</text>
   <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">DLY</text>
   <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="33.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <line x1="33.50" y1="25.16" x2="33.50" y2="21.71" stroke="#161617" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="39.76" cy="19.40" r="0.9" fill="#ababab"/>
   <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Delay</text>
   <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">SUS</text>
   <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="53.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <line x1="53.50" y1="25.16" x2="53.50" y2="21.71" stroke="#161617" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="59.76" cy="19.40" r="0.9" fill="#ababab"/>
   <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Sustain</text>
   <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">WOB</text>
   <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="73.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <line x1="73.50" y1="25.16" x2="73.50" y2="21.71" stroke="#161617" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="79.76" cy="19.40" r="0.9" fill="#ababab"/>
   <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Wobble</text>
   <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">TON</text>
   <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="93.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <line x1="93.50" y1="25.16" x2="93.50" y2="21.71" stroke="#161617" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="99.76" cy="19.40" r="0.9" fill="#ababab"/>
   <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Tone</text>
 </svg>

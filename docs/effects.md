@@ -63,8 +63,12 @@ The drawings say what is on the page, not what a patch sounds like:
 | Text above | The short name, exactly as the synthesizer's display shows it |
 | Text below | The same parameter written out, expanded by this project |
 
-No control has a position. The specification holds no default value for an
-effect parameter, so a pointer or a fader cap would be claiming one.
+Every handle sits at the middle of its travel, and that means nothing. The
+specification holds no default value for an effect parameter, so there is no
+position to draw; the middle is the one choice that carries no information,
+since it is the same for every slot on every page. Leaving the handle off
+entirely was tried first and read badly - a fader without a cap is a line with
+ticks beside it.
 
 <!-- generated:grid -->
 
@@ -81,7 +85,7 @@ effect parameter, so a pointer or a fader cap would be claiming one.
 | Row pitch | 18.6 |
 | Control diameter | 11.9 |
 
-The drawings below space their rows further apart than 18.6 pixels, because the synthesizer has room for a three-letter label and these have room for the parameter's name. Everything across a row is as measured. The shape at each position is not: the FX page draws every slot as a circle, and the drawings use what the effect's own panel uses instead.
+The drawings below space their rows further apart than 18.6 pixels, because the synthesizer has room for a three-letter label and these have room for the parameter's name. Everything across a row is as measured. The shape at each position is not: the FX page draws every slot as a circle, and the drawings use what the effect's own panel uses instead. Every handle is drawn at the middle of travel, which carries no meaning.
 
 <!-- /generated:grid -->
 

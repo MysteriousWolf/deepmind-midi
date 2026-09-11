@@ -7,36 +7,43 @@
   <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#111111">THR</text>
   <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#797979" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="13.50" cy="26.35" r="5.95" fill="#a8a7a6" stroke="#6d6c6b" stroke-width="0.6"/>
+  <line x1="13.50" y1="25.16" x2="13.50" y2="21.71" stroke="#6d6c6b" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="19.76" cy="19.40" r="0.9" fill="#a42522"/>
   <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#797979">Threshold</text>
   <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#111111">RNG</text>
   <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#797979" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="33.50" cy="26.35" r="5.95" fill="#a8a7a6" stroke="#6d6c6b" stroke-width="0.6"/>
+  <line x1="33.50" y1="25.16" x2="33.50" y2="21.71" stroke="#6d6c6b" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="39.76" cy="19.40" r="0.9" fill="#a42522"/>
   <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#797979">Range</text>
   <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#111111">ATT</text>
   <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#797979" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="53.50" cy="26.35" r="5.95" fill="#a8a7a6" stroke="#6d6c6b" stroke-width="0.6"/>
+  <line x1="53.50" y1="25.16" x2="53.50" y2="21.71" stroke="#6d6c6b" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="59.76" cy="19.40" r="0.9" fill="#a42522"/>
   <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#797979">Attack</text>
   <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#111111">REL</text>
   <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#797979" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="73.50" cy="26.35" r="5.95" fill="#a8a7a6" stroke="#6d6c6b" stroke-width="0.6"/>
+  <line x1="73.50" y1="25.16" x2="73.50" y2="21.71" stroke="#6d6c6b" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="79.76" cy="19.40" r="0.9" fill="#a42522"/>
   <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#797979">Release</text>
   <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#111111">HLD</text>
   <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#797979" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="93.50" cy="26.35" r="5.95" fill="#a8a7a6" stroke="#6d6c6b" stroke-width="0.6"/>
+  <line x1="93.50" y1="25.16" x2="93.50" y2="21.71" stroke="#6d6c6b" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="99.76" cy="19.40" r="0.9" fill="#a42522"/>
   <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#797979">Hold</text>
   <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#111111">PUN</text>
   <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#797979" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="113.50" cy="26.35" r="5.95" fill="#a8a7a6" stroke="#6d6c6b" stroke-width="0.6"/>
+  <line x1="113.50" y1="25.16" x2="113.50" y2="21.71" stroke="#6d6c6b" stroke-width="0.8" stroke-linecap="round"/>
   <circle cx="119.76" cy="19.40" r="0.9" fill="#a42522"/>
   <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#797979">Punch</text>
   <text x="13.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#111111">MOD</text>
   <path d="M 8.02 57.33 A 7.75 7.75 0 1 1 18.98 57.33" fill="none" stroke="#797979" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="13.50" cy="51.85" r="5.95" fill="#a8a7a6" stroke="#6d6c6b" stroke-width="0.6"/>
+  <line x1="13.50" y1="50.66" x2="13.50" y2="47.21" stroke="#6d6c6b" stroke-width="0.8" stroke-linecap="round"/>
   <line x1="10.99" y1="54.36" x2="9.93" y2="55.42" stroke="#a42522" stroke-width="0.7" stroke-linecap="round"/>
   <line x1="13.50" y1="48.30" x2="13.50" y2="46.80" stroke="#a42522" stroke-width="0.7" stroke-linecap="round"/>
   <line x1="16.01" y1="54.36" x2="17.07" y2="55.42" stroke="#a42522" stroke-width="0.7" stroke-linecap="round"/>
@@ -44,5 +51,6 @@
   <text x="33.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#111111">PWR</text>
   <path d="M 28.02 57.33 A 7.75 7.75 0 1 1 38.98 57.33" fill="none" stroke="#797979" stroke-width="0.7" stroke-linecap="round"/>
   <circle cx="33.50" cy="51.85" r="5.95" fill="#a8a7a6" stroke="#6d6c6b" stroke-width="0.6"/>
+  <line x1="33.50" y1="50.66" x2="33.50" y2="47.21" stroke="#6d6c6b" stroke-width="0.8" stroke-linecap="round"/>
   <text x="33.50" y="62.40" font-size="3" text-anchor="middle" fill="#797979">Power</text>
 </svg>
