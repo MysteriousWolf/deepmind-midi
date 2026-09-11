@@ -234,7 +234,7 @@ mod tests {
         assert!(parse("26.1.1") > parse("26.1.0"));
         assert!(parse("26.2.0") > parse("26.1.9"));
         assert!(parse("27.1.0") > parse("26.9.9"));
-        assert!(parse("26.1.0") == parse("26.1.0"));
+        assert_eq!(parse("26.1.0"), parse("26.1.0"));
     }
 
     #[test]
