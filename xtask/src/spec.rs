@@ -40,6 +40,9 @@ pub struct Parameter {
     /// Why this row departs from what the manual prints.
     #[serde(default)]
     pub correction: Option<String>,
+    /// `false` when the value is inferred and needs hardware confirmation.
+    #[serde(default = "yes")]
+    pub confirmed: bool,
 }
 
 /// One value of an enumerated parameter.
@@ -137,9 +140,6 @@ pub struct Global {
     /// `false` when the range or ordering is inferred and needs hardware confirmation.
     #[serde(default = "yes")]
     pub confirmed: bool,
-    /// Why this row departs from what the manual's global commands table prints.
-    #[serde(default)]
-    pub correction: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

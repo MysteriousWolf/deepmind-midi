@@ -27,7 +27,7 @@ by hand: change the spec and run `cargo xtask docs`.
 ## Synth structure
 
 Where the parameters sit in the instrument, so an offset means something before
-you reach for the tables.
+the tables.
 
 <!-- generated:structure -->
 
@@ -189,9 +189,8 @@ Responses that carry bulk data put a comms protocol version byte first.
 
 ## Device inquiry
 
-The universal non-realtime identity request is the only way to find a unit whose
-device ID you do not already know, and the only supported way to read firmware
-versions.
+The universal non-realtime identity request is the only way to find a unit with
+an unknown device ID, and the only supported way to read firmware versions.
 
 ```
 request:  F0 7E <dev|7F> 06 01 F7
@@ -336,7 +335,7 @@ Each of these drives one program parameter. The offset column is that parameter'
 
 #### Standard controllers
 
-Ordinary MIDI controllers, answered as you would expect.
+Ordinary MIDI controllers, answered in the usual way.
 
 | CC | Controls | Notes |
 |---|---|---|
@@ -391,9 +390,9 @@ reserved, preserve them on round-trip, and never assume a dump is 242 bytes.
 
 ### Evidence
 
-Checks used to confirm the mapping against real dumps:
+The offset map holds against 256 factory programs:
 
-| Offset | Expected | Observed in 256 factory programs |
+| Offset | Expected | Observed |
 |---|---|---|
 | 241 | transpose, 80-176 with 128 meaning none | `0x80` in 233 of 256 |
 | 219-221 | FX output gains, 0-150 | cluster on 100 |
@@ -464,8 +463,8 @@ sends an NRPN edit and wants confirmation has to re-request the edit buffer.
 | 33 | Noise Level | 0-255 |  | Off, then -48.1 dB to 0.0 dB |
 | 34 | Portamento time | 0-255 |  | 0.00 s to 10.00 s |
 | 35 | Portamento mode | 0-13 | [Portamento Mode](#portamento_mode) |  |
-| 36 | Pitch bend Up depth | 0-24 | In steps of 1 semitone |  |
-| 37 | Pitch bend Down depth | 0-24 | In steps of 1 semitone |  |
+| 36 | Pitch Bend Up Depth | 0-48 | **Unconfirmed.**  | -24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pushing up bends down. |
+| 37 | Pitch Bend Down Depth | 0-48 | **Unconfirmed.**  | -24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pulling down bends up. |
 | 38 | OSC 1 Pitch Mod Mode | 0-1 | [OSC 1 Pitch Mod Mode](#osc1_pitch_mod_mode) |  |
 
 ### VCF
@@ -1373,10 +1372,10 @@ within that dump, so the offsets are still unknown.
 | Velocity Curve | 0-127 | Key velocity to MIDI velocity curve. The manual gives the display range as -64 to +63 and marks it TBD. |
 | Transpose | 0-96 | -48 to +48 semitones. Affects both local play and MIDI output. |
 | Aftertouch Curve | 0-127 | Key pressure to MIDI aftertouch curve. The manual gives the display range as -64 to +63 and marks it TBD. |
-| Pedal CC | 0-6 | **Unconfirmed.** What the pedal or control voltage input drives: Foot Control (0), Mod Wheel (1), Breath (2), Volume (3), Expression (4), Portamento Time (5), Aftertouch (6). **Departs from the manual's own table.** The manual's global commands table gives a range of 0-3 and lists four destinations, but section 7.3.3 describes seven. The seven are recorded here; the value order follows the order that section lists them in and needs confirming. |
-| Sustain CC | 0-9 | **Unconfirmed.** Sustain input polarity and function: Norm-Open (0), Norm-Closed (1), Tap-N.O (2), Tap-N.C (3), Arp+Gate (4), Arp-Gate (5), Seq+Gate (6), Seq-Gate (7), Arp&Seq+Gate (8), Arp&Seq-Gate (9). The gate modes step the arpeggiator or the control sequencer from a 0-5 V gate signal. **Departs from the manual's own table.** The manual's global commands table gives a range of 0-3 and lists four modes, but section 7.3.3 describes ten. The ten are recorded here; the value order follows the order that section lists them in and needs confirming. |
-| Sustain Pedal Mode | 0-1 | **Unconfirmed.** Sustain (0) holds every note while the pedal is down. Sostenuto (1) holds only the notes that were already sounding, like the middle pedal of a piano. **Departs from the manual's own table.** Described in section 7.3.3 but absent from the manual's global commands table, so neither its range nor its position in the global dump is documented. |
-| Fader Pick Up Mode | 0-2 | Relative (0), Pass-thru (1), Jump (2). **Departs from the manual's own table.** Section 7.3.4 describes only Pass-thru and Jump. Relative may be a firmware 1.0 mode that was removed, or an omission from that section. |
+| Pedal CC | 0-6 | **Unconfirmed.** What the pedal or control voltage input drives: Foot Control (0), Mod Wheel (1), Breath (2), Volume (3), Expression (4), Portamento Time (5), Aftertouch (6). |
+| Sustain CC | 0-9 | **Unconfirmed.** Sustain input polarity and function: Norm-Open (0), Norm-Closed (1), Tap-N.O (2), Tap-N.C (3), Arp+Gate (4), Arp-Gate (5), Seq+Gate (6), Seq-Gate (7), Arp&Seq+Gate (8), Arp&Seq-Gate (9). The gate modes step the arpeggiator or the control sequencer from a 0-5 V gate signal. |
+| Sustain Pedal Mode | 0-1 | **Unconfirmed.** Sustain (0) holds every note while the pedal is down. Sostenuto (1) holds only the notes that were already sounding, like the middle pedal of a piano. |
+| Fader Pick Up Mode | 0-2 | **Unconfirmed.** Relative (0), Pass-thru (1), Jump (2). |
 | LCD Brightness | 0-9 | 10% steps. |
 | LCD Contrast | 0-9 | 10% steps. |
 | Arp Send to MIDI | 0-1 | Transmit arpeggiator output to MIDI Out and USB. |
@@ -1387,8 +1386,7 @@ within that dump, so the offsets are still unknown.
 
 ## Corrections to the manual
 
-Where this specification departs from what the manual prints, and why. Rows
-marked resolved are ones a second part of the manual settles.
+Where this document departs from what the manual prints, and why.
 
 <!-- generated:corrections -->
 
@@ -1397,89 +1395,52 @@ marked resolved are ones a second part of the manual settles.
 | 5 | LFO 1 Mono Mode | The manual prints 0-1, but its own note describes Poly (0), Mono (1) and SPREAD-1 (2) through SPREAD-254 (255), matching LFO 2 Mono Mode at offset 12. |
 | 14 | OSC 1 Range | The manual prints "0-216' (0), 8' (1), 4' (2)". The range is 0-2. |
 | 15 | OSC 2 Range | Same run-together as offset 14. The range is 0-2. |
+| 36 | Pitch Bend Up Depth | The NRPN table gives a range of 0-24, but section 8.4.4 states both pitch bend depths run from -24 to +24, which is 49 values. Encoded as 0-48 with 24 as zero, matching how the manual encodes Global Transpose (0-96 for -48 to +48). Needs confirming against hardware. |
+| 37 | Pitch Bend Down Depth | Same as offset 36. |
 | 38 | OSC 1 Pitch Mod Mode | The manual prints "0-10 (OSC1+2), 1 (OSC 1 Only)". The range is 0-1. |
 | 51 | VCF 2 Pole Mode | The manual prints "0-14 Pole (0), 2 Pole (1)". The range is 0-1. |
 | 61 | VCA Envelope Release Curve | The manual repeats "Attack Curve" here. Offsets 58-61 are the attack, decay, sustain and release curves, matching the Env1 AtCur / DcyCur / SuSCur / RelCur modulation destinations. |
 | 70, 79 | VCF Envelope Release Curve and 1 more | Same repeated-name error as offset 61. |
-| 93, 96, 99, 102, 105, 108, 111, 114 | Mod 1 Source and 7 more | Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range. |
-| 94, 97, 100, 103, 106, 109, 112, 115 | Mod 1 Destination and 7 more | Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range. |
-| 118 | Ctrl Sequencer Clock Divider | The manual gives this parameter a range of 0-15, but section 8.1.8 lists twenty clock divisions for the control sequencer. One of the two is wrong and the manual does not say which, so the range is left as printed and the value table is marked unconfirmed. |
-| 119 | Sequence Length | The manual prints the range and the first note value as one run, "0-311 (0) to 32 (31) steps". The range is 0-31. |
-| 120 | Sequencer Swing Timing | Resolved. The manual’s NRPN note reads "0% (0) to 75% (25)", but sections 8.1.7 and 8.1.8 both state the swing range as 50% to 75%. So 0 is 50% and 255 is 75%: the note has a wrong lower endpoint and a dropped digit. |
-| 163 | Arp Swing | Resolved the same way as offset 120. |
+| 93, 96, 99, 102, 105, 108, 111, 114 | Mod 1 Source and 7 more | Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range. |
+| 94, 97, 100, 103, 106, 109, 112, 115 | Mod 1 Destination and 7 more | Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range. |
+| 118 | Ctrl Sequencer Clock Divider | Section 8.1.8 lists twenty clock divisions against this range of 0-15. The range is left as printed and the value table is marked unconfirmed. |
+| 119 | Sequence Length | The manual runs the range and the first note value together as "0-311 (0) to 32 (31) steps". The range is 0-31. |
+| 120 | Sequencer Swing Timing | The NRPN note reads "0% (0) to 75% (25)". Sections 8.1.7 and 8.1.8 give the swing range as 50% to 75%, so 0 is 50% and 255 is 75%. |
+| 163 | Arp Swing | Same as offset 120. |
 | 164 | Arp Octaves | The manual prints "0-51 to 6 Octaves". The range is 0-5. |
-| 166, 179, 192, 205 | FX 1 Type and 3 more | Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range. |
+| 166, 179, 192, 205 | FX 1 Type and 3 more | Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range. |
 
 <!-- /generated:corrections -->
 
 ## Open questions
 
-What the manual still does not settle. Everything here needs a hardware session
-or a firmware source that does not exist publicly.
+Four things the manual does not settle. Each needs a hardware session.
 
-- **The global dump layout.** The global parameter dump carries 45 bytes. The
-  manual lists the settings but never maps them to offsets, and no public source
-  does either. The count does not obviously add up: 25 settings are recorded
-  here, several of them described only in the menu chapters and missing from the
-  manual's own global commands table, so some of the 45 bytes are either
-  multi-byte fields or settings the manual never lists at all.
-- **The control sequencer clock divider range.** Section 8.1.8 lists twenty
-  divisions; the NRPN table gives offset 118 a range of 0-15. One of the two is
-  wrong. The twenty are recorded, marked unconfirmed.
-- **Four global ranges.** Pedal CC, Sustain CC, Sustain Pedal Mode and Fader
-  Pick Up Mode are each described one way in the menu chapters and another way,
-  or not at all, in the global commands table. See their rows above.
+- **The global dump layout.** The dump carries 45 bytes and nothing maps them to
+  settings. This makes every row in [Global settings](#global-settings)
+  unverified, including the four whose ranges the manual gives twice and
+  differently.
+- **The control sequencer clock divider.** Section 8.1.8 lists twenty divisions;
+  the NRPN table gives offset 118 a range of 0-15. The twenty are recorded,
+  marked unconfirmed.
 - **Four controller assignments.** CC 40, 44, 52 and 56, where the controller
   map's labels do not line up with its own attack, decay, sustain, release runs.
-- **Pitch bend depth sign.** Offsets 36 and 37 are documented as 0-24 semitones
-  in the NRPN table, but section 8.4.4 describes the same two settings as
-  running from -24 to +24, which would let the wheel bend the opposite way. A
-  single byte holds either. Recorded as printed.
 - **Where VCA Mode lives.** Section 8.6.2 describes a per-program VCA Mode,
   Ballsy or Transparent, with no NRPN number anywhere in the manual. Protocol
-  version 7 added three bytes at offsets 242-244 that are zero in every factory
-  program. That is the obvious place for it, and for anything else firmware 1.1
-  added, but it is a guess until someone toggles the setting and re-reads a dump.
-- **Per-effect parameter meanings.** Each FX slot has 12 raw 0-255 parameters
-  whose meaning depends on the slot's algorithm, so offsets 167-178, 180-191,
-  193-204 and 206-217 are 48 unlabelled bytes until this is filled in. Section
-  9.3 documents all 35 algorithms with units and ranges, so this is transcription
-  work rather than a real unknown. It goes in `spec/effects.toml` and is tracked
-  in `docs/architecture.md`.
-
-### Settled since the first draft
-
-- **The arpeggiator clock divider.** Section 8.1.7 lists thirteen divisions,
-  exactly matching the 0-12 range the NRPN table gives. Recorded as confirmed.
-- **The swing endpoints.** The NRPN note for offsets 120 and 163 reads "0% (0)
-  to 75% (25)". Sections 8.1.7 and 8.1.8 both state the swing range as 50% to
-  75%, so 0 is 50% and 255 is 75%: the note has a wrong lower endpoint and a
-  dropped digit.
-- **What the LFO rate fader does under Arp Sync.** It stops setting a rate and
-  selects a division of the master BPM instead, from the same twenty-entry table
-  the control sequencer uses.
+  version 7 added three bytes at offsets 242-244 which are zero in every factory
+  program, so that is the likely home for it and for anything else firmware 1.1
+  added.
 
 ## Cross-verification
 
-The parameter table was checked against a source that had no part in building it:
-the DeepMind 12D layout for MIDI Designer, which addresses the synthesizer by
-NRPN. It carries 35 named controls, and all 35 agree with this table.
+The parameter table was checked against a DeepMind 12D layout for MIDI Designer,
+which addresses the synthesizer by NRPN and had no part in building it. All 35 of
+its named controls agree, including offsets 61, 70 and 79, where this document
+says Release Curve and the manual repeats "Attack Curve".
 
-That includes the three offsets this specification renames. The manual labels
-58-61, 67-70 and 76-79 as attack, decay, sustain and *attack* curve, repeating
-the first name. The MIDI Designer layout calls 61, 70 and 79 Release Curve, which
-is what the modulation destination list implies and what is recorded here.
-
-The controller map came from a third source again, and its firmware-1.1 reading
-is corroborated: it puts the 3D axes on CC 115, 116 and 117, matching the
-modulation source list in the newer manual rather than the CC 114-116 of the
-older one.
-
-A fourth pass used a clean transcription of the manual, which confirmed all four
-range corrections below that had been made by cross-checking each maximum against
-the values enumerated in its own note. Where the PDF ran "0-2" and "16' (0)"
-together into "0-216", the transcription reads "0-2". The same for offsets 15, 38,
-51, 119 and 164.
+The controller map is a third source and corroborates the firmware 1.1 reading:
+it puts the 3D axes on CC 115, 116 and 117, matching the modulation source list
+in the newer manual rather than the CC 114-116 of the older one.
 
 ## Sources
 

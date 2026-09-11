@@ -258,6 +258,11 @@ fn render_parameters(spec: &Spec) -> String {
             (_, _, Some(note)) => cell(note),
             _ => String::new(),
         };
+        let values = if parameter.confirmed {
+            values
+        } else {
+            format!("**Unconfirmed.** {values}")
+        };
         let _ = writeln!(
             out,
             "| {} | {} | {}-{} | {values} | {} |",
@@ -305,12 +310,6 @@ fn render_globals(spec: &Spec) -> String {
     let mut out = String::from("| Setting | Range | Notes |\n|---|---|---|\n");
     for global in &spec.globals {
         let mut notes = cell(global.note.as_deref().unwrap_or(""));
-        if let Some(correction) = &global.correction {
-            notes = format!(
-                "{notes} **Departs from the manual's own table.** {}",
-                cell(correction)
-            );
-        }
         if !global.confirmed {
             notes = format!("**Unconfirmed.** {notes}");
         }
@@ -337,7 +336,7 @@ fn render_controllers(spec: &Spec) -> String {
         (
             "standard",
             "Standard controllers",
-            "Ordinary MIDI controllers, answered as you would expect.",
+            "Ordinary MIDI controllers, answered in the usual way.",
         ),
         (
             "other",

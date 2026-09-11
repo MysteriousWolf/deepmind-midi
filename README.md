@@ -2,12 +2,12 @@
 
 Rust library for the Behringer DeepMind MIDI protocol.
 
-The library does no IO. Your program owns the MIDI connection and feeds bytes in
-and out; the library turns them into typed messages, typed parameters and a
-tracked view of the synthesizer.
+The library does no IO. The host program owns the MIDI connection and feeds
+bytes in and out; the library turns them into typed messages, typed parameters
+and a tracked view of the synthesizer.
 
 ```
-DeepMind <--MIDI--> your program <--bytes--> deepmind-midi
+DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 ```
 
 **Status: early.** The protocol is reverse-engineered, verified and written

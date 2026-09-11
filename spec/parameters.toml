@@ -307,19 +307,23 @@ enum = "portamento_mode"
 
 [[parameter]]
 offset = 36
-name = "Pitch bend Up depth"
+name = "Pitch Bend Up Depth"
 group = "Oscillators"
 min = 0
-max = 24
-note = "In steps of 1 semitone"
+max = 48
+confirmed = false
+display = "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pushing up bends down."
+correction = "The NRPN table gives a range of 0-24, but section 8.4.4 states both pitch bend depths run from -24 to +24, which is 49 values. Encoded as 0-48 with 24 as zero, matching how the manual encodes Global Transpose (0-96 for -48 to +48). Needs confirming against hardware."
 
 [[parameter]]
 offset = 37
-name = "Pitch bend Down depth"
+name = "Pitch Bend Down Depth"
 group = "Oscillators"
 min = 0
-max = 24
-note = "In steps of 1 semitone"
+max = 48
+confirmed = false
+display = "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pulling down bends up."
+correction = "Same as offset 36."
 
 [[parameter]]
 offset = 38
@@ -744,7 +748,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
-correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 94
@@ -753,7 +757,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
-correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 95
@@ -770,7 +774,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
-correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 97
@@ -779,7 +783,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
-correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 98
@@ -796,7 +800,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
-correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 100
@@ -805,7 +809,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
-correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 101
@@ -822,7 +826,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
-correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 103
@@ -831,7 +835,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
-correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 104
@@ -848,7 +852,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
-correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 106
@@ -857,7 +861,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
-correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 107
@@ -874,7 +878,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
-correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 109
@@ -883,7 +887,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
-correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 110
@@ -900,7 +904,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
-correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 112
@@ -909,7 +913,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
-correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 113
@@ -926,7 +930,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
-correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 115
@@ -935,7 +939,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
-correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 116
@@ -961,7 +965,7 @@ group = "Control Sequencer"
 min = 0
 max = 15
 enum = "sequencer_clock"
-correction = "The manual gives this parameter a range of 0-15, but section 8.1.8 lists twenty clock divisions for the control sequencer. One of the two is wrong and the manual does not say which, so the range is left as printed and the value table is marked unconfirmed."
+correction = "Section 8.1.8 lists twenty clock divisions against this range of 0-15. The range is left as printed and the value table is marked unconfirmed."
 
 [[parameter]]
 offset = 119
@@ -970,7 +974,7 @@ group = "Control Sequencer"
 min = 0
 max = 31
 note = "1 (0) to 32 (31) steps"
-correction = "The manual prints the range and the first note value as one run, \"0-311 (0) to 32 (31) steps\". The range is 0-31."
+correction = "The manual runs the range and the first note value together as \"0-311 (0) to 32 (31) steps\". The range is 0-31."
 
 [[parameter]]
 offset = 120
@@ -980,7 +984,7 @@ min = 0
 max = 255
 note = "0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel."
 display = "50% to 75%"
-correction = "Resolved. The manual’s NRPN note reads \"0% (0) to 75% (25)\", but sections 8.1.7 and 8.1.8 both state the swing range as 50% to 75%. So 0 is 50% and 255 is 75%: the note has a wrong lower endpoint and a dropped digit."
+correction = "The NRPN note reads \"0% (0) to 75% (25)\". Sections 8.1.7 and 8.1.8 give the swing range as 50% to 75%, so 0 is 50% and 255 is 75%."
 
 [[parameter]]
 offset = 121
@@ -1330,7 +1334,7 @@ min = 0
 max = 255
 note = "0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel."
 display = "50% to 75%"
-correction = "Resolved the same way as offset 120."
+correction = "Same as offset 120."
 
 [[parameter]]
 offset = 164
@@ -1356,7 +1360,7 @@ group = "Effects"
 min = 0
 max = 34
 enum = "fx_type"
-correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 167
@@ -1461,7 +1465,7 @@ group = "Effects"
 min = 0
 max = 34
 enum = "fx_type"
-correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 180
@@ -1566,7 +1570,7 @@ group = "Effects"
 min = 0
 max = 34
 enum = "fx_type"
-correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 193
@@ -1671,7 +1675,7 @@ group = "Effects"
 min = 0
 max = 34
 enum = "fx_type"
-correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range."
+correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
 offset = 206

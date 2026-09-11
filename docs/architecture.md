@@ -14,8 +14,8 @@ DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 
 ## The API a host uses
 
-The point of the library is that you never look up an offset or a controller
-number. You hold one object and change things on it.
+Nothing in a host program looks up an offset or a controller number. One object
+holds the synthesizer; changing it is changing the synthesizer.
 
 ```rust
 let mut synth = Synth::new(DeviceId::Unit(0));
@@ -45,7 +45,7 @@ p.lfo1.shape             // an enum, not a magic number
 ```
 
 Both the field layout and the conversions come from `spec/`, so the offset map
-exists once and nobody has to read it.
+exists in one place and no host code repeats it.
 
 ## Sans-IO
 
@@ -67,8 +67,8 @@ Why:
 - **Honest.** MIDI transports vary wildly in latency and chunking. An async
   facade hides that rather than solving it.
 
-`drain_tx` takes a closure, which covers most of what a callback API would give
-you without making `Device` generic over its IO. For hosts that want even less
+`drain_tx` takes a closure, which covers most of what a callback API would,
+without making `Device` generic over its IO. For hosts that want less
 boilerplate, a `transport` feature adds a trait and a driver loop:
 
 ```rust
@@ -119,7 +119,7 @@ collapses NRPN edits, dump parsing and dump building into a single table.
 [`midi-spec.md`](midi-spec.md), and writes the diagram sources to
 `docs/diagrams/*.mmd`. The diagrams are embedded inline as well, from the same
 strings, so nothing needs a build step to read. `cargo xtask diagrams` renders
-them to SVG for anyone who wants standalone images.
+them to SVG as standalone images.
 
 The same files will generate the `Program` struct, its typed fields and its
 conversions. A correction gets made once.
@@ -150,21 +150,21 @@ offsets where this specification departs from the manual's printed names.
 
 ## State is a set of claims, not a cache
 
-The synthesizer answers no per-parameter reads. You can request dumps, and you
-can send edits and believe they landed. Plain values would conflate the two, so
+The synthesizer answers no per-parameter reads. Dumps can be requested; edits
+can be sent and presumed to have landed. Plain values would conflate the two, so
 every tracked value records where it came from:
 
 ```rust
 pub enum Known<T> {
     Unknown,
-    Assumed { value: T, sent_at: u64 },   // we sent it, no confirmation
-    Confirmed { value: T, at: u64 },      // it came back in a dump
+    Assumed { value: T, sent_at: u64 },   // sent, not confirmed
+    Confirmed { value: T, at: u64 },      // came back in a dump
 }
 ```
 
 The host decides whether to trust an assumed value or re-request the edit buffer
 first. After sending edits, an edit buffer dump is the only way to resync, and
-the library will not poll for you behind your back.
+the library never polls on its own.
 
 ## Two kinds of version
 

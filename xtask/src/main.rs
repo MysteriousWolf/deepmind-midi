@@ -95,7 +95,7 @@ fn docs_command(check: bool) -> Result<(), String> {
 
 /// Renders every `.mmd` source to SVG beside it, if mermaid-cli is installed.
 ///
-/// This is a convenience for anyone who wants standalone images. The documents
+/// Standalone images, for use outside the documents. The documents
 /// themselves embed the Mermaid inline and need no build step.
 fn diagrams_command() -> Result<(), String> {
     let dir = root().join(diagrams::DIR);
