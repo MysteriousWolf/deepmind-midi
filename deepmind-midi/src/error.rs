@@ -23,6 +23,17 @@ pub enum Error {
     PatternOutOfRange(u8),
     /// A MIDI channel was 16 or greater.
     ChannelOutOfRange(u8),
+    /// A parameter offset was 242 or greater, so it names no parameter.
+    ParameterOutOfRange(u8),
+    /// A value was outside the range its parameter accepts.
+    ValueOutOfRange {
+        /// Offset of the parameter the value was meant for.
+        parameter: u8,
+        /// The value offered.
+        value: u16,
+        /// Highest value the parameter accepts. The lowest is always zero.
+        max: u16,
+    },
     /// A dump carried a comms protocol version this build does not understand.
     UnsupportedProtocolVersion(u8),
     /// A `SysEx` frame did not start with `F0` or did not end with `F7`.
@@ -85,6 +96,20 @@ impl fmt::Display for Error {
             Self::ChannelOutOfRange(channel) => {
                 write!(f, "MIDI channel {channel} out of range, expected 0..=15")
             }
+            Self::ParameterOutOfRange(offset) => {
+                write!(
+                    f,
+                    "parameter offset {offset} out of range, expected 0..=241"
+                )
+            }
+            Self::ValueOutOfRange {
+                parameter,
+                value,
+                max,
+            } => write!(
+                f,
+                "value {value} out of range for parameter {parameter}, expected 0..={max}"
+            ),
             Self::UnsupportedProtocolVersion(version) => {
                 write!(
                     f,

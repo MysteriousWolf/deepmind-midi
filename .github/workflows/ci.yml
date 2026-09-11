@@ -29,13 +29,16 @@ jobs:
       - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features
 
-      # Includes generated_documentation_is_current, which fails when
-      # docs/midi-spec.md does not match spec/.
+      # Includes generated_documentation_is_current and generated_code_is_current,
+      # which fail when docs/ or the library's parameter tables do not match spec/.
       - name: Test
         run: cargo test --workspace --all-features
 
       - name: Generated documentation is current
         run: cargo xtask docs --check
+
+      - name: Generated parameter tables are current
+        run: cargo xtask codegen --check
 
       # The first change merged after a release has to move the version.
       # A repository with no release tags yet passes: nothing to be behind.
