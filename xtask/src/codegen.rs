@@ -7,8 +7,9 @@
 //! fallen behind `spec/`, the same safety net the documentation has.
 //!
 //! Only data is generated. The shapes that data fills, and everything that acts
-//! on it, are hand-written in `deepmind-midi/src/param/mod.rs`, so reviewing a
-//! specification change means reading a table rather than reading logic.
+//! on it, are hand-written in `deepmind-midi/src/param/mod.rs` and
+//! `deepmind-midi/src/program/mod.rs`, so reviewing a specification change means
+//! reading a table rather than reading logic.
 
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
@@ -21,19 +22,43 @@ use crate::spec::{Spec, ValueTable};
 /// Path of the generated parameter tables, relative to the repository root.
 pub const CODE_PATH: &str = "deepmind-midi/src/param/generated.rs";
 
-/// Renders the parameter tables and compares them against the file on disk.
+/// Every generated source file, in the order they are written.
+pub const CODE_PATHS: [&str; 2] = [CODE_PATH, crate::program::CODE_PATH];
+
+/// Renders the generated source files and compares them against the files on
+/// disk.
 ///
-/// Writes the result unless `check` is set.
+/// Writes each one that differs, unless `check` is set.
 ///
 /// # Errors
 ///
 /// Returns a message when the spec cannot be loaded, a name in it does not make
-/// a usable Rust identifier, `rustfmt` cannot be run, or the file cannot be
+/// a usable Rust identifier, `rustfmt` cannot be run, or a file cannot be
 /// written.
 pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
     let spec = Spec::load(root)?;
-    let rendered = format(root, &render(&spec)?)?;
-    let path = root.join(CODE_PATH);
+    let files = [
+        (CODE_PATH, render(&spec)?),
+        (crate::program::CODE_PATH, crate::program::render(&spec)?),
+    ];
+
+    let mut outcome = Outcome::Current;
+    for (path, source) in files {
+        if write_if_changed(root, path, &format(root, &source)?, check)? == Outcome::Stale {
+            outcome = Outcome::Stale;
+        }
+    }
+    Ok(outcome)
+}
+
+/// Writes one rendered file, reporting whether the copy on disk was stale.
+fn write_if_changed(
+    root: &Path,
+    path: &str,
+    rendered: &str,
+    check: bool,
+) -> Result<Outcome, String> {
+    let path = root.join(path);
     if std::fs::read_to_string(&path).is_ok_and(|found| found == rendered) {
         return Ok(Outcome::Current);
     }
@@ -412,7 +437,7 @@ fn static_name(spec: &Spec, table: &ValueTable) -> String {
 }
 
 /// Maps each group name to its Rust identifier.
-fn group_identifiers(spec: &Spec) -> Result<BTreeMap<&str, String>, String> {
+pub fn group_identifiers(spec: &Spec) -> Result<BTreeMap<&str, String>, String> {
     let mut groups: Vec<&str> = spec.parameters.iter().map(|p| p.group.as_str()).collect();
     groups.sort_unstable();
     groups.dedup();
@@ -421,7 +446,7 @@ fn group_identifiers(spec: &Spec) -> Result<BTreeMap<&str, String>, String> {
 }
 
 /// Maps each value table identifier to its Rust identifier.
-fn table_identifiers(spec: &Spec) -> Result<BTreeMap<&str, String>, String> {
+pub fn table_identifiers(spec: &Spec) -> Result<BTreeMap<&str, String>, String> {
     let mut ids: Vec<&str> = spec.tables.iter().map(|t| t.id.as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
@@ -433,11 +458,32 @@ fn table_identifiers(spec: &Spec) -> Result<BTreeMap<&str, String>, String> {
 ///
 /// Two names that collide would compile into one variant and silently lose a
 /// parameter, so a collision is an error rather than a suffix.
-fn identifiers<'a>(
+pub fn identifiers<'a>(
     names: impl Iterator<Item = &'a str>,
     what: &str,
 ) -> Result<Vec<String>, String> {
-    let idents: Vec<String> = names.map(pascal).collect();
+    cased(names, what, pascal)
+}
+
+/// Turns each name into a Rust identifier in the case Rust writes values and
+/// functions in, rejecting anything unusable.
+///
+/// # Errors
+///
+/// As [`identifiers`].
+pub fn snake_identifiers<'a>(
+    names: impl Iterator<Item = &'a str>,
+    what: &str,
+) -> Result<Vec<String>, String> {
+    cased(names, what, snake)
+}
+
+fn cased<'a>(
+    names: impl Iterator<Item = &'a str>,
+    what: &str,
+    case: impl Fn(&str) -> String,
+) -> Result<Vec<String>, String> {
+    let idents: Vec<String> = names.map(case).collect();
     for (index, ident) in idents.iter().enumerate() {
         if ident.is_empty() || ident.starts_with(|c: char| c.is_ascii_digit()) {
             return Err(format!("{what} {index} makes no identifier: {ident:?}"));
@@ -451,30 +497,150 @@ fn identifiers<'a>(
 
 /// Renders a name as one Rust identifier, in the case Rust writes type names in.
 ///
-/// `>` and `&` carry meaning in a parameter name - `Mod Wheel > Pitch Mod Depth`
-/// is a route, `Key Sync & Loop` a pair - so they become words rather than being
-/// dropped with the rest of the punctuation.
-fn pascal(name: &str) -> String {
-    let spelled = name.replace('>', " to ").replace('&', " and ");
+/// A leading number is spelled out, since an identifier cannot start with a
+/// digit: `4 Pole` is `FourPole`. A number the table below does not spell is an
+/// error rather than a mangled name.
+pub fn pascal(name: &str) -> String {
     let mut out = String::new();
-    for word in spelled
-        .split(|c: char| !c.is_ascii_alphanumeric())
-        .filter(|word| !word.is_empty())
-    {
+    for word in words(name) {
         let mut characters = word.chars();
         if let Some(first) = characters.next() {
             out.push(first.to_ascii_uppercase());
             out.extend(characters.map(|c| c.to_ascii_lowercase()));
         }
     }
+    spell_leading_number(&out)
+}
+
+/// Renders a name as one Rust identifier, in the case Rust writes values in.
+///
+/// A word that is only digits joins the word before it, so `LFO 1 Rate` is
+/// `lfo1_rate` rather than `lfo_1_rate`.
+pub fn snake(name: &str) -> String {
+    let mut out = String::new();
+    for word in words(name) {
+        if !out.is_empty() && !word.chars().all(|c| c.is_ascii_digit()) {
+            out.push('_');
+        }
+        out.extend(word.chars().map(|c| c.to_ascii_lowercase()));
+    }
+    spell_leading_number(&out)
+}
+
+/// Splits a name into the words an identifier is built from.
+///
+/// Punctuation that carries meaning becomes a word rather than being dropped
+/// with the rest: `>` and `&` are a route and a pair in a parameter name
+/// (`Mod Wheel > Pitch Mod Depth`, `Key Sync & Loop`), `'` is the unit in an
+/// oscillator range (`16'`), and a sign against a number is its sign
+/// (`Fixed -12`). A parenthesised number is what a controller is numbered on one
+/// firmware, and firmware renumbered it, so it is not part of the name: `CC X
+/// (115)` and `CC X (114)` are one value under two firmware versions.
+///
+/// Words already run together in the manual's own spelling are split where the
+/// case changes, so `DeepVRB` is `Deep` and `VRB` rather than one long word.
+fn words(name: &str) -> Vec<String> {
+    let mut spelled = String::new();
+    let mut rest = name;
+    while let Some(open) = rest.find('(') {
+        let Some(close) = rest[open..].find(')').map(|end| open + end) else {
+            break;
+        };
+        let inner = rest.get(open + 1..close).unwrap_or_default();
+        spelled.push_str(rest.get(..open).unwrap_or_default());
+        if !inner.chars().all(|c| c.is_ascii_digit()) || inner.is_empty() {
+            spelled.push_str(inner);
+        }
+        rest = rest.get(close + 1..).unwrap_or_default();
+    }
+    spelled.push_str(rest);
+
+    let spelled = spelled
+        .replace('>', " to ")
+        .replace('&', " and ")
+        .replace('\'', " foot ");
+
+    let mut signed = String::new();
+    let mut previous = ' ';
+    let mut characters = spelled.chars().peekable();
+    while let Some(character) = characters.next() {
+        let sign = matches!(character, '+' | '-')
+            && !previous.is_ascii_alphanumeric()
+            && characters.peek().is_some_and(char::is_ascii_digit);
+        match (sign, character) {
+            (true, '+') => signed.push_str(" plus "),
+            (true, _) => signed.push_str(" minus "),
+            _ => signed.push(character),
+        }
+        previous = character;
+    }
+
+    signed
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .filter(|word| !word.is_empty())
+        .flat_map(humps)
+        .collect()
+}
+
+/// Splits one run of characters where the manual runs two words together: where
+/// a lower-case letter meets an upper-case one, and where a number meets a
+/// letter.
+fn humps(word: &str) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    let mut previous = ' ';
+    for character in word.chars() {
+        let hump = character.is_ascii_uppercase() && previous.is_ascii_lowercase();
+        let counted = character.is_ascii_alphabetic() && previous.is_ascii_digit();
+        if hump || counted {
+            out.push(String::new());
+        }
+        match out.last_mut() {
+            Some(current) => current.push(character),
+            None => out.push(String::from(character)),
+        }
+        previous = character;
+    }
     out
+}
+
+/// Spells out a leading number, which an identifier cannot start with.
+///
+/// Returns the identifier unchanged when it starts with a number this does not
+/// spell, which [`cased`] then rejects by name rather than shipping something
+/// that does not compile.
+fn spell_leading_number(ident: &str) -> String {
+    const SPELLED: [(&str, &str); 10] = [
+        ("16", "Sixteen"),
+        ("12", "Twelve"),
+        ("10", "Ten"),
+        ("8", "Eight"),
+        ("6", "Six"),
+        ("5", "Five"),
+        ("4", "Four"),
+        ("3", "Three"),
+        ("2", "Two"),
+        ("1", "One"),
+    ];
+    let digits: String = ident.chars().take_while(char::is_ascii_digit).collect();
+    let Some((_, word)) = SPELLED.iter().find(|(number, _)| *number == digits) else {
+        return ident.to_owned();
+    };
+    let rest = ident.get(digits.len()..).unwrap_or_default();
+    // The case of what follows says which case the identifier is in: `4Pole` is
+    // a type name and `4_pole` a method name.
+    let word = if rest.starts_with(|c: char| c.is_ascii_lowercase() || c == '_') {
+        word.to_ascii_lowercase()
+    } else {
+        (*word).to_owned()
+    };
+    format!("{word}{rest}")
 }
 
 /// Quotes any word rustdoc would otherwise read as an unlinked item name.
 ///
 /// `DeepMind` in a doc comment is a clippy warning; in a generated file it would
 /// be a warning nobody can fix by hand.
-fn doc(text: &str) -> String {
+pub fn doc(text: &str) -> String {
     text.split(' ')
         .map(|word| {
             if camel_case(word) {
@@ -488,16 +654,17 @@ fn doc(text: &str) -> String {
 }
 
 fn camel_case(word: &str) -> bool {
-    let mut lower = false;
-    word.chars().any(|c| {
-        let hump = lower && c.is_ascii_uppercase();
-        lower |= c.is_ascii_lowercase();
-        hump
-    })
+    let mut characters = word.chars();
+    let Some(_) = characters.next() else {
+        return false;
+    };
+    let rest: String = characters.collect();
+    rest.contains(|c: char| c.is_ascii_uppercase())
+        && rest.contains(|c: char| c.is_ascii_lowercase())
 }
 
 /// Splits a version or version range, `"1.1"` or `"1.1+"`, into its two numbers.
-fn version_parts(version: &str) -> (u32, u32) {
+pub fn version_parts(version: &str) -> (u32, u32) {
     let mut parts = version.trim_end_matches('+').split('.');
     let major = parts.next().and_then(|p| p.parse().ok()).unwrap_or(0);
     let minor = parts.next().and_then(|p| p.parse().ok()).unwrap_or(0);
@@ -535,6 +702,44 @@ mod tests {
         assert_eq!(pascal("Arp Rate (tempo)"), "ArpRateTempo");
         assert_eq!(pascal("Key Sync & Loop"), "KeySyncAndLoop");
         assert_eq!(pascal("VCF Mod Wheel > LFO Depth"), "VcfModWheelToLfoDepth");
+    }
+
+    #[test]
+    fn manual_spellings_split_into_the_words_they_run_together() {
+        assert_eq!(pascal("TC-DeepVRB"), "TcDeepVrb");
+        assert_eq!(pascal("NoteOff Vel"), "NoteOffVel");
+        assert_eq!(pascal("EdisonEX1"), "EdisonEx1");
+    }
+
+    /// A parenthesised number is a controller number, and firmware 1.1 moved
+    /// the three that have one, so it cannot be part of the identifier.
+    #[test]
+    fn a_parenthesised_number_is_not_part_of_the_name() {
+        assert_eq!(pascal("CC X (115)"), "CcX");
+        assert_eq!(pascal("CC X (114)"), "CcX");
+        assert_eq!(pascal("LFO1 (Uni)"), "Lfo1Uni");
+    }
+
+    #[test]
+    fn signs_and_units_become_words_and_leading_numbers_are_spelled() {
+        assert_eq!(pascal("Fixed +12"), "FixedPlus12");
+        assert_eq!(pascal("Fixed -12"), "FixedMinus12");
+        assert_eq!(pascal("16'"), "SixteenFoot");
+        assert_eq!(pascal("4 Pole"), "FourPole");
+        assert_eq!(pascal("3TapDelay"), "ThreeTapDelay");
+        assert_eq!(pascal("4 Pole"), "FourPole");
+    }
+
+    #[test]
+    fn method_names_read_the_way_rust_writes_them() {
+        assert_eq!(snake("LFO 1 Rate"), "lfo1_rate");
+        assert_eq!(snake("Arp On/Off"), "arp_on_off");
+        assert_eq!(snake("VCF HighPass Frequency"), "vcf_high_pass_frequency");
+        assert_eq!(
+            snake("Mod Wheel > Pitch Mod Depth"),
+            "mod_wheel_to_pitch_mod_depth"
+        );
+        assert_eq!(snake("4 Pole"), "four_pole");
     }
 
     #[test]

@@ -36,6 +36,19 @@ pub enum Error {
     },
     /// A dump carried a comms protocol version this build does not understand.
     UnsupportedProtocolVersion(u8),
+    /// Program data was not as long as its comms protocol version calls for.
+    ProgramLength {
+        /// Bytes the version's program data occupies.
+        expected: usize,
+        /// Bytes that were offered.
+        found: usize,
+    },
+    /// A message that carries no program was read as one.
+    NotAProgramDump(u8),
+    /// A program name was longer than sixteen characters.
+    ProgramNameTooLong(usize),
+    /// A program name held a character the display has no glyph for.
+    ProgramNameCharacter(char),
     /// A `SysEx` frame did not start with `F0` or did not end with `F7`.
     Unframed,
     /// A `SysEx` frame was too short to carry the header every message has.
@@ -116,6 +129,19 @@ impl fmt::Display for Error {
                     "unsupported comms protocol version {version}, expected 6 or 7"
                 )
             }
+            Self::ProgramLength { expected, found } => {
+                write!(f, "program data of {found} bytes, expected {expected}")
+            }
+            Self::NotAProgramDump(command) => {
+                write!(f, "command {command:#04X} carries no program")
+            }
+            Self::ProgramNameTooLong(len) => {
+                write!(f, "program name of {len} characters, expected 16 or fewer")
+            }
+            Self::ProgramNameCharacter(character) => write!(
+                f,
+                "program name holds {character:?}, expected printable ASCII"
+            ),
             Self::Unframed => f.write_str("not a SysEx frame: expected F0 ... F7"),
             Self::ShortFrame(len) => {
                 write!(

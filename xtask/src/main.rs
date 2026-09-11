@@ -21,6 +21,7 @@ mod codegen;
 mod diagrams;
 mod docs;
 mod fx;
+mod program;
 mod spec;
 
 use std::path::{Path, PathBuf};
@@ -58,7 +59,7 @@ fn usage() {
     println!("  docs [--check]  regenerate docs/midi-spec.md, docs/effects.md and");
     println!("                  docs/diagrams/ from spec/, or report whether they are");
     println!("                  current without writing");
-    println!("  codegen [--check]  regenerate the library's parameter tables from spec/,");
+    println!("  codegen [--check]  regenerate the library's generated sources from spec/,");
     println!("                  or report whether they are current without writing");
     println!("  help            show this message");
 }
@@ -72,17 +73,17 @@ fn root() -> PathBuf {
 }
 
 fn codegen_command(check: bool) -> Result<(), String> {
+    let paths = codegen::CODE_PATHS.join(" and ");
     match codegen::run(&root(), check)? {
         docs::Outcome::Current => {
-            println!("{} is up to date", codegen::CODE_PATH);
+            println!("{paths} are up to date");
             Ok(())
         }
         docs::Outcome::Stale if check => Err(format!(
-            "{} is out of date with spec/. Run `cargo xtask codegen` and commit the result.",
-            codegen::CODE_PATH
+            "{paths} are out of date with spec/. Run `cargo xtask codegen` and commit the result."
         )),
         docs::Outcome::Stale => {
-            println!("regenerated {} from spec/", codegen::CODE_PATH);
+            println!("regenerated {paths} from spec/");
             Ok(())
         }
     }
