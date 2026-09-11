@@ -16,6 +16,7 @@ change the spec and run `cargo xtask docs`.
 - [SysEx messages](#sysex-messages)
 - [Device inquiry](#device-inquiry)
 - [NRPN edits](#nrpn-edits)
+- [Continuous controllers](#continuous-controllers)
 - [Program data layout](#program-data-layout)
 - [Program parameters](#program-parameters)
 - [Value tables](#value-tables)
@@ -32,7 +33,7 @@ you reach for the tables.
 
 ### Voice signal path
 
-Each block is a parameter group, labelled with its offsets.
+Each block is a parameter group, labelled with its offsets. Solid arrows carry audio, dashed arrows carry modulation.
 
 ```mermaid
 flowchart LR
@@ -49,39 +50,56 @@ flowchart LR
     LFO1("LFO 1<br><small>0-6</small>")
     LFO2("LFO 2<br><small>7-13</small>")
     SEQ("control sequencer<br><small>117-154</small>")
+    MOD{{"mod matrix<br>8 busses<br><small>93-116</small>"}}
     VCAENV -.-> VCA
     VCFENV -.-> VCF
     MODENV -.-> MOD
     LFO1 -.-> MOD
     LFO2 -.-> MOD
     SEQ -.-> MOD
-    MOD{{"mod matrix<br>8 busses<br><small>93-116</small>"}}
     MOD -.-> OSC
     MOD -.-> VCF
     MOD -.-> VCA
     MOD -.-> FX
 ```
 
-Solid arrows carry audio, dashed arrows carry modulation.
-
 ### Modulation matrix
 
-Eight independent busses, each a source, a destination and a signed depth. 24 sources and 132 destinations give 3168 routings per bus.
+Eight independent busses, each a source, a destination and a signed depth.
 
 ```mermaid
 flowchart LR
-    SRC["source<br><small>0 = off</small>"] --> DEPTH["depth<br><small>-128 to +127</small>"] --> DST["destination<br><small>0 = off</small>"]
+    SRC["source<br><small>0 = off, 24 to choose from</small>"]
+    DEPTH["depth<br><small>-128 to +127</small>"]
+    DST["destination<br><small>0 = off, 132 to choose from</small>"]
+    SRC --> DEPTH --> DST
 ```
 
-Bus *n* occupies three consecutive offsets starting at 93: source, destination, depth. So bus 1 is 93, 94, 95, and bus 8 is 114, 115, 116.
+Each bus occupies three consecutive offsets: source, destination, depth. Bus 1 is 93, 94, 95, and bus 8 is 114, 115, 116.
 
 ### Envelopes
 
 Three identical envelopes: VCA, VCF and mod. Each has the four familiar stages plus a curve control per stage, which bends the segment between linear and exponential.
 
-![Envelope shape, showing the four stages and the effect of the attack curve control](img/envelope.svg)
+```mermaid
+xychart-beta
+    title "One envelope, at two attack and decay curve settings"
+    x-axis "time, key released after the sustain stage" 0 --> 15
+    y-axis "level" 0 --> 255
+    line "linear" [0, 85, 170, 255, 215, 185, 160, 160, 160, 160, 160, 120, 80, 40, 0, 0]
+    line "exponential" [0, 160, 215, 255, 190, 170, 160, 160, 160, 160, 160, 75, 35, 15, 0, 0]
+```
 
-The offsets under each stage are the time or level first, then its curve. The numbers shown are the VCA envelope; the VCF envelope repeats the same layout nine offsets later, and the mod envelope nine after that.
+| Stage | VCA | VCF | Mod |
+|---|---|---|---|
+| Attack time | 53 | 62 | 71 |
+| Decay time | 54 | 63 | 72 |
+| Sustain level | 55 | 64 | 73 |
+| Release time | 56 | 65 | 74 |
+| Attack curve | 58 | 67 | 76 |
+| Decay curve | 59 | 68 | 77 |
+| Sustain curve | 60 | 69 | 78 |
+| Release curve | 61 | 70 | 79 |
 
 <!-- /generated:structure -->
 
@@ -206,6 +224,149 @@ Three behaviours worth designing around:
 
 Parameter ranges reach 0-255, which does not fit in a single 7-bit data byte, so
 the 14-bit data entry pair carries the value.
+
+## Continuous controllers
+
+CC is the coarse path: 7 bits, so a controller reaches 128 of the 256 values an
+NRPN can address. Use NRPN where resolution matters, CC where a generic
+controller or DAW lane is easier.
+
+<!-- generated:controllers -->
+
+#### Program parameters
+
+Each of these drives one program parameter. The offset column is that parameter's entry in the table above.
+
+| CC | Controls | Offset | Notes |
+|---|---|---|---|
+| 5 | Portamento time | 34 |  |
+| 12 | Arp Rate (tempo) | 157 |  |
+| 13 | Arp Gate Time | 160 |  |
+| 16 | LFO 1 Rate | 0 |  |
+| 17 | LFO 1 Delay / Fade | 1 |  |
+| 18 | LFO 2 Rate | 7 |  |
+| 19 | LFO 2 Delay / Fade | 8 |  |
+| 20 | OSC 1 Pitch Mod Depth | 21 |  |
+| 21 | OSC 1 PWM Depth | 25 |  |
+| 23 | OSC 2 Pitch Mod Depth | 29 |  |
+| 24 | OSC 2 Tone Mod Depth | 28 |  |
+| 25 | OSC 2 Pitch | 27 |  |
+| 26 | OSC 2 Level | 26 |  |
+| 27 | Noise Level | 33 |  |
+| 28 | Unison Detune | 87 |  |
+| 29 | VCF Frequency | 39 |  |
+| 30 | VCF Resonance | 41 |  |
+| 33 | VCF LFO Depth | 45 |  |
+| 34 | VCF Keyboard Tracking | 49 |  |
+| 35 | VCF HighPass Frequency | 40 |  |
+| 36 | VCA Level | 80 |  |
+| 37 | VCA Envelope Attack Time | 53 |  |
+| 39 | VCA Envelope Decay Time | 54 |  |
+| 40 | VCA Envelope Sustain Level | 55 | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
+| 41 | VCA Envelope Release Time | 56 |  |
+| 42 | VCF Envelope Attack Time | 62 |  |
+| 43 | VCF Envelope Decay Time | 63 |  |
+| 44 | VCF Envelope Sustain Level | 64 | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
+| 45 | VCF Envelope Release Time | 65 |  |
+| 46 | Mod Envelope Attack Time | 71 |  |
+| 47 | Mod Envelope Decay Time | 72 |  |
+| 48 | Mod Envelope Sustain Level | 73 |  |
+| 49 | Mod Envelope Release Time | 74 |  |
+| 50 | VCA Envelope Attack Curve | 58 |  |
+| 51 | VCA Envelope Decay Curve | 59 |  |
+| 52 | VCA Envelope Sustain Curve | 60 | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
+| 53 | VCA Envelope Release Curve | 61 |  |
+| 54 | VCF Envelope Attack Curve | 67 |  |
+| 55 | VCF Envelope Decay Curve | 68 |  |
+| 56 | VCF Envelope Sustain Curve | 69 | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
+| 57 | VCF Envelope Release Curve | 70 |  |
+| 58 | Mod Envelope Attack Curve | 76 |  |
+| 59 | Mod Envelope Decay Curve | 77 |  |
+| 60 | Mod Envelope Sustain Curve | 78 |  |
+| 61 | Mod Envelope Release Curve | 79 |  |
+| 62 | FX 1 Param 1 | 167 |  |
+| 63 | FX 1 Param 2 | 168 |  |
+| 65 | FX 1 Param 3 | 169 |  |
+| 66 | FX 1 Param 4 | 170 |  |
+| 67 | FX 1 Param 5 | 171 |  |
+| 68 | FX 1 Param 6 | 172 |  |
+| 69 | FX 1 Param 7 | 173 |  |
+| 70 | FX 1 Param 8 | 174 |  |
+| 71 | FX 1 Param 9 | 175 |  |
+| 72 | FX 1 Param 10 | 176 |  |
+| 73 | FX 1 Param 11 | 177 |  |
+| 74 | FX 1 Param 12 | 178 |  |
+| 75 | FX 2 Param 1 | 180 |  |
+| 76 | FX 2 Param 2 | 181 |  |
+| 77 | FX 2 Param 3 | 182 |  |
+| 78 | FX 2 Param 4 | 183 |  |
+| 79 | FX 2 Param 5 | 184 |  |
+| 80 | FX 2 Param 6 | 185 |  |
+| 81 | FX 2 Param 7 | 186 |  |
+| 82 | FX 2 Param 8 | 187 |  |
+| 83 | FX 2 Param 9 | 188 |  |
+| 84 | FX 2 Param 10 | 189 |  |
+| 85 | FX 2 Param 11 | 190 |  |
+| 86 | FX 2 Param 12 | 191 |  |
+| 87 | FX 3 Param 1 | 193 |  |
+| 88 | FX 3 Param 2 | 194 |  |
+| 89 | FX 3 Param 3 | 195 |  |
+| 90 | FX 3 Param 4 | 196 |  |
+| 91 | FX 3 Param 5 | 197 |  |
+| 92 | FX 3 Param 6 | 198 |  |
+| 93 | FX 3 Param 7 | 199 |  |
+| 94 | FX 3 Param 8 | 200 |  |
+| 95 | FX 3 Param 9 | 201 |  |
+| 102 | FX 3 Param 10 | 202 |  |
+| 103 | FX 3 Param 11 | 203 |  |
+| 104 | FX 3 Param 12 | 204 |  |
+| 105 | FX 1 Type | 166 |  |
+| 106 | FX 2 Type | 179 |  |
+| 107 | FX 3 Type | 192 |  |
+| 108 | FX 4 Type | 205 |  |
+| 109 | FX 1 Output Gain | 218 |  |
+| 110 | FX 2 Output Gain | 219 |  |
+| 111 | FX 3 Output Gain | 220 |  |
+| 112 | FX 4 Output Gain | 221 |  |
+| 114 | FX Mode | 222 |  |
+
+#### Standard controllers
+
+Ordinary MIDI controllers, answered as you would expect.
+
+| CC | Controls | Notes |
+|---|---|---|
+| 1 | Modulation Wheel |  |
+| 2 | Breath Controller |  |
+| 4 | Foot Controller |  |
+| 6 | Data Entry MSB |  |
+| 7 | Channel Volume |  |
+| 8 | Balance |  |
+| 10 | Pan |  |
+| 11 | Expression |  |
+| 32 | Bank Select LSB |  |
+| 38 | Data Entry LSB |  |
+| 64 | Sustain Pedal |  |
+| 96 | Data Increment |  |
+| 97 | Data Decrement |  |
+| 98 | NRPN LSB |  |
+| 99 | NRPN MSB |  |
+| 100 | RPN LSB |  |
+| 101 | RPN MSB |  |
+
+#### Everything else
+
+Controllers that do something but are not a single program parameter.
+
+| CC | Controls | Notes |
+|---|---|---|
+| 31 | VCF Mod | The source lists this as "VCF MOD" without saying which VCF modulation depth it drives. Left unmapped. |
+| 113 | Analog Thru | Switches the analog thru path. |
+| 115 | 3D X axis | Modulation matrix source CC X. |
+| 116 | 3D Y axis | Modulation matrix source CC Y. |
+| 117 | 3D Z axis | Modulation matrix source CC Z. |
+
+<!-- /generated:controllers -->
 
 ## Program data layout
 
@@ -1223,6 +1384,9 @@ Things the manual does not answer and that need a hardware session to settle.
   mapped to the settings the manual lists.
 - **Swing endpoints.** Offsets 120 and 163 are 0-255 parameters whose notes give
   the top of the range as 25, which looks like a dropped digit.
+- **Four unconfirmed controller assignments.** CC 40, 44, 52 and 56, where the
+  source map's labels do not line up with its own attack, decay, sustain, release
+  runs. See the notes on those rows.
 - **Per-effect parameter meanings.** Each FX slot has 12 raw 0-255 parameters
   whose meaning depends on the slot's algorithm, so offsets 167-178, 180-191,
   193-204 and 206-217 are 48 unlabelled bytes until this is filled in. Section
@@ -1230,8 +1394,27 @@ Things the manual does not answer and that need a hardware session to settle.
   the next piece of work: it goes in `spec/effects.toml` and is tracked in
   `docs/architecture.md`.
 
+## Cross-verification
+
+The parameter table was checked against a source that had no part in building it:
+the DeepMind 12D layout for MIDI Designer, which addresses the synthesizer by
+NRPN. It carries 35 named controls, and all 35 agree with this table.
+
+That includes the three offsets this specification renames. The manual labels
+58-61, 67-70 and 76-79 as attack, decay, sustain and *attack* curve, repeating
+the first name. The MIDI Designer layout calls 61, 70 and 79 Release Curve, which
+is what the modulation destination list implies and what is recorded here.
+
+The controller map came from a third source again, and its firmware-1.1 reading
+is corroborated: it puts the 3D axes on CC 115, 116 and 117, matching the
+modulation source list in the newer manual rather than the CC 114-116 of the
+older one.
+
 ## Sources
 
-- DeepMind 12 user manual, sections 16 through 19, plus sections 8.9 and 9.1
+- DeepMind 12 user manual, sections 16 through 19, plus sections 8.9 and 9.1.
+  Two editions, one per firmware generation
 - Behringer *Retro Electro* sound bank, 128 programs, protocol version 7
 - Behringer *Synth Wizards* sound bank, 128 programs, protocol version 7
+- A community controller map for the DeepMind 12
+- A DeepMind 12D layout for MIDI Designer, used only to check this table against

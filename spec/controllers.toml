@@ -1,0 +1,674 @@
+# MIDI continuous controllers.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# Controllers are 7-bit, so a CC reaches 128 of the 256 values an NRPN can
+# address. Use NRPN where resolution matters.
+
+[meta]
+source = "Community controller map for the DeepMind 12, cross-checked against the DeepMind 12D MIDI Designer layout"
+resolution = "7-bit, 0-127"
+
+[[controller]]
+cc = 1
+name = "Modulation Wheel"
+kind = "standard"
+
+[[controller]]
+cc = 2
+name = "Breath Controller"
+kind = "standard"
+
+[[controller]]
+cc = 4
+name = "Foot Controller"
+kind = "standard"
+
+[[controller]]
+cc = 5
+name = "Portamento time"
+kind = "parameter"
+parameter = 34
+
+[[controller]]
+cc = 6
+name = "Data Entry MSB"
+kind = "standard"
+
+[[controller]]
+cc = 7
+name = "Channel Volume"
+kind = "standard"
+
+[[controller]]
+cc = 8
+name = "Balance"
+kind = "standard"
+
+[[controller]]
+cc = 10
+name = "Pan"
+kind = "standard"
+
+[[controller]]
+cc = 11
+name = "Expression"
+kind = "standard"
+
+[[controller]]
+cc = 12
+name = "Arp Rate (tempo)"
+kind = "parameter"
+parameter = 157
+
+[[controller]]
+cc = 13
+name = "Arp Gate Time"
+kind = "parameter"
+parameter = 160
+
+[[controller]]
+cc = 16
+name = "LFO 1 Rate"
+kind = "parameter"
+parameter = 0
+
+[[controller]]
+cc = 17
+name = "LFO 1 Delay / Fade"
+kind = "parameter"
+parameter = 1
+
+[[controller]]
+cc = 18
+name = "LFO 2 Rate"
+kind = "parameter"
+parameter = 7
+
+[[controller]]
+cc = 19
+name = "LFO 2 Delay / Fade"
+kind = "parameter"
+parameter = 8
+
+[[controller]]
+cc = 20
+name = "OSC 1 Pitch Mod Depth"
+kind = "parameter"
+parameter = 21
+
+[[controller]]
+cc = 21
+name = "OSC 1 PWM Depth"
+kind = "parameter"
+parameter = 25
+
+[[controller]]
+cc = 23
+name = "OSC 2 Pitch Mod Depth"
+kind = "parameter"
+parameter = 29
+
+[[controller]]
+cc = 24
+name = "OSC 2 Tone Mod Depth"
+kind = "parameter"
+parameter = 28
+
+[[controller]]
+cc = 25
+name = "OSC 2 Pitch"
+kind = "parameter"
+parameter = 27
+
+[[controller]]
+cc = 26
+name = "OSC 2 Level"
+kind = "parameter"
+parameter = 26
+
+[[controller]]
+cc = 27
+name = "Noise Level"
+kind = "parameter"
+parameter = 33
+
+[[controller]]
+cc = 28
+name = "Unison Detune"
+kind = "parameter"
+parameter = 87
+
+[[controller]]
+cc = 29
+name = "VCF Frequency"
+kind = "parameter"
+parameter = 39
+
+[[controller]]
+cc = 30
+name = "VCF Resonance"
+kind = "parameter"
+parameter = 41
+
+[[controller]]
+cc = 31
+name = "VCF Mod"
+kind = "other"
+note = "The source lists this as \"VCF MOD\" without saying which VCF modulation depth it drives. Left unmapped."
+
+[[controller]]
+cc = 32
+name = "Bank Select LSB"
+kind = "standard"
+
+[[controller]]
+cc = 33
+name = "VCF LFO Depth"
+kind = "parameter"
+parameter = 45
+
+[[controller]]
+cc = 34
+name = "VCF Keyboard Tracking"
+kind = "parameter"
+parameter = 49
+
+[[controller]]
+cc = 35
+name = "VCF HighPass Frequency"
+kind = "parameter"
+parameter = 40
+
+[[controller]]
+cc = 36
+name = "VCA Level"
+kind = "parameter"
+parameter = 80
+
+[[controller]]
+cc = 37
+name = "VCA Envelope Attack Time"
+kind = "parameter"
+parameter = 53
+
+[[controller]]
+cc = 38
+name = "Data Entry LSB"
+kind = "standard"
+
+[[controller]]
+cc = 39
+name = "VCA Envelope Decay Time"
+kind = "parameter"
+parameter = 54
+
+[[controller]]
+cc = 40
+name = "VCA Envelope Sustain Level"
+kind = "parameter"
+parameter = 55
+confirmed = false
+note = "The source list labels CC 44 \"VCA S\" and CC 56 \"VCA Scrv\" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware."
+
+[[controller]]
+cc = 41
+name = "VCA Envelope Release Time"
+kind = "parameter"
+parameter = 56
+
+[[controller]]
+cc = 42
+name = "VCF Envelope Attack Time"
+kind = "parameter"
+parameter = 62
+
+[[controller]]
+cc = 43
+name = "VCF Envelope Decay Time"
+kind = "parameter"
+parameter = 63
+
+[[controller]]
+cc = 44
+name = "VCF Envelope Sustain Level"
+kind = "parameter"
+parameter = 64
+confirmed = false
+note = "The source list labels CC 44 \"VCA S\" and CC 56 \"VCA Scrv\" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware."
+
+[[controller]]
+cc = 45
+name = "VCF Envelope Release Time"
+kind = "parameter"
+parameter = 65
+
+[[controller]]
+cc = 46
+name = "Mod Envelope Attack Time"
+kind = "parameter"
+parameter = 71
+
+[[controller]]
+cc = 47
+name = "Mod Envelope Decay Time"
+kind = "parameter"
+parameter = 72
+
+[[controller]]
+cc = 48
+name = "Mod Envelope Sustain Level"
+kind = "parameter"
+parameter = 73
+
+[[controller]]
+cc = 49
+name = "Mod Envelope Release Time"
+kind = "parameter"
+parameter = 74
+
+[[controller]]
+cc = 50
+name = "VCA Envelope Attack Curve"
+kind = "parameter"
+parameter = 58
+
+[[controller]]
+cc = 51
+name = "VCA Envelope Decay Curve"
+kind = "parameter"
+parameter = 59
+
+[[controller]]
+cc = 52
+name = "VCA Envelope Sustain Curve"
+kind = "parameter"
+parameter = 60
+confirmed = false
+note = "The source list labels CC 44 \"VCA S\" and CC 56 \"VCA Scrv\" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware."
+
+[[controller]]
+cc = 53
+name = "VCA Envelope Release Curve"
+kind = "parameter"
+parameter = 61
+
+[[controller]]
+cc = 54
+name = "VCF Envelope Attack Curve"
+kind = "parameter"
+parameter = 67
+
+[[controller]]
+cc = 55
+name = "VCF Envelope Decay Curve"
+kind = "parameter"
+parameter = 68
+
+[[controller]]
+cc = 56
+name = "VCF Envelope Sustain Curve"
+kind = "parameter"
+parameter = 69
+confirmed = false
+note = "The source list labels CC 44 \"VCA S\" and CC 56 \"VCA Scrv\" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware."
+
+[[controller]]
+cc = 57
+name = "VCF Envelope Release Curve"
+kind = "parameter"
+parameter = 70
+
+[[controller]]
+cc = 58
+name = "Mod Envelope Attack Curve"
+kind = "parameter"
+parameter = 76
+
+[[controller]]
+cc = 59
+name = "Mod Envelope Decay Curve"
+kind = "parameter"
+parameter = 77
+
+[[controller]]
+cc = 60
+name = "Mod Envelope Sustain Curve"
+kind = "parameter"
+parameter = 78
+
+[[controller]]
+cc = 61
+name = "Mod Envelope Release Curve"
+kind = "parameter"
+parameter = 79
+
+[[controller]]
+cc = 62
+name = "FX 1 Param 1"
+kind = "parameter"
+parameter = 167
+
+[[controller]]
+cc = 63
+name = "FX 1 Param 2"
+kind = "parameter"
+parameter = 168
+
+[[controller]]
+cc = 64
+name = "Sustain Pedal"
+kind = "standard"
+
+[[controller]]
+cc = 65
+name = "FX 1 Param 3"
+kind = "parameter"
+parameter = 169
+
+[[controller]]
+cc = 66
+name = "FX 1 Param 4"
+kind = "parameter"
+parameter = 170
+
+[[controller]]
+cc = 67
+name = "FX 1 Param 5"
+kind = "parameter"
+parameter = 171
+
+[[controller]]
+cc = 68
+name = "FX 1 Param 6"
+kind = "parameter"
+parameter = 172
+
+[[controller]]
+cc = 69
+name = "FX 1 Param 7"
+kind = "parameter"
+parameter = 173
+
+[[controller]]
+cc = 70
+name = "FX 1 Param 8"
+kind = "parameter"
+parameter = 174
+
+[[controller]]
+cc = 71
+name = "FX 1 Param 9"
+kind = "parameter"
+parameter = 175
+
+[[controller]]
+cc = 72
+name = "FX 1 Param 10"
+kind = "parameter"
+parameter = 176
+
+[[controller]]
+cc = 73
+name = "FX 1 Param 11"
+kind = "parameter"
+parameter = 177
+
+[[controller]]
+cc = 74
+name = "FX 1 Param 12"
+kind = "parameter"
+parameter = 178
+
+[[controller]]
+cc = 75
+name = "FX 2 Param 1"
+kind = "parameter"
+parameter = 180
+
+[[controller]]
+cc = 76
+name = "FX 2 Param 2"
+kind = "parameter"
+parameter = 181
+
+[[controller]]
+cc = 77
+name = "FX 2 Param 3"
+kind = "parameter"
+parameter = 182
+
+[[controller]]
+cc = 78
+name = "FX 2 Param 4"
+kind = "parameter"
+parameter = 183
+
+[[controller]]
+cc = 79
+name = "FX 2 Param 5"
+kind = "parameter"
+parameter = 184
+
+[[controller]]
+cc = 80
+name = "FX 2 Param 6"
+kind = "parameter"
+parameter = 185
+
+[[controller]]
+cc = 81
+name = "FX 2 Param 7"
+kind = "parameter"
+parameter = 186
+
+[[controller]]
+cc = 82
+name = "FX 2 Param 8"
+kind = "parameter"
+parameter = 187
+
+[[controller]]
+cc = 83
+name = "FX 2 Param 9"
+kind = "parameter"
+parameter = 188
+
+[[controller]]
+cc = 84
+name = "FX 2 Param 10"
+kind = "parameter"
+parameter = 189
+
+[[controller]]
+cc = 85
+name = "FX 2 Param 11"
+kind = "parameter"
+parameter = 190
+
+[[controller]]
+cc = 86
+name = "FX 2 Param 12"
+kind = "parameter"
+parameter = 191
+
+[[controller]]
+cc = 87
+name = "FX 3 Param 1"
+kind = "parameter"
+parameter = 193
+
+[[controller]]
+cc = 88
+name = "FX 3 Param 2"
+kind = "parameter"
+parameter = 194
+
+[[controller]]
+cc = 89
+name = "FX 3 Param 3"
+kind = "parameter"
+parameter = 195
+
+[[controller]]
+cc = 90
+name = "FX 3 Param 4"
+kind = "parameter"
+parameter = 196
+
+[[controller]]
+cc = 91
+name = "FX 3 Param 5"
+kind = "parameter"
+parameter = 197
+
+[[controller]]
+cc = 92
+name = "FX 3 Param 6"
+kind = "parameter"
+parameter = 198
+
+[[controller]]
+cc = 93
+name = "FX 3 Param 7"
+kind = "parameter"
+parameter = 199
+
+[[controller]]
+cc = 94
+name = "FX 3 Param 8"
+kind = "parameter"
+parameter = 200
+
+[[controller]]
+cc = 95
+name = "FX 3 Param 9"
+kind = "parameter"
+parameter = 201
+
+[[controller]]
+cc = 96
+name = "Data Increment"
+kind = "standard"
+
+[[controller]]
+cc = 97
+name = "Data Decrement"
+kind = "standard"
+
+[[controller]]
+cc = 98
+name = "NRPN LSB"
+kind = "standard"
+
+[[controller]]
+cc = 99
+name = "NRPN MSB"
+kind = "standard"
+
+[[controller]]
+cc = 100
+name = "RPN LSB"
+kind = "standard"
+
+[[controller]]
+cc = 101
+name = "RPN MSB"
+kind = "standard"
+
+[[controller]]
+cc = 102
+name = "FX 3 Param 10"
+kind = "parameter"
+parameter = 202
+
+[[controller]]
+cc = 103
+name = "FX 3 Param 11"
+kind = "parameter"
+parameter = 203
+
+[[controller]]
+cc = 104
+name = "FX 3 Param 12"
+kind = "parameter"
+parameter = 204
+
+[[controller]]
+cc = 105
+name = "FX 1 Type"
+kind = "parameter"
+parameter = 166
+
+[[controller]]
+cc = 106
+name = "FX 2 Type"
+kind = "parameter"
+parameter = 179
+
+[[controller]]
+cc = 107
+name = "FX 3 Type"
+kind = "parameter"
+parameter = 192
+
+[[controller]]
+cc = 108
+name = "FX 4 Type"
+kind = "parameter"
+parameter = 205
+
+[[controller]]
+cc = 109
+name = "FX 1 Output Gain"
+kind = "parameter"
+parameter = 218
+
+[[controller]]
+cc = 110
+name = "FX 2 Output Gain"
+kind = "parameter"
+parameter = 219
+
+[[controller]]
+cc = 111
+name = "FX 3 Output Gain"
+kind = "parameter"
+parameter = 220
+
+[[controller]]
+cc = 112
+name = "FX 4 Output Gain"
+kind = "parameter"
+parameter = 221
+
+[[controller]]
+cc = 113
+name = "Analog Thru"
+kind = "other"
+note = "Switches the analog thru path."
+
+[[controller]]
+cc = 114
+name = "FX Mode"
+kind = "parameter"
+parameter = 222
+
+[[controller]]
+cc = 115
+name = "3D X axis"
+kind = "other"
+note = "Modulation matrix source CC X."
+
+[[controller]]
+cc = 116
+name = "3D Y axis"
+kind = "other"
+note = "Modulation matrix source CC Y."
+
+[[controller]]
+cc = 117
+name = "3D Z axis"
+kind = "other"
+note = "Modulation matrix source CC Z."

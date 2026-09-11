@@ -99,8 +99,13 @@ mappings into one.
 | `spec/enums.toml` | 27 value tables, including the 132 modulation destinations |
 | `spec/messages.toml` | 22 SysEx messages |
 | `spec/globals.toml` | 24 device-wide settings |
+| `spec/controllers.toml` | 112 MIDI controllers, 90 of them mapped to a parameter |
 
-`cargo xtask docs` renders the reference tables in `docs/midi-spec.md`. The same
+`cargo xtask docs` renders the reference tables in `docs/midi-spec.md` and writes
+the Mermaid sources to `docs/diagrams/*.mmd`. The diagrams are embedded inline in
+the document as well, from the same strings, so nothing needs a build step to be
+readable; `cargo xtask diagrams` renders them to SVG with mermaid-cli for anyone
+who wants standalone images. The same
 files will generate the `Param` enum, its lookup tables, and typed accessors on
 `Program` when that layer lands. A correction is made once, in one file.
 
@@ -119,10 +124,16 @@ opt-in: CI auto-committing to contributor branches is worse than a clear failure
 that names the command to run.
 
 The loader validates the spec before rendering anything. Offsets must cover
-0..=241 exactly, every referenced value table must exist, and an enumerated
-parameter's maximum must match its table. That last check is not theoretical: it
-caught the parameter table carrying firmware 1.0 ranges while the value tables
-carried firmware 1.1 lists.
+0..=241 exactly, every referenced value table must exist, an enumerated
+parameter's maximum must match its table, no controller number may repeat, and no
+two controllers may claim the same parameter. Those checks are not theoretical:
+the enum one caught the parameter table carrying firmware 1.0 ranges while the
+value tables carried firmware 1.1 lists.
+
+Correctness beyond that comes from disagreeing sources. The parameter table was
+built from the manual, then checked against a MIDI Designer layout that had no
+part in building it; all 35 of its named NRPN controls agree, including the three
+offsets where this specification departs from the manual's printed names.
 
 ## State is not a cache, it is a set of claims
 

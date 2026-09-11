@@ -98,6 +98,26 @@ pub struct Message {
     pub note: Option<String>,
 }
 
+/// A MIDI continuous controller the synthesizer answers.
+#[derive(Debug, Deserialize)]
+pub struct Controller {
+    /// Controller number, 0-127.
+    pub cc: u8,
+    /// What it controls.
+    pub name: String,
+    /// `"parameter"`, `"standard"` or `"other"`.
+    pub kind: String,
+    /// Offset of the program parameter it drives, when it drives one.
+    #[serde(default)]
+    pub parameter: Option<u16>,
+    /// `false` when the assignment is inferred and needs hardware confirmation.
+    #[serde(default = "yes")]
+    pub confirmed: bool,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
 /// A device-wide setting.
 #[derive(Debug, Deserialize)]
 pub struct Global {
@@ -129,6 +149,11 @@ struct Messages {
 }
 
 #[derive(Debug, Deserialize)]
+struct Controllers {
+    controller: Vec<Controller>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Globals {
     #[serde(rename = "global")]
     globals: Vec<Global>,
@@ -145,6 +170,8 @@ pub struct Spec {
     pub messages: Vec<Message>,
     /// Device-wide settings.
     pub globals: Vec<Global>,
+    /// Continuous controllers, ordered by number.
+    pub controllers: Vec<Controller>,
 }
 
 impl Spec {
@@ -162,12 +189,14 @@ impl Spec {
         let tables: ValueTables = read(&spec.join("enums.toml"))?;
         let messages: Messages = read(&spec.join("messages.toml"))?;
         let globals: Globals = read(&spec.join("globals.toml"))?;
+        let controllers: Controllers = read(&spec.join("controllers.toml"))?;
 
         let this = Self {
             parameters: parameters.parameter,
             tables: tables.tables,
             messages: messages.message,
             globals: globals.globals,
+            controllers: controllers.controller,
         };
         this.validate()?;
         Ok(this)
@@ -213,6 +242,37 @@ impl Spec {
                 return Err(format!(
                     "parameter {} ({}) has max {} but table {id} tops out at {highest}",
                     parameter.offset, parameter.name, parameter.max
+                ));
+            }
+        }
+
+        let mut seen_cc: Vec<u8> = Vec::new();
+        for controller in &self.controllers {
+            if seen_cc.contains(&controller.cc) {
+                return Err(format!(
+                    "controllers.toml: CC {} appears twice",
+                    controller.cc
+                ));
+            }
+            seen_cc.push(controller.cc);
+            let Some(offset) = controller.parameter else {
+                continue;
+            };
+            if !self.parameters.iter().any(|p| p.offset == offset) {
+                return Err(format!(
+                    "controllers.toml: CC {} maps to unknown parameter offset {offset}",
+                    controller.cc
+                ));
+            }
+            if self
+                .controllers
+                .iter()
+                .filter(|c| c.parameter == Some(offset))
+                .count()
+                > 1
+            {
+                return Err(format!(
+                    "controllers.toml: parameter offset {offset} is claimed by more than one CC"
                 ));
             }
         }

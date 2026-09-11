@@ -24,9 +24,10 @@ layers are landing one at a time. Not yet usable.
 | [`docs/architecture.md`](docs/architecture.md) | Design, layering, roadmap |
 | `cargo doc --open` | API reference |
 
-`spec/*.toml` is the machine-readable source of truth. The reference tables in
-`docs/midi-spec.md` are generated from it, and the library's parameter tables
-will be too.
+`spec/*.toml` is the machine-readable source of truth. The reference tables and
+diagrams in `docs/midi-spec.md` are generated from it, and the library's
+parameter tables will be too. Diagram sources also land in `docs/diagrams/` as
+standalone `.mmd` files.
 
 ## Supported hardware
 
