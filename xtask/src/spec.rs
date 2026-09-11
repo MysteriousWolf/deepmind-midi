@@ -222,6 +222,11 @@ pub struct Effect {
 pub struct PanelSlot {
     /// Position within the engine's twelve parameters, counting from 1.
     pub slot: u8,
+    /// The parameter written out in full, for a panel with room for it.
+    ///
+    /// `effects.toml` keeps the manual's abbreviated spelling, which matches the
+    /// synthesizer's own display; this is that name expanded.
+    pub title: String,
     /// `continuous`, `switch` or `selector`.
     pub kind: String,
     /// Slots sharing a label belong together, such as one side of a dual engine.
@@ -703,6 +708,12 @@ impl Spec {
                 if slot.slot != parameter.slot {
                     return Err(format!(
                         "panels.toml: {} slot {} does not line up with effects.toml",
+                        panel.name, slot.slot
+                    ));
+                }
+                if slot.title.trim().is_empty() {
+                    return Err(format!(
+                        "panels.toml: {} slot {} has no title",
                         panel.name, slot.slot
                     ));
                 }

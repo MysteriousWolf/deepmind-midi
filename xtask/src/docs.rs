@@ -479,8 +479,8 @@ fn render_effects(spec: &Spec) -> String {
         let _ = write!(
             out,
             "\n<a id=\"fx-{}\"></a>\n\n#### {} ({})\n\n`FX Type` {}.\n\n\
-             | Slot | Ref | Parameter | Control | Group | Range | Mod | \
-             Description |\n|---|---|---|---|---|---|---|---|\n",
+             | Slot | Ref | Parameter | Reads as | Control | Group | Range | \
+             Mod | Description |\n|---|---|---|---|---|---|---|---|---|\n",
             effect.r#type,
             cell(&effect.full_name),
             cell(&effect.name),
@@ -508,10 +508,11 @@ fn render_effects(spec: &Spec) -> String {
             };
             let _ = writeln!(
                 out,
-                "| {} | `{}` | {} | {} | {} | {range} | {} | {} |",
+                "| {} | `{}` | {} | {} | {} | {} | {range} | {} | {} |",
                 parameter.slot,
                 cell(&parameter.r#ref),
                 cell(&parameter.name),
+                slot.map_or(String::new(), |s| cell(&s.title)),
                 slot.map_or("", |s| s.kind.as_str()),
                 slot.and_then(|s| s.group.as_deref()).unwrap_or(""),
                 if parameter.mod_dest { "yes" } else { "" },

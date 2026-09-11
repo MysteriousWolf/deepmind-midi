@@ -161,8 +161,19 @@ spec.table_for("mod_source", "1.0")    // 23 entries
 spec.table_for("mod_source", "1.1")    // 25 entries
 ```
 
+This is not a footnote-sized difference. 17 of the 23 modulation sources and 120
+of the 130 modulation destinations changed meaning between the two versions, so
+reading a 1.0 program with 1.1 tables mislabels almost everything. Only the FX
+type list is nearly a pure extension.
+
 A table declares the versions it covers: `"1.0"` for exactly that one, `"1.1+"`
 for that one and later, and nothing at all for a table that has never changed.
+The newest version is the default, so a caller who never mentions firmware gets
+current hardware.
+
+What the mechanism cannot do: a dump carries the comms protocol version, not the
+firmware version, so nothing in a `.syx` file says which firmware wrote it. The
+older tables are only reachable when the host knows the version another way.
 Loading fails unless every table identifier resolves to exactly one table for
 every listed version. A gap makes a table unreachable; an overlap makes the
 answer depend on file order, which is how this sort of thing goes wrong

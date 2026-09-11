@@ -3,13 +3,20 @@
 # Generated documentation is built from this file. Edit it here, then run
 # `cargo xtask docs` to refresh docs/midi-spec.md.
 #
-# This is deliberately semantic, not visual. It says what kind of control a
-# slot is and which slots belong together, so a host can lay out a panel that
-# behaves like the hardware. It carries no pixels, colours or fonts: Behringer
-# publishes no panel geometry for the effects, and inventing some and
-# attributing it to them would be worse than leaving it to the host.
+# This is deliberately semantic, not visual. It says what a slot is called in
+# full, what kind of control it is, and which slots belong together, so a host
+# can lay out a panel that behaves like the hardware. It carries no pixels,
+# colours or fonts: Behringer publishes no panel geometry for the effects, and
+# inventing some and attributing it to them would be worse than leaving it to
+# the host.
 
 [meta]
+titles = """
+The manual names parameters as the synthesizer's display does, abbreviated to \
+fit: HiSvFreq, LMF Spread, Rtype. effects.toml keeps those verbatim, for a host \
+that wants to label a compact view exactly as the hardware does. `title` here \
+is the same parameter written out, expanded by this project, for a panel with \
+room to be readable."""
 derivation = """
 Control kind comes from the parameter itself: a slot with two states is a \
 switch, one that picks from a list is a selector, one with a numeric range \
@@ -24,578 +31,578 @@ kinds = ["continuous", "switch", "selector"]
 type = 0
 name = "TC-DeepVRB"
 slots = [
-    { slot = 1, kind = "selector" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous" },
-    { slot = 5, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Preset", kind = "selector" },
+    { slot = 2, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Tone", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Pre-Delay", kind = "continuous" },
+    { slot = 5, title = "Mix", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 1
 name = "AmbVerb"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous" },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous" },
-    { slot = 10, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Pre-Delay", kind = "continuous" },
+    { slot = 2, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Size", kind = "continuous" },
+    { slot = 4, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Diffusion", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Modulation Depth", kind = "continuous" },
+    { slot = 10, title = "Tail Gain", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 2
 name = "RoomRev"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous" },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous" },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous" },
+    { slot = 1, title = "Pre-Delay", kind = "continuous" },
+    { slot = 2, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Size", kind = "continuous" },
+    { slot = 4, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Diffusion", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Bass Multiplier", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Spread", kind = "continuous" },
+    { slot = 11, title = "Shape", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Spin", kind = "continuous" },
 ]
 
 [[panel]]
 type = 3
 name = "VintageRev"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous" },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous" },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "switch", modulatable = true },
+    { slot = 1, title = "Pre-Delay", kind = "continuous" },
+    { slot = 2, title = "Size", kind = "continuous" },
+    { slot = 3, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Low Multiplier", kind = "continuous", modulatable = true },
+    { slot = 5, title = "High Multiplier", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Density", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Early Reflection Level", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Early Reflection Delay", kind = "continuous" },
+    { slot = 11, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Freeze", kind = "switch", modulatable = true },
 ]
 
 [[panel]]
 type = 4
 name = "HallRev"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous" },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous" },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous" },
+    { slot = 1, title = "Pre-Delay", kind = "continuous" },
+    { slot = 2, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Size", kind = "continuous" },
+    { slot = 4, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Diffusion", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Bass Multiplier", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Spread", kind = "continuous" },
+    { slot = 11, title = "Shape", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Modulation Speed", kind = "continuous" },
 ]
 
 [[panel]]
 type = 5
 name = "ChamberRev"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous" },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous" },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous" },
+    { slot = 1, title = "Pre-Delay", kind = "continuous" },
+    { slot = 2, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Size", kind = "continuous" },
+    { slot = 4, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Diffusion", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Bass Multiplier", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Spread", kind = "continuous" },
+    { slot = 11, title = "Shape", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Spin", kind = "continuous" },
 ]
 
 [[panel]]
 type = 6
 name = "PlateRev"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous" },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous" },
-    { slot = 12, kind = "continuous" },
+    { slot = 1, title = "Pre-Delay", kind = "continuous" },
+    { slot = 2, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Size", kind = "continuous" },
+    { slot = 4, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Diffusion", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Bass Multiplier", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Crossover", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Modulation Depth", kind = "continuous" },
+    { slot = 12, title = "Modulation Speed", kind = "continuous" },
 ]
 
 [[panel]]
 type = 7
 name = "RichPltRev"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous" },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous" },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Pre-Delay", kind = "continuous" },
+    { slot = 2, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Size", kind = "continuous" },
+    { slot = 4, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Diffusion", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Bass Multiplier", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Spread", kind = "continuous" },
+    { slot = 11, title = "Attack", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Spin", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 8
 name = "GatedRev"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous" },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous" },
+    { slot = 1, title = "Pre-Delay", kind = "continuous" },
+    { slot = 2, title = "Decay", kind = "continuous" },
+    { slot = 3, title = "Attack", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Density", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Spread", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Shelf Frequency", kind = "continuous", modulatable = true },
+    { slot = 9, title = "High Shelf Gain", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Diffusion", kind = "continuous" },
 ]
 
 [[panel]]
 type = 9
 name = "Reverse"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous" },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous" },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Pre-Delay", kind = "continuous" },
+    { slot = 2, title = "Decay", kind = "continuous" },
+    { slot = 3, title = "Rise", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Diffusion", kind = "continuous" },
+    { slot = 5, title = "Spread", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Shelf Frequency", kind = "continuous", modulatable = true },
+    { slot = 9, title = "High Shelf Gain", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 10
 name = "ChorusVerb"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous" },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous" },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous" },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Speed", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Depth", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Delay", kind = "continuous" },
+    { slot = 4, title = "Phase", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Wave", kind = "continuous" },
+    { slot = 6, title = "Balance", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Pre-Delay", kind = "continuous" },
+    { slot = 8, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Size", kind = "continuous" },
+    { slot = 10, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Mix", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 11
 name = "DelayVerb"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "selector" },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous" },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous" },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Time", kind = "continuous" },
+    { slot = 2, title = "Delay Pattern", kind = "selector" },
+    { slot = 3, title = "Feedback High Cut", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Feedback", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Cross-Feedback", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Balance", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Pre-Delay", kind = "continuous" },
+    { slot = 8, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Size", kind = "continuous" },
+    { slot = 10, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Mix", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 12
 name = "FlangVerb"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous" },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous" },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous" },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Speed", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Depth", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Delay", kind = "continuous" },
+    { slot = 4, title = "Phase", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Feedback", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Balance", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Pre-Delay", kind = "continuous" },
+    { slot = 8, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Size", kind = "continuous" },
+    { slot = 10, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Mix", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 13
 name = "MidasEQ"
 slots = [
-    { slot = 1, kind = "continuous", group = "low", modulatable = true },
-    { slot = 2, kind = "continuous", group = "low", modulatable = true },
-    { slot = 3, kind = "continuous", group = "low-mid", modulatable = true },
-    { slot = 4, kind = "continuous", group = "low-mid", modulatable = true },
-    { slot = 5, kind = "continuous", group = "low-mid", modulatable = true },
-    { slot = 6, kind = "continuous", group = "high-mid", modulatable = true },
-    { slot = 7, kind = "continuous", group = "high-mid", modulatable = true },
-    { slot = 8, kind = "continuous", group = "high-mid", modulatable = true },
-    { slot = 9, kind = "continuous", group = "high", modulatable = true },
-    { slot = 10, kind = "continuous", group = "high", modulatable = true },
-    { slot = 11, kind = "switch", modulatable = true },
+    { slot = 1, title = "Low Shelf Gain", kind = "continuous", group = "low", modulatable = true },
+    { slot = 2, title = "Low Shelf Frequency", kind = "continuous", group = "low", modulatable = true },
+    { slot = 3, title = "Low-Mid Gain", kind = "continuous", group = "low-mid", modulatable = true },
+    { slot = 4, title = "Low-Mid Frequency", kind = "continuous", group = "low-mid", modulatable = true },
+    { slot = 5, title = "Low-Mid Q", kind = "continuous", group = "low-mid", modulatable = true },
+    { slot = 6, title = "High-Mid Gain", kind = "continuous", group = "high-mid", modulatable = true },
+    { slot = 7, title = "High-Mid Frequency", kind = "continuous", group = "high-mid", modulatable = true },
+    { slot = 8, title = "High-Mid Q", kind = "continuous", group = "high-mid", modulatable = true },
+    { slot = 9, title = "High Shelf Gain", kind = "continuous", group = "high", modulatable = true },
+    { slot = 10, title = "High Shelf Frequency", kind = "continuous", group = "high", modulatable = true },
+    { slot = 11, title = "EQ In or Out", kind = "switch", modulatable = true },
 ]
 
 [[panel]]
 type = 14
 name = "Enhancer"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", group = "low", modulatable = true },
-    { slot = 4, kind = "continuous", group = "low", modulatable = true },
-    { slot = 5, kind = "continuous", group = "mid", modulatable = true },
-    { slot = 6, kind = "continuous", group = "mid", modulatable = true },
-    { slot = 7, kind = "continuous", group = "high", modulatable = true },
-    { slot = 8, kind = "continuous", group = "high", modulatable = true },
-    { slot = 9, kind = "switch" },
+    { slot = 1, title = "Output Gain", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Spread", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Bass Gain", kind = "continuous", group = "low", modulatable = true },
+    { slot = 4, title = "Bass Frequency", kind = "continuous", group = "low", modulatable = true },
+    { slot = 5, title = "Mid Gain", kind = "continuous", group = "mid", modulatable = true },
+    { slot = 6, title = "Mid Q", kind = "continuous", group = "mid", modulatable = true },
+    { slot = 7, title = "High Gain", kind = "continuous", group = "high", modulatable = true },
+    { slot = 8, title = "High Frequency", kind = "continuous", group = "high", modulatable = true },
+    { slot = 9, title = "Solo", kind = "switch" },
 ]
 
 [[panel]]
 type = 15
 name = "FairComp"
 slots = [
-    { slot = 1, kind = "selector" },
-    { slot = 2, kind = "continuous", group = "left-mid", modulatable = true },
-    { slot = 3, kind = "continuous", group = "left-mid", modulatable = true },
-    { slot = 4, kind = "continuous", group = "left-mid" },
-    { slot = 5, kind = "continuous", group = "left-mid", modulatable = true },
-    { slot = 6, kind = "continuous", group = "left-mid", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", group = "right-side", modulatable = true },
-    { slot = 9, kind = "continuous", group = "right-side", modulatable = true },
-    { slot = 10, kind = "continuous", group = "right-side" },
-    { slot = 11, kind = "continuous", group = "right-side", modulatable = true },
-    { slot = 12, kind = "continuous", group = "right-side", modulatable = true },
+    { slot = 1, title = "Mode", kind = "selector" },
+    { slot = 2, title = "Input Gain, left/mid", kind = "continuous", group = "left-mid", modulatable = true },
+    { slot = 3, title = "Threshold, left/mid", kind = "continuous", group = "left-mid", modulatable = true },
+    { slot = 4, title = "Time, left/mid", kind = "continuous", group = "left-mid" },
+    { slot = 5, title = "DC Bias, left/mid", kind = "continuous", group = "left-mid", modulatable = true },
+    { slot = 6, title = "Output Gain, left/mid", kind = "continuous", group = "left-mid", modulatable = true },
+    { slot = 7, title = "Bias Balance", kind = "continuous", modulatable = true },
+    { slot = 8, title = "Input Gain, right/side", kind = "continuous", group = "right-side", modulatable = true },
+    { slot = 9, title = "Threshold, right/side", kind = "continuous", group = "right-side", modulatable = true },
+    { slot = 10, title = "Time, right/side", kind = "continuous", group = "right-side" },
+    { slot = 11, title = "DC Bias, right/side", kind = "continuous", group = "right-side", modulatable = true },
+    { slot = 12, title = "Output Gain, right/side", kind = "continuous", group = "right-side", modulatable = true },
 ]
 
 [[panel]]
 type = 16
 name = "MulBndDist"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "selector" },
-    { slot = 3, kind = "continuous", group = "low", modulatable = true },
-    { slot = 4, kind = "continuous", group = "low", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", group = "mid", modulatable = true },
-    { slot = 7, kind = "continuous", group = "mid", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", group = "high", modulatable = true },
-    { slot = 10, kind = "continuous", group = "high", modulatable = true },
-    { slot = 11, kind = "selector" },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Input Gain", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Distortion Type", kind = "selector" },
+    { slot = 3, title = "Low Band Level", kind = "continuous", group = "low", modulatable = true },
+    { slot = 4, title = "Low Band Drive", kind = "continuous", group = "low", modulatable = true },
+    { slot = 5, title = "Crossover Frequency 1", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Mid Band Level", kind = "continuous", group = "mid", modulatable = true },
+    { slot = 7, title = "Mid Band Drive", kind = "continuous", group = "mid", modulatable = true },
+    { slot = 8, title = "Crossover Frequency 2", kind = "continuous", modulatable = true },
+    { slot = 9, title = "High Band Level", kind = "continuous", group = "high", modulatable = true },
+    { slot = 10, title = "High Band Drive", kind = "continuous", group = "high", modulatable = true },
+    { slot = 11, title = "Cabinet", kind = "selector" },
+    { slot = 12, title = "Output Gain", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 17
 name = "RackAmp"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "switch" },
+    { slot = 1, title = "Pre-Amp", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Buzz", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Punch", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Crunch", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Drive", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Level", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Tone", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Tone", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Cabinet", kind = "switch" },
 ]
 
 [[panel]]
 type = 18
 name = "EdisonEX1"
 slots = [
-    { slot = 1, kind = "switch" },
-    { slot = 2, kind = "selector" },
-    { slot = 3, kind = "selector" },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
+    { slot = 1, title = "On or Off", kind = "switch" },
+    { slot = 2, title = "Input Mode", kind = "selector" },
+    { slot = 3, title = "Output Mode", kind = "selector" },
+    { slot = 4, title = "Stereo Spread", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Low-Mid Frequency Spread", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Balance", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Centre Distance", kind = "continuous", modulatable = true },
+    { slot = 8, title = "Gain", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 19
 name = "Auto Pan"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Speed", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Phase", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Wave", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Depth", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Envelope Speed", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Envelope Depth", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Attack", kind = "continuous", modulatable = true },
+    { slot = 8, title = "Hold", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Release", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 20
 name = "NoiseGate"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "selector" },
-    { slot = 8, kind = "continuous" },
+    { slot = 1, title = "Threshold", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Range", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Attack", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Release", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Hold", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Punch", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Mode", kind = "selector" },
+    { slot = 8, title = "Power", kind = "continuous" },
 ]
 
 [[panel]]
 type = 21
 name = "Delay"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous" },
-    { slot = 3, kind = "selector" },
-    { slot = 4, kind = "selector" },
-    { slot = 5, kind = "selector" },
-    { slot = 6, kind = "continuous" },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Time", kind = "continuous" },
+    { slot = 3, title = "Mode", kind = "selector" },
+    { slot = 4, title = "Delay Factor, left", kind = "selector" },
+    { slot = 5, title = "Delay Factor, right", kind = "selector" },
+    { slot = 6, title = "Offset", kind = "continuous" },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Feedback Low Cut", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Feedback, left", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Feedback, right", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Feedback High Cut", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 22
 name = "3TapDelay"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "selector" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "selector" },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "switch" },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Time", kind = "continuous" },
+    { slot = 2, title = "Tap T Gain", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Tap T Pan", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Feedback", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Tap A Delay Factor", kind = "selector" },
+    { slot = 6, title = "Tap A Gain", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Tap A Pan", kind = "continuous", modulatable = true },
+    { slot = 8, title = "Tap B Delay Factor", kind = "selector" },
+    { slot = 9, title = "Tap B Gain", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Tap B Pan", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Cross-Feedback", kind = "switch" },
+    { slot = 12, title = "Mix", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 23
 name = "4TapDelay"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous" },
-    { slot = 5, kind = "selector" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "selector" },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "selector" },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous" },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Time", kind = "continuous" },
+    { slot = 2, title = "Gain", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Feedback", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Spread", kind = "continuous" },
+    { slot = 5, title = "Tap A Delay Factor", kind = "selector" },
+    { slot = 6, title = "Tap A Gain", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Tap B Delay Factor", kind = "selector" },
+    { slot = 8, title = "Tap B Gain", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Tap C Delay Factor", kind = "selector" },
+    { slot = 10, title = "Tap C Gain", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Cross-Feedback", kind = "continuous" },
+    { slot = 12, title = "Mix", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 24
 name = "T-RayDelay"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Delay", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Sustain", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Wobble", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Tone", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 25
 name = "DecimDelay"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous" },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "selector" },
-    { slot = 5, kind = "selector" },
-    { slot = 6, kind = "continuous" },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "selector" },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "switch" },
+    { slot = 1, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Master Time", kind = "continuous" },
+    { slot = 3, title = "Downsample", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Delay Factor, left", kind = "selector" },
+    { slot = 5, title = "Delay Factor, right", kind = "selector" },
+    { slot = 6, title = "Bit Depth", kind = "continuous" },
+    { slot = 7, title = "Cutoff Frequency", kind = "continuous", modulatable = true },
+    { slot = 8, title = "Resonance", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Type", kind = "selector" },
+    { slot = 10, title = "Feedback, left", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Feedback, right", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Decimation Point", kind = "switch" },
 ]
 
 [[panel]]
 type = 26
 name = "ModDlyRev"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "selector" },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "selector" },
-    { slot = 8, kind = "selector" },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Time", kind = "continuous" },
+    { slot = 2, title = "Delay Factor", kind = "selector" },
+    { slot = 3, title = "Feedback", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Feedback High Cut", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Depth", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Speed", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Mode", kind = "selector" },
+    { slot = 8, title = "Reverb Type", kind = "selector" },
+    { slot = 9, title = "Decay", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Damping", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Balance", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Mix", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 27
 name = "Chorus"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous" },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous" },
-    { slot = 10, kind = "continuous" },
-    { slot = 11, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Speed", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Width, left", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Width, right", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Delay, left", kind = "continuous" },
+    { slot = 5, title = "Delay, right", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Phase", kind = "continuous" },
+    { slot = 10, title = "Wave", kind = "continuous" },
+    { slot = 11, title = "Spread", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 28
 name = "Chorus-D"
 slots = [
-    { slot = 1, kind = "switch" },
-    { slot = 2, kind = "selector" },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "switch", group = "channel-1" },
-    { slot = 5, kind = "switch", group = "channel-2" },
-    { slot = 6, kind = "switch" },
-    { slot = 7, kind = "switch" },
+    { slot = 1, title = "On or Off", kind = "switch" },
+    { slot = 2, title = "Mode", kind = "selector" },
+    { slot = 3, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Switch 1", kind = "switch", group = "channel-1" },
+    { slot = 5, title = "Switch 2", kind = "switch", group = "channel-2" },
+    { slot = 6, title = "Switch 3", kind = "switch" },
+    { slot = 7, title = "Switch 4", kind = "switch" },
 ]
 
 [[panel]]
 type = 29
 name = "Flanger"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous" },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", modulatable = true },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous" },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Speed", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Width, left", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Width, right", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Delay, left", kind = "continuous" },
+    { slot = 5, title = "Delay, right", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Low Cut", kind = "continuous", modulatable = true },
+    { slot = 8, title = "High Cut", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Phase", kind = "continuous" },
+    { slot = 10, title = "Feedback Low Cut", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Feedback High Cut", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Feedback", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 30
 name = "Phaser"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous" },
-    { slot = 8, kind = "continuous" },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Speed", kind = "continuous", modulatable = true },
+    { slot = 2, title = "Depth", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Resonance", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Base Frequency", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Stages", kind = "continuous" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Wave", kind = "continuous" },
+    { slot = 8, title = "Phase", kind = "continuous" },
+    { slot = 9, title = "Envelope Modulation", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Attack", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Hold", kind = "continuous", modulatable = true },
+    { slot = 12, title = "Release", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 31
 name = "MoodFilter"
 slots = [
-    { slot = 1, kind = "continuous" },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "selector" },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "selector" },
-    { slot = 8, kind = "continuous", modulatable = true },
-    { slot = 9, kind = "continuous", modulatable = true },
-    { slot = 10, kind = "continuous", modulatable = true },
-    { slot = 11, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Speed", kind = "continuous" },
+    { slot = 2, title = "Depth", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Resonance", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Base Frequency", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Type", kind = "selector" },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Wave", kind = "selector" },
+    { slot = 8, title = "Envelope Modulation", kind = "continuous", modulatable = true },
+    { slot = 9, title = "Attack", kind = "continuous", modulatable = true },
+    { slot = 10, title = "Release", kind = "continuous", modulatable = true },
+    { slot = 11, title = "Drive", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 32
 name = "DualPitch"
 slots = [
-    { slot = 1, kind = "continuous", group = "channel-1", modulatable = true },
-    { slot = 2, kind = "continuous", group = "channel-1", modulatable = true },
-    { slot = 3, kind = "continuous", group = "channel-1" },
-    { slot = 4, kind = "continuous", group = "channel-1", modulatable = true },
-    { slot = 5, kind = "continuous", group = "channel-1", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", group = "channel-2", modulatable = true },
-    { slot = 8, kind = "continuous", group = "channel-2", modulatable = true },
-    { slot = 9, kind = "continuous", group = "channel-2" },
-    { slot = 10, kind = "continuous", group = "channel-2", modulatable = true },
-    { slot = 11, kind = "continuous", group = "channel-2", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Semitones, channel 1", kind = "continuous", group = "channel-1", modulatable = true },
+    { slot = 2, title = "Cents, channel 1", kind = "continuous", group = "channel-1", modulatable = true },
+    { slot = 3, title = "Delay, channel 1", kind = "continuous", group = "channel-1" },
+    { slot = 4, title = "Gain, channel 1", kind = "continuous", group = "channel-1", modulatable = true },
+    { slot = 5, title = "Pan, channel 1", kind = "continuous", group = "channel-1", modulatable = true },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Semitones, channel 2", kind = "continuous", group = "channel-2", modulatable = true },
+    { slot = 8, title = "Cents, channel 2", kind = "continuous", group = "channel-2", modulatable = true },
+    { slot = 9, title = "Delay, channel 2", kind = "continuous", group = "channel-2" },
+    { slot = 10, title = "Gain, channel 2", kind = "continuous", group = "channel-2", modulatable = true },
+    { slot = 11, title = "Pan, channel 2", kind = "continuous", group = "channel-2", modulatable = true },
+    { slot = 12, title = "High Cut", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 33
 name = "Vintage Pitch"
 slots = [
-    { slot = 1, kind = "continuous", group = "channel-1", modulatable = true },
-    { slot = 2, kind = "continuous", group = "channel-1", modulatable = true },
-    { slot = 3, kind = "continuous", group = "channel-1" },
-    { slot = 4, kind = "continuous", group = "channel-1", modulatable = true },
-    { slot = 5, kind = "continuous", group = "channel-1", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "continuous", group = "channel-2", modulatable = true },
-    { slot = 8, kind = "continuous", group = "channel-2", modulatable = true },
-    { slot = 9, kind = "continuous", group = "channel-2" },
-    { slot = 10, kind = "continuous", group = "channel-2", modulatable = true },
-    { slot = 11, kind = "continuous", group = "channel-2", modulatable = true },
-    { slot = 12, kind = "continuous", modulatable = true },
+    { slot = 1, title = "Semitones, channel 1", kind = "continuous", group = "channel-1", modulatable = true },
+    { slot = 2, title = "Cents, channel 1", kind = "continuous", group = "channel-1", modulatable = true },
+    { slot = 3, title = "Delay, channel 1", kind = "continuous", group = "channel-1" },
+    { slot = 4, title = "Feedback, channel 1", kind = "continuous", group = "channel-1", modulatable = true },
+    { slot = 5, title = "Pan, channel 1", kind = "continuous", group = "channel-1", modulatable = true },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Semitones, channel 2", kind = "continuous", group = "channel-2", modulatable = true },
+    { slot = 8, title = "Cents, channel 2", kind = "continuous", group = "channel-2", modulatable = true },
+    { slot = 9, title = "Delay, channel 2", kind = "continuous", group = "channel-2" },
+    { slot = 10, title = "Feedback, channel 2", kind = "continuous", group = "channel-2", modulatable = true },
+    { slot = 11, title = "Pan, channel 2", kind = "continuous", group = "channel-2", modulatable = true },
+    { slot = 12, title = "High Cut", kind = "continuous", modulatable = true },
 ]
 
 [[panel]]
 type = 34
 name = "RotarySpkr"
 slots = [
-    { slot = 1, kind = "continuous", modulatable = true },
-    { slot = 2, kind = "continuous", modulatable = true },
-    { slot = 3, kind = "continuous", modulatable = true },
-    { slot = 4, kind = "continuous", modulatable = true },
-    { slot = 5, kind = "continuous", modulatable = true },
-    { slot = 6, kind = "continuous", modulatable = true },
-    { slot = 7, kind = "switch", modulatable = true },
-    { slot = 8, kind = "selector", modulatable = true },
+    { slot = 1, title = "Low Speed", kind = "continuous", modulatable = true },
+    { slot = 2, title = "High Speed", kind = "continuous", modulatable = true },
+    { slot = 3, title = "Acceleration", kind = "continuous", modulatable = true },
+    { slot = 4, title = "Distance", kind = "continuous", modulatable = true },
+    { slot = 5, title = "Balance", kind = "continuous", modulatable = true },
+    { slot = 6, title = "Mix", kind = "continuous", modulatable = true },
+    { slot = 7, title = "Motor", kind = "switch", modulatable = true },
+    { slot = 8, title = "Speed", kind = "selector", modulatable = true },
 ]
