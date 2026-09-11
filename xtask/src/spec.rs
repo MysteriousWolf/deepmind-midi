@@ -33,6 +33,10 @@ pub struct Parameter {
     /// Free-form note carried through from the manual.
     #[serde(default)]
     pub note: Option<String>,
+    /// The physical range the synthesizer shows for the same raw value, where the
+    /// manual states one. Hz, dB, seconds and so on.
+    #[serde(default)]
+    pub display: Option<String>,
     /// Why this row departs from what the manual prints.
     #[serde(default)]
     pub correction: Option<String>,
@@ -130,6 +134,12 @@ pub struct Global {
     /// Free-form note.
     #[serde(default)]
     pub note: Option<String>,
+    /// `false` when the range or ordering is inferred and needs hardware confirmation.
+    #[serde(default = "yes")]
+    pub confirmed: bool,
+    /// Why this row departs from what the manual's global commands table prints.
+    #[serde(default)]
+    pub correction: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -230,9 +240,11 @@ impl Spec {
                 )
             })?;
             let highest = table.entries.iter().map(|e| e.value).max().unwrap_or(0);
-            // Tables whose tail is a documented range (SPREAD-n, User-n) list only
-            // the first entry of that range, so only exact tables are checked.
+            // Only exact, confirmed tables are checked. A table whose tail is a
+            // documented range (SPREAD-n, User-n) lists just its first entry, and an
+            // unconfirmed one is where the manual contradicts itself about the range.
             let contiguous = !table.partial
+                && table.confirmed
                 && table
                     .entries
                     .iter()

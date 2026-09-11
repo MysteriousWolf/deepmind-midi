@@ -262,46 +262,77 @@ entries = [
 [[enum]]
 id = "arp_clock"
 name = "Arpeggiator Clock Divider"
-note = "The manual lists the available sync ratios in Appendix 2 but does not print the value-to-ratio mapping. The ratios below are the candidates, in the order the appendix lists them. The mapping needs confirmation against hardware before it is relied on."
-confirmed = false
+note = "Section 8.1.7 of the manual lists these thirteen ratios, which is exactly the 0-12 range the NRPN table gives. Divides the master BPM."
 entries = [
-    { value = 0, name = "1" },
-    { value = 1, name = "1/2" },
-    { value = 2, name = "3/8" },
-    { value = 3, name = "1/3" },
-    { value = 4, name = "1/4" },
-    { value = 5, name = "3/16" },
-    { value = 6, name = "1/6" },
-    { value = 7, name = "1/8" },
-    { value = 8, name = "3/32" },
-    { value = 9, name = "1/12" },
-    { value = 10, name = "1/16" },
-    { value = 11, name = "3/64" },
-    { value = 12, name = "1/24" },
+    { value = 0, name = "1/2", description = "Half note" },
+    { value = 1, name = "3/8", description = "Dotted quarter note" },
+    { value = 2, name = "1/3", description = "Third note, half note triplets" },
+    { value = 3, name = "1/4", description = "Quarter note" },
+    { value = 4, name = "3/16", description = "Dotted eighth note" },
+    { value = 5, name = "1/6", description = "Sixth note, quarter note triplets" },
+    { value = 6, name = "1/8", description = "Eighth note" },
+    { value = 7, name = "3/32", description = "Dotted sixteenth note" },
+    { value = 8, name = "1/12", description = "Twelfth note, eighth note triplets" },
+    { value = 9, name = "1/16", description = "Sixteenth note, the default" },
+    { value = 10, name = "1/24", description = "Twenty-fourth note, sixteenth note triplets" },
+    { value = 11, name = "1/32", description = "Thirty-second note" },
+    { value = 12, name = "1/48", description = "Forty-eighth note, thirty-second note triplets" },
 ]
 
 [[enum]]
 id = "sequencer_clock"
 name = "Control Sequencer Clock Divider"
-note = "The manual lists the available sync ratios in Appendix 2 but does not print the value-to-ratio mapping. The ratios below are the candidates, in the order the appendix lists them. The mapping needs confirmation against hardware before it is relied on."
+note = "Section 8.1.8 lists these twenty ratios, but the NRPN table gives the parameter a range of 0-15. One of the two is wrong and the manual does not say which. The list is recorded as printed; the mapping needs confirmation against hardware."
 confirmed = false
 entries = [
-    { value = 0, name = "1" },
-    { value = 1, name = "1/2" },
-    { value = 2, name = "3/8" },
-    { value = 3, name = "1/3" },
-    { value = 4, name = "1/4" },
-    { value = 5, name = "3/16" },
-    { value = 6, name = "1/6" },
-    { value = 7, name = "1/8" },
-    { value = 8, name = "3/32" },
-    { value = 9, name = "1/12" },
-    { value = 10, name = "1/16" },
-    { value = 11, name = "3/64" },
-    { value = 12, name = "1/24" },
-    { value = 13, name = "1/32" },
-    { value = 14, name = "3/128" },
-    { value = 15, name = "1/48" },
+    { value = 0, name = "4", description = "Four notes" },
+    { value = 1, name = "3", description = "Three notes" },
+    { value = 2, name = "2", description = "Two notes" },
+    { value = 3, name = "1", description = "One note" },
+    { value = 4, name = "1/2", description = "Half note" },
+    { value = 5, name = "3/8", description = "Dotted quarter note" },
+    { value = 6, name = "1/3", description = "Third note, half note triplets" },
+    { value = 7, name = "1/4", description = "Quarter note" },
+    { value = 8, name = "3/16", description = "Dotted eighth note" },
+    { value = 9, name = "1/6", description = "Sixth note, quarter note triplets" },
+    { value = 10, name = "1/8", description = "Eighth note" },
+    { value = 11, name = "3/32", description = "Dotted sixteenth note" },
+    { value = 12, name = "1/12", description = "Twelfth note, eighth note triplets" },
+    { value = 13, name = "1/16", description = "Sixteenth note, the default" },
+    { value = 14, name = "3/64", description = "Dotted thirty-second note" },
+    { value = 15, name = "1/24", description = "Twenty-fourth note, sixteenth note triplets" },
+    { value = 16, name = "1/32", description = "Thirty-second note" },
+    { value = 17, name = "3/128", description = "Dotted sixty-fourth note" },
+    { value = 18, name = "1/48", description = "Forty-eighth note, thirty-second note triplets" },
+    { value = 19, name = "1/64", description = "Sixty-fourth note" },
+]
+
+[[enum]]
+id = "lfo_clock"
+name = "LFO Clock Divider"
+note = "Section 8.2.4. When LFO Arp Sync is on, the LFO rate parameter selects one of these divisions of the master BPM instead of a free-running rate. Same twenty ratios as the control sequencer."
+confirmed = false
+entries = [
+    { value = 0, name = "4", description = "Four notes" },
+    { value = 1, name = "3", description = "Three notes" },
+    { value = 2, name = "2", description = "Two notes" },
+    { value = 3, name = "1", description = "One note" },
+    { value = 4, name = "1/2", description = "Half note" },
+    { value = 5, name = "3/8", description = "Dotted quarter note" },
+    { value = 6, name = "1/3", description = "Third note, half note triplets" },
+    { value = 7, name = "1/4", description = "Quarter note" },
+    { value = 8, name = "3/16", description = "Dotted eighth note" },
+    { value = 9, name = "1/6", description = "Sixth note, quarter note triplets" },
+    { value = 10, name = "1/8", description = "Eighth note" },
+    { value = 11, name = "3/32", description = "Dotted sixteenth note" },
+    { value = 12, name = "1/12", description = "Twelfth note, eighth note triplets" },
+    { value = 13, name = "1/16", description = "Sixteenth note, the default" },
+    { value = 14, name = "3/64", description = "Dotted thirty-second note" },
+    { value = 15, name = "1/24", description = "Twenty-fourth note, sixteenth note triplets" },
+    { value = 16, name = "1/32", description = "Thirty-second note" },
+    { value = 17, name = "3/128", description = "Dotted sixty-fourth note" },
+    { value = 18, name = "1/48", description = "Forty-eighth note, thirty-second note triplets" },
+    { value = 19, name = "1/64", description = "Sixty-fourth note" },
 ]
 
 [[enum]]

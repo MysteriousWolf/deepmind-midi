@@ -100,6 +100,7 @@ mappings into one.
 | `spec/messages.toml` | 22 SysEx messages |
 | `spec/globals.toml` | 24 device-wide settings |
 | `spec/controllers.toml` | 112 MIDI controllers, 90 of them mapped to a parameter |
+| `spec/enums.toml` | includes the three clock divider tables |
 
 `cargo xtask docs` renders the reference tables in `docs/midi-spec.md` and writes
 the Mermaid sources to `docs/diagrams/*.mmd`. The diagrams are embedded inline in

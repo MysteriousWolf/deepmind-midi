@@ -17,6 +17,8 @@ name = "LFO 1 Rate"
 group = "LFO 1"
 min = 0
 max = 255
+note = "When LFO 1 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate."
+display = "0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix"
 
 [[parameter]]
 offset = 1
@@ -24,6 +26,7 @@ name = "LFO 1 Delay / Fade"
 group = "LFO 1"
 min = 0
 max = 255
+display = "0.00 s to 6.59 s"
 
 [[parameter]]
 offset = 2
@@ -73,6 +76,8 @@ name = "LFO 2 Rate"
 group = "LFO 2"
 min = 0
 max = 255
+note = "When LFO 2 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate."
+display = "0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix"
 
 [[parameter]]
 offset = 8
@@ -80,6 +85,7 @@ name = "LFO 2 Delay / Fade"
 group = "LFO 2"
 min = 0
 max = 255
+display = "0.00 s to 6.59 s"
 
 [[parameter]]
 offset = 9
@@ -189,6 +195,7 @@ name = "OSC 1 Pitch Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+display = "0.00 cents to 36.0 semitones, on a non-linear fader response"
 
 [[parameter]]
 offset = 22
@@ -218,6 +225,7 @@ name = "OSC 1 PWM Depth"
 group = "Oscillators"
 min = 0
 max = 255
+display = "50.0% to 99.0% pulse width when the source is Manual, otherwise 0 to plus or minus 49% modulation"
 
 [[parameter]]
 offset = 26
@@ -225,6 +233,7 @@ name = "OSC 2 Level"
 group = "Oscillators"
 min = 0
 max = 255
+display = "Off, then -48.0 dB to 0.0 dB"
 
 [[parameter]]
 offset = 27
@@ -232,6 +241,7 @@ name = "OSC 2 Pitch"
 group = "Oscillators"
 min = 0
 max = 255
+display = "-12.0 to +12.0 semitones"
 
 [[parameter]]
 offset = 28
@@ -239,6 +249,7 @@ name = "OSC 2 Tone Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+display = "50% to 100% tone modulation when the source is Manual, otherwise 0 to plus or minus 49%"
 
 [[parameter]]
 offset = 29
@@ -246,6 +257,7 @@ name = "OSC 2 Pitch Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+display = "0.00 cents to 36.0 semitones, on a non-linear fader response"
 
 [[parameter]]
 offset = 30
@@ -275,6 +287,7 @@ name = "Noise Level"
 group = "Oscillators"
 min = 0
 max = 255
+display = "Off, then -48.1 dB to 0.0 dB"
 
 [[parameter]]
 offset = 34
@@ -282,6 +295,7 @@ name = "Portamento time"
 group = "Oscillators"
 min = 0
 max = 255
+display = "0.00 s to 10.00 s"
 
 [[parameter]]
 offset = 35
@@ -322,6 +336,7 @@ name = "VCF Frequency"
 group = "VCF"
 min = 0
 max = 255
+display = "50.0 Hz to 20000.0 Hz"
 
 [[parameter]]
 offset = 40
@@ -329,6 +344,7 @@ name = "VCF HighPass Frequency"
 group = "VCF"
 min = 0
 max = 255
+display = "20.0 Hz to 2000.0 Hz"
 
 [[parameter]]
 offset = 41
@@ -336,6 +352,7 @@ name = "VCF Resonance"
 group = "VCF"
 min = 0
 max = 255
+display = "0.0% to 100.0%"
 
 [[parameter]]
 offset = 42
@@ -343,6 +360,7 @@ name = "VCF Envelope Depth"
 group = "VCF"
 min = 0
 max = 255
+display = "0.0% to 100.0%"
 
 [[parameter]]
 offset = 43
@@ -364,6 +382,7 @@ name = "VCF LFO Depth"
 group = "VCF"
 min = 0
 max = 255
+display = "0.0% to 100.0%"
 
 [[parameter]]
 offset = 46
@@ -393,6 +412,7 @@ name = "VCF Keyboard Tracking"
 group = "VCF"
 min = 0
 max = 255
+display = "0.0% to 100.0%"
 
 [[parameter]]
 offset = 50
@@ -621,6 +641,7 @@ name = "VCA Level"
 group = "VCA"
 min = 0
 max = 255
+display = "-12.0 dB to +6.0 dB"
 
 [[parameter]]
 offset = 81
@@ -675,6 +696,7 @@ group = "Voicing"
 min = 0
 max = 255
 note = "Sets the amount phatness!"
+display = "plus or minus 0.0 to 50.0 cents"
 
 [[parameter]]
 offset = 88
@@ -696,6 +718,7 @@ name = "Drift Rate"
 group = "Voicing"
 min = 0
 max = 255
+display = "Each drift step lasts a random time between 25-50 ms at 0 and 2.5-5.0 s at 255"
 
 [[parameter]]
 offset = 91
@@ -938,6 +961,7 @@ group = "Control Sequencer"
 min = 0
 max = 15
 enum = "sequencer_clock"
+correction = "The manual gives this parameter a range of 0-15, but section 8.1.8 lists twenty clock divisions for the control sequencer. One of the two is wrong and the manual does not say which, so the range is left as printed and the value table is marked unconfirmed."
 
 [[parameter]]
 offset = 119
@@ -954,8 +978,9 @@ name = "Sequencer Swing Timing"
 group = "Control Sequencer"
 min = 0
 max = 255
-note = "0% (0) to 75% (25)"
-correction = "The manual gives the upper endpoint as 25 on a 0-255 parameter, which is almost certainly a typo for 255. Left verbatim pending hardware confirmation."
+note = "0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel."
+display = "50% to 75%"
+correction = "Resolved. The manual’s NRPN note reads \"0% (0) to 75% (25)\", but sections 8.1.7 and 8.1.8 both state the swing range as 50% to 75%. So 0 is 50% and 255 is 75%: the note has a wrong lower endpoint and a dropped digit."
 
 [[parameter]]
 offset = 121
@@ -1254,6 +1279,7 @@ group = "Arpeggiator"
 min = 0
 max = 255
 note = "20 bpm (0) to 275 bpm (255)"
+display = "20.0 to 275.0 BPM"
 
 [[parameter]]
 offset = 158
@@ -1302,8 +1328,9 @@ name = "Arp Swing"
 group = "Arpeggiator"
 min = 0
 max = 255
-note = "0% (0) to 75% (25)"
-correction = "Same suspected typo as offset 120."
+note = "0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel."
+display = "50% to 75%"
+correction = "Resolved the same way as offset 120."
 
 [[parameter]]
 offset = 164
@@ -1929,3 +1956,4 @@ group = "Program"
 min = 80
 max = 176
 note = "-48 (80) ... 0 (128) ... +48 (176)"
+

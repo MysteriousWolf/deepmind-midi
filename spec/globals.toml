@@ -112,20 +112,51 @@ note = "Key pressure to MIDI aftertouch curve. The manual gives the display rang
 [[global]]
 name = "Pedal CC"
 min = 0
-max = 3
-note = "Foot controller CC: Foot Control CC4 (0), Breath CC2 (1), Volume CC7 (2), Expression CC11 (3)."
+max = 6
+confirmed = false
+note = """
+What the pedal or control voltage input drives: Foot Control (0), Mod Wheel (1), \
+Breath (2), Volume (3), Expression (4), Portamento Time (5), Aftertouch (6)."""
+correction = """
+The manual's global commands table gives a range of 0-3 and lists four \
+destinations, but section 7.3.3 describes seven. The seven are recorded here; the \
+value order follows the order that section lists them in and needs confirming."""
 
 [[global]]
 name = "Sustain CC"
 min = 0
-max = 3
-note = "Sustain pedal polarity and function: Normal+ (0), Normal- (1), Arp+ (2), Arp- (3)."
+max = 9
+confirmed = false
+note = """
+Sustain input polarity and function: Norm-Open (0), Norm-Closed (1), Tap-N.O (2), \
+Tap-N.C (3), Arp+Gate (4), Arp-Gate (5), Seq+Gate (6), Seq-Gate (7), \
+Arp&Seq+Gate (8), Arp&Seq-Gate (9). The gate modes step the arpeggiator or the \
+control sequencer from a 0-5 V gate signal."""
+correction = """
+The manual's global commands table gives a range of 0-3 and lists four modes, but \
+section 7.3.3 describes ten. The ten are recorded here; the value order follows the \
+order that section lists them in and needs confirming."""
+
+[[global]]
+name = "Sustain Pedal Mode"
+min = 0
+max = 1
+confirmed = false
+note = """
+Sustain (0) holds every note while the pedal is down. Sostenuto (1) holds only the \
+notes that were already sounding, like the middle pedal of a piano."""
+correction = """
+Described in section 7.3.3 but absent from the manual's global commands table, so \
+neither its range nor its position in the global dump is documented."""
 
 [[global]]
 name = "Fader Pick Up Mode"
 min = 0
 max = 2
 note = "Relative (0), Pass-thru (1), Jump (2)."
+correction = """
+Section 7.3.4 describes only Pass-thru and Jump. Relative may be a firmware 1.0 \
+mode that was removed, or an omission from that section."""
 
 [[global]]
 name = "LCD Brightness"

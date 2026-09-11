@@ -245,7 +245,8 @@ fn render_parameters(spec: &Spec) -> String {
             group = &parameter.group;
             let _ = write!(
                 out,
-                "\n### {group}\n\n| Offset | Parameter | Range | Values |\n|---|---|---|---|\n"
+                "\n### {group}\n\n| Offset | Parameter | Raw | Values | Shows as |\n\
+                 |---|---|---|---|---|\n"
             );
         }
         let values = match (&parameter.kind, &parameter.value_table, &parameter.note) {
@@ -259,11 +260,12 @@ fn render_parameters(spec: &Spec) -> String {
         };
         let _ = writeln!(
             out,
-            "| {} | {} | {}-{} | {values} |",
+            "| {} | {} | {}-{} | {values} | {} |",
             parameter.offset,
             cell(&parameter.name),
             parameter.min,
-            parameter.max
+            parameter.max,
+            cell(parameter.display.as_deref().unwrap_or(""))
         );
     }
     out
@@ -302,13 +304,22 @@ fn render_value_tables(spec: &Spec) -> String {
 fn render_globals(spec: &Spec) -> String {
     let mut out = String::from("| Setting | Range | Notes |\n|---|---|---|\n");
     for global in &spec.globals {
+        let mut notes = cell(global.note.as_deref().unwrap_or(""));
+        if let Some(correction) = &global.correction {
+            notes = format!(
+                "{notes} **Departs from the manual's own table.** {}",
+                cell(correction)
+            );
+        }
+        if !global.confirmed {
+            notes = format!("**Unconfirmed.** {notes}");
+        }
         let _ = writeln!(
             out,
-            "| {} | {}-{} | {} |",
+            "| {} | {}-{} | {notes} |",
             cell(&global.name),
             global.min,
-            global.max,
-            cell(global.note.as_deref().unwrap_or(""))
+            global.max
         );
     }
     out
@@ -416,6 +427,43 @@ fn render_corrections(spec: &Spec) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Fails when a generated Markdown table has a row whose column count differs
+    /// from its header.
+    ///
+    /// Adding a column to a row and forgetting the header renders as a broken table
+    /// rather than an error, so it is worth checking rather than eyeballing.
+    #[test]
+    fn generated_tables_have_consistent_columns() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap_or(Path::new("."));
+        let document = std::fs::read_to_string(root.join(DOC_PATH)).expect("document is readable");
+
+        let columns = |line: &str| line.trim().trim_matches('|').split('|').count();
+        let mut expected: Option<usize> = None;
+        for (number, line) in document.lines().enumerate() {
+            let line = line.trim();
+            if !line.starts_with('|') {
+                expected = None;
+                continue;
+            }
+            // The dashed rule under a header sets the width for the rows that follow.
+            if line.chars().all(|c| "|-: ".contains(c)) {
+                expected = Some(columns(line));
+                continue;
+            }
+            if let Some(want) = expected {
+                assert_eq!(
+                    columns(line),
+                    want,
+                    "{DOC_PATH} line {}: table row has {} columns, header has {want}",
+                    number + 1,
+                    columns(line)
+                );
+            }
+        }
+    }
 
     /// Fails when `docs/midi-spec.md` does not match the spec files.
     ///

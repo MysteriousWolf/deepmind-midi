@@ -412,315 +412,315 @@ sends an NRPN edit and wants confirmation has to re-request the edit buffer.
 
 ### LFO 1
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 0 | LFO 1 Rate | 0-255 |  |
-| 1 | LFO 1 Delay / Fade | 0-255 |  |
-| 2 | LFO 1 Shape | 0-6 | [LFO Shape](#lfo_shape) |
-| 3 | LFO 1 Key Sync | 0-1 | Off (0), On (1) |
-| 4 | LFO 1 Arp Sync | 0-1 | Off (0), On (1) |
-| 5 | LFO 1 Mono Mode | 0-255 | [LFO Mono Mode](#lfo_mono_mode) |
-| 6 | LFO 1 Slew Rate | 0-255 |  |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 0 | LFO 1 Rate | 0-255 | When LFO 1 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate. | 0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix |
+| 1 | LFO 1 Delay / Fade | 0-255 |  | 0.00 s to 6.59 s |
+| 2 | LFO 1 Shape | 0-6 | [LFO Shape](#lfo_shape) |  |
+| 3 | LFO 1 Key Sync | 0-1 | Off (0), On (1) |  |
+| 4 | LFO 1 Arp Sync | 0-1 | Off (0), On (1) |  |
+| 5 | LFO 1 Mono Mode | 0-255 | [LFO Mono Mode](#lfo_mono_mode) |  |
+| 6 | LFO 1 Slew Rate | 0-255 |  |  |
 
 ### LFO 2
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 7 | LFO 2 Rate | 0-255 |  |
-| 8 | LFO 2 Delay / Fade | 0-255 |  |
-| 9 | LFO 2 Shape | 0-6 | [LFO Shape](#lfo_shape) |
-| 10 | LFO 2 Key Sync | 0-1 | Off (0), On (1) |
-| 11 | LFO 2 Arp Sync | 0-1 | Off (0), On (1) |
-| 12 | LFO 2 Mono Mode | 0-255 | [LFO Mono Mode](#lfo_mono_mode) |
-| 13 | LFO 2 Slew Rate | 0-255 |  |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 7 | LFO 2 Rate | 0-255 | When LFO 2 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate. | 0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix |
+| 8 | LFO 2 Delay / Fade | 0-255 |  | 0.00 s to 6.59 s |
+| 9 | LFO 2 Shape | 0-6 | [LFO Shape](#lfo_shape) |  |
+| 10 | LFO 2 Key Sync | 0-1 | Off (0), On (1) |  |
+| 11 | LFO 2 Arp Sync | 0-1 | Off (0), On (1) |  |
+| 12 | LFO 2 Mono Mode | 0-255 | [LFO Mono Mode](#lfo_mono_mode) |  |
+| 13 | LFO 2 Slew Rate | 0-255 |  |  |
 
 ### Oscillators
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 14 | OSC 1 Range | 0-2 | [Oscillator Range](#osc_range) |
-| 15 | OSC 2 Range | 0-2 | [Oscillator Range](#osc_range) |
-| 16 | OSC 1 PWM Source | 0-5 | [OSC 1 PWM Source](#pwm_source) |
-| 17 | OSC 2 Tone Mod Source | 0-5 | [OSC 2 Tone Mod Source](#tone_mod_source) |
-| 18 | OSC 1 Pulse Enable | 0-1 | Off (0), On (1) |
-| 19 | OSC 1 Saw Enable | 0-1 | Off (0), On (1) |
-| 20 | OSC Sync Enable | 0-1 | Off (0), On (1) |
-| 21 | OSC 1 Pitch Mod Depth | 0-255 |  |
-| 22 | OSC 1 Pitch Mod Select | 0-6 | [Oscillator Pitch Mod Source](#pitch_mod_source) |
-| 23 | OSC 1 Aftertouch > Pitch Mod Depth | 0-255 |  |
-| 24 | OSC 1 Mod Wheel > Pitch Mod Depth | 0-255 |  |
-| 25 | OSC 1 PWM Depth | 0-255 |  |
-| 26 | OSC 2 Level | 0-255 |  |
-| 27 | OSC 2 Pitch | 0-255 |  |
-| 28 | OSC 2 Tone Mod Depth | 0-255 |  |
-| 29 | OSC 2 Pitch Mod Depth | 0-255 |  |
-| 30 | OSC 2 Aftertouch > Pitch Mod Depth | 0-255 |  |
-| 31 | OSC 2 Mod Wheel > Pitch Mod Depth | 0-255 |  |
-| 32 | OSC 2 Pitch Mod Select | 0-6 | [Oscillator Pitch Mod Source](#pitch_mod_source) |
-| 33 | Noise Level | 0-255 |  |
-| 34 | Portamento time | 0-255 |  |
-| 35 | Portamento mode | 0-13 | [Portamento Mode](#portamento_mode) |
-| 36 | Pitch bend Up depth | 0-24 | In steps of 1 semitone |
-| 37 | Pitch bend Down depth | 0-24 | In steps of 1 semitone |
-| 38 | OSC 1 Pitch Mod Mode | 0-1 | [OSC 1 Pitch Mod Mode](#osc1_pitch_mod_mode) |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 14 | OSC 1 Range | 0-2 | [Oscillator Range](#osc_range) |  |
+| 15 | OSC 2 Range | 0-2 | [Oscillator Range](#osc_range) |  |
+| 16 | OSC 1 PWM Source | 0-5 | [OSC 1 PWM Source](#pwm_source) |  |
+| 17 | OSC 2 Tone Mod Source | 0-5 | [OSC 2 Tone Mod Source](#tone_mod_source) |  |
+| 18 | OSC 1 Pulse Enable | 0-1 | Off (0), On (1) |  |
+| 19 | OSC 1 Saw Enable | 0-1 | Off (0), On (1) |  |
+| 20 | OSC Sync Enable | 0-1 | Off (0), On (1) |  |
+| 21 | OSC 1 Pitch Mod Depth | 0-255 |  | 0.00 cents to 36.0 semitones, on a non-linear fader response |
+| 22 | OSC 1 Pitch Mod Select | 0-6 | [Oscillator Pitch Mod Source](#pitch_mod_source) |  |
+| 23 | OSC 1 Aftertouch > Pitch Mod Depth | 0-255 |  |  |
+| 24 | OSC 1 Mod Wheel > Pitch Mod Depth | 0-255 |  |  |
+| 25 | OSC 1 PWM Depth | 0-255 |  | 50.0% to 99.0% pulse width when the source is Manual, otherwise 0 to plus or minus 49% modulation |
+| 26 | OSC 2 Level | 0-255 |  | Off, then -48.0 dB to 0.0 dB |
+| 27 | OSC 2 Pitch | 0-255 |  | -12.0 to +12.0 semitones |
+| 28 | OSC 2 Tone Mod Depth | 0-255 |  | 50% to 100% tone modulation when the source is Manual, otherwise 0 to plus or minus 49% |
+| 29 | OSC 2 Pitch Mod Depth | 0-255 |  | 0.00 cents to 36.0 semitones, on a non-linear fader response |
+| 30 | OSC 2 Aftertouch > Pitch Mod Depth | 0-255 |  |  |
+| 31 | OSC 2 Mod Wheel > Pitch Mod Depth | 0-255 |  |  |
+| 32 | OSC 2 Pitch Mod Select | 0-6 | [Oscillator Pitch Mod Source](#pitch_mod_source) |  |
+| 33 | Noise Level | 0-255 |  | Off, then -48.1 dB to 0.0 dB |
+| 34 | Portamento time | 0-255 |  | 0.00 s to 10.00 s |
+| 35 | Portamento mode | 0-13 | [Portamento Mode](#portamento_mode) |  |
+| 36 | Pitch bend Up depth | 0-24 | In steps of 1 semitone |  |
+| 37 | Pitch bend Down depth | 0-24 | In steps of 1 semitone |  |
+| 38 | OSC 1 Pitch Mod Mode | 0-1 | [OSC 1 Pitch Mod Mode](#osc1_pitch_mod_mode) |  |
 
 ### VCF
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 39 | VCF Frequency | 0-255 |  |
-| 40 | VCF HighPass Frequency | 0-255 |  |
-| 41 | VCF Resonance | 0-255 |  |
-| 42 | VCF Envelope Depth | 0-255 |  |
-| 43 | VCF Envelope Velocity Sensitivity | 0-255 |  |
-| 44 | VCF Pitch Bend to Freq Depth | 0-255 |  |
-| 45 | VCF LFO Depth | 0-255 |  |
-| 46 | VCF LFO Select | 0-1 | [VCF LFO Select](#vcf_lfo_select) |
-| 47 | VCF Aftertouch > LFO Depth | 0-255 |  |
-| 48 | VCF Mod Wheel > LFO Depth | 0-255 |  |
-| 49 | VCF Keyboard Tracking | 0-255 |  |
-| 50 | VCF Envelope Polarity | 0-1 | [VCF Envelope Polarity](#vcf_envelope_polarity) |
-| 51 | VCF 2 Pole Mode | 0-1 | [VCF Pole Mode](#vcf_pole_mode) |
-| 52 | VCF Bass Boost | 0-1 | Off (0), On (1) |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 39 | VCF Frequency | 0-255 |  | 50.0 Hz to 20000.0 Hz |
+| 40 | VCF HighPass Frequency | 0-255 |  | 20.0 Hz to 2000.0 Hz |
+| 41 | VCF Resonance | 0-255 |  | 0.0% to 100.0% |
+| 42 | VCF Envelope Depth | 0-255 |  | 0.0% to 100.0% |
+| 43 | VCF Envelope Velocity Sensitivity | 0-255 |  |  |
+| 44 | VCF Pitch Bend to Freq Depth | 0-255 |  |  |
+| 45 | VCF LFO Depth | 0-255 |  | 0.0% to 100.0% |
+| 46 | VCF LFO Select | 0-1 | [VCF LFO Select](#vcf_lfo_select) |  |
+| 47 | VCF Aftertouch > LFO Depth | 0-255 |  |  |
+| 48 | VCF Mod Wheel > LFO Depth | 0-255 |  |  |
+| 49 | VCF Keyboard Tracking | 0-255 |  | 0.0% to 100.0% |
+| 50 | VCF Envelope Polarity | 0-1 | [VCF Envelope Polarity](#vcf_envelope_polarity) |  |
+| 51 | VCF 2 Pole Mode | 0-1 | [VCF Pole Mode](#vcf_pole_mode) |  |
+| 52 | VCF Bass Boost | 0-1 | Off (0), On (1) |  |
 
 ### VCA Envelope
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 53 | VCA Envelope Attack Time | 0-255 |  |
-| 54 | VCA Envelope Decay Time | 0-255 |  |
-| 55 | VCA Envelope Sustain Level | 0-255 |  |
-| 56 | VCA Envelope Release Time | 0-255 |  |
-| 57 | VCA Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |
-| 58 | VCA Envelope Attack Curve | 0-255 |  |
-| 59 | VCA Envelope Decay Curve | 0-255 |  |
-| 60 | VCA Envelope Sustain Curve | 0-255 |  |
-| 61 | VCA Envelope Release Curve | 0-255 |  |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 53 | VCA Envelope Attack Time | 0-255 |  |  |
+| 54 | VCA Envelope Decay Time | 0-255 |  |  |
+| 55 | VCA Envelope Sustain Level | 0-255 |  |  |
+| 56 | VCA Envelope Release Time | 0-255 |  |  |
+| 57 | VCA Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |  |
+| 58 | VCA Envelope Attack Curve | 0-255 |  |  |
+| 59 | VCA Envelope Decay Curve | 0-255 |  |  |
+| 60 | VCA Envelope Sustain Curve | 0-255 |  |  |
+| 61 | VCA Envelope Release Curve | 0-255 |  |  |
 
 ### VCF Envelope
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 62 | VCF Envelope Attack Time | 0-255 |  |
-| 63 | VCF Envelope Decay Time | 0-255 |  |
-| 64 | VCF Envelope Sustain Level | 0-255 |  |
-| 65 | VCF Envelope Release Time | 0-255 |  |
-| 66 | VCF Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |
-| 67 | VCF Envelope Attack Curve | 0-255 |  |
-| 68 | VCF Envelope Decay Curve | 0-255 |  |
-| 69 | VCF Envelope Sustain Curve | 0-255 |  |
-| 70 | VCF Envelope Release Curve | 0-255 |  |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 62 | VCF Envelope Attack Time | 0-255 |  |  |
+| 63 | VCF Envelope Decay Time | 0-255 |  |  |
+| 64 | VCF Envelope Sustain Level | 0-255 |  |  |
+| 65 | VCF Envelope Release Time | 0-255 |  |  |
+| 66 | VCF Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |  |
+| 67 | VCF Envelope Attack Curve | 0-255 |  |  |
+| 68 | VCF Envelope Decay Curve | 0-255 |  |  |
+| 69 | VCF Envelope Sustain Curve | 0-255 |  |  |
+| 70 | VCF Envelope Release Curve | 0-255 |  |  |
 
 ### Mod Envelope
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 71 | Mod Envelope Attack Time | 0-255 |  |
-| 72 | Mod Envelope Decay Time | 0-255 |  |
-| 73 | Mod Envelope Sustain Level | 0-255 |  |
-| 74 | Mod Envelope Release Time | 0-255 |  |
-| 75 | Mod Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |
-| 76 | Mod Envelope Attack Curve | 0-255 |  |
-| 77 | Mod Envelope Decay Curve | 0-255 |  |
-| 78 | Mod Envelope Sustain Curve | 0-255 |  |
-| 79 | Mod Envelope Release Curve | 0-255 |  |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 71 | Mod Envelope Attack Time | 0-255 |  |  |
+| 72 | Mod Envelope Decay Time | 0-255 |  |  |
+| 73 | Mod Envelope Sustain Level | 0-255 |  |  |
+| 74 | Mod Envelope Release Time | 0-255 |  |  |
+| 75 | Mod Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |  |
+| 76 | Mod Envelope Attack Curve | 0-255 |  |  |
+| 77 | Mod Envelope Decay Curve | 0-255 |  |  |
+| 78 | Mod Envelope Sustain Curve | 0-255 |  |  |
+| 79 | Mod Envelope Release Curve | 0-255 |  |  |
 
 ### VCA
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 80 | VCA Level | 0-255 |  |
-| 81 | VCA Envelope Depth | 0-255 |  |
-| 82 | VCA Envelope Velocity Sensitivity | 0-255 |  |
-| 83 | VCA Pan Spread | 0-255 | -128 (0) to +127 (255) |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 80 | VCA Level | 0-255 |  | -12.0 dB to +6.0 dB |
+| 81 | VCA Envelope Depth | 0-255 |  |  |
+| 82 | VCA Envelope Velocity Sensitivity | 0-255 |  |  |
+| 83 | VCA Pan Spread | 0-255 | -128 (0) to +127 (255) |  |
 
 ### Voicing
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 84 | Voice Priority Mode | 0-2 | [Voice Priority Mode](#voice_priority) |
-| 85 | Polyphony Mode | 0-12 | [Polyphony Mode](#polyphony_mode) |
-| 86 | Envelope Trigger Mode | 0-3 | [Envelope Trigger Mode](#key_assign_mode) |
-| 87 | Unison Detune | 0-255 | Sets the amount phatness! |
-| 88 | Voice Drift | 0-255 |  |
-| 89 | Parameter Drift | 0-255 |  |
-| 90 | Drift Rate | 0-255 |  |
-| 91 | OSC Portamento Balance | 0-255 | -128 (0) to +127 (255) |
-| 92 | OSC Key Down Reset | 0-1 | Off (0), On (1) |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 84 | Voice Priority Mode | 0-2 | [Voice Priority Mode](#voice_priority) |  |
+| 85 | Polyphony Mode | 0-12 | [Polyphony Mode](#polyphony_mode) |  |
+| 86 | Envelope Trigger Mode | 0-3 | [Envelope Trigger Mode](#key_assign_mode) |  |
+| 87 | Unison Detune | 0-255 | Sets the amount phatness! | plus or minus 0.0 to 50.0 cents |
+| 88 | Voice Drift | 0-255 |  |  |
+| 89 | Parameter Drift | 0-255 |  |  |
+| 90 | Drift Rate | 0-255 |  | Each drift step lasts a random time between 25-50 ms at 0 and 2.5-5.0 s at 255 |
+| 91 | OSC Portamento Balance | 0-255 | -128 (0) to +127 (255) |  |
+| 92 | OSC Key Down Reset | 0-1 | Off (0), On (1) |  |
 
 ### Mod Matrix
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 93 | Mod 1 Source | 0-24 | [Modulation Matrix Source](#mod_source) |
-| 94 | Mod 1 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |
-| 95 | Mod 1 Depth | 0-255 | -128 (0) to +127 (255) |
-| 96 | Mod 2 Source | 0-24 | [Modulation Matrix Source](#mod_source) |
-| 97 | Mod 2 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |
-| 98 | Mod 2 Depth | 0-255 | -128 (0) to +127 (255) |
-| 99 | Mod 3 Source | 0-24 | [Modulation Matrix Source](#mod_source) |
-| 100 | Mod 3 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |
-| 101 | Mod 3 Depth | 0-255 | -128 (0) to +127 (255) |
-| 102 | Mod 4 Source | 0-24 | [Modulation Matrix Source](#mod_source) |
-| 103 | Mod 4 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |
-| 104 | Mod 4 Depth | 0-255 | -128 (0) to +127 (255) |
-| 105 | Mod 5 Source | 0-24 | [Modulation Matrix Source](#mod_source) |
-| 106 | Mod 5 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |
-| 107 | Mod 5 Depth | 0-255 | -128 (0) to +127 (255) |
-| 108 | Mod 6 Source | 0-24 | [Modulation Matrix Source](#mod_source) |
-| 109 | Mod 6 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |
-| 110 | Mod 6 Depth | 0-255 | -128 (0) to +127 (255) |
-| 111 | Mod 7 Source | 0-24 | [Modulation Matrix Source](#mod_source) |
-| 112 | Mod 7 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |
-| 113 | Mod 7 Depth | 0-255 | -128 (0) to +127 (255) |
-| 114 | Mod 8 Source | 0-24 | [Modulation Matrix Source](#mod_source) |
-| 115 | Mod 8 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |
-| 116 | Mod 8 Depth | 0-255 | -128 (0) to +127 (255) |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 93 | Mod 1 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  |
+| 94 | Mod 1 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  |
+| 95 | Mod 1 Depth | 0-255 | -128 (0) to +127 (255) |  |
+| 96 | Mod 2 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  |
+| 97 | Mod 2 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  |
+| 98 | Mod 2 Depth | 0-255 | -128 (0) to +127 (255) |  |
+| 99 | Mod 3 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  |
+| 100 | Mod 3 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  |
+| 101 | Mod 3 Depth | 0-255 | -128 (0) to +127 (255) |  |
+| 102 | Mod 4 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  |
+| 103 | Mod 4 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  |
+| 104 | Mod 4 Depth | 0-255 | -128 (0) to +127 (255) |  |
+| 105 | Mod 5 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  |
+| 106 | Mod 5 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  |
+| 107 | Mod 5 Depth | 0-255 | -128 (0) to +127 (255) |  |
+| 108 | Mod 6 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  |
+| 109 | Mod 6 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  |
+| 110 | Mod 6 Depth | 0-255 | -128 (0) to +127 (255) |  |
+| 111 | Mod 7 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  |
+| 112 | Mod 7 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  |
+| 113 | Mod 7 Depth | 0-255 | -128 (0) to +127 (255) |  |
+| 114 | Mod 8 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  |
+| 115 | Mod 8 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  |
+| 116 | Mod 8 Depth | 0-255 | -128 (0) to +127 (255) |  |
 
 ### Control Sequencer
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 117 | Ctrl Sequencer Enable | 0-1 | Off (0), On (1) |
-| 118 | Ctrl Sequencer Clock Divider | 0-15 | [Control Sequencer Clock Divider](#sequencer_clock) |
-| 119 | Sequence Length | 0-31 | 1 (0) to 32 (31) steps |
-| 120 | Sequencer Swing Timing | 0-255 | 0% (0) to 75% (25) |
-| 121 | Key Sync & Loop | 0-2 | [Control Sequencer Key Sync and Loop](#sequencer_sync) |
-| 122 | Slew Rate | 0-255 |  |
-| 123 | Seq Step Value 1 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 124 | Seq Step Value 2 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 125 | Seq Step Value 3 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 126 | Seq Step Value 4 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 127 | Seq Step Value 5 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 128 | Seq Step Value 6 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 129 | Seq Step Value 7 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 130 | Seq Step Value 8 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 131 | Seq Step Value 9 | 0-255 | Off (0), On (1) |
-| 132 | Seq Step Value 10 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 133 | Seq Step Value 11 | 0-255 | Off (0), On (1) |
-| 134 | Seq Step Value 12 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 135 | Seq Step Value 13 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 136 | Seq Step Value 14 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 137 | Seq Step Value 15 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 138 | Seq Step Value 16 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 139 | Seq Step Value 17 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 140 | Seq Step Value 18 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 141 | Seq Step Value 19 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 142 | Seq Step Value 20 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 143 | Seq Step Value 21 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 144 | Seq Step Value 22 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 145 | Seq Step Value 23 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 146 | Seq Step Value 24 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 147 | Seq Step Value 25 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 148 | Seq Step Value 26 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 149 | Seq Step Value 27 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 150 | Seq Step Value 28 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 151 | Seq Step Value 29 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 152 | Seq Step Value 30 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 153 | Seq Step Value 31 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
-| 154 | Seq Step Value 32 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 117 | Ctrl Sequencer Enable | 0-1 | Off (0), On (1) |  |
+| 118 | Ctrl Sequencer Clock Divider | 0-15 | [Control Sequencer Clock Divider](#sequencer_clock) |  |
+| 119 | Sequence Length | 0-31 | 1 (0) to 32 (31) steps |  |
+| 120 | Sequencer Swing Timing | 0-255 | 0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel. | 50% to 75% |
+| 121 | Key Sync & Loop | 0-2 | [Control Sequencer Key Sync and Loop](#sequencer_sync) |  |
+| 122 | Slew Rate | 0-255 |  |  |
+| 123 | Seq Step Value 1 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 124 | Seq Step Value 2 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 125 | Seq Step Value 3 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 126 | Seq Step Value 4 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 127 | Seq Step Value 5 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 128 | Seq Step Value 6 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 129 | Seq Step Value 7 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 130 | Seq Step Value 8 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 131 | Seq Step Value 9 | 0-255 | Off (0), On (1) |  |
+| 132 | Seq Step Value 10 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 133 | Seq Step Value 11 | 0-255 | Off (0), On (1) |  |
+| 134 | Seq Step Value 12 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 135 | Seq Step Value 13 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 136 | Seq Step Value 14 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 137 | Seq Step Value 15 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 138 | Seq Step Value 16 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 139 | Seq Step Value 17 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 140 | Seq Step Value 18 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 141 | Seq Step Value 19 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 142 | Seq Step Value 20 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 143 | Seq Step Value 21 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 144 | Seq Step Value 22 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 145 | Seq Step Value 23 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 146 | Seq Step Value 24 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 147 | Seq Step Value 25 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 148 | Seq Step Value 26 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 149 | Seq Step Value 27 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 150 | Seq Step Value 28 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 151 | Seq Step Value 29 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 152 | Seq Step Value 30 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 153 | Seq Step Value 31 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
+| 154 | Seq Step Value 32 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
 
 ### Arpeggiator
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 155 | Arp On/Off | 0-1 | Off (0), On (1) |
-| 156 | Arp Mode | 0-10 | [Arpeggiator Mode](#arp_mode) |
-| 157 | Arp Rate (tempo) | 0-255 | 20 bpm (0) to 275 bpm (255) |
-| 158 | Arp Clock | 0-12 | [Arpeggiator Clock Divider](#arp_clock) |
-| 159 | Arp Key Sync | 0-1 | Off (0), On (1) |
-| 160 | Arp Gate Time | 0-255 |  |
-| 161 | Arp Hold | 0-1 | Off (0), On (1) |
-| 162 | Arp Pattern | 0-64 | [Arpeggiator Pattern](#arp_pattern) |
-| 163 | Arp Swing | 0-255 | 0% (0) to 75% (25) |
-| 164 | Arp Octaves | 0-5 | 1 to 6 octaves |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 155 | Arp On/Off | 0-1 | Off (0), On (1) |  |
+| 156 | Arp Mode | 0-10 | [Arpeggiator Mode](#arp_mode) |  |
+| 157 | Arp Rate (tempo) | 0-255 | 20 bpm (0) to 275 bpm (255) | 20.0 to 275.0 BPM |
+| 158 | Arp Clock | 0-12 | [Arpeggiator Clock Divider](#arp_clock) |  |
+| 159 | Arp Key Sync | 0-1 | Off (0), On (1) |  |
+| 160 | Arp Gate Time | 0-255 |  |  |
+| 161 | Arp Hold | 0-1 | Off (0), On (1) |  |
+| 162 | Arp Pattern | 0-64 | [Arpeggiator Pattern](#arp_pattern) |  |
+| 163 | Arp Swing | 0-255 | 0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel. | 50% to 75% |
+| 164 | Arp Octaves | 0-5 | 1 to 6 octaves |  |
 
 ### Effects
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 165 | FX Routing | 0-9 | [FX Connection Mode](#fx_routing) |
-| 166 | FX 1 Type | 0-34 | [FX Type](#fx_type) |
-| 167 | FX 1 Param 1 | 0-255 | Meaning depends on FX 1 Type |
-| 168 | FX 1 Param 2 | 0-255 | Meaning depends on FX 1 Type |
-| 169 | FX 1 Param 3 | 0-255 | Meaning depends on FX 1 Type |
-| 170 | FX 1 Param 4 | 0-255 | Meaning depends on FX 1 Type |
-| 171 | FX 1 Param 5 | 0-255 | Meaning depends on FX 1 Type |
-| 172 | FX 1 Param 6 | 0-255 | Meaning depends on FX 1 Type |
-| 173 | FX 1 Param 7 | 0-255 | Meaning depends on FX 1 Type |
-| 174 | FX 1 Param 8 | 0-255 | Meaning depends on FX 1 Type |
-| 175 | FX 1 Param 9 | 0-255 | Meaning depends on FX 1 Type |
-| 176 | FX 1 Param 10 | 0-255 | Meaning depends on FX 1 Type |
-| 177 | FX 1 Param 11 | 0-255 | Meaning depends on FX 1 Type |
-| 178 | FX 1 Param 12 | 0-255 | Meaning depends on FX 1 Type |
-| 179 | FX 2 Type | 0-34 | [FX Type](#fx_type) |
-| 180 | FX 2 Param 1 | 0-255 | Meaning depends on FX 2 Type |
-| 181 | FX 2 Param 2 | 0-255 | Meaning depends on FX 2 Type |
-| 182 | FX 2 Param 3 | 0-255 | Meaning depends on FX 2 Type |
-| 183 | FX 2 Param 4 | 0-255 | Meaning depends on FX 2 Type |
-| 184 | FX 2 Param 5 | 0-255 | Meaning depends on FX 2 Type |
-| 185 | FX 2 Param 6 | 0-255 | Meaning depends on FX 2 Type |
-| 186 | FX 2 Param 7 | 0-255 | Meaning depends on FX 2 Type |
-| 187 | FX 2 Param 8 | 0-255 | Meaning depends on FX 2 Type |
-| 188 | FX 2 Param 9 | 0-255 | Meaning depends on FX 2 Type |
-| 189 | FX 2 Param 10 | 0-255 | Meaning depends on FX 2 Type |
-| 190 | FX 2 Param 11 | 0-255 | Meaning depends on FX 2 Type |
-| 191 | FX 2 Param 12 | 0-255 | Meaning depends on FX 2 Type |
-| 192 | FX 3 Type | 0-34 | [FX Type](#fx_type) |
-| 193 | FX 3 Param 1 | 0-255 | Meaning depends on FX 3 Type |
-| 194 | FX 3 Param 2 | 0-255 | Meaning depends on FX 3 Type |
-| 195 | FX 3 Param 3 | 0-255 | Meaning depends on FX 3 Type |
-| 196 | FX 3 Param 4 | 0-255 | Meaning depends on FX 3 Type |
-| 197 | FX 3 Param 5 | 0-255 | Meaning depends on FX 3 Type |
-| 198 | FX 3 Param 6 | 0-255 | Meaning depends on FX 3 Type |
-| 199 | FX 3 Param 7 | 0-255 | Meaning depends on FX 3 Type |
-| 200 | FX 3 Param 8 | 0-255 | Meaning depends on FX 3 Type |
-| 201 | FX 3 Param 9 | 0-255 | Meaning depends on FX 3 Type |
-| 202 | FX 3 Param 10 | 0-255 | Meaning depends on FX 3 Type |
-| 203 | FX 3 Param 11 | 0-255 | Meaning depends on FX 3 Type |
-| 204 | FX 3 Param 12 | 0-255 | Meaning depends on FX 3 Type |
-| 205 | FX 4 Type | 0-34 | [FX Type](#fx_type) |
-| 206 | FX 4 Param 1 | 0-255 | Meaning depends on FX 4 Type |
-| 207 | FX 4 Param 2 | 0-255 | Meaning depends on FX 4 Type |
-| 208 | FX 4 Param 3 | 0-255 | Meaning depends on FX 4 Type |
-| 209 | FX 4 Param 4 | 0-255 | Meaning depends on FX 4 Type |
-| 210 | FX 4 Param 5 | 0-255 | Meaning depends on FX 4 Type |
-| 211 | FX 4 Param 6 | 0-255 | Meaning depends on FX 4 Type |
-| 212 | FX 4 Param 7 | 0-255 | Meaning depends on FX 4 Type |
-| 213 | FX 4 Param 8 | 0-255 | Meaning depends on FX 4 Type |
-| 214 | FX 4 Param 9 | 0-255 | Meaning depends on FX 4 Type |
-| 215 | FX 4 Param 10 | 0-255 | Meaning depends on FX 4 Type |
-| 216 | FX 4 Param 11 | 0-255 | Meaning depends on FX 4 Type |
-| 217 | FX 4 Param 12 | 0-255 | Meaning depends on FX 4 Type |
-| 218 | FX 1 Output Gain | 0-150 |  |
-| 219 | FX 2 Output Gain | 0-150 |  |
-| 220 | FX 3 Output Gain | 0-150 |  |
-| 221 | FX 4 Output Gain | 0-150 |  |
-| 222 | FX Mode | 0-2 | [FX Mode](#fx_mode) |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 165 | FX Routing | 0-9 | [FX Connection Mode](#fx_routing) |  |
+| 166 | FX 1 Type | 0-34 | [FX Type](#fx_type) |  |
+| 167 | FX 1 Param 1 | 0-255 | Meaning depends on FX 1 Type |  |
+| 168 | FX 1 Param 2 | 0-255 | Meaning depends on FX 1 Type |  |
+| 169 | FX 1 Param 3 | 0-255 | Meaning depends on FX 1 Type |  |
+| 170 | FX 1 Param 4 | 0-255 | Meaning depends on FX 1 Type |  |
+| 171 | FX 1 Param 5 | 0-255 | Meaning depends on FX 1 Type |  |
+| 172 | FX 1 Param 6 | 0-255 | Meaning depends on FX 1 Type |  |
+| 173 | FX 1 Param 7 | 0-255 | Meaning depends on FX 1 Type |  |
+| 174 | FX 1 Param 8 | 0-255 | Meaning depends on FX 1 Type |  |
+| 175 | FX 1 Param 9 | 0-255 | Meaning depends on FX 1 Type |  |
+| 176 | FX 1 Param 10 | 0-255 | Meaning depends on FX 1 Type |  |
+| 177 | FX 1 Param 11 | 0-255 | Meaning depends on FX 1 Type |  |
+| 178 | FX 1 Param 12 | 0-255 | Meaning depends on FX 1 Type |  |
+| 179 | FX 2 Type | 0-34 | [FX Type](#fx_type) |  |
+| 180 | FX 2 Param 1 | 0-255 | Meaning depends on FX 2 Type |  |
+| 181 | FX 2 Param 2 | 0-255 | Meaning depends on FX 2 Type |  |
+| 182 | FX 2 Param 3 | 0-255 | Meaning depends on FX 2 Type |  |
+| 183 | FX 2 Param 4 | 0-255 | Meaning depends on FX 2 Type |  |
+| 184 | FX 2 Param 5 | 0-255 | Meaning depends on FX 2 Type |  |
+| 185 | FX 2 Param 6 | 0-255 | Meaning depends on FX 2 Type |  |
+| 186 | FX 2 Param 7 | 0-255 | Meaning depends on FX 2 Type |  |
+| 187 | FX 2 Param 8 | 0-255 | Meaning depends on FX 2 Type |  |
+| 188 | FX 2 Param 9 | 0-255 | Meaning depends on FX 2 Type |  |
+| 189 | FX 2 Param 10 | 0-255 | Meaning depends on FX 2 Type |  |
+| 190 | FX 2 Param 11 | 0-255 | Meaning depends on FX 2 Type |  |
+| 191 | FX 2 Param 12 | 0-255 | Meaning depends on FX 2 Type |  |
+| 192 | FX 3 Type | 0-34 | [FX Type](#fx_type) |  |
+| 193 | FX 3 Param 1 | 0-255 | Meaning depends on FX 3 Type |  |
+| 194 | FX 3 Param 2 | 0-255 | Meaning depends on FX 3 Type |  |
+| 195 | FX 3 Param 3 | 0-255 | Meaning depends on FX 3 Type |  |
+| 196 | FX 3 Param 4 | 0-255 | Meaning depends on FX 3 Type |  |
+| 197 | FX 3 Param 5 | 0-255 | Meaning depends on FX 3 Type |  |
+| 198 | FX 3 Param 6 | 0-255 | Meaning depends on FX 3 Type |  |
+| 199 | FX 3 Param 7 | 0-255 | Meaning depends on FX 3 Type |  |
+| 200 | FX 3 Param 8 | 0-255 | Meaning depends on FX 3 Type |  |
+| 201 | FX 3 Param 9 | 0-255 | Meaning depends on FX 3 Type |  |
+| 202 | FX 3 Param 10 | 0-255 | Meaning depends on FX 3 Type |  |
+| 203 | FX 3 Param 11 | 0-255 | Meaning depends on FX 3 Type |  |
+| 204 | FX 3 Param 12 | 0-255 | Meaning depends on FX 3 Type |  |
+| 205 | FX 4 Type | 0-34 | [FX Type](#fx_type) |  |
+| 206 | FX 4 Param 1 | 0-255 | Meaning depends on FX 4 Type |  |
+| 207 | FX 4 Param 2 | 0-255 | Meaning depends on FX 4 Type |  |
+| 208 | FX 4 Param 3 | 0-255 | Meaning depends on FX 4 Type |  |
+| 209 | FX 4 Param 4 | 0-255 | Meaning depends on FX 4 Type |  |
+| 210 | FX 4 Param 5 | 0-255 | Meaning depends on FX 4 Type |  |
+| 211 | FX 4 Param 6 | 0-255 | Meaning depends on FX 4 Type |  |
+| 212 | FX 4 Param 7 | 0-255 | Meaning depends on FX 4 Type |  |
+| 213 | FX 4 Param 8 | 0-255 | Meaning depends on FX 4 Type |  |
+| 214 | FX 4 Param 9 | 0-255 | Meaning depends on FX 4 Type |  |
+| 215 | FX 4 Param 10 | 0-255 | Meaning depends on FX 4 Type |  |
+| 216 | FX 4 Param 11 | 0-255 | Meaning depends on FX 4 Type |  |
+| 217 | FX 4 Param 12 | 0-255 | Meaning depends on FX 4 Type |  |
+| 218 | FX 1 Output Gain | 0-150 |  |  |
+| 219 | FX 2 Output Gain | 0-150 |  |  |
+| 220 | FX 3 Output Gain | 0-150 |  |  |
+| 221 | FX 4 Output Gain | 0-150 |  |  |
+| 222 | FX Mode | 0-2 | [FX Mode](#fx_mode) |  |
 
 ### Program
 
-| Offset | Parameter | Range | Values |
-|---|---|---|---|
-| 223 | Program Name Char 1 | 0-127 | Null-terminated 16 char ASCII string |
-| 224 | Program Name Char 2 | 0-127 | Null-terminated 16 char ASCII string |
-| 225 | Program Name Char 3 | 0-127 | Null-terminated 16 char ASCII string |
-| 226 | Program Name Char 4 | 0-127 | Null-terminated 16 char ASCII string |
-| 227 | Program Name Char 5 | 0-127 | Null-terminated 16 char ASCII string |
-| 228 | Program Name Char 6 | 0-127 | Null-terminated 16 char ASCII string |
-| 229 | Program Name Char 7 | 0-127 | Null-terminated 16 char ASCII string |
-| 230 | Program Name Char 8 | 0-127 | Null-terminated 16 char ASCII string |
-| 231 | Program Name Char 9 | 0-127 | Null-terminated 16 char ASCII string |
-| 232 | Program Name Char 10 | 0-127 | Null-terminated 16 char ASCII string |
-| 233 | Program Name Char 11 | 0-127 | Null-terminated 16 char ASCII string |
-| 234 | Program Name Char 12 | 0-127 | Null-terminated 16 char ASCII string |
-| 235 | Program Name Char 13 | 0-127 | Null-terminated 16 char ASCII string |
-| 236 | Program Name Char 14 | 0-127 | Null-terminated 16 char ASCII string |
-| 237 | Program Name Char 15 | 0-127 | Null-terminated 16 char ASCII string |
-| 238 | Program Name Char 16 | 0-127 | Null-terminated 16 char ASCII string |
-| 239 | Program Name Char 17 | 0-127 | Null-terminated 16 char ASCII string |
-| 240 | Program Category | 0-16 | [Program Category](#program_category) |
-| 241 | Program Transpose | 80-176 | -48 (80) ... 0 (128) ... +48 (176) |
+| Offset | Parameter | Raw | Values | Shows as |
+|---|---|---|---|---|
+| 223 | Program Name Char 1 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 224 | Program Name Char 2 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 225 | Program Name Char 3 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 226 | Program Name Char 4 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 227 | Program Name Char 5 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 228 | Program Name Char 6 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 229 | Program Name Char 7 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 230 | Program Name Char 8 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 231 | Program Name Char 9 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 232 | Program Name Char 10 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 233 | Program Name Char 11 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 234 | Program Name Char 12 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 235 | Program Name Char 13 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 236 | Program Name Char 14 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 237 | Program Name Char 15 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 238 | Program Name Char 16 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 239 | Program Name Char 17 | 0-127 | Null-terminated 16 char ASCII string |  |
+| 240 | Program Category | 0-16 | [Program Category](#program_category) |  |
+| 241 | Program Transpose | 80-176 | -48 (80) ... 0 (128) ... +48 (176) |  |
 
 <!-- /generated:parameters -->
 
@@ -1009,52 +1009,85 @@ Values 1-32 select the presets, 33-64 the user patterns.
 
 #### Arpeggiator Clock Divider
 
-The manual lists the available sync ratios in Appendix 2 but does not print the value-to-ratio mapping. The ratios below are the candidates, in the order the appendix lists them. The mapping needs confirmation against hardware before it is relied on.
-
-> Unconfirmed. This mapping is inferred and needs checking against hardware.
+Section 8.1.7 of the manual lists these thirteen ratios, which is exactly the 0-12 range the NRPN table gives. Divides the master BPM.
 
 | Value | Name | Notes |
 |---|---|---|
-| 0 | 1 |  |
-| 1 | 1/2 |  |
-| 2 | 3/8 |  |
-| 3 | 1/3 |  |
-| 4 | 1/4 |  |
-| 5 | 3/16 |  |
-| 6 | 1/6 |  |
-| 7 | 1/8 |  |
-| 8 | 3/32 |  |
-| 9 | 1/12 |  |
-| 10 | 1/16 |  |
-| 11 | 3/64 |  |
-| 12 | 1/24 |  |
+| 0 | 1/2 | Half note |
+| 1 | 3/8 | Dotted quarter note |
+| 2 | 1/3 | Third note, half note triplets |
+| 3 | 1/4 | Quarter note |
+| 4 | 3/16 | Dotted eighth note |
+| 5 | 1/6 | Sixth note, quarter note triplets |
+| 6 | 1/8 | Eighth note |
+| 7 | 3/32 | Dotted sixteenth note |
+| 8 | 1/12 | Twelfth note, eighth note triplets |
+| 9 | 1/16 | Sixteenth note, the default |
+| 10 | 1/24 | Twenty-fourth note, sixteenth note triplets |
+| 11 | 1/32 | Thirty-second note |
+| 12 | 1/48 | Forty-eighth note, thirty-second note triplets |
 
 <a id="sequencer_clock"></a>
 
 #### Control Sequencer Clock Divider
 
-The manual lists the available sync ratios in Appendix 2 but does not print the value-to-ratio mapping. The ratios below are the candidates, in the order the appendix lists them. The mapping needs confirmation against hardware before it is relied on.
+Section 8.1.8 lists these twenty ratios, but the NRPN table gives the parameter a range of 0-15. One of the two is wrong and the manual does not say which. The list is recorded as printed; the mapping needs confirmation against hardware.
 
 > Unconfirmed. This mapping is inferred and needs checking against hardware.
 
 | Value | Name | Notes |
 |---|---|---|
-| 0 | 1 |  |
-| 1 | 1/2 |  |
-| 2 | 3/8 |  |
-| 3 | 1/3 |  |
-| 4 | 1/4 |  |
-| 5 | 3/16 |  |
-| 6 | 1/6 |  |
-| 7 | 1/8 |  |
-| 8 | 3/32 |  |
-| 9 | 1/12 |  |
-| 10 | 1/16 |  |
-| 11 | 3/64 |  |
-| 12 | 1/24 |  |
-| 13 | 1/32 |  |
-| 14 | 3/128 |  |
-| 15 | 1/48 |  |
+| 0 | 4 | Four notes |
+| 1 | 3 | Three notes |
+| 2 | 2 | Two notes |
+| 3 | 1 | One note |
+| 4 | 1/2 | Half note |
+| 5 | 3/8 | Dotted quarter note |
+| 6 | 1/3 | Third note, half note triplets |
+| 7 | 1/4 | Quarter note |
+| 8 | 3/16 | Dotted eighth note |
+| 9 | 1/6 | Sixth note, quarter note triplets |
+| 10 | 1/8 | Eighth note |
+| 11 | 3/32 | Dotted sixteenth note |
+| 12 | 1/12 | Twelfth note, eighth note triplets |
+| 13 | 1/16 | Sixteenth note, the default |
+| 14 | 3/64 | Dotted thirty-second note |
+| 15 | 1/24 | Twenty-fourth note, sixteenth note triplets |
+| 16 | 1/32 | Thirty-second note |
+| 17 | 3/128 | Dotted sixty-fourth note |
+| 18 | 1/48 | Forty-eighth note, thirty-second note triplets |
+| 19 | 1/64 | Sixty-fourth note |
+
+<a id="lfo_clock"></a>
+
+#### LFO Clock Divider
+
+Section 8.2.4. When LFO Arp Sync is on, the LFO rate parameter selects one of these divisions of the master BPM instead of a free-running rate. Same twenty ratios as the control sequencer.
+
+> Unconfirmed. This mapping is inferred and needs checking against hardware.
+
+| Value | Name | Notes |
+|---|---|---|
+| 0 | 4 | Four notes |
+| 1 | 3 | Three notes |
+| 2 | 2 | Two notes |
+| 3 | 1 | One note |
+| 4 | 1/2 | Half note |
+| 5 | 3/8 | Dotted quarter note |
+| 6 | 1/3 | Third note, half note triplets |
+| 7 | 1/4 | Quarter note |
+| 8 | 3/16 | Dotted eighth note |
+| 9 | 1/6 | Sixth note, quarter note triplets |
+| 10 | 1/8 | Eighth note |
+| 11 | 3/32 | Dotted sixteenth note |
+| 12 | 1/12 | Twelfth note, eighth note triplets |
+| 13 | 1/16 | Sixteenth note, the default |
+| 14 | 3/64 | Dotted thirty-second note |
+| 15 | 1/24 | Twenty-fourth note, sixteenth note triplets |
+| 16 | 1/32 | Thirty-second note |
+| 17 | 3/128 | Dotted sixty-fourth note |
+| 18 | 1/48 | Forty-eighth note, thirty-second note triplets |
+| 19 | 1/64 | Sixty-fourth note |
 
 <a id="mod_source"></a>
 
@@ -1336,9 +1369,10 @@ within that dump, so the offsets are still unknown.
 | Velocity Curve | 0-127 | Key velocity to MIDI velocity curve. The manual gives the display range as -64 to +63 and marks it TBD. |
 | Transpose | 0-96 | -48 to +48 semitones. Affects both local play and MIDI output. |
 | Aftertouch Curve | 0-127 | Key pressure to MIDI aftertouch curve. The manual gives the display range as -64 to +63 and marks it TBD. |
-| Pedal CC | 0-3 | Foot controller CC: Foot Control CC4 (0), Breath CC2 (1), Volume CC7 (2), Expression CC11 (3). |
-| Sustain CC | 0-3 | Sustain pedal polarity and function: Normal+ (0), Normal- (1), Arp+ (2), Arp- (3). |
-| Fader Pick Up Mode | 0-2 | Relative (0), Pass-thru (1), Jump (2). |
+| Pedal CC | 0-6 | **Unconfirmed.** What the pedal or control voltage input drives: Foot Control (0), Mod Wheel (1), Breath (2), Volume (3), Expression (4), Portamento Time (5), Aftertouch (6). **Departs from the manual's own table.** The manual's global commands table gives a range of 0-3 and lists four destinations, but section 7.3.3 describes seven. The seven are recorded here; the value order follows the order that section lists them in and needs confirming. |
+| Sustain CC | 0-9 | **Unconfirmed.** Sustain input polarity and function: Norm-Open (0), Norm-Closed (1), Tap-N.O (2), Tap-N.C (3), Arp+Gate (4), Arp-Gate (5), Seq+Gate (6), Seq-Gate (7), Arp&Seq+Gate (8), Arp&Seq-Gate (9). The gate modes step the arpeggiator or the control sequencer from a 0-5 V gate signal. **Departs from the manual's own table.** The manual's global commands table gives a range of 0-3 and lists four modes, but section 7.3.3 describes ten. The ten are recorded here; the value order follows the order that section lists them in and needs confirming. |
+| Sustain Pedal Mode | 0-1 | **Unconfirmed.** Sustain (0) holds every note while the pedal is down. Sostenuto (1) holds only the notes that were already sounding, like the middle pedal of a piano. **Departs from the manual's own table.** Described in section 7.3.3 but absent from the manual's global commands table, so neither its range nor its position in the global dump is documented. |
+| Fader Pick Up Mode | 0-2 | Relative (0), Pass-thru (1), Jump (2). **Departs from the manual's own table.** Section 7.3.4 describes only Pass-thru and Jump. Relative may be a firmware 1.0 mode that was removed, or an omission from that section. |
 | LCD Brightness | 0-9 | 10% steps. |
 | LCD Contrast | 0-9 | 10% steps. |
 | Arp Send to MIDI | 0-1 | Transmit arpeggiator output to MIDI Out and USB. |
@@ -1364,9 +1398,10 @@ Rows where this specification departs from what the manual prints, and why.
 | 70, 79 | VCF Envelope Release Curve and 1 more | Same repeated-name error as offset 61. |
 | 93, 96, 99, 102, 105, 108, 111, 114 | Mod 1 Source and 7 more | Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range. |
 | 94, 97, 100, 103, 106, 109, 112, 115 | Mod 1 Destination and 7 more | Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range. |
+| 118 | Ctrl Sequencer Clock Divider | The manual gives this parameter a range of 0-15, but section 8.1.8 lists twenty clock divisions for the control sequencer. One of the two is wrong and the manual does not say which, so the range is left as printed and the value table is marked unconfirmed. |
 | 119 | Sequence Length | The manual prints the range and the first note value as one run, "0-311 (0) to 32 (31) steps". The range is 0-31. |
-| 120 | Sequencer Swing Timing | The manual gives the upper endpoint as 25 on a 0-255 parameter, which is almost certainly a typo for 255. Left verbatim pending hardware confirmation. |
-| 163 | Arp Swing | Same suspected typo as offset 120. |
+| 120 | Sequencer Swing Timing | Resolved. The manual’s NRPN note reads "0% (0) to 75% (25)", but sections 8.1.7 and 8.1.8 both state the swing range as 50% to 75%. So 0 is 50% and 255 is 75%: the note has a wrong lower endpoint and a dropped digit. |
+| 163 | Arp Swing | Resolved the same way as offset 120. |
 | 164 | Arp Octaves | The manual prints "0-51 to 6 Octaves". The range is 0-5. |
 | 166, 179, 192, 205 | FX 1 Type and 3 more | Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range. |
 
@@ -1374,25 +1409,50 @@ Rows where this specification departs from what the manual prints, and why.
 
 ## Open questions
 
-Things the manual does not answer and that need a hardware session to settle.
+What the manual still does not settle. Everything here needs a hardware session
+or a firmware source that does not exist publicly.
 
-- **Clock divider mappings.** Appendix 2 lists the available sync ratios but not
-  which value selects which ratio. Arp Clock takes 0-12 and the control
-  sequencer divider takes 0-15, against 17 listed ratios, so both are subsets in
-  an unknown order.
-- **Global dump layout.** The 45 bytes of the global parameter dump are not
-  mapped to the settings the manual lists.
-- **Swing endpoints.** Offsets 120 and 163 are 0-255 parameters whose notes give
-  the top of the range as 25, which looks like a dropped digit.
-- **Four unconfirmed controller assignments.** CC 40, 44, 52 and 56, where the
-  source map's labels do not line up with its own attack, decay, sustain, release
-  runs. See the notes on those rows.
+- **The global dump layout.** The global parameter dump carries 45 bytes. The
+  manual lists the settings but never maps them to offsets, and no public source
+  does either. The count does not obviously add up: 25 settings are recorded
+  here, several of them described only in the menu chapters and missing from the
+  manual's own global commands table, so some of the 45 bytes are either
+  multi-byte fields or settings the manual never lists at all.
+- **The control sequencer clock divider range.** Section 8.1.8 lists twenty
+  divisions; the NRPN table gives offset 118 a range of 0-15. One of the two is
+  wrong. The twenty are recorded, marked unconfirmed.
+- **Four global ranges.** Pedal CC, Sustain CC, Sustain Pedal Mode and Fader
+  Pick Up Mode are each described one way in the menu chapters and another way,
+  or not at all, in the global commands table. See their rows above.
+- **Four controller assignments.** CC 40, 44, 52 and 56, where the controller
+  map's labels do not line up with its own attack, decay, sustain, release runs.
+- **Pitch bend depth sign.** Offsets 36 and 37 are documented as 0-24 semitones
+  in the NRPN table, but section 8.4.4 describes the same two settings as
+  running from -24 to +24, which would let the wheel bend the opposite way. A
+  single byte holds either. Recorded as printed.
+- **Where VCA Mode lives.** Section 8.6.2 describes a per-program VCA Mode,
+  Ballsy or Transparent, with no NRPN number anywhere in the manual. Protocol
+  version 7 added three bytes at offsets 242-244 that are zero in every factory
+  program. That is the obvious place for it, and for anything else firmware 1.1
+  added, but it is a guess until someone toggles the setting and re-reads a dump.
 - **Per-effect parameter meanings.** Each FX slot has 12 raw 0-255 parameters
   whose meaning depends on the slot's algorithm, so offsets 167-178, 180-191,
   193-204 and 206-217 are 48 unlabelled bytes until this is filled in. Section
-  9.3 of the manual documents all 35 algorithms with units and ranges. This is
-  the next piece of work: it goes in `spec/effects.toml` and is tracked in
-  `docs/architecture.md`.
+  9.3 documents all 35 algorithms with units and ranges, so this is transcription
+  work rather than a real unknown. It goes in `spec/effects.toml` and is tracked
+  in `docs/architecture.md`.
+
+### Settled since the first draft
+
+- **The arpeggiator clock divider.** Section 8.1.7 lists thirteen divisions,
+  exactly matching the 0-12 range the NRPN table gives. Recorded as confirmed.
+- **The swing endpoints.** The NRPN note for offsets 120 and 163 reads "0% (0)
+  to 75% (25)". Sections 8.1.7 and 8.1.8 both state the swing range as 50% to
+  75%, so 0 is 50% and 255 is 75%: the note has a wrong lower endpoint and a
+  dropped digit.
+- **What the LFO rate fader does under Arp Sync.** It stops setting a rate and
+  selects a division of the master BPM instead, from the same twenty-entry table
+  the control sequencer uses.
 
 ## Cross-verification
 
@@ -1409,6 +1469,12 @@ The controller map came from a third source again, and its firmware-1.1 reading
 is corroborated: it puts the 3D axes on CC 115, 116 and 117, matching the
 modulation source list in the newer manual rather than the CC 114-116 of the
 older one.
+
+A fourth pass used a clean transcription of the manual, which confirmed all four
+range corrections below that had been made by cross-checking each maximum against
+the values enumerated in its own note. Where the PDF ran "0-2" and "16' (0)"
+together into "0-216", the transcription reads "0-2". The same for offsets 15, 38,
+51, 119 and 164.
 
 ## Sources
 
