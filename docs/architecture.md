@@ -214,6 +214,19 @@ What would not survive translation is anything that parses a display string.
 Ranges are stored as their two ends and a unit, not as `"0.1 to 6.0 s"`, for
 that reason among others.
 
+## Raw values stay raw until measured
+
+A parameter is one byte on the wire, and the manual gives the displayed value at
+each end of its range but never the curve between. That curve cannot be inferred:
+201 of the 329 effect ranges start at or cross zero, which rules out a
+logarithmic fit, and the manual documents at least one fader that starts at zero
+and is still explicitly non-linear, printed as a graph with no numbers.
+
+So `Frequency::hz()` will exist only for parameters whose curve has been measured
+against hardware, and `raw()` always works. A conversion that has not been
+measured is absent rather than approximated: a plausible wrong number in front of
+a musician is worse than an honest raw one, and it would be believed.
+
 ## State is a set of claims, not a cache
 
 The synthesizer answers no per-parameter reads. Dumps can be requested; edits

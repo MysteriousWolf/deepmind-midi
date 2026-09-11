@@ -25,6 +25,7 @@ by hand: change the spec and run `cargo xtask docs`.
 - [Global settings](#global-settings)
 - [Effect parameters](#effect-parameters)
 - [Corrections to the manual](#corrections-to-the-manual)
+- [Scaling](#scaling-raw-values-to-displayed-values)
 - [Open questions](#open-questions)
 
 ## Synth structure
@@ -2429,15 +2430,43 @@ Five things the manual does not settle. Each needs a hardware session.
   marked unconfirmed.
 - **Four controller assignments.** CC 40, 44, 52 and 56, where the controller
   map's labels do not line up with its own attack, decay, sustain, release runs.
-- **How effect parameters scale.** Section 9.3 gives each one a displayed
-  range, and every one is a single byte on the wire, but nothing maps 0-255 onto
-  that range. Reading a value back and comparing is the only way to find the
-  curve, and it may differ per parameter.
+- **How a raw byte maps onto a displayed range.** Both ends are known: section
+  9.3 gives every effect parameter a displayed minimum and maximum, and the NRPN
+  table does the same for the rest. What is missing is the curve between them,
+  and it cannot be guessed from the endpoints. See
+  [Scaling](#scaling-raw-values-to-displayed-values).
 - **Where VCA Mode lives.** Section 8.6.2 describes a per-program VCA Mode,
   Ballsy or Transparent, with no NRPN number anywhere in the manual. Protocol
   version 7 added three bytes at offsets 242-244 which are zero in every factory
   program, so that is the likely home for it and for anything else firmware 1.1
   added.
+
+## Scaling raw values to displayed values
+
+Every parameter is one byte on the wire and every displayed range has two known
+ends, so the only missing piece is the shape in between. Neither of the two
+obvious guesses is safe, and the manual supplies its own counterexample.
+
+Logarithmic does not fit most of them. Of the 329 effect parameters with a
+numeric range, 201 either start at zero or cross it, which no logarithmic curve
+can do.
+
+Linear does not follow from that either. OSC 1 Pitch Mod Depth runs from 0.00
+cents to 36.0 semitones, starts at zero, and section 8.3.1 says outright that
+the fader "has a non-linear response which gives more resolution at smaller
+settings". The manual prints that response as a graph with no numbers on it. So
+a range that starts at zero tells you the curve is not logarithmic, and nothing
+more.
+
+That leaves measurement. The procedure is mechanical once the wire layer exists:
+send an NRPN edit for a known raw value, read the value the synthesizer displays,
+repeat across the range, and fit. It has to be done per parameter, because the
+manual describes bespoke fader responses rather than one house curve.
+
+Until then this specification records the two ends and no curve, and a host
+should show raw values rather than invent displayed ones. Inventing them would
+put plausible, wrong numbers in front of a musician, which is worse than showing
+a number that is honestly raw.
 
 ## Cross-verification
 
