@@ -286,6 +286,44 @@ impl fmt::Display for ProgramNumber {
     }
 }
 
+/// A user arpeggiator or sequencer pattern slot, 0 through 31.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct PatternNumber(u8);
+
+impl PatternNumber {
+    /// The first user pattern.
+    pub const FIRST: Self = Self(0);
+    /// The last user pattern.
+    pub const LAST: Self = Self(31);
+
+    /// Builds a pattern number.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::PatternOutOfRange`] for a number of 32 or more.
+    pub const fn new(number: u8) -> Result<Self, Error> {
+        if number < USER_PATTERN_COUNT {
+            Ok(Self(number))
+        } else {
+            Err(Error::PatternOutOfRange(number))
+        }
+    }
+
+    /// Returns the zero-based slot number.
+    #[must_use]
+    pub const fn get(self) -> u8 {
+        self.0
+    }
+}
+
+impl fmt::Display for PatternNumber {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // The front panel numbers patterns from 1.
+        write!(f, "{}", u16::from(self.0) + 1)
+    }
+}
+
 #[cfg(test)]
 #[expect(
     clippy::expect_used,
@@ -341,6 +379,12 @@ mod tests {
     fn program_numbers_reject_out_of_range_slots() {
         assert_eq!(ProgramNumber::new(127).map(ProgramNumber::get), Ok(127));
         assert_eq!(ProgramNumber::new(128), Err(Error::ProgramOutOfRange(128)));
+    }
+
+    #[test]
+    fn pattern_numbers_reject_out_of_range_slots() {
+        assert_eq!(PatternNumber::new(31).map(PatternNumber::get), Ok(31));
+        assert_eq!(PatternNumber::new(32), Err(Error::PatternOutOfRange(32)));
     }
 
     #[test]

@@ -14,11 +14,32 @@
 //! |-----------|--------------------------------------------------------------|
 //! | [`ids`]   | Addressing primitives: device ID, model, bank, program number |
 //! | [`error`] | Crate-wide error type                                        |
+//! | [`wire`]  | MIDI bytes: running status, channel messages, `SysEx` reassembly |
+//! | [`sysex`] | `DeepMind` framing, the packed MS-bit codec, typed messages   |
 //!
-//! Further layers (`wire`, `sysex`, `param`, `program`, `device`, `syx`) land in
-//! subsequent changes, generated where possible from the machine-readable
-//! specification in `spec/`. See `docs/architecture.md` for the design and
-//! `docs/midi-spec.md` for the protocol itself.
+//! Each layer depends only on those above it: [`wire`] does not know what a
+//! `DeepMind` is, and [`sysex`] does not know where its bytes came from.
+//!
+//! ```
+//! use deepmind_midi::ids::DeviceId;
+//! use deepmind_midi::sysex::{Frame, Message};
+//! use deepmind_midi::wire::{Decoder, Event};
+//!
+//! // Bytes off a port, in whatever chunks they arrived in.
+//! let mut decoder: Decoder = Decoder::new();
+//! decoder.feed(&[0xF0, 0x00, 0x20, 0x32, 0x20, 0x00, 0x03, 0xF7], |event| {
+//!     if let Ok(Event::SysEx(bytes)) = event {
+//!         let frame = Frame::parse(bytes).expect("a DeepMind frame");
+//!         assert_eq!(frame.device, DeviceId::Unit(0));
+//!         assert_eq!(frame.message, Message::EditBufferDumpRequest);
+//!     }
+//! });
+//! ```
+//!
+//! Further layers (`param`, `program`, `device`, `syx`) land in subsequent
+//! changes, generated where possible from the machine-readable specification in
+//! `spec/`. See `docs/architecture.md` for the design and `docs/midi-spec.md`
+//! for the protocol itself.
 //!
 //! # Feature flags
 //!
@@ -34,6 +55,10 @@ extern crate alloc;
 
 pub mod error;
 pub mod ids;
+pub mod sysex;
+pub mod wire;
 
 pub use error::{Error, Result};
-pub use ids::{Bank, DeviceId, Model, ProgramNumber, ProtocolVersion};
+pub use ids::{Bank, DeviceId, Model, PatternNumber, ProgramNumber, ProtocolVersion};
+pub use sysex::{Command, Frame, Message};
+pub use wire::{Channel, ChannelMessage, Decoder};

@@ -145,8 +145,35 @@ packed:  M  d0 d1 d2 d3 d4 d5 d6       8 bytes, 7 bits each
          bit n of M is bit 7 of raw byte n
 ```
 
-`packed_len = ceil(raw_len / 7) * 8`. The final group is short when the raw
-length is not a multiple of 7.
+A raw length that is not a multiple of 7 leaves a last group with a choice: pad
+it out to eight bytes, or send only the bytes it needs. The manual's own figures
+answer it. Five of the six packed lengths it tabulates are
+`ceil(raw_len / 7) * 8` exactly, the padded form, and not one of them is the
+short form:
+
+| Dump | Raw | Printed | Padded | Short |
+|---|---|---|---|---|
+| Global parameters | 45 | 56 | 56 | 52 |
+| User pattern | 65 | 80 | 80 | 75 |
+| Bank program names | 2048 | 2344 | 2344 | 2341 |
+| Single program name | 16 | 24 | 24 | 19 |
+| Chord memory | 26 | 32 | 32 | 30 |
+| Poly chord memory | 512 | 592 | 592 | 586 |
+| Program | 242 | 278 | 280 | 277 |
+
+The program dump is the last row and the odd one, printed as 278 where padding
+gives 280 and the short form gives 277. It is recorded as printed and nothing
+relies on it; see [Open questions](#open-questions).
+
+So this library pads when it writes and accepts either when it reads, because a
+parser that insisted on one of them would turn a figure that cannot be right
+into a rejected dump.
+
+Padding has a consequence worth stating: a packed run does not carry its own raw
+length. 280 packed bytes hold 245, which is a version 7 program and also a
+version 6 program with three bytes to spare. The comms protocol version byte is
+what says which, which is the same reason
+[the two versions](#protocol-version-6-versus-7) cannot be told apart by length.
 
 ## SysEx messages
 
@@ -182,7 +209,7 @@ Responses that carry bulk data put a comms protocol version byte first.
 
 **Control App Notify Request.** Tells the synthesizer that a control application is attached to this interface. It responds by enabling NRPN and SysEx on that interface and emitting extra traffic such as key-down and voice-allocation updates. Nothing enables that stream implicitly.
 
-**Program Dump Response.** Protocol version 7 carries 245 raw bytes in 280 packed, for a 291 byte message.
+**Program Dump Response.** Protocol version 7 carries 245 raw bytes in 280 packed, for a 291 byte message. The 278 printed here for version 6 matches neither packing rule: padding the last group gives 280, sending it short gives 277. Every other packed length in this table is the padded rule exactly, so the figure is recorded as printed and nothing depends on it.
 
 **User Pattern Dump Response.** The manual assigns this command to both the single pattern response and the edit buffer pattern response. They are told apart by length: the single pattern form carries a pattern number byte before the payload. Pattern data is one length byte, then 32 step velocities, then 32 step gates.
 
@@ -1773,7 +1800,13 @@ Where this document departs from what the manual prints, and why.
 
 ## Open questions
 
-Six things the manual does not settle. Each needs a hardware session.
+Seven things the manual does not settle. Each needs a hardware session.
+
+- **The packed length of a program dump.** The manual prints 278 packed bytes
+  for 242 raw. Padding the last group gives 280 and sending it short gives 277,
+  and every other packed length it prints is the padded rule exactly. One
+  captured dump settles it. See
+  [Packed MS-bit encoding](#packed-ms-bit-encoding).
 
 - **The global dump layout.** The dump carries 45 bytes and nothing maps them to
   settings. This makes every row in [Global settings](#global-settings)
