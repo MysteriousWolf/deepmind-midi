@@ -1,0 +1,181 @@
+# How the four FX engines are wired to each other.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# The FX Routing parameter at offset 165 picks one of ten fixed topologies.
+# enums.toml names them, the way the manual names them, and a name like
+# "Parallel 1/2, parallel 3/4" is something a person can read and a program
+# cannot. This file is the same ten topologies as graphs.
+#
+# It is needed for more than drawing. The manual defines the LEVEL parameter of
+# a slot as the output level "of any effects which are configured in parallel,
+# or any effects which are the last effect before reaching the output stage",
+# so what LEVEL does to a slot depends on where the routing puts that slot.
+
+[meta]
+source = """
+DeepMind 12 User Manual, section 7.2.2 (Selecting FX Routing), transcribed from \
+the ten diagrams printed there. The mode table is from the block diagram in \
+section 6 (Signal Path / Voice Structure)."""
+note = """
+`from` lists what reaches a slot: 0 is the FX block's own input, 1 to 4 are the \
+other slots. `output` lists the slots whose outputs are summed to leave the \
+block. Between them they are the edge list of the diagram the manual prints, \
+which is the whole of the topology."""
+naming = """
+The manual's names read ambiguously in two places and the diagrams settle both. \
+M-3 "Parallel 1/2 Parallel 3/4" is two serial pairs side by side, 1 into 2 \
+alongside 3 into 4, not slot 1 alongside slot 2. M-9 and M-10 put their \
+numbered slots in a feedback loop around the main path rather than in it."""
+
+[[routing]]
+value = 0
+label = "M-1"
+name = "Serial 1-2-3-4"
+slots = [
+    { slot = 1, from = [0] },
+    { slot = 2, from = [1] },
+    { slot = 3, from = [2] },
+    { slot = 4, from = [3] },
+]
+output = [4]
+
+[[routing]]
+value = 1
+label = "M-2"
+name = "Parallel 1/2, serial 3-4"
+slots = [
+    { slot = 1, from = [0] },
+    { slot = 2, from = [0] },
+    { slot = 3, from = [1, 2] },
+    { slot = 4, from = [3] },
+]
+output = [4]
+
+[[routing]]
+value = 2
+label = "M-3"
+name = "Parallel 1/2, parallel 3/4"
+slots = [
+    { slot = 1, from = [0] },
+    { slot = 2, from = [1] },
+    { slot = 3, from = [0] },
+    { slot = 4, from = [3] },
+]
+output = [2, 4]
+
+[[routing]]
+value = 3
+label = "M-4"
+name = "Parallel 1/2/3/4"
+slots = [
+    { slot = 1, from = [0] },
+    { slot = 2, from = [0] },
+    { slot = 3, from = [0] },
+    { slot = 4, from = [0] },
+]
+output = [1, 2, 3, 4]
+
+[[routing]]
+value = 4
+label = "M-5"
+name = "Parallel 1/2/3, serial 4"
+slots = [
+    { slot = 1, from = [0] },
+    { slot = 2, from = [0] },
+    { slot = 3, from = [0] },
+    { slot = 4, from = [1, 2, 3] },
+]
+output = [4]
+
+[[routing]]
+value = 5
+label = "M-6"
+name = "Serial 1-2, parallel 3/4"
+slots = [
+    { slot = 1, from = [0] },
+    { slot = 2, from = [1] },
+    { slot = 3, from = [2] },
+    { slot = 4, from = [2] },
+]
+output = [3, 4]
+
+[[routing]]
+value = 6
+label = "M-7"
+name = "Serial 1, parallel 2/3/4"
+slots = [
+    { slot = 1, from = [0] },
+    { slot = 2, from = [1] },
+    { slot = 3, from = [1] },
+    { slot = 4, from = [1] },
+]
+output = [2, 3, 4]
+
+[[routing]]
+value = 7
+label = "M-8"
+name = "Parallel (serial 1-2-3)/4"
+slots = [
+    { slot = 1, from = [0] },
+    { slot = 2, from = [1] },
+    { slot = 3, from = [2] },
+    { slot = 4, from = [0] },
+]
+output = [3, 4]
+
+[[routing]]
+value = 8
+label = "M-9"
+name = "Serial 3-4 feedback 4(1-2)"
+feedback = true
+note = """
+The input reaches slot 3 and the output leaves slot 4. Slots 1 and 2 sit in a \
+loop that taps slot 4's output and returns ahead of slot 4."""
+slots = [
+    { slot = 1, from = [4] },
+    { slot = 2, from = [1] },
+    { slot = 3, from = [0] },
+    { slot = 4, from = [3, 2] },
+]
+output = [4]
+
+[[routing]]
+value = 9
+label = "M-10"
+name = "Serial 4 feedback 4(1-2-3)"
+feedback = true
+note = """
+The input reaches slot 4 and the output leaves it. Slots 1, 2 and 3 sit in a \
+loop that taps slot 4's output and returns ahead of slot 4."""
+slots = [
+    { slot = 1, from = [4] },
+    { slot = 2, from = [1] },
+    { slot = 3, from = [2] },
+    { slot = 4, from = [0, 3] },
+]
+output = [4]
+
+# What the INSERT, SEND and BYPASS settings of the FX Mode parameter at offset
+# 222 do to the two paths through the instrument. The analog path carries the
+# voices straight to the output stage; the digital path carries them through the
+# FX block. BYPASS is a true bypass: the DSP is out of circuit, not muted.
+
+[[mode]]
+value = 0
+name = "Insert"
+analog_path = false
+digital_path = true
+
+[[mode]]
+value = 1
+name = "Send"
+analog_path = true
+digital_path = true
+
+[[mode]]
+value = 2
+name = "Bypass"
+analog_path = true
+digital_path = false

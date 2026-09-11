@@ -1,0 +1,632 @@
+# DeepMind effect parameters, by algorithm.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# Each FX engine holds twelve raw parameter bytes. What they mean depends on
+# the algorithm that engine is running, which is why this table exists. `type`
+# joins to the fx_type value table in enums.toml.
+
+[meta]
+source = "DeepMind 12 User Manual, section 9.3 (Effects Parameters)"
+engine_offsets = [167, 180, 193, 206]
+slots_per_engine = 12
+note = """
+Ranges are what the synthesizer displays, not raw wire values; every raw
+parameter is a byte. The manual gives no raw-to-display mapping, so the two
+ends are recorded and the curve between them is not yet known."""
+
+[[effect]]
+type = 0
+name = "TC-DeepVRB"
+full_name = "TC Deep Reverb"
+parameters = [
+    { slot = 1, ref = "PST", name = "Preset", values = "Ambience, Church, Gate, Hall, Lo Fi, Modulated, Plate, Room, Spring, Tile, Default" },
+    { slot = 2, ref = "DCY", name = "Decay", unit = "s", min = "0.1", max = "6.0", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate (range is preset dependant)." },
+    { slot = 3, ref = "TON", name = "Tone", unit = "%", min = "-50.0", max = "50.0", mod_dest = true, description = "Enhances high frequencies/low frequencies for positive/negative settings respectivly." },
+    { slot = 4, ref = "PDY", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 5, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+]
+
+[[effect]]
+type = 1
+name = "AmbVerb"
+full_name = "Ambient Reverb"
+parameters = [
+    { slot = 1, ref = "PD", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 2, ref = "DCY", name = "Decay", unit = "s", min = "0.2", max = "7.3", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 3, ref = "SIZ", name = "Size", min = "2.0", max = "100.0", description = "Controls the perceived size of the space being created by the reverb." },
+    { slot = 4, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Adjusts the decay of the high frequencies within the reverb tail." },
+    { slot = 5, ref = "DIF", name = "Diffusion", min = "1.0", max = "30.0", description = "Controls the initial reflection density." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies affected by the reverb to be reduced." },
+    { slot = 8, ref = "HC", name = "Hi Cut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies affected by the reverb to be reduced." },
+    { slot = 9, ref = "MOD", name = "Mod", unit = "%", min = "0.0", max = "100", description = "Controls the reverb tail modulation depth." },
+    { slot = 10, ref = "TGN", name = "TailGain", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the volume of the reverb tail." },
+]
+
+[[effect]]
+type = 2
+name = "RoomRev"
+full_name = "Room Reverb"
+parameters = [
+    { slot = 1, ref = "PRE", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 2, ref = "DCY", name = "Decay", unit = "s", min = "0.3", max = "28.9", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 3, ref = "SIZ", name = "Size", unit = "m", min = "4.0", max = "76.0", description = "Controls the perceived size of the space being created by the reverb." },
+    { slot = 4, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Adjusts the decay of the high frequencies within the reverb tail." },
+    { slot = 5, ref = "DIF", name = "Diffusion", unit = "%", min = "0.0", max = "100", description = "Controls the initial reflection density." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies affected by the reverb to be reduced." },
+    { slot = 8, ref = "HC", name = "Hi Cut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies affected by the reverb to be reduced." },
+    { slot = 9, ref = "LFX", name = "BassMult", min = "0.2", max = "4.0", mod_dest = true, description = "Controls the low frequency build-up." },
+    { slot = 10, ref = "SPR", name = "Spread", min = "0.0", max = "50.0", description = "Emphasizes the stereo effect of the reverb." },
+    { slot = 11, ref = "SHP", name = "Shape", min = "0.0", max = "250.0", mod_dest = true, description = "Adjusts the contour of the reverberation envelope." },
+    { slot = 12, ref = "SPI", name = "Spin", unit = "%", min = "0.0", max = "100", description = "Controls randomization / modulation effects within the reverb." },
+]
+
+[[effect]]
+type = 3
+name = "VintageRev"
+full_name = "Vintage Room Reverb"
+parameters = [
+    { slot = 1, ref = "PRE", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 2, ref = "SIZ", name = "Size", unit = "%", min = "1.0", max = "100", description = "Controls the perceived size of the space being created by the reverb. Affects DECAY range." },
+    { slot = 3, ref = "DCY", name = "Decay", unit = "s", min = "0.1", max = "20.7", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate. Range dependant on SIZE." },
+    { slot = 4, ref = "LFX", name = "Lo Mult", min = "0.1", max = "10.0", mod_dest = true, description = "Controls the low frequency build-up." },
+    { slot = 5, ref = "HFX", name = "Hi Mult", min = "0.1", max = "10.0", mod_dest = true, description = "Controls the high frequency build-up." },
+    { slot = 6, ref = "DEN", name = "Density", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Manipulates the reflection density in the simulated room." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies affected by the reverb to be reduced." },
+    { slot = 8, ref = "HC", name = "Hi Cut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies affected by the reverb to be reduced." },
+    { slot = 9, ref = "ERL", name = "ER Level", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Set the early reflection times." },
+    { slot = 10, ref = "ERD", name = "ER Delay", unit = "ms", min = "0.0", max = "200.0", description = "Sets the loudness of the early reflection level." },
+    { slot = 11, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 12, ref = "FRZ", name = "Freeze", min = "OFF", max = "ON", mod_dest = true, description = "Applies freeze mode and blends signals into a continuous response." },
+]
+
+[[effect]]
+type = 4
+name = "HallRev"
+full_name = "Hall Reverb"
+parameters = [
+    { slot = 1, ref = "PD", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 2, ref = "DCY", name = "Decay", unit = "s", min = "0.2", max = "4.9", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 3, ref = "SIZ", name = "Size", min = "2.0", max = "200.0", description = "Controls the perceived size of the space being created by the reverb." },
+    { slot = 4, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Adjusts the decay of the high frequencies within the reverb tail." },
+    { slot = 5, ref = "DIF", name = "Diffusion", min = "1.0", max = "30.0", description = "Controls the initial reflection density." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies affected by the reverb to be reduced." },
+    { slot = 8, ref = "HC", name = "Hi Cut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies affected by the reverb to be reduced." },
+    { slot = 9, ref = "LFX", name = "BassMult", min = "0.5", max = "2.0", mod_dest = true, description = "Controls the low frequency build-up." },
+    { slot = 10, ref = "SPR", name = "Spread", min = "0.0", max = "50.0", description = "Emphasizes the stereo effect of the reverb." },
+    { slot = 11, ref = "SHP", name = "Shape", min = "0.0", max = "250.0", mod_dest = true, description = "Adjusts the contour of the reverberation envelope." },
+    { slot = 12, ref = "MOD", name = "ModSpeed", min = "0.0", max = "100.0", description = "Controls the reverb tail modulation rate ." },
+]
+
+[[effect]]
+type = 5
+name = "ChamberRev"
+full_name = "Chamber Reverb"
+parameters = [
+    { slot = 1, ref = "PRE", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 2, ref = "DCY", name = "Decay", unit = "s", min = "0.3", max = "28.9", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 3, ref = "SIZ", name = "Size", unit = "m", min = "4.0", max = "76.0", description = "Controls the perceived size of the space being created by the reverb." },
+    { slot = 4, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Adjusts the decay of the high frequencies within the reverb tail." },
+    { slot = 5, ref = "DIF", name = "Diffusion", unit = "%", min = "0.0", max = "100", description = "Controls the initial reflection density." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies affected by the reverb to be reduced." },
+    { slot = 8, ref = "HC", name = "Hi Cut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies affected by the reverb to be reduced." },
+    { slot = 9, ref = "LFX", name = "BassMult", min = "0.2", max = "4.0", mod_dest = true, description = "Controls the low frequency build-up." },
+    { slot = 10, ref = "SPR", name = "Spread", min = "0.0", max = "50.0", description = "Emphasizes the stereo effect of the reverb." },
+    { slot = 11, ref = "SHP", name = "Shape", min = "0.0", max = "250.0", mod_dest = true, description = "Adjusts the contour of the reverberation envelope." },
+    { slot = 12, ref = "SPI", name = "Spin", unit = "%", min = "0.0", max = "100", description = "Controls randomization / modulation effects within the reverb." },
+]
+
+[[effect]]
+type = 6
+name = "PlateRev"
+full_name = "Plate Reverb"
+parameters = [
+    { slot = 1, ref = "PD", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 2, ref = "DCY", name = "Decay", unit = "s", min = "0.5", max = "10.0", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 3, ref = "SIZ", name = "Size", min = "2.0", max = "200.0", description = "Controls the perceived size of the space being created by the reverb." },
+    { slot = 4, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Adjusts the decay of the high frequencies within the reverb tail." },
+    { slot = 5, ref = "DIF", name = "Diffusion", min = "1.0", max = "30.0", description = "Controls the initial reflection density." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies affected by the reverb to be reduced." },
+    { slot = 8, ref = "HC", name = "Hi Cut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies affected by the reverb to be reduced." },
+    { slot = 9, ref = "LFX", name = "BassMult", min = "0.5", max = "2.0", mod_dest = true, description = "Controls the low frequency build-up." },
+    { slot = 10, ref = "XOV", name = "Xover", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Controls the crossover point for bass multiplier." },
+    { slot = 11, ref = "MOD", name = "ModDepth", min = "1.0", max = "50.0", description = "Controls the reverb tail modulation depth." },
+    { slot = 12, ref = "MDS", name = "ModSpeed", min = "0.0", max = "100.0", description = "Controls the reverb tail modulation rate." },
+]
+
+[[effect]]
+type = 7
+name = "RichPltRev"
+full_name = "Rich Plate Reverb"
+parameters = [
+    { slot = 1, ref = "PD", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 2, ref = "DCY", name = "Decay", unit = "s", min = "0.3", max = "28.9", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 3, ref = "SIZ", name = "Size", unit = "m", min = "4.0", max = "39.0", description = "Controls the perceived size of the space being created by the reverb." },
+    { slot = 4, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Adjusts the decay of the high frequencies within the reverb tail." },
+    { slot = 5, ref = "DIF", name = "Diffusion", unit = "%", min = "0.0", max = "100", description = "Controls the initial reflection density." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies affected by the reverb to be reduced." },
+    { slot = 8, ref = "HC", name = "Hi Cut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies affected by the reverb to be reduced." },
+    { slot = 9, ref = "LFX", name = "BassMult", min = "0.2", max = "4.0", mod_dest = true, description = "Controls the low frequency build-up." },
+    { slot = 10, ref = "SPR", name = "Spread", min = "0.0", max = "50.0", description = "Emphasizes the stereo effect of the reverb." },
+    { slot = 11, ref = "ATK", name = "Attack", min = "0.0", max = "100.0", mod_dest = true, description = "Adjusts the contour of the reverberation envelope." },
+    { slot = 12, ref = "SPN", name = "Spin", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls randomization / modulation effects within the reverb." },
+]
+
+[[effect]]
+type = 8
+name = "GatedRev"
+full_name = "Gated Reverb"
+parameters = [
+    { slot = 1, ref = "PD", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 2, ref = "DCY", name = "Decay", unit = "ms", min = "140.0", max = "1000.0", description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 3, ref = "ATK", name = "Attack", min = "0.0", max = "30.0", mod_dest = true, description = "Adjusts the contour of the reverberation envelope ." },
+    { slot = 4, ref = "DEN", name = "Density", min = "1.0", max = "50.0", mod_dest = true, description = "Manipulates the reflection density in the simulated room." },
+    { slot = 5, ref = "SPR", name = "Spread", min = "0.0", max = "100.0", description = "Emphasizes the stereo effect of the reverb." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies affected by the reverb to be reduced." },
+    { slot = 8, ref = "HIF", name = "HiSvFreq", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Adjusts the frequency of a Hi-Shelving filter at the input of the reverb effect." },
+    { slot = 9, ref = "HIG", name = "HiSvGain", unit = "dB", min = "-30.0", max = "0.0", mod_dest = true, description = "Adjusts the gain of a Hi-Shelving filter at the input of the reverb effect." },
+    { slot = 10, ref = "DIF", name = "Diffusion", unit = "%", min = "0.0", max = "100", description = "Controls the initial reflection density ." },
+]
+
+[[effect]]
+type = 9
+name = "Reverse"
+full_name = "Reverse Reverb"
+parameters = [
+    { slot = 1, ref = "PD", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 2, ref = "DCY", name = "Decay", unit = "ms", min = "140.0", max = "1000.0", description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 3, ref = "RIS", name = "Rise", min = "0.0", max = "50.0", mod_dest = true, description = "Controls how quickly the effect builds up." },
+    { slot = 4, ref = "DIF", name = "Diffusion", min = "1.0", max = "30.0", description = "Controls the initial reflection density." },
+    { slot = 5, ref = "SPR", name = "Spread", min = "0.0", max = "100.0", description = "Controls how the reflection is distributed through the envelope of the reverb." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies affected by the reverb to be reduced." },
+    { slot = 8, ref = "HIF", name = "HiSvFreq", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Adjusts the frequency of a Hi-Shelving filter at the input of the reverb effect." },
+    { slot = 9, ref = "HIG", name = "HiSvGain", unit = "dB", min = "-30.0", max = "0.0", mod_dest = true, description = "Adjusts the gain of a Hi-Shelving filter at the input of the reverb effect." },
+]
+
+[[effect]]
+type = 10
+name = "ChorusVerb"
+full_name = "Chorus and Reverb"
+parameters = [
+    { slot = 1, ref = "SPD", name = "Speed", unit = "Hz", min = "0.0", max = "4.0", mod_dest = true, description = "Adjusts the rate of the chorus. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "DEP", name = "Depth", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the modulation depth of the chorus." },
+    { slot = 3, ref = "DLY", name = "Delay", unit = "ms", min = "0.5", max = "50.0", description = "Adjusts the delay of the chorus." },
+    { slot = 4, ref = "PHS", name = "Phase", min = "0.0", max = "180.0", mod_dest = true, description = "Offsets the phase between the left and right channels." },
+    { slot = 5, ref = "WAV", name = "Wave", unit = "%", min = "0.0", max = "100", description = "Adjusts the LFO waveform from a sine wave to triangular wave." },
+    { slot = 6, ref = "BAL", name = "Balance", min = "-100.0", max = "100.0", mod_dest = true, description = "Adjusts the balance between chorus and reverb." },
+    { slot = 7, ref = "PRE", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 8, ref = "DCY", name = "Decay", unit = "s", min = "0.1", max = "5.0", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 9, ref = "SIZ", name = "Size", min = "2.0", max = "200.0", description = "Controls how large or small the simulated space is." },
+    { slot = 10, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Determines the decay of high frequencies within the reverb tail." },
+    { slot = 11, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Excludes low frequencies below the value ." },
+    { slot = 12, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+]
+
+[[effect]]
+type = 11
+name = "DelayVerb"
+full_name = "Delay and Reverb"
+parameters = [
+    { slot = 1, ref = "TIM", name = "Time", unit = "ms", min = "1.0", max = "1500.0", description = "Adjusts the delay time for the left channel delay. Time sync options from 4 to 1/64 bars." },
+    { slot = 2, ref = "PAT", name = "Pattern", values = "1/4, 1X", description = "Sets the delay ratio for the right channel delay." },
+    { slot = 3, ref = "FHC", name = "FeedHC", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Trims high frequencies from the feedback." },
+    { slot = 4, ref = "FBK", name = "Feedback", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the percentage of feedback." },
+    { slot = 5, ref = "XFD", name = "X-Feed", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Control the amount of delay sound sent to the reverb effect." },
+    { slot = 6, ref = "BAL", name = "Balance", min = "-100.0", max = "100.0", mod_dest = true, description = "Adjusts the ratio between delay and reverb." },
+    { slot = 7, ref = "PRE", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 8, ref = "DCY", name = "Decay", unit = "s", min = "0.1", max = "5.0", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 9, ref = "SIZ", name = "Size", min = "2.0", max = "200.0", description = "Controls how large or small the simulated space is." },
+    { slot = 10, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Determines the decay of high frequencies within the reverb tail." },
+    { slot = 11, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Excludes low frequencies below the value ." },
+    { slot = 12, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+]
+
+[[effect]]
+type = 12
+name = "FlangVerb"
+full_name = "Flanger and Reverb"
+parameters = [
+    { slot = 1, ref = "SPD", name = "Speed", unit = "Hz", min = "0.0", max = "4.0", mod_dest = true, description = "Adjusts the rate of the flanger. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "DEP", name = "Depth", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the modulation depth of the flanger." },
+    { slot = 3, ref = "DLY", name = "Delay", unit = "ms", min = "0.5", max = "20.0", description = "Adjusts the delay of the flanger." },
+    { slot = 4, ref = "PHS", name = "Phase", min = "0.0", max = "180.0", mod_dest = true, description = "Offsets the phase between the left and right channels." },
+    { slot = 5, ref = "FBK", name = "Feed", unit = "%", min = "-90.0", max = "90.0", mod_dest = true, description = "Controls the percentage of positive or negative feedback." },
+    { slot = 6, ref = "BAL", name = "Balance", min = "-100.0", max = "100.0", mod_dest = true, description = "Adjusts the balance between flanger and reverb." },
+    { slot = 7, ref = "PRE", name = "PreDelay", unit = "ms", min = "0.0", max = "200.0", description = "Controls the amount of time before the reverb is heard following the source signal." },
+    { slot = 8, ref = "DCY", name = "Decay", unit = "s", min = "0.1", max = "5.0", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 9, ref = "SIZ", name = "Size", min = "2.0", max = "200.0", description = "Controls how large or small the simulated space is." },
+    { slot = 10, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Determines the decay of high frequencies within the reverb tail." },
+    { slot = 11, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Excludes low frequencies below the value ." },
+    { slot = 12, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+]
+
+[[effect]]
+type = 13
+name = "MidasEQ"
+full_name = "Midas Equaliser"
+parameters = [
+    { slot = 1, ref = "LSG", name = "LoShelfGain", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Adjusts the gain of the low band." },
+    { slot = 2, ref = "LSF", name = "LoShelfFreq", unit = "Hz", min = "30.0", max = "20000.0", mod_dest = true, description = "Adjusts the frequency of the low band." },
+    { slot = 3, ref = "LMG", name = "LoMidGain", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Adjusts the gain of the low-mid band." },
+    { slot = 4, ref = "LMF", name = "LoMidFreq", unit = "Hz", min = "30.0", max = "20000.0", mod_dest = true, description = "Adjusts the frequency of the low-mid band." },
+    { slot = 5, ref = "LMQ", name = "LoMidQ", min = "0.3", max = "5.0", mod_dest = true, description = "Adjusts the Q-factor of the low-mid band." },
+    { slot = 6, ref = "HMG", name = "HiMidGain", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Adjusts the gain of the high-mid band." },
+    { slot = 7, ref = "HMF", name = "HiMidFreq", unit = "Hz", min = "30.0", max = "20000.0", mod_dest = true, description = "Adjusts the frequency of the high- mid band." },
+    { slot = 8, ref = "HMQ", name = "HiMidQ", min = "0.3", max = "5.0", mod_dest = true, description = "Adjusts the Q-factor of the high-mid band." },
+    { slot = 9, ref = "HSG", name = "HiShelfGain", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Adjusts the gain of the high band." },
+    { slot = 10, ref = "HSF", name = "HiShelfFreq", unit = "Hz", min = "30.0", max = "20000.0", mod_dest = true, description = "Adjusts the frequency of the high band." },
+    { slot = 11, ref = "EQ", name = "EQ", values = "IN, OUT", mod_dest = true, description = "INOUTAdjusts the frequency of the high band." },
+]
+
+[[effect]]
+type = 14
+name = "Enhancer"
+full_name = "Enhancing EQ"
+parameters = [
+    { slot = 1, ref = "OGN", name = "OutGain", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Compensates for changes in level resulting from the effect." },
+    { slot = 2, ref = "SPR", name = "Spread", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Emphasizes the stereo content for a wider mix ." },
+    { slot = 3, ref = "BGN", name = "BassGain", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the gain of the bass band." },
+    { slot = 4, ref = "BFR", name = "BassFreq", min = "1.0", max = "50.0", mod_dest = true, description = "Adjusts the frequency of the bass band." },
+    { slot = 5, ref = "MGN", name = "MidGain", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the gain of the mid band." },
+    { slot = 6, ref = "MIQ", name = "MidQ", min = "1.0", max = "50.0", mod_dest = true, description = "Adjusts the Q-factor of the mid band." },
+    { slot = 7, ref = "HIG", name = "HiGain", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the gain of the high band." },
+    { slot = 8, ref = "HIF", name = "HiFreq", min = "1.0", max = "50.0", mod_dest = true, description = "Adjusts the frequency of the high band." },
+    { slot = 9, ref = "SOL", name = "Solo", values = "OFF, ON", description = "Solo mode - used to isolate only the audio resulting from the effect." },
+]
+
+[[effect]]
+type = 15
+name = "FairComp"
+full_name = "Compressor"
+parameters = [
+    { slot = 1, ref = "MOD", name = "Mode", values = "Off, Stereo, Dual, M/S", description = "Mode of operation: Off, Stereo, Dual, M/S (Mid/Side)." },
+    { slot = 2, ref = "INL", name = "InGain L/M", min = "-20.0", max = "0.0", mod_dest = true, description = "Controls the input gain for the Left/Mid signal." },
+    { slot = 3, ref = "THL", name = "Thresh L/M", min = "0.0", max = "10.0", mod_dest = true, description = "Controls the threshold for the Left/Mid signal." },
+    { slot = 4, ref = "TML", name = "Time L/M", min = "1.0", max = "6.0", description = "Controls the attack and release time for the Left/Mid channel." },
+    { slot = 5, ref = "DCL", name = "DC Bias L/M", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjust the ratio and knee of the compression curve for the Left/Mid signal." },
+    { slot = 6, ref = "OGL", name = "OutGain L/M", unit = "dB", min = "-18.0", max = "6.0", mod_dest = true, description = "Controls the output gain for the Left/Mid signal." },
+    { slot = 7, ref = "BAL", name = "Bias Bal", unit = "%", min = "-100.0", max = "100", mod_dest = true, description = "Adjust the bias current, creating accentuation of attacks" },
+    { slot = 8, ref = "INR", name = "InGain R/S", min = "-20.0", max = "0.0", mod_dest = true, description = "Controls the input gain for the Right/Side signal." },
+    { slot = 9, ref = "THR", name = "Thresh R/S", min = "0.0", max = "10.0", mod_dest = true, description = "Controls the threshold for the Right/Side signal." },
+    { slot = 10, ref = "TMR", name = "Time R/S", min = "1.0", max = "6.0", description = "Controls the attack and release time for the Right/Side channel." },
+    { slot = 11, ref = "DCR", name = "DC Bias R/S", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjust the ratio and knee of the compression curve for the Right/Side signal." },
+    { slot = 12, ref = "OGR", name = "OutGain R/S", unit = "dB", min = "-18.0", max = "6.0", mod_dest = true, description = "Controls the output gain for the Right/Side signal." },
+]
+
+[[effect]]
+type = 16
+name = "MulBndDist"
+full_name = "Multiband Distortion"
+parameters = [
+    { slot = 1, ref = "IPG", name = "InputGain", unit = "dB", min = "-24.0", max = "24.0", mod_dest = true, description = "Controls the amount of input gain applied to the signal." },
+    { slot = 2, ref = "DST", name = "Dist Types", values = "VAL, SAT, TUB, PFV, PFS, PFT", description = "Distortion Type: VAL(Valve), SAT(Saturation), TUB (Tube), & Post Filter variants (PFV/PFS/PFT)." },
+    { slot = 3, ref = "LBL", name = "Low Level", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Controls the level of the frequencies below XoverFreq 1." },
+    { slot = 4, ref = "LDR", name = "Low Drive", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the percentage of distortion introduced below XoverFreq 1." },
+    { slot = 5, ref = "XV1", name = "Xover Freq 1", unit = "Hz", min = "30.0", max = "9000.0", mod_dest = true, description = "Sets the lower cross over frequency." },
+    { slot = 6, ref = "MBL", name = "Mid Level", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Controls the level of the frequencies between Xover1 Freq and Xover2 Freq." },
+    { slot = 7, ref = "MDR", name = "Mid Drive", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the percentage of distortion introduced between Xover1 Freq and Xover2 Freq." },
+    { slot = 8, ref = "XV2", name = "Xover Freq 2", unit = "Hz", min = "30.0", max = "9000.0", mod_dest = true, description = "Sets the upper cross over frequency." },
+    { slot = 9, ref = "HBL", name = "High Level", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Controls the level of the frequencies below XoverFreq 2." },
+    { slot = 10, ref = "HDR", name = "High Drive", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the percentage of distortion introduced above XoverFreq 2." },
+    { slot = 11, ref = "CAB", name = "Cabinet", values = "OFF, VTw, VBs, A10, Mid, BFC, B60, V30, S78, Oax, Ac1, Ac2", description = "Cabinet Type: OFF, VTw, VBs, A10, Mid, BFC, B60, V30, S78, Oax, A12, Rck. (See Table Above)." },
+    { slot = 12, ref = "OPG", name = "OutputGain", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Controls the amount of output gain applied to the signal." },
+]
+
+[[effect]]
+type = 17
+name = "RackAmp"
+full_name = "Rack Amplifier"
+parameters = [
+    { slot = 1, ref = "PRE", name = "PreAmp", min = "0.0", max = "10.0", mod_dest = true, description = "Adjusts the amount of input gain prior to the band-specific distortion adjustment." },
+    { slot = 2, ref = "BUZ", name = "Buzz", min = "0.0", max = "10.0", mod_dest = true, description = "Adjusts the amount of low-end breakup." },
+    { slot = 3, ref = "PNC", name = "Punch", min = "0.0", max = "10.0", mod_dest = true, description = "Adjusts the amount of midrange distortion." },
+    { slot = 4, ref = "CRN", name = "Crunch", min = "0.0", max = "10.0", mod_dest = true, description = "Tailors the high-frequency content and distortion for smooth or cutting notes." },
+    { slot = 5, ref = "DRV", name = "Drive", min = "0.0", max = "10.0", mod_dest = true, description = "Emulates the amount of power amp distortion from a tube amp." },
+    { slot = 6, ref = "LVL", name = "Level", min = "0.0", max = "10.0", mod_dest = true, description = "Controls the overall output level." },
+    { slot = 7, ref = "LOW", name = "Low", min = "0.0", max = "10.0", mod_dest = true, description = "EQ adjustment of the low frequencies, independent of distortion content." },
+    { slot = 8, ref = "HI", name = "High", min = "0.0", max = "10.0", mod_dest = true, description = "EQ adjustment of the high frequencies, independent of distortion content." },
+    { slot = 9, ref = "CAB", name = "Cabinet", min = "OFF", max = "ON", description = "Turns the cabinet simulation on or off." },
+]
+
+[[effect]]
+type = 18
+name = "EdisonEX1"
+full_name = "Stereo Imaging"
+parameters = [
+    { slot = 1, ref = "ON", name = "On", min = "OFF", max = "ON", description = "Allows the effect to be turned On or Off." },
+    { slot = 2, ref = "IMD", name = "InMode", values = "ST, M/S", description = "STM/SControls the input mode (Stereo or Mid/Side)." },
+    { slot = 3, ref = "OMD", name = "OutMode", values = "ST, M/S", description = "STM/SControls the output mode (Stereo or Mid/Side)." },
+    { slot = 4, ref = "STS", name = "StSpread", min = "-50.0", max = "50.0", mod_dest = true, description = "Controls the spread of the stereo field." },
+    { slot = 5, ref = "LMF", name = "LMF Spread", min = "-50.0", max = "50.0", mod_dest = true, description = "Controls the spread of the stereo field for low/mid frequencies only." },
+    { slot = 6, ref = "BAL", name = "Balance", min = "-50.0", max = "50.0", mod_dest = true, description = "Adjusts the ratio of mono to stereo content." },
+    { slot = 7, ref = "CNT", name = "CntrDist", min = "-50.0", max = "50.0", mod_dest = true, description = "Allows the mono content to be panned." },
+    { slot = 8, ref = "GN", name = "Gain", unit = "dB", min = "-12.0", max = "12.0", mod_dest = true, description = "Controls the amount of output gain applied to the signal." },
+]
+
+[[effect]]
+type = 19
+name = "Auto Pan"
+full_name = "Auto Panning"
+parameters = [
+    { slot = 1, ref = "SPD", name = "Speed", unit = "Hz", min = "0.0", max = "5.0", mod_dest = true, description = "Adjusts the LFO rate. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "PHS", name = "Phase", min = "0.0", max = "180.0", mod_dest = true, description = "Controls the LFO phase difference between the left and right channels." },
+    { slot = 3, ref = "WAV", name = "Wave", min = "-50.0", max = "50.0", mod_dest = true, description = "Blends the LFO waveform between triangular and square shape." },
+    { slot = 4, ref = "DEP", name = "Depth", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the depth (amount) of modulation." },
+    { slot = 5, ref = "ESP", name = "EnvSpd", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts how much the LFO speed is modulated by the envelope." },
+    { slot = 6, ref = "EDP", name = "EnvDepth", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the depth of the envelope modulation." },
+    { slot = 7, ref = "ATK", name = "Attack", unit = "ms", min = "10.0", max = "1000.0", mod_dest = true, description = "Controls the envelope attack stage time." },
+    { slot = 8, ref = "HLD", name = "Hold", unit = "ms", min = "1.0", max = "2000.0", mod_dest = true, description = "Controls the envelope hold stage time." },
+    { slot = 9, ref = "REL", name = "Release", unit = "ms", min = "10.0", max = "1000.0", mod_dest = true, description = "Controls the envelope release stage time." },
+]
+
+[[effect]]
+type = 20
+name = "NoiseGate"
+full_name = "Noise Gate"
+parameters = [
+    { slot = 1, ref = "THR", name = "Threshold", unit = "dB", min = "-50.0", max = "0.0", mod_dest = true, description = "Sets signal level at which gate opens." },
+    { slot = 2, ref = "RNG", name = "Range", unit = "dB", min = "-100.0", max = "0.0", mod_dest = true, description = "Control adjusts the amount of gain reduction applied to the signal below threshold." },
+    { slot = 3, ref = "ATT", name = "Attack", unit = "ms", min = "0.0", max = "20.0", mod_dest = true, description = "Adjusts time taken for gate to open after an over-threshold signal." },
+    { slot = 4, ref = "REL", name = "Release", unit = "ms", min = "2.0", max = "1999.9", mod_dest = true, description = "Adjusts time taken for gate to close after programme material falls back below threshold." },
+    { slot = 5, ref = "HLD", name = "Hold", unit = "ms", min = "2.0", max = "1999.9", mod_dest = true, description = "This defines a waiting period before the gate starts to close." },
+    { slot = 6, ref = "PUN", name = "Punch", min = "-6.0", max = "6.0", mod_dest = true, description = "Used to increase tonal shaping or reduce gated breathing/delay/resonant howl-round." },
+    { slot = 7, ref = "MOD", name = "Mode", values = "GAT, TRN, DUC", description = "GAT (Gate), TRN (Transient Gate), DUC (Ducker)." },
+    { slot = 8, ref = "PWR", name = "Power", min = "ON", max = "OFF", description = "Enables gate in the signal path. When switched off, gate is bypassed." },
+]
+
+[[effect]]
+type = 21
+name = "Delay"
+full_name = "Stereo Delay"
+parameters = [
+    { slot = 1, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 2, ref = "TIM", name = "Time", unit = "ms", min = "1.0", max = "1500.0", description = "Adjusts the master delay time. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 3, ref = "MOD", name = "Mode", values = "ST, X, M, P-P", description = "ST- Stereo feedback, X - crosses feedback between channels, M - Mono mix in feedback chain. P-P - Ping Pong (Note that Feedback-R (FBR) is disabled in this mode." },
+    { slot = 4, ref = "FCL", name = "FactorL", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Sets left delay to rhythmic fractions of the master delay." },
+    { slot = 5, ref = "FCR", name = "FactorR", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Sets right delay to rhythmic fractions of the master delay." },
+    { slot = 6, ref = "OFS", name = "Offset", unit = "ms", min = "-100.0", max = "100.0", description = "Adds a delay difference between the left and right delayed signals." },
+    { slot = 7, ref = "LC", name = "LC", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Adjusts the low frequency cut, allowing lower frequencies to remain unaffected by the delay." },
+    { slot = 8, ref = "HC", name = "HC", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Adjusts the high frequency cut, allowing higher frequencies to remain unaffected by the delay." },
+    { slot = 9, ref = "FLC", name = "FeedLC", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Adjusts the low cut filter frequency in the feedback paths." },
+    { slot = 10, ref = "FBL", name = "FeedL", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Control the amount of feedback for the left channel." },
+    { slot = 11, ref = "FBR", name = "FeedR", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Control the amount of feedback for the right channel." },
+    { slot = 12, ref = "FHC", name = "FeedHC", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Adjusts the high cut filter frequency in the feedback paths." },
+]
+
+[[effect]]
+type = 22
+name = "3TapDelay"
+full_name = "3-Tap Delay"
+parameters = [
+    { slot = 1, ref = "TIM", name = "Time", unit = "ms", min = "1.0", max = "1500.0", description = "Sets the master delay time, and the first stage. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "GNT", name = "GainT", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Sets the gain level of the first stage of the delay." },
+    { slot = 3, ref = "PNT", name = "PanT", unit = "%", min = "-100", max = "100", mod_dest = true, description = "Sets the position of the first delay stage in the stereo field." },
+    { slot = 4, ref = "FBK", name = "Feedback", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the amount of feedback." },
+    { slot = 5, ref = "FCA", name = "FactorA", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Controls the delay time in the second stage of the delay." },
+    { slot = 6, ref = "GNA", name = "GainA", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the gain level of the second delay stage." },
+    { slot = 7, ref = "PNA", name = "PanA", unit = "%", min = "-100", max = "100", mod_dest = true, description = "Sets the position of the second delay stage in the stereo field." },
+    { slot = 8, ref = "FCB", name = "FactorB", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Controls the delay time in the third stage of the delay." },
+    { slot = 9, ref = "GNB", name = "GainB", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the gain level of the third delay stage." },
+    { slot = 10, ref = "PNB", name = "PanB", unit = "%", min = "-100", max = "100", mod_dest = true, description = "Sets the position of the third gain stage in the stereo field." },
+    { slot = 11, ref = "XFD", name = "X-Feed", min = "OFF", max = "ON", description = "Turns the stereo cross-feedback of the delays On or Off ." },
+    { slot = 12, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+]
+
+[[effect]]
+type = 23
+name = "4TapDelay"
+full_name = "4-Tap Delay"
+parameters = [
+    { slot = 1, ref = "TIM", name = "Time", unit = "ms", min = "1.0", max = "1500.0", description = "Sets the master delay time, and the first stage. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "GN", name = "Gain", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Sets the gain level of the first stage of the delay." },
+    { slot = 3, ref = "FBK", name = "Feedback", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the amount of feedback." },
+    { slot = 4, ref = "SPR", name = "Spread", min = "0.0", max = "6.0", description = "Positions the first delay stage in the stereo field." },
+    { slot = 5, ref = "FCA", name = "FactorA", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Controls the delay time in the second stage of the delay." },
+    { slot = 6, ref = "GNA", name = "GainA", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the gain level of the second delay stage." },
+    { slot = 7, ref = "FCB", name = "FactorB", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Controls the delay time in the third stage of the delay." },
+    { slot = 8, ref = "GNB", name = "GainB", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the gain level of the third delay stage." },
+    { slot = 9, ref = "FCC", name = "FactorC", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Controls the delay time in the fourth stage of the delay." },
+    { slot = 10, ref = "GNC", name = "GainC", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the gain level of the fourth delay stage ." },
+    { slot = 11, ref = "XFD", name = "X-Feed", min = "0.0", max = "1.0", description = "Turns the stereo cross-feedback of the delays On or Off." },
+    { slot = 12, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+]
+
+[[effect]]
+type = 24
+name = "T-RayDelay"
+full_name = "Tel-Ray Delay"
+parameters = [
+    { slot = 1, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 2, ref = "DLY", name = "Delay", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the master delay time." },
+    { slot = 3, ref = "SUS", name = "Sustain", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls how long the delay is sustained for. Warning at 100% build up will occur." },
+    { slot = 4, ref = "WOB", name = "Wobble", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the amount of wobble caused by age and quality of build/materials." },
+    { slot = 5, ref = "TON", name = "Tone", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the tone of the delays." },
+]
+
+[[effect]]
+type = 25
+name = "DecimDelay"
+full_name = "Decimator Delay"
+parameters = [
+    { slot = 1, ref = "MIX", name = "Mix", unit = "%", min = "0.00", max = "100.00", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 2, ref = "TIM", name = "Time M", unit = "ms", min = "1.0", max = "1500.0", description = "Adjusts the master delay time. Time synchronized options from 4 to 1/64 bars." },
+    { slot = 3, ref = "DSM", name = "Downsample", unit = "%", min = "0.00", max = "100.00", mod_dest = true, description = "Decimates the signal by reducing the sampling frequency." },
+    { slot = 4, ref = "FCL", name = "FactorL", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Sets left delay to rhythmic fractions of the master delay." },
+    { slot = 5, ref = "FCR", name = "FactorR", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Sets right delay to rhythmic fractions of the master delay." },
+    { slot = 6, ref = "BRC", name = "Bit-Reduce", min = "24", max = "1", description = "Decimates the signal by reducing the bit-depth.", note = "Counts down: 24 bits at the minimum, 1 bit at the maximum." },
+    { slot = 7, ref = "FC", name = "Cutoff", unit = "Hz", min = "30.0", max = "20000.0", mod_dest = true, description = "Adjust the cutoff frequency of the filter, allowing specific frequencies to be affected by the delay." },
+    { slot = 8, ref = "RES", name = "Resonance", unit = "%", min = "0.00", max = "100.00", mod_dest = true, description = "Adjusts the resonance of the filter." },
+    { slot = 9, ref = "FLT", name = "Type", values = "Lowpass, Highpass, Bandpass, Notch" },
+    { slot = 10, ref = "FBL", name = "FeedL", unit = "%", min = "0.00", max = "100.00", mod_dest = true, description = "Controls the amount of feedback for the left channel." },
+    { slot = 11, ref = "FBR", name = "FeedR", unit = "%", min = "0.00", max = "100.00", mod_dest = true, description = "Controls the amount of feedback for the right channel." },
+    { slot = 12, ref = "DMT", name = "Decimate", values = "PRE, POST", description = "It sets the decimation on the input signal (PRE) or only on the delay (POST)." },
+]
+
+[[effect]]
+type = 26
+name = "ModDlyRev"
+full_name = "Modulation, Delay and Reverb"
+parameters = [
+    { slot = 1, ref = "TIM", name = "Time", unit = "ms", min = "1.0", max = "1500.0", description = "Sets the master delay time. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "FAC", name = "Factor", values = "1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3", description = "Sets the delay to rhythmic fractions." },
+    { slot = 3, ref = "FBK", name = "Feedback", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the percentage of positive feedback." },
+    { slot = 4, ref = "FHC", name = "FeedHC", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Adjusts the high cut filter frequency in the feedback path." },
+    { slot = 5, ref = "DEP", name = "Depth", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the depth (amount) of modulation." },
+    { slot = 6, ref = "SPD", name = "Speed", unit = "Hz", min = "0.0", max = "10.0", mod_dest = true, description = "Adjusts the rate of the modulation. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 7, ref = "MOD", name = "Mode", values = "PAR, SER", description = "PARSERControls the processor chain routing (Serial/Parallel)" },
+    { slot = 8, ref = "RTY", name = "Rtype", values = "AMB, CLUB, HALL", description = "Reverb Type can be set to AMB (Ambience), CLUB, or HALL." },
+    { slot = 9, ref = "DCY", name = "Decay", min = "1.0", max = "10.0", mod_dest = true, description = "Controls the amount of time it takes for the reverb to dissipate." },
+    { slot = 10, ref = "DMP", name = "Damping", unit = "Hz", min = "1000", max = "20000", mod_dest = true, description = "Determines the decay of high frequencies within the reverb tail." },
+    { slot = 11, ref = "BAL", name = "Balance", min = "-100.0", max = "100.0", mod_dest = true, description = "Adjusts ratio of the delay signal to the reverb signal." },
+    { slot = 12, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals" },
+]
+
+[[effect]]
+type = 27
+name = "Chorus"
+full_name = "Stereo Chorus"
+parameters = [
+    { slot = 1, ref = "SPD", name = "Speed", unit = "Hz", min = "0.0", max = "5", mod_dest = true, description = "Sets the modulation speed. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "WDL", name = "WidthL", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Determines the amount of modulated delay in the left channel." },
+    { slot = 3, ref = "WDR", name = "WidthR", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Determines the amount of modulated delay in the right channel." },
+    { slot = 4, ref = "DLL", name = "DelayL", unit = "ms", min = "0.5", max = "50.0", description = "Sets the total amount of delay for the left channel." },
+    { slot = 5, ref = "DLR", name = "DelayR", unit = "ms", min = "0.5", max = "50.0", description = "Sets the total amount of delay for the right channel." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies in the signal to be reduced." },
+    { slot = 8, ref = "HC", name = "Hi Cut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies in the signal to be reduced." },
+    { slot = 9, ref = "PHS", name = "Phase", min = "0.0", max = "100.0", description = "Adjusts the phase offset of the LFO between left and right channel." },
+    { slot = 10, ref = "WAV", name = "Wave", unit = "%", min = "0.0", max = "100", description = "Blends between the digital triangular chorus sound and the classic analog sine wave." },
+    { slot = 11, ref = "SPR", name = "Spread", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts how much of the left channel is mixed into the right and vice versa." },
+]
+
+[[effect]]
+type = 28
+name = "Chorus-D"
+full_name = "Dimensional Chorus"
+parameters = [
+    { slot = 1, ref = "ON", name = "On", min = "OFF", max = "ON", description = "Allows the effect to be turned On or Off." },
+    { slot = 2, ref = "MOD", name = "Mode", values = "M, ST", description = "MSTSwitches the operation between Mono and Stereo modes." },
+    { slot = 3, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 4, ref = "SW1", name = "Sw1", min = "OFF", max = "ON", description = "Engages level one intensity (minimum)." },
+    { slot = 5, ref = "SW2", name = "Sw2", min = "OFF", max = "ON", description = "Engages level two intensity." },
+    { slot = 6, ref = "SW3", name = "Sw3", min = "OFF", max = "ON", description = "Engages level three intensity." },
+    { slot = 7, ref = "SW4", name = "Sw4", min = "OFF", max = "ON", description = "Engages level four intensity (maximum)." },
+]
+
+[[effect]]
+type = 29
+name = "Flanger"
+full_name = "Stereo Flanger"
+parameters = [
+    { slot = 1, ref = "SPD", name = "Speed", unit = "Hz", min = "0.0", max = "5", mod_dest = true, description = "Sets the modulation speed. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "WDL", name = "WidthL", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Determines the amount of modulated delay in the left channel." },
+    { slot = 3, ref = "WDR", name = "WidthR", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Determines the amount of modulated delay in the right channel." },
+    { slot = 4, ref = "DLL", name = "DelayL", unit = "ms", min = "0.5", max = "20.0", description = "Sets the total amount of delay for the left channel." },
+    { slot = 5, ref = "DLR", name = "DelayR", unit = "ms", min = "0.5", max = "20.0", description = "Sets the total amount of delay for the right channel." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "LC", name = "LoCut", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Allows the low frequencies in the signal to be reduced." },
+    { slot = 8, ref = "HC", name = "Hi Cut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies in the signal to be reduced." },
+    { slot = 9, ref = "PHS", name = "Phase", min = "0.0", max = "180.0", description = "Adjusts the phase offset of the LFO between left and right channel." },
+    { slot = 10, ref = "FLC", name = "FeedLC", unit = "Hz", min = "10.0", max = "500.0", mod_dest = true, description = "Adjusts the low cut filter frequency in the feedback path." },
+    { slot = 11, ref = "FHC", name = "FeedHC", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Adjusts the high cut filter frequency in the feedback path." },
+    { slot = 12, ref = "FD", name = "Feed", unit = "%", min = "-90.0", max = "90.0", mod_dest = true, description = "Controls the percentage of positive or negative feedback." },
+]
+
+[[effect]]
+type = 30
+name = "Phaser"
+full_name = "Stereo Phaser"
+parameters = [
+    { slot = 1, ref = "SPD", name = "Speed", unit = "Hz", min = "0.0", max = "5", mod_dest = true, description = "Sets the modulation speed. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "DEP", name = "Depth", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the depth (amount) of modulation." },
+    { slot = 3, ref = "RES", name = "Reso", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the resonance of the multiple filter stages." },
+    { slot = 4, ref = "BAS", name = "Base Freq", unit = "Hz", min = "20", max = "15000", mod_dest = true, description = "Adjusts the frequency range of the modulated filters." },
+    { slot = 5, ref = "STG", name = "Stages", min = "2.0", max = "12.0", description = "Controls how many filter stages are used." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "WAV", name = "Wave", min = "-50.0", max = "50.0", description = "Shapes the symmetry of the LFO waveform." },
+    { slot = 8, ref = "PHS", name = "Phase", unit = "deg", min = "0.0", max = "180.0", description = "Adjusts the LFO phase difference between the left and right channel" },
+    { slot = 9, ref = "ENV", name = "EnvMod", unit = "%", min = "-100.0", max = "100", mod_dest = true, description = "Adjusts the level of positive or negative envelope modulation." },
+    { slot = 10, ref = "ATK", name = "Attack", unit = "ms", min = "10.0", max = "1000.0", mod_dest = true, description = "Controls the envelope attack stage time ." },
+    { slot = 11, ref = "HLD", name = "Hold", unit = "ms", min = "1.0", max = "2000.0", mod_dest = true, description = "Controls the envelope hold stage time." },
+    { slot = 12, ref = "REL", name = "Release", unit = "ms", min = "10.0", max = "1000.0", mod_dest = true, description = "Controls the envelope release stage time." },
+]
+
+[[effect]]
+type = 31
+name = "MoodFilter"
+full_name = "Moog-Type Filter"
+parameters = [
+    { slot = 1, ref = "SPD", name = "Speed", unit = "Hz", min = "0.0", max = "20.0", description = "Sets the modulation speed. Time synchronised options from 4 to 1/64 bars." },
+    { slot = 2, ref = "DEP", name = "Depth", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the depth (amount) of modulation." },
+    { slot = 3, ref = "RES", name = "Resonance", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the resonance of the filter." },
+    { slot = 4, ref = "FRQ", name = "Base Freq", unit = "Hz", min = "20", max = "15000", mod_dest = true, description = "Adjusts the level of positive or negative envelope modulation." },
+    { slot = 5, ref = "TYP", name = "Type", values = "LP, HP, BP", description = "Selects between low pass (LP), high-pass (HP), band- pass (BP) and Notch (NOT)." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "WAV", name = "Wave", values = "Triangle, Sine, Saw Up, Saw Down, Square, Random, Envelope", description = "Selects modulation waveform Triangular, Sine, Saw Up, Saw Down, Ramp, Square or Random." },
+    { slot = 8, ref = "ENV", name = "EnvMod", unit = "%", min = "-100.0", max = "100", mod_dest = true, description = "Adjusts the level of positive or negative envelope modulation." },
+    { slot = 9, ref = "ATK", name = "Attack", unit = "ms", min = "10.0", max = "249.9", mod_dest = true, description = "Controls the filter attack time." },
+    { slot = 10, ref = "REL", name = "Release", unit = "ms", min = "10.0", max = "500.0", mod_dest = true, description = "Controls the filter release time." },
+    { slot = 11, ref = "DRV", name = "Drive", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the level, also introduces an overdrive effect if pushed hard. 124P4-Pole--2P 4P100.0Adjusts the slope of the filter from 2-pole to 4-pole (steeper)." },
+]
+
+[[effect]]
+type = 32
+name = "DualPitch"
+full_name = "Dual Pitch Shifter"
+parameters = [
+    { slot = 1, ref = "SM1", name = "Semi1", min = "-12.0", max = "12.0", mod_dest = true, description = "Adjusts the pitch of the first channel in semi-tones." },
+    { slot = 2, ref = "CN1", name = "Cent1", min = "-50.0", max = "50.0", mod_dest = true, description = "Adjusts the pitch of the first channel in cents." },
+    { slot = 3, ref = "DL1", name = "Delay1", unit = "ms", min = "1.0", max = "500.0", description = "Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars." },
+    { slot = 4, ref = "GN1", name = "Gain1", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Allows gain compensation to be applied to the first channel." },
+    { slot = 5, ref = "PN1", name = "Pan1", unit = "%", min = "-100.0", max = "100", mod_dest = true, description = "Allows panning of the first channel." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "SM2", name = "Semi2", min = "-12.0", max = "12.0", mod_dest = true, description = "Adjusts the pitch of the second channel in semi-tones." },
+    { slot = 8, ref = "CN2", name = "Cent2", min = "-50.0", max = "50.0", mod_dest = true, description = "Adjusts the pitch of the second channel in cents ." },
+    { slot = 9, ref = "DL2", name = "Delay2", unit = "ms", min = "1.0", max = "500.0", description = "Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars." },
+    { slot = 10, ref = "GN2", name = "Gain2", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Allows gain compensation to be applied to the second channel." },
+    { slot = 11, ref = "PN2", name = "Pan2", unit = "%", min = "-100.0", max = "100", mod_dest = true, description = "Allows panning of the second channel." },
+    { slot = 12, ref = "HIC", name = "HiCut", unit = "Hz", min = "200.0", max = "20000.0", mod_dest = true, description = "Allows the high frequencies affected by the pitch shifting to be reduced." },
+]
+
+[[effect]]
+type = 33
+name = "Vintage Pitch"
+full_name = "Dual Pitch Shifter"
+parameters = [
+    { slot = 1, ref = "SM1", name = "Semi1", min = "-12.0", max = "12.0", mod_dest = true, description = "Adjusts the pitch of the first channel in semi-tones." },
+    { slot = 2, ref = "CN1", name = "Cent1", min = "-50.0", max = "50.0", mod_dest = true, description = "Adjusts the pitch of the first channel in cents." },
+    { slot = 3, ref = "DL1", name = "Delay1", unit = "ms", min = "1.0", max = "500.0", description = "Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars." },
+    { slot = 4, ref = "FB1", name = "Feedback1", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Allows feedback to be applied to the first channel." },
+    { slot = 5, ref = "PN1", name = "Pan1", unit = "%", min = "-100.0", max = "100", mod_dest = true, description = "Allows panning of the first channel." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "SM2", name = "Semi2", min = "-12.0", max = "12.0", mod_dest = true, description = "Adjusts the pitch of the second channel in semi-tones." },
+    { slot = 8, ref = "CN2", name = "Cent2", min = "-50.0", max = "50.0", mod_dest = true, description = "Adjusts the pitch of the second channel in cents ." },
+    { slot = 9, ref = "DL2", name = "Delay2", unit = "ms", min = "1.0", max = "500.0", description = "Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars." },
+    { slot = 10, ref = "FB2", name = "Feedback2", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Allows feedback to be applied to the second channel." },
+    { slot = 11, ref = "PN2", name = "Pan2", unit = "%", min = "-100.0", max = "100", mod_dest = true, description = "Allows panning of the second channel." },
+    { slot = 12, ref = "HIC", name = "HiCut", unit = "Hz", min = "2000", max = "20000 k", mod_dest = true, description = "Allows the high frequencies affected by the pitch shifting to be reduced." },
+]
+
+[[effect]]
+type = 34
+name = "RotarySpkr"
+full_name = "Rotary Speaker"
+parameters = [
+    { slot = 1, ref = "LOS", name = "LoSpeed", unit = "Hz", min = "0.1", max = "4.0", mod_dest = true, description = "Adjusts the rotational speed when the Low Speed operation is selected." },
+    { slot = 2, ref = "HIS", name = "HiSpeed", unit = "Hz", min = "2.0", max = "9.9", mod_dest = true, description = "Adjusts the rotational speed when the High Speed operation is selected." },
+    { slot = 3, ref = "ACC", name = "Accel", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts how quickly the speed increases and decreases from the Slow mode to the Fast mode." },
+    { slot = 4, ref = "DIS", name = "Distance", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the distance between the Rotary speakers and the virtual microphone." },
+    { slot = 5, ref = "BAL", name = "Balance", min = "-100.0", max = "100.0", mod_dest = true, description = "Adjusts the balance between the virtual horn and virtual drum controlling the signal tone." },
+    { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
+    { slot = 7, ref = "MOT", name = "Motor", values = "RUN, STOP", mod_dest = true, description = "Allows the rotation effect of the motor to be disengaged (STOP)." },
+    { slot = 8, ref = "SPD", name = "Speed", values = "SLOW, FAST", mod_dest = true, description = "SLOWFASTSelects either the slow or fast speeds for rotation." },
+]

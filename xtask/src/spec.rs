@@ -57,6 +57,44 @@ pub struct EnumEntry {
     pub description: Option<String>,
 }
 
+/// A firmware version that changes the protocol.
+#[derive(Debug, Deserialize)]
+pub struct Firmware {
+    /// Dotted version as a device inquiry reports it, such as `"1.1"`.
+    pub version: String,
+    /// `true` for the version assumed when a caller names none.
+    #[serde(default)]
+    pub default: bool,
+    /// What this version changed.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+impl Firmware {
+    /// Parses a dotted version into comparable parts.
+    fn parts(version: &str) -> (u32, u32) {
+        let mut split = version.split('.');
+        let major = split.next().and_then(|p| p.parse().ok()).unwrap_or(0);
+        let minor = split.next().and_then(|p| p.parse().ok()).unwrap_or(0);
+        (major, minor)
+    }
+
+    /// Returns whether `range` covers `version`.
+    ///
+    /// A range is a bare version for exactly that one, a version with a
+    /// trailing `+` for that one and later, or absent for every version.
+    #[must_use]
+    pub fn range_covers(range: Option<&str>, version: &str) -> bool {
+        match range {
+            None => true,
+            Some(range) => match range.strip_suffix('+') {
+                Some(from) => Self::parts(version) >= Self::parts(from),
+                None => range == version,
+            },
+        }
+    }
+}
+
 /// A named table of parameter values.
 #[derive(Debug, Deserialize)]
 pub struct ValueTable {
@@ -64,7 +102,10 @@ pub struct ValueTable {
     pub id: String,
     /// Human-readable table name.
     pub name: String,
-    /// Free-form note, typically firmware differences.
+    /// Which firmware versions this table describes. See [`Firmware::range_covers`].
+    #[serde(default)]
+    pub firmware: Option<String>,
+    /// Free-form note.
     #[serde(default)]
     pub note: Option<String>,
     /// `false` when the mapping is inferred and still needs hardware confirmation.
@@ -125,6 +166,216 @@ pub struct Controller {
     pub note: Option<String>,
 }
 
+/// One parameter of one effect algorithm.
+///
+/// An engine holds twelve raw bytes whatever it is running; `slot` says which
+/// of those twelve this is, and the meaning comes from the algorithm.
+#[derive(Debug, Deserialize)]
+pub struct EffectParameter {
+    /// Position within the engine's twelve parameters, counting from 1.
+    pub slot: u8,
+    /// Short name as the synthesizer's display shows it.
+    pub r#ref: String,
+    /// Full parameter name.
+    pub name: String,
+    /// Unit of the displayed value, where there is one.
+    #[serde(default)]
+    pub unit: Option<String>,
+    /// Lowest displayed value, for a parameter with a numeric range.
+    #[serde(default)]
+    pub min: Option<String>,
+    /// Highest displayed value, for a parameter with a numeric range.
+    #[serde(default)]
+    pub max: Option<String>,
+    /// Options this parameter selects between, for a parameter without a range.
+    #[serde(default)]
+    pub values: Option<String>,
+    /// `true` when the manual marks the parameter as responding to modulation.
+    ///
+    /// Every slot is addressable from the modulation matrix regardless, as
+    /// `Fx <engine> Param <slot>`; this says the engine acts on what arrives.
+    #[serde(default)]
+    pub mod_dest: bool,
+    /// What the parameter does, from the manual. See NOTICE.
+    #[serde(default)]
+    pub description: Option<String>,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+/// An effect algorithm and the twelve parameters it gives its engine.
+#[derive(Debug, Deserialize)]
+pub struct Effect {
+    /// Value of the `FX Type` parameter that selects this algorithm.
+    pub r#type: u16,
+    /// Short name, matching the `fx_type` value table.
+    pub name: String,
+    /// Full name as the manual writes it.
+    pub full_name: String,
+    /// The parameters, ordered by slot.
+    pub parameters: Vec<EffectParameter>,
+}
+
+/// How one effect slot presents itself to a host.
+#[derive(Debug, Deserialize)]
+pub struct PanelSlot {
+    /// Position within the engine's twelve parameters, counting from 1.
+    pub slot: u8,
+    /// The parameter written out in full, for a panel with room for it.
+    ///
+    /// `effects.toml` keeps the manual's abbreviated spelling, which matches the
+    /// synthesizer's own display; this is that name expanded.
+    pub title: String,
+    /// `continuous`, `switch` or `selector`.
+    pub kind: String,
+    /// Slots sharing a label belong together, such as one side of a dual engine.
+    #[serde(default)]
+    pub group: Option<String>,
+    /// `true` when the engine acts on modulation reaching this slot.
+    #[serde(default)]
+    pub modulatable: bool,
+}
+
+/// Presentation facts that hold for every effect.
+#[derive(Debug, Deserialize)]
+pub struct PanelMeta {
+    /// Slots per row on the synthesizer's own FX page.
+    pub columns: u8,
+}
+
+/// The presentation of one effect algorithm's slots.
+#[derive(Debug, Deserialize)]
+pub struct Panel {
+    /// Value of the `FX Type` parameter that selects this algorithm.
+    pub r#type: u16,
+    /// Short name, matching the effect and the `fx_type` value table.
+    pub name: String,
+    /// The slots, ordered.
+    pub slots: Vec<PanelSlot>,
+}
+
+/// A raw parameter value printed beside the value the synthesizer displays.
+///
+/// Taken from the PROG screenshots in the manual, where the upper number is the
+/// parameter's MIDI value and the line along the bottom of the screen is the
+/// same parameter in its own units. These decide which curves are still
+/// possible between a parameter's two stated ends; none of them is a conversion.
+#[derive(Debug, Deserialize)]
+pub struct Measurement {
+    /// Offset of the parameter read, joining to `parameters.toml`.
+    pub offset: u16,
+    /// The value on the wire, 0-255.
+    pub raw: u16,
+    /// What the synthesizer displayed for it, units and all.
+    pub shown: String,
+    /// Which interpolation between the parameter's stated ends reproduces this.
+    pub fit: String,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+/// One effect slot's place in a routing topology.
+#[derive(Debug, Deserialize)]
+pub struct RoutingSlot {
+    /// Which of the four engines this is, counting from 1.
+    pub slot: u8,
+    /// What reaches this slot: 0 is the FX block's input, 1-4 are other slots.
+    pub from: Vec<u8>,
+}
+
+/// One of the ten ways the four effect engines can be wired together.
+#[derive(Debug, Deserialize)]
+pub struct Routing {
+    /// Value of the `FX Routing` parameter that selects this topology.
+    pub value: u16,
+    /// The manual's label for it, `M-1` through `M-10`.
+    pub label: String,
+    /// Name, matching the `fx_routing` value table.
+    pub name: String,
+    /// `true` when the topology contains a feedback loop.
+    #[serde(default)]
+    pub feedback: bool,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+    /// The four slots, ordered.
+    pub slots: Vec<RoutingSlot>,
+    /// Slots whose outputs are summed to leave the FX block.
+    pub output: Vec<u8>,
+}
+
+/// What one `FX Mode` setting does to the two paths through the instrument.
+#[derive(Debug, Deserialize)]
+pub struct FxMode {
+    /// Value of the `FX Mode` parameter that selects this setting.
+    pub value: u16,
+    /// Name, matching the `fx_mode` value table.
+    pub name: String,
+    /// `true` when the analog path from the voices to the output stage is live.
+    pub analog_path: bool,
+    /// `true` when the voices also run through the FX block.
+    pub digital_path: bool,
+}
+
+/// One field of a transport's byte pattern.
+#[derive(Debug, Deserialize)]
+pub struct MappingField {
+    /// Name used by the `<placeholder>` in the pattern.
+    pub name: String,
+    /// Where the value comes from, such as `parameter.offset`.
+    pub source: String,
+    /// Identifier of the encoding applied, if any.
+    #[serde(default)]
+    pub encoding: Option<String>,
+    /// Width in bits, where the field is a fixed-width number.
+    #[serde(default)]
+    pub bits: Option<u8>,
+    /// `true` when the field may be left out.
+    #[serde(default)]
+    pub optional: bool,
+    /// When the field may be left out.
+    #[serde(default)]
+    pub optional_when: Option<String>,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+/// A way of carrying an address and a value over MIDI.
+#[derive(Debug, Deserialize)]
+pub struct Transport {
+    /// Identifier, such as `nrpn`.
+    pub id: String,
+    /// Human-readable name.
+    pub name: String,
+    /// One-line summary of what it reaches.
+    pub summary: String,
+    /// Byte pattern, with `<name>` standing for a field.
+    pub pattern: String,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+    /// The fields the pattern refers to.
+    #[serde(default, rename = "field")]
+    pub fields: Vec<MappingField>,
+}
+
+/// A named rule turning a value into wire bytes.
+#[derive(Debug, Deserialize)]
+pub struct Encoding {
+    /// Identifier referenced by [`MappingField::encoding`].
+    pub id: String,
+    /// Human-readable name.
+    pub name: String,
+    /// The rule itself.
+    pub rule: String,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
 /// A device-wide setting.
 #[derive(Debug, Deserialize)]
 pub struct Global {
@@ -164,6 +415,40 @@ struct Controllers {
 }
 
 #[derive(Debug, Deserialize)]
+struct Panels {
+    meta: PanelMeta,
+    panel: Vec<Panel>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Measurements {
+    measurement: Vec<Measurement>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Routings {
+    routing: Vec<Routing>,
+    mode: Vec<FxMode>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Mapping {
+    transport: Vec<Transport>,
+    #[serde(rename = "encoding")]
+    encodings: Vec<Encoding>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Firmwares {
+    firmware: Vec<Firmware>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Effects {
+    effect: Vec<Effect>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Globals {
     #[serde(rename = "global")]
     globals: Vec<Global>,
@@ -182,6 +467,24 @@ pub struct Spec {
     pub globals: Vec<Global>,
     /// Continuous controllers, ordered by number.
     pub controllers: Vec<Controller>,
+    /// Effect algorithms, ordered by `FX Type` value.
+    pub effects: Vec<Effect>,
+    /// Firmware versions that change the protocol, oldest first.
+    pub firmwares: Vec<Firmware>,
+    /// Ways of carrying an address and a value over MIDI.
+    pub transports: Vec<Transport>,
+    /// Rules turning a value into wire bytes.
+    pub encodings: Vec<Encoding>,
+    /// Presentation facts shared by every effect.
+    pub panel_meta: PanelMeta,
+    /// How each effect presents its slots, ordered by `FX Type` value.
+    pub panels: Vec<Panel>,
+    /// How the four engines can be wired, ordered by `FX Routing` value.
+    pub routings: Vec<Routing>,
+    /// What each `FX Mode` setting does to the analog and digital paths.
+    pub fx_modes: Vec<FxMode>,
+    /// Raw values read off the manual's screenshots with what they displayed.
+    pub measurements: Vec<Measurement>,
 }
 
 impl Spec {
@@ -200,6 +503,12 @@ impl Spec {
         let messages: Messages = read(&spec.join("messages.toml"))?;
         let globals: Globals = read(&spec.join("globals.toml"))?;
         let controllers: Controllers = read(&spec.join("controllers.toml"))?;
+        let effects: Effects = read(&spec.join("effects.toml"))?;
+        let firmwares: Firmwares = read(&spec.join("firmware.toml"))?;
+        let mapping: Mapping = read(&spec.join("mapping.toml"))?;
+        let panels: Panels = read(&spec.join("panels.toml"))?;
+        let routings: Routings = read(&spec.join("routing.toml"))?;
+        let measurements: Measurements = read(&spec.join("measurements.toml"))?;
 
         let this = Self {
             parameters: parameters.parameter,
@@ -207,18 +516,98 @@ impl Spec {
             messages: messages.message,
             globals: globals.globals,
             controllers: controllers.controller,
+            effects: effects.effect,
+            firmwares: firmwares.firmware,
+            transports: mapping.transport,
+            encodings: mapping.encodings,
+            panel_meta: panels.meta,
+            panels: panels.panel,
+            routings: routings.routing,
+            fx_modes: routings.mode,
+            measurements: measurements.measurement,
         };
         this.validate()?;
         Ok(this)
     }
 
-    /// Returns the value table with this identifier, if it exists.
+    /// Returns the firmware version used when a caller names none.
+    ///
+    /// The one marked `default` in `firmware.toml`, or the last listed.
+    #[must_use]
+    pub fn default_firmware(&self) -> &str {
+        self.firmwares
+            .iter()
+            .find(|f| f.default)
+            .or_else(|| self.firmwares.last())
+            .map_or("", |f| f.version.as_str())
+    }
+
+    /// Returns the value table with this identifier as of `firmware`.
+    ///
+    /// Several tables may share an identifier when firmware renumbered their
+    /// entries; the one whose firmware range covers `firmware` is the right one.
+    #[must_use]
+    pub fn table_for(&self, id: &str, firmware: &str) -> Option<&ValueTable> {
+        self.tables
+            .iter()
+            .find(|t| t.id == id && Firmware::range_covers(t.firmware.as_deref(), firmware))
+    }
+
+    /// Returns the value table with this identifier on the default firmware.
     #[must_use]
     pub fn table(&self, id: &str) -> Option<&ValueTable> {
-        self.tables.iter().find(|table| table.id == id)
+        self.table_for(id, self.default_firmware())
     }
 
     fn validate(&self) -> Result<(), String> {
+        self.validate_firmware()?;
+        self.validate_parameters()?;
+        self.validate_controllers()?;
+        self.validate_effects()?;
+        self.validate_routing()?;
+        self.validate_measurements()?;
+        self.validate_mapping()?;
+        self.validate_messages()
+    }
+
+    /// Checks that every table identifier resolves for every known firmware.
+    ///
+    /// A table that covers no version is unreachable; two that cover the same
+    /// version make lookup depend on file order, which is how a renumbering
+    /// silently goes wrong.
+    fn validate_firmware(&self) -> Result<(), String> {
+        if self.firmwares.is_empty() {
+            return Err("firmware.toml: no versions listed".to_owned());
+        }
+        if self.firmwares.iter().filter(|f| f.default).count() > 1 {
+            return Err("firmware.toml: more than one version marked default".to_owned());
+        }
+
+        let mut ids: Vec<&str> = self.tables.iter().map(|t| t.id.as_str()).collect();
+        ids.sort_unstable();
+        ids.dedup();
+        for id in ids {
+            for firmware in &self.firmwares {
+                let matches = self
+                    .tables
+                    .iter()
+                    .filter(|t| {
+                        t.id == id
+                            && Firmware::range_covers(t.firmware.as_deref(), &firmware.version)
+                    })
+                    .count();
+                if matches != 1 {
+                    return Err(format!(
+                        "enums.toml: table {id} has {matches} definitions for firmware {}, want 1",
+                        firmware.version
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn validate_parameters(&self) -> Result<(), String> {
         let offsets: Vec<u16> = self.parameters.iter().map(|p| p.offset).collect();
         let expected: Vec<u16> = (0..242).collect();
         if offsets != expected {
@@ -233,6 +622,8 @@ impl Spec {
             let Some(id) = &parameter.value_table else {
                 continue;
             };
+            // A parameter's stated maximum is the one for the default firmware.
+            // Older firmware reaches a lower maximum through its own table.
             let table = self.table(id).ok_or_else(|| {
                 format!(
                     "parameter {} references unknown table {id}",
@@ -258,6 +649,10 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    fn validate_controllers(&self) -> Result<(), String> {
         let mut seen_cc: Vec<u8> = Vec::new();
         for controller in &self.controllers {
             if seen_cc.contains(&controller.cc) {
@@ -289,6 +684,406 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    fn validate_effects(&self) -> Result<(), String> {
+        let fx_types: Vec<u16> = self.effects.iter().map(|e| e.r#type).collect();
+        let expected_types: Vec<u16> = (0..35).collect();
+        if fx_types != expected_types {
+            return Err(format!(
+                "effects.toml: type values must be 0..=34 in order, found {} entries",
+                fx_types.len()
+            ));
+        }
+        let fx_table = self
+            .table("fx_type")
+            .ok_or("enums.toml: no fx_type table to check effects.toml against")?;
+        for effect in &self.effects {
+            let listed = fx_table
+                .entries
+                .iter()
+                .find(|e| e.value == effect.r#type)
+                .ok_or_else(|| format!("fx_type has no value {}", effect.r#type))?;
+            if listed.name != effect.name {
+                return Err(format!(
+                    "effects.toml: type {} is {:?} but fx_type calls it {:?}",
+                    effect.r#type, effect.name, listed.name
+                ));
+            }
+            if effect.parameters.len() > 12 {
+                return Err(format!(
+                    "effects.toml: {} has {} parameters, an engine holds 12",
+                    effect.name,
+                    effect.parameters.len()
+                ));
+            }
+            for (index, parameter) in effect.parameters.iter().enumerate() {
+                if usize::from(parameter.slot) != index + 1 {
+                    return Err(format!(
+                        "effects.toml: {} slot {} is out of order",
+                        effect.name, parameter.slot
+                    ));
+                }
+                if parameter.values.is_none() && parameter.min.is_none() {
+                    return Err(format!(
+                        "effects.toml: {} slot {} has neither a range nor a value list",
+                        effect.name, parameter.slot
+                    ));
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Checks the ten routing topologies against the value tables and themselves.
+    ///
+    /// The graph checks matter because these were transcribed by eye from ten
+    /// small printed diagrams. A slot that nothing feeds, or that reaches no
+    /// output, is a misread line rather than a topology the hardware offers.
+    fn validate_routing(&self) -> Result<(), String> {
+        let table = self
+            .table("fx_routing")
+            .ok_or("enums.toml: no fx_routing table to check routing.toml against")?;
+        if self.routings.len() != table.entries.len() {
+            return Err(format!(
+                "routing.toml has {} routings but fx_routing lists {}",
+                self.routings.len(),
+                table.entries.len()
+            ));
+        }
+        for (index, routing) in self.routings.iter().enumerate() {
+            if u16::try_from(index) != Ok(routing.value) {
+                return Err(format!(
+                    "routing.toml: {} has value {} at position {index}",
+                    routing.label, routing.value
+                ));
+            }
+            let listed = table
+                .entries
+                .iter()
+                .find(|e| e.value == routing.value)
+                .ok_or_else(|| format!("fx_routing has no value {}", routing.value))?;
+            if listed.name != routing.name {
+                return Err(format!(
+                    "routing.toml: value {} is {:?} but fx_routing calls it {:?}",
+                    routing.value, routing.name, listed.name
+                ));
+            }
+
+            let slots: Vec<u8> = routing.slots.iter().map(|s| s.slot).collect();
+            if slots != [1, 2, 3, 4] {
+                return Err(format!(
+                    "routing.toml: {} lists slots {slots:?}, want 1 to 4 in order",
+                    routing.label
+                ));
+            }
+            for slot in &routing.slots {
+                if slot.from.is_empty() {
+                    return Err(format!(
+                        "routing.toml: {} slot {} has nothing feeding it",
+                        routing.label, slot.slot
+                    ));
+                }
+                for &from in &slot.from {
+                    if from > 4 {
+                        return Err(format!(
+                            "routing.toml: {} slot {} is fed by {from}, which is not a slot",
+                            routing.label, slot.slot
+                        ));
+                    }
+                    if from == slot.slot {
+                        return Err(format!(
+                            "routing.toml: {} slot {} feeds itself",
+                            routing.label, slot.slot
+                        ));
+                    }
+                }
+            }
+            if routing.output.is_empty() {
+                return Err(format!(
+                    "routing.toml: {} sends no slot to the output",
+                    routing.label
+                ));
+            }
+            for &slot in &routing.output {
+                if slot == 0 || slot > 4 {
+                    return Err(format!(
+                        "routing.toml: {} sends {slot} to the output, which is not a slot",
+                        routing.label
+                    ));
+                }
+            }
+            Self::validate_routing_graph(routing)?;
+        }
+        self.validate_fx_modes()
+    }
+
+    /// Checks the three FX modes against the `fx_mode` value table.
+    fn validate_fx_modes(&self) -> Result<(), String> {
+        let table = self
+            .table("fx_mode")
+            .ok_or("enums.toml: no fx_mode table to check routing.toml against")?;
+        if self.fx_modes.len() != table.entries.len() {
+            return Err(format!(
+                "routing.toml has {} modes but fx_mode lists {}",
+                self.fx_modes.len(),
+                table.entries.len()
+            ));
+        }
+        for mode in &self.fx_modes {
+            let listed = table
+                .entries
+                .iter()
+                .find(|e| e.value == mode.value)
+                .ok_or_else(|| format!("fx_mode has no value {}", mode.value))?;
+            if listed.name != mode.name {
+                return Err(format!(
+                    "routing.toml: mode {} is {:?} but fx_mode calls it {:?}",
+                    mode.value, mode.name, listed.name
+                ));
+            }
+            if !mode.analog_path && !mode.digital_path {
+                return Err(format!(
+                    "routing.toml: mode {} leaves no path to the output",
+                    mode.name
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks that a topology is connected and that `feedback` matches the graph.
+    ///
+    /// Every slot must be reachable from the block input and must reach the
+    /// block output, and a loop must be declared rather than discovered.
+    fn validate_routing_graph(routing: &Routing) -> Result<(), String> {
+        let feeds = |slot: u8| -> &[u8] {
+            routing
+                .slots
+                .iter()
+                .find(|s| s.slot == slot)
+                .map_or(&[][..], |s| s.from.as_slice())
+        };
+
+        // Walk forwards from the input, ignoring edges that close a loop.
+        let mut reached = [false; 5];
+        reached[0] = true;
+        for _ in 0..4 {
+            for slot in 1..=4u8 {
+                if feeds(slot).iter().any(|&f| reached[usize::from(f)]) {
+                    reached[usize::from(slot)] = true;
+                }
+            }
+        }
+        for slot in 1..=4u8 {
+            if !reached[usize::from(slot)] {
+                return Err(format!(
+                    "routing.toml: {} slot {slot} is not reachable from the input",
+                    routing.label
+                ));
+            }
+        }
+
+        // Walk backwards from the output the same way.
+        let mut leads_out = [false; 5];
+        for &slot in &routing.output {
+            leads_out[usize::from(slot)] = true;
+        }
+        for _ in 0..4 {
+            for slot in 1..=4u8 {
+                let downstream = (1..=4u8)
+                    .any(|other| leads_out[usize::from(other)] && feeds(other).contains(&slot));
+                if downstream {
+                    leads_out[usize::from(slot)] = true;
+                }
+            }
+        }
+        for slot in 1..=4u8 {
+            if !leads_out[usize::from(slot)] {
+                return Err(format!(
+                    "routing.toml: {} slot {slot} reaches no output",
+                    routing.label
+                ));
+            }
+        }
+
+        // A loop exists when some slot feeds itself through the others.
+        let mut cyclic = false;
+        for start in 1..=4u8 {
+            let mut seen = [false; 5];
+            let mut frontier = vec![start];
+            while let Some(slot) = frontier.pop() {
+                for &from in feeds(slot) {
+                    if from == 0 {
+                        continue;
+                    }
+                    if from == start {
+                        cyclic = true;
+                    }
+                    if !seen[usize::from(from)] {
+                        seen[usize::from(from)] = true;
+                        frontier.push(from);
+                    }
+                }
+            }
+        }
+        if cyclic != routing.feedback {
+            return Err(format!(
+                "routing.toml: {} declares feedback = {} but its graph {} a loop",
+                routing.label,
+                routing.feedback,
+                if cyclic { "has" } else { "has no" }
+            ));
+        }
+        Ok(())
+    }
+
+    /// Checks each reading against the parameter it claims to be of.
+    ///
+    /// A reading outside the parameter's own range is a misread screenshot, and
+    /// a reading of an offset that does not exist is a typo. Neither is
+    /// recoverable later: these are the only record of what the screen said.
+    fn validate_measurements(&self) -> Result<(), String> {
+        const FITS: [&str; 6] = [
+            "linear",
+            "exponential",
+            "piecewise",
+            "endpoint",
+            "untested",
+            "none",
+        ];
+        for measurement in &self.measurements {
+            let parameter = self
+                .parameters
+                .iter()
+                .find(|p| p.offset == measurement.offset)
+                .ok_or_else(|| {
+                    format!(
+                        "measurements.toml: offset {} is not a parameter",
+                        measurement.offset
+                    )
+                })?;
+            if measurement.raw < parameter.min || measurement.raw > parameter.max {
+                return Err(format!(
+                    "measurements.toml: {} reads {} but the parameter runs {}-{}",
+                    parameter.name, measurement.raw, parameter.min, parameter.max
+                ));
+            }
+            if !FITS.contains(&measurement.fit.as_str()) {
+                return Err(format!(
+                    "measurements.toml: {} has unknown fit {:?}",
+                    parameter.name, measurement.fit
+                ));
+            }
+            if measurement.shown.trim().is_empty() {
+                return Err(format!(
+                    "measurements.toml: {} records no displayed value",
+                    parameter.name
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks that every pattern placeholder has a field and every field an
+    /// encoding that exists.
+    fn validate_mapping(&self) -> Result<(), String> {
+        for transport in &self.transports {
+            for field in &transport.fields {
+                let placeholder = format!("<{}>", field.name);
+                if !transport.pattern.contains(&placeholder) {
+                    return Err(format!(
+                        "mapping.toml: {} defines field {} which its pattern never uses",
+                        transport.id, field.name
+                    ));
+                }
+                // A let chain would read better but needs Rust 1.88; see the
+                // rust-version in Cargo.toml.
+                if let Some(id) = &field.encoding {
+                    if !self.encodings.iter().any(|e| &e.id == id) {
+                        return Err(format!(
+                            "mapping.toml: {} field {} uses unknown encoding {id}",
+                            transport.id, field.name
+                        ));
+                    }
+                }
+            }
+            for placeholder in transport.pattern.split('<').skip(1) {
+                let Some(name) = placeholder.split('>').next() else {
+                    continue;
+                };
+                if !transport.fields.iter().any(|f| f.name == name) {
+                    return Err(format!(
+                        "mapping.toml: {} pattern uses <{name}> with no field to fill it",
+                        transport.id
+                    ));
+                }
+            }
+        }
+        self.validate_panels()
+    }
+
+    /// Checks that panels.toml lines up with effects.toml slot for slot.
+    ///
+    /// The two are generated together, so a mismatch means one was edited by
+    /// hand and the other was not.
+    fn validate_panels(&self) -> Result<(), String> {
+        const KINDS: [&str; 3] = ["continuous", "switch", "selector"];
+        if self.panels.len() != self.effects.len() {
+            return Err(format!(
+                "panels.toml has {} panels but effects.toml has {} effects",
+                self.panels.len(),
+                self.effects.len()
+            ));
+        }
+        for (panel, effect) in self.panels.iter().zip(&self.effects) {
+            if panel.r#type != effect.r#type || panel.name != effect.name {
+                return Err(format!(
+                    "panels.toml has {} at type {} where effects.toml has {} at type {}",
+                    panel.name, panel.r#type, effect.name, effect.r#type
+                ));
+            }
+            if panel.slots.len() != effect.parameters.len() {
+                return Err(format!(
+                    "panels.toml: {} has {} slots but effects.toml has {} parameters",
+                    panel.name,
+                    panel.slots.len(),
+                    effect.parameters.len()
+                ));
+            }
+            for (slot, parameter) in panel.slots.iter().zip(&effect.parameters) {
+                if slot.slot != parameter.slot {
+                    return Err(format!(
+                        "panels.toml: {} slot {} does not line up with effects.toml",
+                        panel.name, slot.slot
+                    ));
+                }
+                if slot.title.trim().is_empty() {
+                    return Err(format!(
+                        "panels.toml: {} slot {} has no title",
+                        panel.name, slot.slot
+                    ));
+                }
+                if !KINDS.contains(&slot.kind.as_str()) {
+                    return Err(format!(
+                        "panels.toml: {} slot {} has unknown kind {:?}",
+                        panel.name, slot.slot, slot.kind
+                    ));
+                }
+                if slot.modulatable != parameter.mod_dest {
+                    return Err(format!(
+                        "panels.toml: {} slot {} disagrees with effects.toml about modulation",
+                        panel.name, slot.slot
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn validate_messages(&self) -> Result<(), String> {
         let mut commands: Vec<u8> = self.messages.iter().map(|m| m.command).collect();
         commands.sort_unstable();
         if commands.windows(2).any(|w| w[0] == w[1]) {

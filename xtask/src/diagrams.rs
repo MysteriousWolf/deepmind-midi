@@ -80,7 +80,7 @@ fn signal_path(spec: &Spec) -> Result<String, String> {
     let mut out = String::from("flowchart LR\n");
     for (id, label, group) in [
         ("OSC", "OSC 1 + OSC 2<br>noise", "Oscillators"),
-        ("VCF", "VCF<br>low pass + high pass", "VCF"),
+        ("VCF", "VCF<br>low pass", "VCF"),
         ("VCA", "VCA", "VCA"),
         ("FX", "FX<br>4 slots", "Effects"),
     ] {
@@ -90,7 +90,13 @@ fn signal_path(spec: &Spec) -> Result<String, String> {
             range(spec, group)?
         );
     }
-    out.push_str("    OUT([output])\n    OSC --> VCF --> VCA --> FX --> OUT\n\n");
+    // The high pass and the bass boost are front-panel VCF controls but sit
+    // after the VCA in the instrument, per the block diagram in section 6.
+    out.push_str(
+        "    HPF[\"high pass + boost<br><small>40, 52</small>\"]\n    \
+         OUT([output])\n    OSC --> VCF --> VCA --> HPF --> FX --> OUT\n    \
+         HPF -- analog path --> OUT\n\n",
+    );
     for (id, label, group) in [
         ("VCAENV", "VCA envelope", "VCA Envelope"),
         ("VCFENV", "VCF envelope", "VCF Envelope"),

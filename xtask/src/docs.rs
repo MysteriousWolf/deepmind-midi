@@ -51,9 +51,14 @@ pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
         ("structure", render_structure(&spec, &diagrams)?),
         ("messages", render_messages(&spec)),
         ("parameters", render_parameters(&spec)),
+        ("firmware", render_firmware(&spec)),
+        ("mapping", render_mapping(&spec)),
         ("value-tables", render_value_tables(&spec)),
         ("globals", render_globals(&spec)),
         ("controllers", render_controllers(&spec)),
+        ("routing", render_routing(&spec)),
+        ("effects", render_effects(&spec)),
+        ("measurements", render_measurements(&spec)),
         ("corrections", render_corrections(&spec)),
     ] {
         updated = splice(&updated, marker, &body)?;
@@ -159,6 +164,15 @@ fn render_structure(spec: &Spec, all: &[diagrams::Diagram]) -> Result<String, St
                   arrows carry audio, dashed arrows carry modulation.\n\n",
     );
     let _ = writeln!(out, "```mermaid\n{}\n```\n", source("signal-path")?);
+    out.push_str(
+        "Offsets 40 and 52, the high pass frequency and the bass boost, appear \
+         twice on purpose. The front panel groups them with the VCF and this \
+         specification follows the panel, but the block diagram in section 6 of \
+         the manual places both after the VCA, where they act on the mixed voices \
+         rather than on one. The analog path is the route that skips the FX \
+         block; which of the two paths carry signal is the \
+         [`FX Mode`](#fx-routing) parameter's job.\n\n",
+    );
 
     let _ = writeln!(out, "### {}\n", title("modulation-matrix")?);
     out.push_str("Eight independent busses, each a source, a destination and a signed depth.\n\n");
@@ -276,14 +290,101 @@ fn render_parameters(spec: &Spec) -> String {
     out
 }
 
+/// Renders each transport's byte pattern, its fields, and the encodings.
+fn render_mapping(spec: &Spec) -> String {
+    let mut out = String::new();
+    for transport in &spec.transports {
+        let _ = write!(
+            out,
+            "\n### {}\n\n{}\n\n```\n{}\n```\n\n",
+            cell(&transport.name),
+            transport.summary,
+            transport.pattern
+        );
+        if let Some(note) = &transport.note {
+            let _ = write!(out, "{note}\n\n");
+        }
+        out.push_str("| Field | From | Encoding | Bits | Notes |\n|---|---|---|---|---|\n");
+        for field in &transport.fields {
+            let note = cell(field.note.as_deref().unwrap_or(""));
+            let notes = if field.optional {
+                let when = cell(field.optional_when.as_deref().unwrap_or(""));
+                format!("Optional. {when} {note}").trim().to_owned()
+            } else {
+                note
+            };
+            let _ = writeln!(
+                out,
+                "| `{}` | `{}` | {} | {} | {notes} |",
+                cell(&field.name),
+                cell(&field.source),
+                field
+                    .encoding
+                    .as_deref()
+                    .map_or_else(|| "-".to_owned(), |id| format!("[{id}](#encodings)")),
+                field.bits.map_or_else(|| "-".to_owned(), |b| b.to_string()),
+            );
+        }
+    }
+
+    out.push_str("\n<a id=\"encodings\"></a>\n\n### Encodings\n\n");
+    out.push_str("| Encoding | Name | Rule | Notes |\n|---|---|---|---|\n");
+    for encoding in &spec.encodings {
+        let _ = writeln!(
+            out,
+            "| `{}` | {} | {} | {} |",
+            cell(&encoding.id),
+            cell(&encoding.name),
+            cell(&encoding.rule),
+            cell(encoding.note.as_deref().unwrap_or(""))
+        );
+    }
+    out
+}
+
+/// Renders the firmware list and what each version changed.
+fn render_firmware(spec: &Spec) -> String {
+    let default = spec.default_firmware();
+    let mut out = String::from("| Version | Notes |\n|---|---|\n");
+    for firmware in &spec.firmwares {
+        let marker = if firmware.version == default {
+            " (assumed by default)"
+        } else {
+            ""
+        };
+        let _ = writeln!(
+            out,
+            "| {}{marker} | {} |",
+            cell(&firmware.version),
+            cell(firmware.note.as_deref().unwrap_or(""))
+        );
+    }
+    out
+}
+
+/// Anchor for a value table, kept unique when firmware split it in two.
+fn table_anchor(table: &crate::spec::ValueTable, default: &str) -> String {
+    match &table.firmware {
+        Some(range) if !crate::spec::Firmware::range_covers(Some(range), default) => {
+            format!("{}-fw{}", table.id, range.replace(['.', '+'], ""))
+        }
+        _ => table.id.clone(),
+    }
+}
+
 fn render_value_tables(spec: &Spec) -> String {
+    let default = spec.default_firmware();
     let mut out = String::new();
     for table in &spec.tables {
         let _ = write!(
             out,
             "\n<a id=\"{}\"></a>\n\n#### {}\n\n",
-            table.id, table.name
+            table_anchor(table, default),
+            table.name
         );
+        if let Some(range) = &table.firmware {
+            let _ = write!(out, "Firmware {range}.\n\n");
+        }
         if let Some(note) = &table.note {
             let _ = write!(out, "{note}\n\n");
         }
@@ -378,6 +479,209 @@ fn render_controllers(spec: &Spec) -> String {
             let _ = writeln!(out, " {notes} |");
         }
     }
+    out
+}
+
+/// Renders one table per algorithm: what each of an engine's twelve raw
+/// parameters means when that algorithm is loaded.
+fn render_effects(spec: &Spec) -> String {
+    let mut out = String::new();
+    let columns = usize::from(spec.panel_meta.columns);
+    for effect in &spec.effects {
+        // The FX page fills rows of `columns` in slot order, so the shape of the
+        // page follows from the parameter count.
+        let rows: Vec<String> = effect
+            .parameters
+            .chunks(columns)
+            .map(|row| row.len().to_string())
+            .collect();
+        let _ = write!(
+            out,
+            "\n<a id=\"fx-{}\"></a>\n\n#### {} ({})\n\n`FX Type` {}. \
+             {} slots, shown as {}.\n\n\
+             | Slot | Ref | Parameter | Reads as | Control | Group | Range | \
+             Mod | Description |\n|---|---|---|---|---|---|---|---|---|\n",
+            effect.r#type,
+            cell(&effect.full_name),
+            cell(&effect.name),
+            effect.r#type,
+            effect.parameters.len(),
+            match rows.len() {
+                1 => format!("one row of {}", rows[0]),
+                _ => format!("rows of {}", rows.join(" and ")),
+            },
+        );
+        let panel = spec.panels.iter().find(|p| p.r#type == effect.r#type);
+        for parameter in &effect.parameters {
+            let slot = panel.and_then(|p| p.slots.iter().find(|s| s.slot == parameter.slot));
+            let range = match (&parameter.values, &parameter.min, &parameter.max) {
+                (Some(values), _, _) => cell(values),
+                (_, Some(min), Some(max)) => {
+                    let unit = parameter.unit.as_deref().unwrap_or("");
+                    let unit = if unit.is_empty() {
+                        String::new()
+                    } else {
+                        format!(" {unit}")
+                    };
+                    format!("{min} to {max}{unit}")
+                }
+                _ => String::new(),
+            };
+            let range = match &parameter.note {
+                Some(note) => format!("{range}. {}", cell(note)),
+                None => range,
+            };
+            let _ = writeln!(
+                out,
+                "| {} | `{}` | {} | {} | {} | {} | {range} | {} | {} |",
+                parameter.slot,
+                cell(&parameter.r#ref),
+                cell(&parameter.name),
+                slot.map_or(String::new(), |s| cell(&s.title)),
+                slot.map_or("", |s| s.kind.as_str()),
+                slot.and_then(|s| s.group.as_deref()).unwrap_or(""),
+                if parameter.mod_dest { "yes" } else { "" },
+                cell(parameter.description.as_deref().unwrap_or(""))
+            );
+        }
+    }
+    out
+}
+
+/// Renders the ten FX topologies and the three FX modes.
+///
+/// Each slot's cell says what reaches it, which together with the output column
+/// is the edge list of the diagram the manual prints.
+fn render_routing(spec: &Spec) -> String {
+    let slots = |routing: &crate::spec::Routing, slot: u8| -> String {
+        routing
+            .slots
+            .iter()
+            .find(|s| s.slot == slot)
+            .map_or_else(String::new, |s| {
+                s.from
+                    .iter()
+                    .map(|&f| {
+                        if f == 0 {
+                            "input".to_owned()
+                        } else {
+                            f.to_string()
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" + ")
+            })
+    };
+
+    let mut out = String::from(
+        "| Value | | Routing | Slot 1 from | Slot 2 from | Slot 3 from | \
+         Slot 4 from | To output |\n|---|---|---|---|---|---|---|---|\n",
+    );
+    for routing in &spec.routings {
+        let _ = writeln!(
+            out,
+            "| {} | {} | {} | {} | {} | {} | {} | {} |",
+            routing.value,
+            cell(&routing.label),
+            cell(&routing.name),
+            slots(routing, 1),
+            slots(routing, 2),
+            slots(routing, 3),
+            slots(routing, 4),
+            routing
+                .output
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join(" + "),
+        );
+    }
+
+    let feedback: Vec<&crate::spec::Routing> =
+        spec.routings.iter().filter(|r| r.feedback).collect();
+    if !feedback.is_empty() {
+        out.push_str(
+            "\nA feedback routing feeds a slot, directly or through others, from \
+             a slot downstream of it. The manual notes a 30 Hz high pass filter \
+             in the feedback path of these.\n\n",
+        );
+        for routing in feedback {
+            let _ = writeln!(
+                out,
+                "- **{}**, {}. {}",
+                cell(&routing.label),
+                cell(&routing.name),
+                cell(routing.note.as_deref().unwrap_or("")).trim()
+            );
+        }
+    }
+
+    out.push_str(
+        "\nThe `FX Mode` parameter at offset 222 decides which paths the voices \
+         take. The analog path runs from the voices to the output stage \
+         untouched; the digital path runs them through the FX block. Bypass is a \
+         true bypass, with the DSP out of circuit rather than muted.\n\n\
+         | Value | Mode | Analog path | Digital path |\n|---|---|---|---|\n",
+    );
+    let mark = |on: bool| if on { "on" } else { "off" };
+    for mode in &spec.fx_modes {
+        let _ = writeln!(
+            out,
+            "| {} | {} | {} | {} |",
+            mode.value,
+            cell(&mode.name),
+            mark(mode.analog_path),
+            mark(mode.digital_path)
+        );
+    }
+    out
+}
+
+/// Renders the raw-to-displayed readings, grouped by parameter.
+fn render_measurements(spec: &Spec) -> String {
+    let mut out = String::from(
+        "| Offset | Parameter | Raw | Displayed | Fits | Note |\n|---|---|---|---|---|---|\n",
+    );
+    for measurement in &spec.measurements {
+        let name = spec
+            .parameters
+            .iter()
+            .find(|p| p.offset == measurement.offset)
+            .map_or("", |p| p.name.as_str());
+        let _ = writeln!(
+            out,
+            "| {} | {} | {} | {} | {} | {} |",
+            measurement.offset,
+            cell(name),
+            measurement.raw,
+            cell(&measurement.shown),
+            cell(&measurement.fit),
+            cell(measurement.note.as_deref().unwrap_or("")),
+        );
+    }
+
+    let count = |fit: &str| spec.measurements.iter().filter(|m| m.fit == fit).count();
+    let parameters = {
+        let mut offsets: Vec<u16> = spec.measurements.iter().map(|m| m.offset).collect();
+        offsets.sort_unstable();
+        offsets.dedup();
+        offsets.len()
+    };
+    let _ = write!(
+        out,
+        "\n{} readings across {parameters} parameters: {} match a linear \
+         interpolation between the parameter's stated ends, {} an exponential \
+         one, {} sit on the two-segment fader response section 8.3.1 draws, {} \
+         are at an end of a range rather than inside it, {} are of a parameter \
+         the manual states no range for, and {} match nothing simple.\n",
+        spec.measurements.len(),
+        count("linear"),
+        count("exponential"),
+        count("piecewise"),
+        count("endpoint"),
+        count("untested"),
+        count("none"),
+    );
     out
 }
 

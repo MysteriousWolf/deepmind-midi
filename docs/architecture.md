@@ -114,6 +114,12 @@ collapses NRPN edits, dump parsing and dump building into a single table.
 | `spec/controllers.toml` | 112 MIDI controllers, 90 mapped to a parameter |
 | `spec/messages.toml` | 22 SysEx messages |
 | `spec/globals.toml` | 25 device-wide settings |
+| `spec/effects.toml` | 370 effect parameters across 35 algorithms |
+| `spec/panels.toml` | how those 370 slots present themselves |
+| `spec/mapping.toml` | how an address and a value become bytes |
+| `spec/routing.toml` | how the four FX engines can be wired together |
+| `spec/measurements.toml` | 29 raw values with what the synthesizer displayed |
+| `spec/firmware.toml` | firmware versions that change the protocol |
 
 `cargo xtask docs` renders the tables and Mermaid diagrams in
 [`midi-spec.md`](midi-spec.md), and writes the diagram sources to
@@ -145,6 +151,120 @@ Beyond that, correctness comes from disagreeing sources. The parameter table was
 built from the manual, then checked against a MIDI Designer layout that had no
 part in building it. All 35 of its named NRPN controls agree, including the three
 offsets where this specification departs from the manual's printed names.
+
+## Firmware is a dimension, not a footnote
+
+Firmware 1.1 renumbered three value tables rather than only appending to them.
+A program stored on 1.0 using modulation source 23 means something else read
+back on 1.1. That is not a note for a human, it is a lookup key:
+
+```rust
+spec.table_for("mod_source", "1.0")    // 23 entries
+spec.table_for("mod_source", "1.1")    // 25 entries
+```
+
+This is not a footnote-sized difference. 17 of the 23 modulation sources and 120
+of the 130 modulation destinations changed meaning between the two versions, so
+reading a 1.0 program with 1.1 tables mislabels almost everything. Only the FX
+type list is nearly a pure extension.
+
+A table declares the versions it covers: `"1.0"` for exactly that one, `"1.1+"`
+for that one and later, and nothing at all for a table that has never changed.
+The newest version is the default, so a caller who never mentions firmware gets
+current hardware.
+
+What the mechanism cannot do: a dump carries the comms protocol version, not the
+firmware version, so nothing in a `.syx` file says which firmware wrote it. The
+older tables are only reachable when the host knows the version another way.
+Loading fails unless every table identifier resolves to exactly one table for
+every listed version. A gap makes a table unreachable; an overlap makes the
+answer depend on file order, which is how this sort of thing goes wrong
+quietly.
+
+Comms protocol version is a separate axis and stays separate: it decides how
+many bytes a dump carries, not what a value means.
+
+## Presentation is separate from protocol
+
+`spec/effects.toml` says what a parameter is. `spec/panels.toml` says how to
+show it: continuous, switch or selector, which slots belong together, such as the
+two sides of the compressor or the two channels of the pitch shifter, and the
+grid the synthesizer's own FX page draws.
+
+Those two files are split because their provenance differs, and the split runs
+through `panels.toml` itself. The grid is Behringer's: the manual screenshots the
+FX page beside every algorithm in section 9.3, and all 35 lay the slots out six
+to a row in slot order, wrapping onto a second row. That is transcribed, and the
+file says so. The full titles, the control kinds and the grouping are derived
+from `effects.toml` by this project, and the file says that too.
+
+What the manual does not publish is geometry: no sizes, no positions beyond the
+grid, no colours, no fonts. So `panels.toml` carries none, and a host is free to
+lay the slots out its own way knowing which arrangement the hardware uses.
+
+Loading checks `panels.toml` and `effects.toml` line up slot for slot, since they
+are generated together and a mismatch means one was hand-edited.
+
+## Routing is a graph, not a name
+
+Ten fixed wirings of the four FX engines, chosen by one parameter. The manual
+names them, and the names alone are not enough to act on: `Level` is defined as
+the output level of effects "configured in parallel, or any effects which are the
+last effect before reaching the output stage", so a host cannot label that control
+without knowing where the current routing puts the slot.
+
+`spec/routing.toml` carries all ten as edge lists, transcribed from the diagrams
+in section 7.2.2. Loading checks each graph rather than trusting the
+transcription: every slot has to be reachable from the FX block's input and have
+a path to its output, and a topology's declared feedback flag has to match whether
+its graph actually contains a loop. Ten small printed diagrams read by eye is
+exactly the input that wants checking by machine.
+
+## Strings are reachable by key
+
+Every user-visible string in `spec/` is addressed by a stable path: a parameter
+by its offset, an effect slot by its type and slot number, a value table entry
+by its table and value. Nothing addresses a string by the string.
+
+That is all translation needs from the data model, and it is already true. A
+translation would be an overlay file keyed the same way, merged over the English
+at load. Until someone actually wants one, English lives in the spec files and
+there is no second mechanism to keep in sync. The point is that adding one later
+is not a refactor.
+
+What would not survive translation is anything that parses a display string.
+Ranges are stored as their two ends and a unit, not as `"0.1 to 6.0 s"`, for
+that reason among others.
+
+## Raw values stay raw until measured
+
+A parameter is one byte on the wire, and the manual gives the displayed value at
+each end of its range but almost never the curve between. That curve cannot be
+inferred: 201 of the 329 effect ranges start at or cross zero, which rules out a
+logarithmic fit, and the manual documents a fader that starts at zero and is
+still explicitly non-linear.
+
+Almost never, rather than never, because the manual's figures give up more than
+its prose does. Its PROG screenshots print a parameter's raw MIDI value next to
+the value the synthesizer displays for it, which makes each one a measurement.
+`spec/measurements.toml` collects the 29 of them the manual contains, and
+[the specification](midi-spec.md#scaling-raw-values-to-displayed-values) works
+through what they say. Most faders are linear. The three frequency parameters are
+exponential, and not marginally: VCF Frequency reads 500.0 Hz where an
+exponential sweep predicts 500.0005 and a straight line predicts 7717. Two faders
+match neither, and the manual warns about neither.
+
+None of that is a conversion, and none of it touches the 329 effect ranges, for
+which the manual prints no screenshot and no graph. A single interior reading
+fixes a curve only if the family is already known, and the two faders that match
+nothing are what assuming the family costs.
+
+So `Frequency::hz()` will exist only for parameters whose curve has been measured,
+and `raw()` always works. A conversion that has not been measured is absent rather
+than approximated: a plausible wrong number in front of a musician is worse than
+an honest raw one, and it would be believed. A partially measured curve is absent
+too, since a conversion that is right above the breakpoint and wrong below it is
+the same trap wearing a better disguise.
 
 ## State is a set of claims, not a cache
 
@@ -236,7 +356,7 @@ built-in token; any failure there leaves the generated notes alone.
 | Step | Contents |
 |---|---|
 | 1 | Workspace, CI, lint policy, the specification, generation and release tooling |
-| 2 | `spec/effects.toml`: per-effect parameter names |
+| 2 | `spec/effects.toml`: per-effect parameter names, presentation, FX routing |
 | 3 | `wire` and `sysex`: framing, packed MS-bit codec, typed messages |
 | 4 | `param`: code generated from `spec/`, typed values |
 | 5 | `program`: the `Program` struct, decode and encode, `.syx` import and export |
@@ -244,17 +364,7 @@ built-in token; any failure there leaves the generated notes alone.
 | 7 | `transport`: the blocking adapter |
 | 8 | `deepmind-cli` |
 
-### Next: per-effect parameter names
+### Next: the wire layer
 
-Each FX slot has 12 raw parameters at offsets 167-178, 180-191, 193-204 and
-206-217. Their meaning depends on that slot's algorithm, so `FX 1 Param 3` is
-Size on a Room Reverb and something else on a Phaser. Without this table, 48
-bytes of every program are unlabelled, which defeats the point.
-
-Section 9.3 of the manual documents all 35 algorithms with a display reference, a
-full name, units, a range, a description, and a marker for the ones that are also
-modulation destinations. Roughly 350 rows. It goes in `spec/effects.toml`, keyed
-by FX type value so it joins to the existing `fx_type` table.
-
-Transcription, not research: the section extracts cleanly. It is separate only
-because 350 rows would make one change unreviewable.
+Framing, the packed MS-bit codec and typed messages. `spec/` now describes every
+byte a program carries, so the remaining steps are code.

@@ -1,0 +1,229 @@
+# Raw parameter values paired with what the synthesizer displays for them.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# The manual gives each parameter's displayed range but not the shape between
+# its ends. These are readings taken off the middle of that range, so a curve
+# can be tested rather than assumed.
+#
+# They are observations, not conversions. Nothing in the library converts a raw
+# value to a displayed one on the strength of a row here; that waits for a
+# measured curve. What these do is decide which curves are still possible, and
+# give a future measurement pass something to check itself against.
+
+[meta]
+source = """
+PROG screenshots printed beside the fader descriptions in section 8 of the \
+DeepMind 12 User Manual, plus the worked example in section 7.1."""
+method = """
+Section 7.1.7 of the manual calls the upper number on the PROG screen the \
+CURRENT PARAMETER MIDI VALUE and says it is "a simple value (0-255)", which is \
+the value on the wire. Section 7.1.8 calls the lower, reverse-video number the \
+stored value, and 7.1.9 says the line along the bottom of the screen gives "a \
+more accurate value of the parameter being adjusted" with its units. So every \
+screenshot of that screen is a raw value printed next to its displayed value. \
+Only the upper number is used here."""
+exception = """
+The arpeggiator tempo screen is not one of these. Its box reads 256 where the \
+line below reads 256.0 BPM, and 256 is outside the 0-255 the MIDI value uses, \
+so that screen shows BPM in both places. Tempo readings are left out."""
+precision = """
+`fit` names the interpolation between the parameter's two stated ends that \
+reproduces the reading. Agreement is only ever to the last digit the screen \
+prints, because the stated ends are themselves printed rounded. `endpoint` is a \
+reading at one end, which confirms the end rather than the shape. `untested` is \
+a reading the manual states no range for, so there is nothing to test it \
+against; it is recorded because it is the only figure there is. `none` means \
+neither linear nor exponential between the stated ends comes close."""
+fits = ["linear", "exponential", "piecewise", "endpoint", "untested", "none"]
+
+[[measurement]]
+offset = 0
+raw = 0
+shown = "24.1 s"
+fit = "endpoint"
+note = "The slowest rate. A period of 24.1 s is 0.0415 Hz, agreeing with the 0.041 Hz the parameter table gives as the bottom of the range."
+
+[[measurement]]
+offset = 0
+raw = 12
+shown = "17.0 s"
+fit = "exponential"
+note = "Exponential in frequency between the ends, not in period. Linear in frequency would show 0.32 s here."
+
+[[measurement]]
+offset = 1
+raw = 193
+shown = "4.99 s"
+fit = "linear"
+
+[[measurement]]
+offset = 21
+raw = 121
+shown = "+/-4.5 semitones"
+fit = "piecewise"
+note = "Bipolar, from an LFO source. The magnitude is the same as a unipolar source gives."
+
+[[measurement]]
+offset = 21
+raw = 135
+shown = "+7.8 semitones"
+fit = "piecewise"
+
+[[measurement]]
+offset = 25
+raw = 118
+shown = "72.6 %"
+fit = "linear"
+note = "Pulse width, which is what this fader sets while the PWM source is Manual."
+
+[[measurement]]
+offset = 25
+raw = 101
+shown = "+/-19.4 %"
+fit = "linear"
+note = "Modulation depth, which is what the same fader sets once the PWM source is not Manual. A different range on the same offset, so the two readings do not contradict each other."
+
+[[measurement]]
+offset = 26
+raw = 0
+shown = "Off"
+fit = "endpoint"
+
+[[measurement]]
+offset = 26
+raw = 255
+shown = "0.0 dB"
+fit = "endpoint"
+
+[[measurement]]
+offset = 27
+raw = 121
+shown = "-7.0 cents"
+fit = "none"
+note = "Seven cents below centre at six and a half steps below centre, on a fader the manual gives a range of plus or minus 12 semitones. Linear would show -61 cents. The fader has to be far finer near the centre than at its ends, which the manual does not say anywhere."
+
+[[measurement]]
+offset = 28
+raw = 255
+shown = "100.0 %"
+fit = "endpoint"
+note = "Tone modulation, which is what this fader sets while the source is Manual."
+
+[[measurement]]
+offset = 28
+raw = 255
+shown = "+/-49"
+fit = "endpoint"
+note = "Modulation depth, which is what the same fader sets once the source is not Manual."
+
+[[measurement]]
+offset = 29
+raw = 135
+shown = "+7.8 semitones"
+fit = "piecewise"
+note = "The same reading at the same raw value as OSC 1 Pitch Mod Depth at offset 21, so the two oscillators share one fader response."
+
+[[measurement]]
+offset = 33
+raw = 255
+shown = "0.0 dB"
+fit = "endpoint"
+
+[[measurement]]
+offset = 39
+raw = 98
+shown = "500.0 Hz"
+fit = "exponential"
+note = "An exponential sweep from 50 Hz to 20 kHz gives 500.0005 Hz here. Linear would give 7717 Hz, so this rules linear out rather than merely fitting."
+
+[[measurement]]
+offset = 40
+raw = 0
+shown = "20.0 Hz"
+fit = "endpoint"
+
+[[measurement]]
+offset = 40
+raw = 88
+shown = "98.0 Hz"
+fit = "exponential"
+note = "An exponential sweep from 20 Hz to 2 kHz gives 97.99 Hz here. Linear would give 703 Hz."
+
+[[measurement]]
+offset = 41
+raw = 255
+shown = "100.0 %"
+fit = "endpoint"
+
+[[measurement]]
+offset = 42
+raw = 153
+shown = "60.0 %"
+fit = "linear"
+
+[[measurement]]
+offset = 45
+raw = 102
+shown = "40.0 %"
+fit = "linear"
+
+[[measurement]]
+offset = 49
+raw = 68
+shown = "26.6 %"
+fit = "linear"
+
+[[measurement]]
+offset = 49
+raw = 153
+shown = "60.0 %"
+fit = "linear"
+
+[[measurement]]
+offset = 54
+raw = 128
+shown = "1.13 s"
+fit = "untested"
+note = "The parameter table carries no displayed range for the envelope times, so this is the only figure there is for one."
+
+[[measurement]]
+offset = 56
+raw = 255
+shown = "32.0 s"
+fit = "untested"
+note = "The top of the range, for a parameter the manual gives no range for. The longest release the VCA envelope reaches is 32 seconds."
+
+[[measurement]]
+offset = 80
+raw = 181
+shown = "2.50 dB"
+fit = "none"
+note = "Linear between the stated -12.0 dB and +6.0 dB would show 0.78 dB. A fader that is linear in amplitude rather than in decibels comes closer, at 3.0 dB, but does not land on it either."
+
+[[measurement]]
+offset = 87
+raw = 34
+shown = "+/-6.6 cents"
+fit = "linear"
+
+[[measurement]]
+offset = 87
+raw = 255
+shown = "+/-50.0 cents"
+fit = "endpoint"
+note = "The example the manual works through in section 7.1, where this reading is printed alongside a stored value of 20."
+
+[[measurement]]
+offset = 160
+raw = 112
+shown = "43.9 %"
+fit = "linear"
+note = "Against a range of 0 to 100%, which the parameter table does not state for this offset. Two readings agreeing with it is the reason to think that is the range."
+
+[[measurement]]
+offset = 160
+raw = 128
+shown = "50.1 %"
+fit = "linear"

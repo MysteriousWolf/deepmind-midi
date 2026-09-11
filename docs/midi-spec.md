@@ -15,13 +15,18 @@ by hand: change the spec and run `cargo xtask docs`.
 - [Packed MS-bit encoding](#packed-ms-bit-encoding)
 - [SysEx messages](#sysex-messages)
 - [Device inquiry](#device-inquiry)
+- [Wire mapping](#wire-mapping)
 - [NRPN edits](#nrpn-edits)
 - [Continuous controllers](#continuous-controllers)
 - [Program data layout](#program-data-layout)
 - [Program parameters](#program-parameters)
+- [Firmware versions](#firmware-versions)
 - [Value tables](#value-tables)
 - [Global settings](#global-settings)
+- [FX routing](#fx-routing)
+- [Effect parameters](#effect-parameters)
 - [Corrections to the manual](#corrections-to-the-manual)
+- [Scaling](#scaling-raw-values-to-displayed-values)
 - [Open questions](#open-questions)
 
 ## Synth structure
@@ -38,11 +43,13 @@ Each block is a parameter group, labelled with its offsets. Solid arrows carry a
 ```mermaid
 flowchart LR
     OSC["OSC 1 + OSC 2<br>noise<br><small>14-38</small>"]
-    VCF["VCF<br>low pass + high pass<br><small>39-52</small>"]
+    VCF["VCF<br>low pass<br><small>39-52</small>"]
     VCA["VCA<br><small>80-83</small>"]
     FX["FX<br>4 slots<br><small>165-222</small>"]
+    HPF["high pass + boost<br><small>40, 52</small>"]
     OUT([output])
-    OSC --> VCF --> VCA --> FX --> OUT
+    OSC --> VCF --> VCA --> HPF --> FX --> OUT
+    HPF -- analog path --> OUT
 
     VCAENV("VCA envelope<br><small>53-61</small>")
     VCFENV("VCF envelope<br><small>62-70</small>")
@@ -62,6 +69,8 @@ flowchart LR
     MOD -.-> VCA
     MOD -.-> FX
 ```
+
+Offsets 40 and 52, the high pass frequency and the bass boost, appear twice on purpose. The front panel groups them with the VCF and this specification follows the panel, but the block diagram in section 6 of the manual places both after the VCA, where they act on the mixed voices rather than on one. The analog path is the route that skips the FX block; which of the two paths carry signal is the [`FX Mode`](#fx-routing) parameter's job.
 
 ### Modulation matrix
 
@@ -203,6 +212,77 @@ the major (0-15). `ii` and `nn` are the voice software major and minor versions.
 Firmware itself is distributed as a vendor SysEx file that Behringer's own
 updater streams to the synthesizer. That bootloader protocol is not documented
 and is not modelled here.
+
+## Wire mapping
+
+How an address and a value become bytes. This section is generated from
+`spec/mapping.toml`, which exists so a host that is not this library can be
+driven from the same data rather than from hard-coded byte patterns.
+
+`Bn` is a status byte carrying the MIDI channel in its low nibble.
+
+<!-- generated:mapping -->
+
+### NRPN edit
+
+Sets one program parameter. The only way to reach every parameter.
+
+```
+Bn 63 <number_msb> Bn 62 <number_lsb> Bn 06 <value_msb> Bn 26 <value_lsb>
+```
+
+Running status collapses this to a single status byte. The selected parameter persists, so sweeping one control means sending the selection once and then data entry pairs alone. Each interface (DIN, USB, Wi-Fi) keeps its own selected-parameter register.
+
+| Field | From | Encoding | Bits | Notes |
+|---|---|---|---|---|
+| `number_msb` | `parameter.offset` | [shift_right_7](#encodings) | 7 |  |
+| `number_lsb` | `parameter.offset` | [low_7](#encodings) | 7 |  |
+| `value_msb` | `value` | [shift_right_7](#encodings) | 7 | Optional. The parameter's maximum is 127 or less. |
+| `value_lsb` | `value` | [low_7](#encodings) | 7 |  |
+
+### Control change
+
+Reaches 90 of the 242 parameters, one byte of resolution each.
+
+```
+Bn <cc> <value>
+```
+
+A shortcut, not a second address space: controllers.toml maps each controller number onto the parameter offset it drives. A parameter whose range exceeds 0-127 loses resolution here, so NRPN is the general path.
+
+| Field | From | Encoding | Bits | Notes |
+|---|---|---|---|---|
+| `cc` | `controller.cc` | - | 7 |  |
+| `value` | `value` | [scale_to_7](#encodings) | 7 |  |
+
+### SysEx
+
+Bulk data: program dumps, bank dumps, globals, patterns, inquiries.
+
+```
+F0 00 20 32 20 <device> <command> <payload> F7
+```
+
+`00 20 32` is Behringer's manufacturer ID and `20` the shared DeepMind model ID; no model in the range identifies itself further. Commands are listed in messages.toml.
+
+| Field | From | Encoding | Bits | Notes |
+|---|---|---|---|---|
+| `device` | `device_id` | - | 7 | The unit's global MIDI channel, or 7F to address every unit on the port. |
+| `command` | `message.command` | - | 7 |  |
+| `payload` | `message.payload` | [packed_ms_bit](#encodings) | - | Bulk payloads only. Short commands carry their arguments unpacked. |
+
+<a id="encodings"></a>
+
+### Encodings
+
+| Encoding | Name | Rule | Notes |
+|---|---|---|---|
+| `low_7` | Low seven bits | value & 0x7F |  |
+| `shift_right_7` | High seven bits | (value >> 7) & 0x7F |  |
+| `scale_to_7` | Scaled to seven bits | value * 127 / maximum | Lossy for a parameter whose range exceeds 0-127. |
+| `packed_ms_bit` | Packed MS-bit | Seven raw bytes become eight: one byte of their high bits, then the seven with bit 7 cleared. | SysEx data bytes cannot set bit 7, so bulk payloads carry it separately. The last group is short when the payload length is not a multiple of seven. |
+
+<!-- /generated:mapping -->
 
 ## NRPN edits
 
@@ -727,6 +807,36 @@ sends an NRPN edit and wants confirmation has to re-request the edit buffer.
 
 <!-- /generated:parameters -->
 
+## Firmware versions
+
+Firmware version and comms protocol version are independent. This is the
+firmware one, read with a device inquiry.
+
+Firmware 1.1 renumbered three value tables rather than only appending to them,
+so the same stored value means different things depending on which version
+wrote it. It is not a small overlap: 17 of the 23 modulation sources and 120 of
+the 130 modulation destinations changed meaning. Only the FX type list is close
+to a pure extension, and even there value 33 moved from Rotary Speaker to
+Vintage Pitch.
+
+Tables below carry the firmware they describe; where a version is not named, the
+table has never changed. Firmware 1.1 is assumed unless a caller says otherwise,
+so reading this document straight through describes current hardware.
+
+One caveat worth knowing. A dump carries the comms protocol version, not the
+firmware version, so a `.syx` file on its own does not say which firmware wrote
+it. The firmware 1.0 tables are usable only when a host knows the version
+another way, which in practice means it asked the device.
+
+<!-- generated:firmware -->
+
+| Version | Notes |
+|---|---|
+| 1.0 | The version the DeepMind 12 shipped with, and the one the manual's NRPN appendix describes. |
+| 1.1 (assumed by default) | Added Expression and Uni Voice as modulation sources, three fine-tune modulation destinations, and the Vintage Pitch effect. Each insertion renumbered every entry after it. Also moved the modulation matrix CC axes from CC 114-116 to CC 115-117. |
+
+<!-- /generated:firmware -->
+
 ## Value tables
 
 <!-- generated:value-tables -->
@@ -1096,7 +1206,7 @@ Section 8.2.4. When LFO Arp Sync is on, the LFO rate parameter selects one of th
 
 #### Modulation Matrix Source
 
-Value 0 selects Off. Firmware 1.1 inserted Expression at 6 and Uni Voice at 21, renumbering everything after each, and moved the CC axes from CC 114-116 to CC 115-117. See mod_source_fw10 for the earlier ordering.
+Firmware 1.1+.
 
 | Value | Name | Notes |
 |---|---|---|
@@ -1126,11 +1236,13 @@ Value 0 selects Off. Firmware 1.1 inserted Expression at 6 and Uni Voice at 21, 
 | 23 | CC Y (116) | Continuous controller Y axis, CC 116 |
 | 24 | CC Z (117) | Continuous controller Z axis, CC 117 |
 
-<a id="mod_source_fw10"></a>
+<a id="mod_source-fw10"></a>
 
 #### Modulation Matrix Source (firmware 1.0)
 
-Superseded by mod_source on firmware 1.1 and later. Value 0 selects Off.
+Firmware 1.0.
+
+Value 0 selects Off.
 
 | Value | Name | Notes |
 |---|---|---|
@@ -1162,7 +1274,7 @@ Superseded by mod_source on firmware 1.1 and later. Value 0 selects Off.
 
 #### Modulation Matrix Destination
 
-Value 0 selects Off. Firmware 1.0 had 129 destinations; firmware 1.1 inserted OSC1+2 Fine, OSC1 Fine and OSC2 Fine at values 10, 12 and 14. To read a firmware 1.0 value: 1-9 are unchanged, 10 becomes 11, 11 becomes 13, and 12 or above gain 3.
+Firmware 1.1+.
 
 | Value | Name | Notes |
 |---|---|---|
@@ -1304,7 +1416,7 @@ Value 0 selects Off. Firmware 1.0 had 129 destinations; firmware 1.1 inserted OS
 
 #### FX Type
 
-Firmware 1.1 added Vintage Pitch at value 33, shifting Rotary Speaker to 34. Firmware 1.0 stopped at 33.
+Firmware 1.1+.
 
 | Value | Name | Notes |
 |---|---|---|
@@ -1343,6 +1455,196 @@ Firmware 1.1 added Vintage Pitch at value 33, shifting Rotary Speaker to 34. Fir
 | 32 | DualPitch | Dual Pitch Shifter (Creative) |
 | 33 | Vintage Pitch | Vintage Dual Pitch Shifter (Creative) |
 | 34 | RotarySpkr | Rotary Speaker (Creative) |
+
+<a id="mod_destination-fw10"></a>
+
+#### Modulation Matrix Destination (firmware 1.0)
+
+Firmware 1.0.
+
+Value 0 selects Off. Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual. It offers 129 destinations, and the mod matrix diagram on page 19 of the firmware 1.1 manual, which was left at its firmware 1.0 numbers, says 130. That diagram counts 22 sources, which is this table's companion mod_source list with Off excluded, so by the same convention 130 means 130 selectable destinations and this table is one entry short. Which entry is missing needs a firmware 1.0 manual or the hardware.
+
+> Unconfirmed. This mapping is inferred and needs checking against hardware.
+
+| Value | Name | Notes |
+|---|---|---|
+| 0 | Off |  |
+| 1 | LFO1 Rate |  |
+| 2 | LFO1 Delay |  |
+| 3 | LFO1 Slew |  |
+| 4 | LFO1 Shape |  |
+| 5 | LFO2 Rate |  |
+| 6 | LFO2 Delay |  |
+| 7 | LFO2 Slew |  |
+| 8 | LFO2 Shape |  |
+| 9 | OSC1+2 Pit |  |
+| 10 | OSC1 Pitch |  |
+| 11 | OSC2 Pitch |  |
+| 12 | OSC1 PM Dep |  |
+| 13 | PWM Depth |  |
+| 14 | TMod Depth |  |
+| 15 | OSC2 PM Dep |  |
+| 16 | Porta Time |  |
+| 17 | VCF Freq |  |
+| 18 | VCF Res |  |
+| 19 | VCF Env |  |
+| 20 | VCF LFO |  |
+| 21 | Env Rates |  |
+| 22 | All Attack |  |
+| 23 | All Decay |  |
+| 24 | All Sus |  |
+| 25 | All Rel |  |
+| 26 | Env1 Rates |  |
+| 27 | Env2 Rates |  |
+| 28 | Env3 Rates |  |
+| 29 | Env1CurveS |  |
+| 30 | Env2CurveS |  |
+| 31 | Env3CurveS |  |
+| 32 | Env1 Attack |  |
+| 33 | Env1 Decay |  |
+| 34 | Env1 Sus |  |
+| 35 | Env1 Rel |  |
+| 36 | Env1 AtCur |  |
+| 37 | Env1 DcyCur |  |
+| 38 | Env1 SuSCur |  |
+| 39 | Env1 RelCur |  |
+| 40 | Env2 Attack |  |
+| 41 | Env2 Decay |  |
+| 42 | Env2 Sus |  |
+| 43 | Env2 Rel |  |
+| 44 | Env2 AtCur |  |
+| 45 | Env2 DcyCur |  |
+| 46 | Env2 SuSCur |  |
+| 47 | Env2 RelCur |  |
+| 48 | Env3 Attack |  |
+| 49 | Env3 Decay |  |
+| 50 | Env3 Sus |  |
+| 51 | Env3 Rel |  |
+| 52 | Env3 AtCur |  |
+| 53 | Env3 DcyCur |  |
+| 54 | Env3 SuSCur |  |
+| 55 | Env3 RelCur |  |
+| 56 | VCA All |  |
+| 57 | VCA Active |  |
+| 58 | VCA EnvDep |  |
+| 59 | Pan Spread |  |
+| 60 | VCA Pan |  |
+| 61 | OSC2 Lvl |  |
+| 62 | Noise Lvl |  |
+| 63 | HP Freq |  |
+| 64 | Uni Detune |  |
+| 65 | OSC Drift |  |
+| 66 | Param Drift |  |
+| 67 | Drift Rate |  |
+| 68 | Arp Gate |  |
+| 69 | Seq Slew |  |
+| 70 | Mod 1 Dep |  |
+| 71 | Mod 2 Dep |  |
+| 72 | Mod 3 Dep |  |
+| 73 | Mod 4 Dep |  |
+| 74 | Mod 5 Dep |  |
+| 75 | Mod 6 Dep |  |
+| 76 | Mod 7 Dep |  |
+| 77 | Mod 8 Dep |  |
+| 78 | Fx 1 Param 1 |  |
+| 79 | Fx 1 Param 2 |  |
+| 80 | Fx 1 Param 3 |  |
+| 81 | Fx 1 Param 4 |  |
+| 82 | Fx 1 Param 5 |  |
+| 83 | Fx 1 Param 6 |  |
+| 84 | Fx 1 Param 7 |  |
+| 85 | Fx 1 Param 8 |  |
+| 86 | Fx 1 Param 9 |  |
+| 87 | Fx 1 Param 10 |  |
+| 88 | Fx 1 Param 11 |  |
+| 89 | Fx 1 Param 12 |  |
+| 90 | Fx 2 Param 1 |  |
+| 91 | Fx 2 Param 2 |  |
+| 92 | Fx 2 Param 3 |  |
+| 93 | Fx 2 Param 4 |  |
+| 94 | Fx 2 Param 5 |  |
+| 95 | Fx 2 Param 6 |  |
+| 96 | Fx 2 Param 7 |  |
+| 97 | Fx 2 Param 8 |  |
+| 98 | Fx 2 Param 9 |  |
+| 99 | Fx 2 Param 10 |  |
+| 100 | Fx 2 Param 11 |  |
+| 101 | Fx 2 Param 12 |  |
+| 102 | Fx 3 Param 1 |  |
+| 103 | Fx 3 Param 2 |  |
+| 104 | Fx 3 Param 3 |  |
+| 105 | Fx 3 Param 4 |  |
+| 106 | Fx 3 Param 5 |  |
+| 107 | Fx 3 Param 6 |  |
+| 108 | Fx 3 Param 7 |  |
+| 109 | Fx 3 Param 8 |  |
+| 110 | Fx 3 Param 9 |  |
+| 111 | Fx 3 Param 10 |  |
+| 112 | Fx 3 Param 11 |  |
+| 113 | Fx 3 Param 12 |  |
+| 114 | Fx 4 Param 1 |  |
+| 115 | Fx 4 Param 2 |  |
+| 116 | Fx 4 Param 3 |  |
+| 117 | Fx 4 Param 4 |  |
+| 118 | Fx 4 Param 5 |  |
+| 119 | Fx 4 Param 6 |  |
+| 120 | Fx 4 Param 7 |  |
+| 121 | Fx 4 Param 8 |  |
+| 122 | Fx 4 Param 9 |  |
+| 123 | Fx 4 Param 10 |  |
+| 124 | Fx 4 Param 11 |  |
+| 125 | Fx 4 Param 12 |  |
+| 126 | Fx 1 Level |  |
+| 127 | Fx 2 Level |  |
+| 128 | Fx 3 Level |  |
+| 129 | Fx 4 Level |  |
+
+<a id="fx_type-fw10"></a>
+
+#### FX Type (firmware 1.0)
+
+Firmware 1.0.
+
+Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual.
+
+> Unconfirmed. This mapping is inferred and needs checking against hardware.
+
+| Value | Name | Notes |
+|---|---|---|
+| 0 | TC-DeepVRB | TC Deep Reverb (Reverb) |
+| 1 | AmbVerb | Ambient Reverb (Reverb) |
+| 2 | RoomRev | Room Reverb (Reverb) |
+| 3 | VintageRev | Vintage Room Reverb (Reverb) |
+| 4 | HallRev | Hall Reverb (Reverb) |
+| 5 | ChamberRev | Chamber Reverb (Reverb) |
+| 6 | PlateRev | Plate Reverb (Reverb) |
+| 7 | RichPltRev | Rich Plate Reverb (Reverb) |
+| 8 | GatedRev | Gated Reverb (Reverb) |
+| 9 | Reverse | Reverse Reverb (Reverb) |
+| 10 | ChorusVerb | Chorus and Reverb (Reverb) |
+| 11 | DelayVerb | Delay and Reverb (Reverb) |
+| 12 | FlangVerb | Flange and Reverb (Reverb) |
+| 13 | MidasEQ | Midas Equaliser (Processing) |
+| 14 | Enhancer | Enhancer (Processing) |
+| 15 | FairComp | Fair Compressor (Processing) |
+| 16 | MulBndDist | Multi-Band Distortion (Processing) |
+| 17 | RackAmp | Rack Amplifier (Processing) |
+| 18 | EdisonEX1 | Stereo Imaging (Processing) |
+| 19 | Auto Pan | Auto-Panning (Processing) |
+| 20 | NoiseGate | Noise Gate (Processing) |
+| 21 | Delay | Delay (Delay) |
+| 22 | 3TapDelay | 3-Tap Delay (Delay) |
+| 23 | 4TapDelay | 4-Tap Delay (Delay) |
+| 24 | T-RayDelay | Tel-Ray Delay (Delay) |
+| 25 | DecimDelay | Decimator Delay (Delay) |
+| 26 | ModDlyRev | Mod, Delay and Reverb (Delay) |
+| 27 | Chorus | Chorus (Creative) |
+| 28 | Chorus-D | Chorus D (Creative) |
+| 29 | Flanger | Flanger (Creative) |
+| 30 | Phaser | Phaser (Creative) |
+| 31 | MoodFilter | Mood Filter (Creative) |
+| 32 | DualPitch | Dual Pitch Shifter (Creative) |
+| 33 | RotarySpkr | Rotary Speaker (Creative) |
 
 <!-- /generated:value-tables -->
 
@@ -1384,6 +1686,765 @@ within that dump, so the offsets are still unknown.
 
 <!-- /generated:globals -->
 
+## FX routing
+
+The `FX Routing` parameter at offset 165 picks one of ten fixed wirings of the
+four engines. `enums.toml` carries the manual's name for each, and a name is not
+enough: what the `Mix` and `Level` of a slot do depends on where the routing puts
+that slot, since the manual defines `Level` as the output level of effects
+"configured in parallel, or any effects which are the last effect before
+reaching the output stage". So the topologies are recorded as graphs.
+
+Two of the manual's names read ambiguously and its diagrams settle both. M-3,
+"Parallel 1/2 Parallel 3/4", is two serial pairs side by side, 1 into 2 alongside
+3 into 4, rather than slot 1 alongside slot 2. M-9 and M-10 put their numbered
+slots in a feedback loop around the main path rather than in the path.
+
+<!-- generated:routing -->
+
+| Value | | Routing | Slot 1 from | Slot 2 from | Slot 3 from | Slot 4 from | To output |
+|---|---|---|---|---|---|---|---|
+| 0 | M-1 | Serial 1-2-3-4 | input | 1 | 2 | 3 | 4 |
+| 1 | M-2 | Parallel 1/2, serial 3-4 | input | input | 1 + 2 | 3 | 4 |
+| 2 | M-3 | Parallel 1/2, parallel 3/4 | input | 1 | input | 3 | 2 + 4 |
+| 3 | M-4 | Parallel 1/2/3/4 | input | input | input | input | 1 + 2 + 3 + 4 |
+| 4 | M-5 | Parallel 1/2/3, serial 4 | input | input | input | 1 + 2 + 3 | 4 |
+| 5 | M-6 | Serial 1-2, parallel 3/4 | input | 1 | 2 | 2 | 3 + 4 |
+| 6 | M-7 | Serial 1, parallel 2/3/4 | input | 1 | 1 | 1 | 2 + 3 + 4 |
+| 7 | M-8 | Parallel (serial 1-2-3)/4 | input | 1 | 2 | input | 3 + 4 |
+| 8 | M-9 | Serial 3-4 feedback 4(1-2) | 4 | 1 | input | 3 + 2 | 4 |
+| 9 | M-10 | Serial 4 feedback 4(1-2-3) | 4 | 1 | 2 | input + 3 | 4 |
+
+A feedback routing feeds a slot, directly or through others, from a slot downstream of it. The manual notes a 30 Hz high pass filter in the feedback path of these.
+
+- **M-9**, Serial 3-4 feedback 4(1-2). The input reaches slot 3 and the output leaves slot 4. Slots 1 and 2 sit in a loop that taps slot 4's output and returns ahead of slot 4.
+- **M-10**, Serial 4 feedback 4(1-2-3). The input reaches slot 4 and the output leaves it. Slots 1, 2 and 3 sit in a loop that taps slot 4's output and returns ahead of slot 4.
+
+The `FX Mode` parameter at offset 222 decides which paths the voices take. The analog path runs from the voices to the output stage untouched; the digital path runs them through the FX block. Bypass is a true bypass, with the DSP out of circuit rather than muted.
+
+| Value | Mode | Analog path | Digital path |
+|---|---|---|---|
+| 0 | Insert | off | on |
+| 1 | Send | on | on |
+| 2 | Bypass | on | off |
+
+<!-- /generated:routing -->
+
+## Effect parameters
+
+Each of the four FX engines holds twelve raw parameter bytes, at offsets
+167-178, 180-191, 193-204 and 206-217. What those bytes mean depends on the
+algorithm the engine is running, so `FX 1 Param 3` is Size on a room reverb and
+something else on a phaser. This is the table that makes those 48 bytes
+readable.
+
+Ranges are what the synthesizer displays, not raw values. Every parameter is
+still one byte on the wire; the manual gives no mapping between the two, so only
+the two ends are recorded here and the curve between them is unknown.
+
+The `Mod` column needs care. All 48 slots are addressable from the modulation
+matrix as `Fx 1 Param 1` through `Fx 4 Param 12`, whatever algorithm is loaded,
+so a blank does not mean unreachable. It means the manual does not mark the
+parameter as responding, and the pattern holds up: of the 30 parameters that
+select between options rather than sweep a range, 27 are blank, as are the
+structural ones such as reverb size and pre-delay.
+
+Each heading also gives the shape of the synthesizer's own FX page for that
+algorithm. It draws the slots as a grid six to a row, in slot order, wrapping
+onto a second row, so a twelve-slot algorithm reads as six and six. That is the
+one piece of arrangement the manual publishes; everything else in the `Reads as`,
+`Control` and `Group` columns is derived by this project. See
+[`spec/panels.toml`](../spec/panels.toml).
+
+<!-- generated:effects -->
+
+<a id="fx-0"></a>
+
+#### TC Deep Reverb (TC-DeepVRB)
+
+`FX Type` 0. 5 slots, shown as one row of 5.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PST` | Preset | Preset | selector |  | Ambience, Church, Gate, Hall, Lo Fi, Modulated, Plate, Room, Spring, Tile, Default |  |  |
+| 2 | `DCY` | Decay | Decay | continuous |  | 0.1 to 6.0 s | yes | Controls the amount of time it takes for the reverb to dissipate (range is preset dependant). |
+| 3 | `TON` | Tone | Tone | continuous |  | -50.0 to 50.0 % | yes | Enhances high frequencies/low frequencies for positive/negative settings respectivly. |
+| 4 | `PDY` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 5 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+
+<a id="fx-1"></a>
+
+#### Ambient Reverb (AmbVerb)
+
+`FX Type` 1. 10 slots, shown as rows of 6 and 4.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PD` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 2 | `DCY` | Decay | Decay | continuous |  | 0.2 to 7.3 s | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 3 | `SIZ` | Size | Size | continuous |  | 2.0 to 100.0 |  | Controls the perceived size of the space being created by the reverb. |
+| 4 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Adjusts the decay of the high frequencies within the reverb tail. |
+| 5 | `DIF` | Diffusion | Diffusion | continuous |  | 1.0 to 30.0 |  | Controls the initial reflection density. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies affected by the reverb to be reduced. |
+| 8 | `HC` | Hi Cut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies affected by the reverb to be reduced. |
+| 9 | `MOD` | Mod | Modulation Depth | continuous |  | 0.0 to 100 % |  | Controls the reverb tail modulation depth. |
+| 10 | `TGN` | TailGain | Tail Gain | continuous |  | 0.0 to 100 % | yes | Adjusts the volume of the reverb tail. |
+
+<a id="fx-2"></a>
+
+#### Room Reverb (RoomRev)
+
+`FX Type` 2. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PRE` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 2 | `DCY` | Decay | Decay | continuous |  | 0.3 to 28.9 s | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 3 | `SIZ` | Size | Size | continuous |  | 4.0 to 76.0 m |  | Controls the perceived size of the space being created by the reverb. |
+| 4 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Adjusts the decay of the high frequencies within the reverb tail. |
+| 5 | `DIF` | Diffusion | Diffusion | continuous |  | 0.0 to 100 % |  | Controls the initial reflection density. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies affected by the reverb to be reduced. |
+| 8 | `HC` | Hi Cut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies affected by the reverb to be reduced. |
+| 9 | `LFX` | BassMult | Bass Multiplier | continuous |  | 0.2 to 4.0 | yes | Controls the low frequency build-up. |
+| 10 | `SPR` | Spread | Spread | continuous |  | 0.0 to 50.0 |  | Emphasizes the stereo effect of the reverb. |
+| 11 | `SHP` | Shape | Shape | continuous |  | 0.0 to 250.0 | yes | Adjusts the contour of the reverberation envelope. |
+| 12 | `SPI` | Spin | Spin | continuous |  | 0.0 to 100 % |  | Controls randomization / modulation effects within the reverb. |
+
+<a id="fx-3"></a>
+
+#### Vintage Room Reverb (VintageRev)
+
+`FX Type` 3. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PRE` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 2 | `SIZ` | Size | Size | continuous |  | 1.0 to 100 % |  | Controls the perceived size of the space being created by the reverb. Affects DECAY range. |
+| 3 | `DCY` | Decay | Decay | continuous |  | 0.1 to 20.7 s | yes | Controls the amount of time it takes for the reverb to dissipate. Range dependant on SIZE. |
+| 4 | `LFX` | Lo Mult | Low Multiplier | continuous |  | 0.1 to 10.0 | yes | Controls the low frequency build-up. |
+| 5 | `HFX` | Hi Mult | High Multiplier | continuous |  | 0.1 to 10.0 | yes | Controls the high frequency build-up. |
+| 6 | `DEN` | Density | Density | continuous |  | 0.0 to 100 % | yes | Manipulates the reflection density in the simulated room. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies affected by the reverb to be reduced. |
+| 8 | `HC` | Hi Cut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies affected by the reverb to be reduced. |
+| 9 | `ERL` | ER Level | Early Reflection Level | continuous |  | 0.0 to 100 % | yes | Set the early reflection times. |
+| 10 | `ERD` | ER Delay | Early Reflection Delay | continuous |  | 0.0 to 200.0 ms |  | Sets the loudness of the early reflection level. |
+| 11 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 12 | `FRZ` | Freeze | Freeze | switch |  | OFF to ON | yes | Applies freeze mode and blends signals into a continuous response. |
+
+<a id="fx-4"></a>
+
+#### Hall Reverb (HallRev)
+
+`FX Type` 4. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PD` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 2 | `DCY` | Decay | Decay | continuous |  | 0.2 to 4.9 s | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 3 | `SIZ` | Size | Size | continuous |  | 2.0 to 200.0 |  | Controls the perceived size of the space being created by the reverb. |
+| 4 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Adjusts the decay of the high frequencies within the reverb tail. |
+| 5 | `DIF` | Diffusion | Diffusion | continuous |  | 1.0 to 30.0 |  | Controls the initial reflection density. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies affected by the reverb to be reduced. |
+| 8 | `HC` | Hi Cut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies affected by the reverb to be reduced. |
+| 9 | `LFX` | BassMult | Bass Multiplier | continuous |  | 0.5 to 2.0 | yes | Controls the low frequency build-up. |
+| 10 | `SPR` | Spread | Spread | continuous |  | 0.0 to 50.0 |  | Emphasizes the stereo effect of the reverb. |
+| 11 | `SHP` | Shape | Shape | continuous |  | 0.0 to 250.0 | yes | Adjusts the contour of the reverberation envelope. |
+| 12 | `MOD` | ModSpeed | Modulation Speed | continuous |  | 0.0 to 100.0 |  | Controls the reverb tail modulation rate . |
+
+<a id="fx-5"></a>
+
+#### Chamber Reverb (ChamberRev)
+
+`FX Type` 5. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PRE` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 2 | `DCY` | Decay | Decay | continuous |  | 0.3 to 28.9 s | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 3 | `SIZ` | Size | Size | continuous |  | 4.0 to 76.0 m |  | Controls the perceived size of the space being created by the reverb. |
+| 4 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Adjusts the decay of the high frequencies within the reverb tail. |
+| 5 | `DIF` | Diffusion | Diffusion | continuous |  | 0.0 to 100 % |  | Controls the initial reflection density. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies affected by the reverb to be reduced. |
+| 8 | `HC` | Hi Cut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies affected by the reverb to be reduced. |
+| 9 | `LFX` | BassMult | Bass Multiplier | continuous |  | 0.2 to 4.0 | yes | Controls the low frequency build-up. |
+| 10 | `SPR` | Spread | Spread | continuous |  | 0.0 to 50.0 |  | Emphasizes the stereo effect of the reverb. |
+| 11 | `SHP` | Shape | Shape | continuous |  | 0.0 to 250.0 | yes | Adjusts the contour of the reverberation envelope. |
+| 12 | `SPI` | Spin | Spin | continuous |  | 0.0 to 100 % |  | Controls randomization / modulation effects within the reverb. |
+
+<a id="fx-6"></a>
+
+#### Plate Reverb (PlateRev)
+
+`FX Type` 6. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PD` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 2 | `DCY` | Decay | Decay | continuous |  | 0.5 to 10.0 s | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 3 | `SIZ` | Size | Size | continuous |  | 2.0 to 200.0 |  | Controls the perceived size of the space being created by the reverb. |
+| 4 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Adjusts the decay of the high frequencies within the reverb tail. |
+| 5 | `DIF` | Diffusion | Diffusion | continuous |  | 1.0 to 30.0 |  | Controls the initial reflection density. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies affected by the reverb to be reduced. |
+| 8 | `HC` | Hi Cut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies affected by the reverb to be reduced. |
+| 9 | `LFX` | BassMult | Bass Multiplier | continuous |  | 0.5 to 2.0 | yes | Controls the low frequency build-up. |
+| 10 | `XOV` | Xover | Crossover | continuous |  | 10.0 to 500.0 Hz | yes | Controls the crossover point for bass multiplier. |
+| 11 | `MOD` | ModDepth | Modulation Depth | continuous |  | 1.0 to 50.0 |  | Controls the reverb tail modulation depth. |
+| 12 | `MDS` | ModSpeed | Modulation Speed | continuous |  | 0.0 to 100.0 |  | Controls the reverb tail modulation rate. |
+
+<a id="fx-7"></a>
+
+#### Rich Plate Reverb (RichPltRev)
+
+`FX Type` 7. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PD` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 2 | `DCY` | Decay | Decay | continuous |  | 0.3 to 28.9 s | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 3 | `SIZ` | Size | Size | continuous |  | 4.0 to 39.0 m |  | Controls the perceived size of the space being created by the reverb. |
+| 4 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Adjusts the decay of the high frequencies within the reverb tail. |
+| 5 | `DIF` | Diffusion | Diffusion | continuous |  | 0.0 to 100 % |  | Controls the initial reflection density. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies affected by the reverb to be reduced. |
+| 8 | `HC` | Hi Cut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies affected by the reverb to be reduced. |
+| 9 | `LFX` | BassMult | Bass Multiplier | continuous |  | 0.2 to 4.0 | yes | Controls the low frequency build-up. |
+| 10 | `SPR` | Spread | Spread | continuous |  | 0.0 to 50.0 |  | Emphasizes the stereo effect of the reverb. |
+| 11 | `ATK` | Attack | Attack | continuous |  | 0.0 to 100.0 | yes | Adjusts the contour of the reverberation envelope. |
+| 12 | `SPN` | Spin | Spin | continuous |  | 0.0 to 100 % | yes | Controls randomization / modulation effects within the reverb. |
+
+<a id="fx-8"></a>
+
+#### Gated Reverb (GatedRev)
+
+`FX Type` 8. 10 slots, shown as rows of 6 and 4.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PD` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 2 | `DCY` | Decay | Decay | continuous |  | 140.0 to 1000.0 ms |  | Controls the amount of time it takes for the reverb to dissipate. |
+| 3 | `ATK` | Attack | Attack | continuous |  | 0.0 to 30.0 | yes | Adjusts the contour of the reverberation envelope . |
+| 4 | `DEN` | Density | Density | continuous |  | 1.0 to 50.0 | yes | Manipulates the reflection density in the simulated room. |
+| 5 | `SPR` | Spread | Spread | continuous |  | 0.0 to 100.0 |  | Emphasizes the stereo effect of the reverb. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies affected by the reverb to be reduced. |
+| 8 | `HIF` | HiSvFreq | High Shelf Frequency | continuous |  | 200.0 to 20000.0 Hz | yes | Adjusts the frequency of a Hi-Shelving filter at the input of the reverb effect. |
+| 9 | `HIG` | HiSvGain | High Shelf Gain | continuous |  | -30.0 to 0.0 dB | yes | Adjusts the gain of a Hi-Shelving filter at the input of the reverb effect. |
+| 10 | `DIF` | Diffusion | Diffusion | continuous |  | 0.0 to 100 % |  | Controls the initial reflection density . |
+
+<a id="fx-9"></a>
+
+#### Reverse Reverb (Reverse)
+
+`FX Type` 9. 9 slots, shown as rows of 6 and 3.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PD` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 2 | `DCY` | Decay | Decay | continuous |  | 140.0 to 1000.0 ms |  | Controls the amount of time it takes for the reverb to dissipate. |
+| 3 | `RIS` | Rise | Rise | continuous |  | 0.0 to 50.0 | yes | Controls how quickly the effect builds up. |
+| 4 | `DIF` | Diffusion | Diffusion | continuous |  | 1.0 to 30.0 |  | Controls the initial reflection density. |
+| 5 | `SPR` | Spread | Spread | continuous |  | 0.0 to 100.0 |  | Controls how the reflection is distributed through the envelope of the reverb. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies affected by the reverb to be reduced. |
+| 8 | `HIF` | HiSvFreq | High Shelf Frequency | continuous |  | 200.0 to 20000.0 Hz | yes | Adjusts the frequency of a Hi-Shelving filter at the input of the reverb effect. |
+| 9 | `HIG` | HiSvGain | High Shelf Gain | continuous |  | -30.0 to 0.0 dB | yes | Adjusts the gain of a Hi-Shelving filter at the input of the reverb effect. |
+
+<a id="fx-10"></a>
+
+#### Chorus and Reverb (ChorusVerb)
+
+`FX Type` 10. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `SPD` | Speed | Speed | continuous |  | 0.0 to 4.0 Hz | yes | Adjusts the rate of the chorus. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `DEP` | Depth | Depth | continuous |  | 0.0 to 100 % | yes | Adjusts the modulation depth of the chorus. |
+| 3 | `DLY` | Delay | Delay | continuous |  | 0.5 to 50.0 ms |  | Adjusts the delay of the chorus. |
+| 4 | `PHS` | Phase | Phase | continuous |  | 0.0 to 180.0 | yes | Offsets the phase between the left and right channels. |
+| 5 | `WAV` | Wave | Wave | continuous |  | 0.0 to 100 % |  | Adjusts the LFO waveform from a sine wave to triangular wave. |
+| 6 | `BAL` | Balance | Balance | continuous |  | -100.0 to 100.0 | yes | Adjusts the balance between chorus and reverb. |
+| 7 | `PRE` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 8 | `DCY` | Decay | Decay | continuous |  | 0.1 to 5.0 s | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 9 | `SIZ` | Size | Size | continuous |  | 2.0 to 200.0 |  | Controls how large or small the simulated space is. |
+| 10 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Determines the decay of high frequencies within the reverb tail. |
+| 11 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Excludes low frequencies below the value . |
+| 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+
+<a id="fx-11"></a>
+
+#### Delay and Reverb (DelayVerb)
+
+`FX Type` 11. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `TIM` | Time | Time | continuous |  | 1.0 to 1500.0 ms |  | Adjusts the delay time for the left channel delay. Time sync options from 4 to 1/64 bars. |
+| 2 | `PAT` | Pattern | Delay Pattern | selector |  | 1/4, 1X |  | Sets the delay ratio for the right channel delay. |
+| 3 | `FHC` | FeedHC | Feedback High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Trims high frequencies from the feedback. |
+| 4 | `FBK` | Feedback | Feedback | continuous |  | 0.0 to 100 % | yes | Controls the percentage of feedback. |
+| 5 | `XFD` | X-Feed | Cross-Feedback | continuous |  | 0.0 to 100 % | yes | Control the amount of delay sound sent to the reverb effect. |
+| 6 | `BAL` | Balance | Balance | continuous |  | -100.0 to 100.0 | yes | Adjusts the ratio between delay and reverb. |
+| 7 | `PRE` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 8 | `DCY` | Decay | Decay | continuous |  | 0.1 to 5.0 s | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 9 | `SIZ` | Size | Size | continuous |  | 2.0 to 200.0 |  | Controls how large or small the simulated space is. |
+| 10 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Determines the decay of high frequencies within the reverb tail. |
+| 11 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Excludes low frequencies below the value . |
+| 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+
+<a id="fx-12"></a>
+
+#### Flanger and Reverb (FlangVerb)
+
+`FX Type` 12. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `SPD` | Speed | Speed | continuous |  | 0.0 to 4.0 Hz | yes | Adjusts the rate of the flanger. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `DEP` | Depth | Depth | continuous |  | 0.0 to 100 % | yes | Adjusts the modulation depth of the flanger. |
+| 3 | `DLY` | Delay | Delay | continuous |  | 0.5 to 20.0 ms |  | Adjusts the delay of the flanger. |
+| 4 | `PHS` | Phase | Phase | continuous |  | 0.0 to 180.0 | yes | Offsets the phase between the left and right channels. |
+| 5 | `FBK` | Feed | Feedback | continuous |  | -90.0 to 90.0 % | yes | Controls the percentage of positive or negative feedback. |
+| 6 | `BAL` | Balance | Balance | continuous |  | -100.0 to 100.0 | yes | Adjusts the balance between flanger and reverb. |
+| 7 | `PRE` | PreDelay | Pre-Delay | continuous |  | 0.0 to 200.0 ms |  | Controls the amount of time before the reverb is heard following the source signal. |
+| 8 | `DCY` | Decay | Decay | continuous |  | 0.1 to 5.0 s | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 9 | `SIZ` | Size | Size | continuous |  | 2.0 to 200.0 |  | Controls how large or small the simulated space is. |
+| 10 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Determines the decay of high frequencies within the reverb tail. |
+| 11 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Excludes low frequencies below the value . |
+| 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+
+<a id="fx-13"></a>
+
+#### Midas Equaliser (MidasEQ)
+
+`FX Type` 13. 11 slots, shown as rows of 6 and 5.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `LSG` | LoShelfGain | Low Shelf Gain | continuous | low | -12.0 to 12.0 dB | yes | Adjusts the gain of the low band. |
+| 2 | `LSF` | LoShelfFreq | Low Shelf Frequency | continuous | low | 30.0 to 20000.0 Hz | yes | Adjusts the frequency of the low band. |
+| 3 | `LMG` | LoMidGain | Low-Mid Gain | continuous | low-mid | -12.0 to 12.0 dB | yes | Adjusts the gain of the low-mid band. |
+| 4 | `LMF` | LoMidFreq | Low-Mid Frequency | continuous | low-mid | 30.0 to 20000.0 Hz | yes | Adjusts the frequency of the low-mid band. |
+| 5 | `LMQ` | LoMidQ | Low-Mid Q | continuous | low-mid | 0.3 to 5.0 | yes | Adjusts the Q-factor of the low-mid band. |
+| 6 | `HMG` | HiMidGain | High-Mid Gain | continuous | high-mid | -12.0 to 12.0 dB | yes | Adjusts the gain of the high-mid band. |
+| 7 | `HMF` | HiMidFreq | High-Mid Frequency | continuous | high-mid | 30.0 to 20000.0 Hz | yes | Adjusts the frequency of the high- mid band. |
+| 8 | `HMQ` | HiMidQ | High-Mid Q | continuous | high-mid | 0.3 to 5.0 | yes | Adjusts the Q-factor of the high-mid band. |
+| 9 | `HSG` | HiShelfGain | High Shelf Gain | continuous | high | -12.0 to 12.0 dB | yes | Adjusts the gain of the high band. |
+| 10 | `HSF` | HiShelfFreq | High Shelf Frequency | continuous | high | 30.0 to 20000.0 Hz | yes | Adjusts the frequency of the high band. |
+| 11 | `EQ` | EQ | EQ In or Out | switch |  | IN, OUT | yes | INOUTAdjusts the frequency of the high band. |
+
+<a id="fx-14"></a>
+
+#### Enhancing EQ (Enhancer)
+
+`FX Type` 14. 9 slots, shown as rows of 6 and 3.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `OGN` | OutGain | Output Gain | continuous |  | -12.0 to 12.0 dB | yes | Compensates for changes in level resulting from the effect. |
+| 2 | `SPR` | Spread | Spread | continuous |  | 0.0 to 100 % | yes | Emphasizes the stereo content for a wider mix . |
+| 3 | `BGN` | BassGain | Bass Gain | continuous | low | 0.0 to 100 % | yes | Adjusts the gain of the bass band. |
+| 4 | `BFR` | BassFreq | Bass Frequency | continuous | low | 1.0 to 50.0 | yes | Adjusts the frequency of the bass band. |
+| 5 | `MGN` | MidGain | Mid Gain | continuous | mid | 0.0 to 100 % | yes | Adjusts the gain of the mid band. |
+| 6 | `MIQ` | MidQ | Mid Q | continuous | mid | 1.0 to 50.0 | yes | Adjusts the Q-factor of the mid band. |
+| 7 | `HIG` | HiGain | High Gain | continuous | high | 0.0 to 100 % | yes | Adjusts the gain of the high band. |
+| 8 | `HIF` | HiFreq | High Frequency | continuous | high | 1.0 to 50.0 | yes | Adjusts the frequency of the high band. |
+| 9 | `SOL` | Solo | Solo | switch |  | OFF, ON |  | Solo mode - used to isolate only the audio resulting from the effect. |
+
+<a id="fx-15"></a>
+
+#### Compressor (FairComp)
+
+`FX Type` 15. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `MOD` | Mode | Mode | selector |  | Off, Stereo, Dual, M/S |  | Mode of operation: Off, Stereo, Dual, M/S (Mid/Side). |
+| 2 | `INL` | InGain L/M | Input Gain, left/mid | continuous | left-mid | -20.0 to 0.0 | yes | Controls the input gain for the Left/Mid signal. |
+| 3 | `THL` | Thresh L/M | Threshold, left/mid | continuous | left-mid | 0.0 to 10.0 | yes | Controls the threshold for the Left/Mid signal. |
+| 4 | `TML` | Time L/M | Time, left/mid | continuous | left-mid | 1.0 to 6.0 |  | Controls the attack and release time for the Left/Mid channel. |
+| 5 | `DCL` | DC Bias L/M | DC Bias, left/mid | continuous | left-mid | 0.0 to 100 % | yes | Adjust the ratio and knee of the compression curve for the Left/Mid signal. |
+| 6 | `OGL` | OutGain L/M | Output Gain, left/mid | continuous | left-mid | -18.0 to 6.0 dB | yes | Controls the output gain for the Left/Mid signal. |
+| 7 | `BAL` | Bias Bal | Bias Balance | continuous |  | -100.0 to 100 % | yes | Adjust the bias current, creating accentuation of attacks |
+| 8 | `INR` | InGain R/S | Input Gain, right/side | continuous | right-side | -20.0 to 0.0 | yes | Controls the input gain for the Right/Side signal. |
+| 9 | `THR` | Thresh R/S | Threshold, right/side | continuous | right-side | 0.0 to 10.0 | yes | Controls the threshold for the Right/Side signal. |
+| 10 | `TMR` | Time R/S | Time, right/side | continuous | right-side | 1.0 to 6.0 |  | Controls the attack and release time for the Right/Side channel. |
+| 11 | `DCR` | DC Bias R/S | DC Bias, right/side | continuous | right-side | 0.0 to 100 % | yes | Adjust the ratio and knee of the compression curve for the Right/Side signal. |
+| 12 | `OGR` | OutGain R/S | Output Gain, right/side | continuous | right-side | -18.0 to 6.0 dB | yes | Controls the output gain for the Right/Side signal. |
+
+<a id="fx-16"></a>
+
+#### Multiband Distortion (MulBndDist)
+
+`FX Type` 16. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `IPG` | InputGain | Input Gain | continuous |  | -24.0 to 24.0 dB | yes | Controls the amount of input gain applied to the signal. |
+| 2 | `DST` | Dist Types | Distortion Type | selector |  | VAL, SAT, TUB, PFV, PFS, PFT |  | Distortion Type: VAL(Valve), SAT(Saturation), TUB (Tube), & Post Filter variants (PFV/PFS/PFT). |
+| 3 | `LBL` | Low Level | Low Band Level | continuous | low | -12.0 to 12.0 dB | yes | Controls the level of the frequencies below XoverFreq 1. |
+| 4 | `LDR` | Low Drive | Low Band Drive | continuous | low | 0.0 to 100 % | yes | Controls the percentage of distortion introduced below XoverFreq 1. |
+| 5 | `XV1` | Xover Freq 1 | Crossover Frequency 1 | continuous |  | 30.0 to 9000.0 Hz | yes | Sets the lower cross over frequency. |
+| 6 | `MBL` | Mid Level | Mid Band Level | continuous | mid | -12.0 to 12.0 dB | yes | Controls the level of the frequencies between Xover1 Freq and Xover2 Freq. |
+| 7 | `MDR` | Mid Drive | Mid Band Drive | continuous | mid | 0.0 to 100 % | yes | Controls the percentage of distortion introduced between Xover1 Freq and Xover2 Freq. |
+| 8 | `XV2` | Xover Freq 2 | Crossover Frequency 2 | continuous |  | 30.0 to 9000.0 Hz | yes | Sets the upper cross over frequency. |
+| 9 | `HBL` | High Level | High Band Level | continuous | high | -12.0 to 12.0 dB | yes | Controls the level of the frequencies below XoverFreq 2. |
+| 10 | `HDR` | High Drive | High Band Drive | continuous | high | 0.0 to 100 % | yes | Controls the percentage of distortion introduced above XoverFreq 2. |
+| 11 | `CAB` | Cabinet | Cabinet | selector |  | OFF, VTw, VBs, A10, Mid, BFC, B60, V30, S78, Oax, Ac1, Ac2 |  | Cabinet Type: OFF, VTw, VBs, A10, Mid, BFC, B60, V30, S78, Oax, A12, Rck. (See Table Above). |
+| 12 | `OPG` | OutputGain | Output Gain | continuous |  | -12.0 to 12.0 dB | yes | Controls the amount of output gain applied to the signal. |
+
+<a id="fx-17"></a>
+
+#### Rack Amplifier (RackAmp)
+
+`FX Type` 17. 9 slots, shown as rows of 6 and 3.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `PRE` | PreAmp | Pre-Amp | continuous |  | 0.0 to 10.0 | yes | Adjusts the amount of input gain prior to the band-specific distortion adjustment. |
+| 2 | `BUZ` | Buzz | Buzz | continuous |  | 0.0 to 10.0 | yes | Adjusts the amount of low-end breakup. |
+| 3 | `PNC` | Punch | Punch | continuous |  | 0.0 to 10.0 | yes | Adjusts the amount of midrange distortion. |
+| 4 | `CRN` | Crunch | Crunch | continuous |  | 0.0 to 10.0 | yes | Tailors the high-frequency content and distortion for smooth or cutting notes. |
+| 5 | `DRV` | Drive | Drive | continuous |  | 0.0 to 10.0 | yes | Emulates the amount of power amp distortion from a tube amp. |
+| 6 | `LVL` | Level | Level | continuous |  | 0.0 to 10.0 | yes | Controls the overall output level. |
+| 7 | `LOW` | Low | Low Tone | continuous |  | 0.0 to 10.0 | yes | EQ adjustment of the low frequencies, independent of distortion content. |
+| 8 | `HI` | High | High Tone | continuous |  | 0.0 to 10.0 | yes | EQ adjustment of the high frequencies, independent of distortion content. |
+| 9 | `CAB` | Cabinet | Cabinet | switch |  | OFF to ON |  | Turns the cabinet simulation on or off. |
+
+<a id="fx-18"></a>
+
+#### Stereo Imaging (EdisonEX1)
+
+`FX Type` 18. 8 slots, shown as rows of 6 and 2.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `ON` | On | On or Off | switch |  | OFF to ON |  | Allows the effect to be turned On or Off. |
+| 2 | `IMD` | InMode | Input Mode | selector |  | ST, M/S |  | STM/SControls the input mode (Stereo or Mid/Side). |
+| 3 | `OMD` | OutMode | Output Mode | selector |  | ST, M/S |  | STM/SControls the output mode (Stereo or Mid/Side). |
+| 4 | `STS` | StSpread | Stereo Spread | continuous |  | -50.0 to 50.0 | yes | Controls the spread of the stereo field. |
+| 5 | `LMF` | LMF Spread | Low-Mid Frequency Spread | continuous |  | -50.0 to 50.0 | yes | Controls the spread of the stereo field for low/mid frequencies only. |
+| 6 | `BAL` | Balance | Balance | continuous |  | -50.0 to 50.0 | yes | Adjusts the ratio of mono to stereo content. |
+| 7 | `CNT` | CntrDist | Centre Distance | continuous |  | -50.0 to 50.0 | yes | Allows the mono content to be panned. |
+| 8 | `GN` | Gain | Gain | continuous |  | -12.0 to 12.0 dB | yes | Controls the amount of output gain applied to the signal. |
+
+<a id="fx-19"></a>
+
+#### Auto Panning (Auto Pan)
+
+`FX Type` 19. 9 slots, shown as rows of 6 and 3.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `SPD` | Speed | Speed | continuous |  | 0.0 to 5.0 Hz | yes | Adjusts the LFO rate. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `PHS` | Phase | Phase | continuous |  | 0.0 to 180.0 | yes | Controls the LFO phase difference between the left and right channels. |
+| 3 | `WAV` | Wave | Wave | continuous |  | -50.0 to 50.0 | yes | Blends the LFO waveform between triangular and square shape. |
+| 4 | `DEP` | Depth | Depth | continuous |  | 0.0 to 100 % | yes | Controls the depth (amount) of modulation. |
+| 5 | `ESP` | EnvSpd | Envelope Speed | continuous |  | 0.0 to 100 % | yes | Adjusts how much the LFO speed is modulated by the envelope. |
+| 6 | `EDP` | EnvDepth | Envelope Depth | continuous |  | 0.0 to 100 % | yes | Adjusts the depth of the envelope modulation. |
+| 7 | `ATK` | Attack | Attack | continuous |  | 10.0 to 1000.0 ms | yes | Controls the envelope attack stage time. |
+| 8 | `HLD` | Hold | Hold | continuous |  | 1.0 to 2000.0 ms | yes | Controls the envelope hold stage time. |
+| 9 | `REL` | Release | Release | continuous |  | 10.0 to 1000.0 ms | yes | Controls the envelope release stage time. |
+
+<a id="fx-20"></a>
+
+#### Noise Gate (NoiseGate)
+
+`FX Type` 20. 8 slots, shown as rows of 6 and 2.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `THR` | Threshold | Threshold | continuous |  | -50.0 to 0.0 dB | yes | Sets signal level at which gate opens. |
+| 2 | `RNG` | Range | Range | continuous |  | -100.0 to 0.0 dB | yes | Control adjusts the amount of gain reduction applied to the signal below threshold. |
+| 3 | `ATT` | Attack | Attack | continuous |  | 0.0 to 20.0 ms | yes | Adjusts time taken for gate to open after an over-threshold signal. |
+| 4 | `REL` | Release | Release | continuous |  | 2.0 to 1999.9 ms | yes | Adjusts time taken for gate to close after programme material falls back below threshold. |
+| 5 | `HLD` | Hold | Hold | continuous |  | 2.0 to 1999.9 ms | yes | This defines a waiting period before the gate starts to close. |
+| 6 | `PUN` | Punch | Punch | continuous |  | -6.0 to 6.0 | yes | Used to increase tonal shaping or reduce gated breathing/delay/resonant howl-round. |
+| 7 | `MOD` | Mode | Mode | selector |  | GAT, TRN, DUC |  | GAT (Gate), TRN (Transient Gate), DUC (Ducker). |
+| 8 | `PWR` | Power | Power | continuous |  | ON to OFF |  | Enables gate in the signal path. When switched off, gate is bypassed. |
+
+<a id="fx-21"></a>
+
+#### Stereo Delay (Delay)
+
+`FX Type` 21. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 2 | `TIM` | Time | Time | continuous |  | 1.0 to 1500.0 ms |  | Adjusts the master delay time. Time synchronised options from 4 to 1/64 bars. |
+| 3 | `MOD` | Mode | Mode | selector |  | ST, X, M, P-P |  | ST- Stereo feedback, X - crosses feedback between channels, M - Mono mix in feedback chain. P-P - Ping Pong (Note that Feedback-R (FBR) is disabled in this mode. |
+| 4 | `FCL` | FactorL | Delay Factor, left | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Sets left delay to rhythmic fractions of the master delay. |
+| 5 | `FCR` | FactorR | Delay Factor, right | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Sets right delay to rhythmic fractions of the master delay. |
+| 6 | `OFS` | Offset | Offset | continuous |  | -100.0 to 100.0 ms |  | Adds a delay difference between the left and right delayed signals. |
+| 7 | `LC` | LC | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Adjusts the low frequency cut, allowing lower frequencies to remain unaffected by the delay. |
+| 8 | `HC` | HC | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Adjusts the high frequency cut, allowing higher frequencies to remain unaffected by the delay. |
+| 9 | `FLC` | FeedLC | Feedback Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Adjusts the low cut filter frequency in the feedback paths. |
+| 10 | `FBL` | FeedL | Feedback, left | continuous |  | 0.0 to 100 % | yes | Control the amount of feedback for the left channel. |
+| 11 | `FBR` | FeedR | Feedback, right | continuous |  | 0.0 to 100 % | yes | Control the amount of feedback for the right channel. |
+| 12 | `FHC` | FeedHC | Feedback High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Adjusts the high cut filter frequency in the feedback paths. |
+
+<a id="fx-22"></a>
+
+#### 3-Tap Delay (3TapDelay)
+
+`FX Type` 22. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `TIM` | Time | Time | continuous |  | 1.0 to 1500.0 ms |  | Sets the master delay time, and the first stage. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `GNT` | GainT | Tap T Gain | continuous |  | 0.0 to 100 % | yes | Sets the gain level of the first stage of the delay. |
+| 3 | `PNT` | PanT | Tap T Pan | continuous |  | -100 to 100 % | yes | Sets the position of the first delay stage in the stereo field. |
+| 4 | `FBK` | Feedback | Feedback | continuous |  | 0.0 to 100 % | yes | Adjusts the amount of feedback. |
+| 5 | `FCA` | FactorA | Tap A Delay Factor | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Controls the delay time in the second stage of the delay. |
+| 6 | `GNA` | GainA | Tap A Gain | continuous |  | 0.0 to 100 % | yes | Controls the gain level of the second delay stage. |
+| 7 | `PNA` | PanA | Tap A Pan | continuous |  | -100 to 100 % | yes | Sets the position of the second delay stage in the stereo field. |
+| 8 | `FCB` | FactorB | Tap B Delay Factor | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Controls the delay time in the third stage of the delay. |
+| 9 | `GNB` | GainB | Tap B Gain | continuous |  | 0.0 to 100 % | yes | Controls the gain level of the third delay stage. |
+| 10 | `PNB` | PanB | Tap B Pan | continuous |  | -100 to 100 % | yes | Sets the position of the third gain stage in the stereo field. |
+| 11 | `XFD` | X-Feed | Cross-Feedback | switch |  | OFF to ON |  | Turns the stereo cross-feedback of the delays On or Off . |
+| 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+
+<a id="fx-23"></a>
+
+#### 4-Tap Delay (4TapDelay)
+
+`FX Type` 23. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `TIM` | Time | Time | continuous |  | 1.0 to 1500.0 ms |  | Sets the master delay time, and the first stage. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `GN` | Gain | Gain | continuous |  | 0.0 to 100 % | yes | Sets the gain level of the first stage of the delay. |
+| 3 | `FBK` | Feedback | Feedback | continuous |  | 0.0 to 100 % | yes | Adjusts the amount of feedback. |
+| 4 | `SPR` | Spread | Spread | continuous |  | 0.0 to 6.0 |  | Positions the first delay stage in the stereo field. |
+| 5 | `FCA` | FactorA | Tap A Delay Factor | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Controls the delay time in the second stage of the delay. |
+| 6 | `GNA` | GainA | Tap A Gain | continuous |  | 0.0 to 100 % | yes | Controls the gain level of the second delay stage. |
+| 7 | `FCB` | FactorB | Tap B Delay Factor | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Controls the delay time in the third stage of the delay. |
+| 8 | `GNB` | GainB | Tap B Gain | continuous |  | 0.0 to 100 % | yes | Controls the gain level of the third delay stage. |
+| 9 | `FCC` | FactorC | Tap C Delay Factor | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Controls the delay time in the fourth stage of the delay. |
+| 10 | `GNC` | GainC | Tap C Gain | continuous |  | 0.0 to 100 % | yes | Controls the gain level of the fourth delay stage . |
+| 11 | `XFD` | X-Feed | Cross-Feedback | continuous |  | 0.0 to 1.0 |  | Turns the stereo cross-feedback of the delays On or Off. |
+| 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+
+<a id="fx-24"></a>
+
+#### Tel-Ray Delay (T-RayDelay)
+
+`FX Type` 24. 5 slots, shown as one row of 5.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 2 | `DLY` | Delay | Delay | continuous |  | 0.0 to 100 % | yes | Adjusts the master delay time. |
+| 3 | `SUS` | Sustain | Sustain | continuous |  | 0.0 to 100 % | yes | Controls how long the delay is sustained for. Warning at 100% build up will occur. |
+| 4 | `WOB` | Wobble | Wobble | continuous |  | 0.0 to 100 % | yes | Adjusts the amount of wobble caused by age and quality of build/materials. |
+| 5 | `TON` | Tone | Tone | continuous |  | 0.0 to 100 % | yes | Controls the tone of the delays. |
+
+<a id="fx-25"></a>
+
+#### Decimator Delay (DecimDelay)
+
+`FX Type` 25. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `MIX` | Mix | Mix | continuous |  | 0.00 to 100.00 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 2 | `TIM` | Time M | Master Time | continuous |  | 1.0 to 1500.0 ms |  | Adjusts the master delay time. Time synchronized options from 4 to 1/64 bars. |
+| 3 | `DSM` | Downsample | Downsample | continuous |  | 0.00 to 100.00 % | yes | Decimates the signal by reducing the sampling frequency. |
+| 4 | `FCL` | FactorL | Delay Factor, left | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Sets left delay to rhythmic fractions of the master delay. |
+| 5 | `FCR` | FactorR | Delay Factor, right | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Sets right delay to rhythmic fractions of the master delay. |
+| 6 | `BRC` | Bit-Reduce | Bit Depth | continuous |  | 24 to 1. Counts down: 24 bits at the minimum, 1 bit at the maximum. |  | Decimates the signal by reducing the bit-depth. |
+| 7 | `FC` | Cutoff | Cutoff Frequency | continuous |  | 30.0 to 20000.0 Hz | yes | Adjust the cutoff frequency of the filter, allowing specific frequencies to be affected by the delay. |
+| 8 | `RES` | Resonance | Resonance | continuous |  | 0.00 to 100.00 % | yes | Adjusts the resonance of the filter. |
+| 9 | `FLT` | Type | Type | selector |  | Lowpass, Highpass, Bandpass, Notch |  |  |
+| 10 | `FBL` | FeedL | Feedback, left | continuous |  | 0.00 to 100.00 % | yes | Controls the amount of feedback for the left channel. |
+| 11 | `FBR` | FeedR | Feedback, right | continuous |  | 0.00 to 100.00 % | yes | Controls the amount of feedback for the right channel. |
+| 12 | `DMT` | Decimate | Decimation Point | switch |  | PRE, POST |  | It sets the decimation on the input signal (PRE) or only on the delay (POST). |
+
+<a id="fx-26"></a>
+
+#### Modulation, Delay and Reverb (ModDlyRev)
+
+`FX Type` 26. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `TIM` | Time | Time | continuous |  | 1.0 to 1500.0 ms |  | Sets the master delay time. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `FAC` | Factor | Delay Factor | selector |  | 1/4, 1/3, 1/2, 2/3, 3/4, 1, 4/3, 3/2, 2, 3 |  | Sets the delay to rhythmic fractions. |
+| 3 | `FBK` | Feedback | Feedback | continuous |  | 0.0 to 100 % | yes | Controls the percentage of positive feedback. |
+| 4 | `FHC` | FeedHC | Feedback High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Adjusts the high cut filter frequency in the feedback path. |
+| 5 | `DEP` | Depth | Depth | continuous |  | 0.0 to 100 % | yes | Controls the depth (amount) of modulation. |
+| 6 | `SPD` | Speed | Speed | continuous |  | 0.0 to 10.0 Hz | yes | Adjusts the rate of the modulation. Time synchronised options from 4 to 1/64 bars. |
+| 7 | `MOD` | Mode | Mode | selector |  | PAR, SER |  | PARSERControls the processor chain routing (Serial/Parallel) |
+| 8 | `RTY` | Rtype | Reverb Type | selector |  | AMB, CLUB, HALL |  | Reverb Type can be set to AMB (Ambience), CLUB, or HALL. |
+| 9 | `DCY` | Decay | Decay | continuous |  | 1.0 to 10.0 | yes | Controls the amount of time it takes for the reverb to dissipate. |
+| 10 | `DMP` | Damping | Damping | continuous |  | 1000 to 20000 Hz | yes | Determines the decay of high frequencies within the reverb tail. |
+| 11 | `BAL` | Balance | Balance | continuous |  | -100.0 to 100.0 | yes | Adjusts ratio of the delay signal to the reverb signal. |
+| 12 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals |
+
+<a id="fx-27"></a>
+
+#### Stereo Chorus (Chorus)
+
+`FX Type` 27. 11 slots, shown as rows of 6 and 5.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `SPD` | Speed | Speed | continuous |  | 0.0 to 5 Hz | yes | Sets the modulation speed. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `WDL` | WidthL | Width, left | continuous |  | 0.0 to 100 % | yes | Determines the amount of modulated delay in the left channel. |
+| 3 | `WDR` | WidthR | Width, right | continuous |  | 0.0 to 100 % | yes | Determines the amount of modulated delay in the right channel. |
+| 4 | `DLL` | DelayL | Delay, left | continuous |  | 0.5 to 50.0 ms |  | Sets the total amount of delay for the left channel. |
+| 5 | `DLR` | DelayR | Delay, right | continuous |  | 0.5 to 50.0 ms |  | Sets the total amount of delay for the right channel. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies in the signal to be reduced. |
+| 8 | `HC` | Hi Cut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies in the signal to be reduced. |
+| 9 | `PHS` | Phase | Phase | continuous |  | 0.0 to 100.0 |  | Adjusts the phase offset of the LFO between left and right channel. |
+| 10 | `WAV` | Wave | Wave | continuous |  | 0.0 to 100 % |  | Blends between the digital triangular chorus sound and the classic analog sine wave. |
+| 11 | `SPR` | Spread | Spread | continuous |  | 0.0 to 100 % | yes | Adjusts how much of the left channel is mixed into the right and vice versa. |
+
+<a id="fx-28"></a>
+
+#### Dimensional Chorus (Chorus-D)
+
+`FX Type` 28. 7 slots, shown as rows of 6 and 1.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `ON` | On | On or Off | switch |  | OFF to ON |  | Allows the effect to be turned On or Off. |
+| 2 | `MOD` | Mode | Mode | selector |  | M, ST |  | MSTSwitches the operation between Mono and Stereo modes. |
+| 3 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 4 | `SW1` | Sw1 | Switch 1 | switch | channel-1 | OFF to ON |  | Engages level one intensity (minimum). |
+| 5 | `SW2` | Sw2 | Switch 2 | switch | channel-2 | OFF to ON |  | Engages level two intensity. |
+| 6 | `SW3` | Sw3 | Switch 3 | switch |  | OFF to ON |  | Engages level three intensity. |
+| 7 | `SW4` | Sw4 | Switch 4 | switch |  | OFF to ON |  | Engages level four intensity (maximum). |
+
+<a id="fx-29"></a>
+
+#### Stereo Flanger (Flanger)
+
+`FX Type` 29. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `SPD` | Speed | Speed | continuous |  | 0.0 to 5 Hz | yes | Sets the modulation speed. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `WDL` | WidthL | Width, left | continuous |  | 0.0 to 100 % | yes | Determines the amount of modulated delay in the left channel. |
+| 3 | `WDR` | WidthR | Width, right | continuous |  | 0.0 to 100 % | yes | Determines the amount of modulated delay in the right channel. |
+| 4 | `DLL` | DelayL | Delay, left | continuous |  | 0.5 to 20.0 ms |  | Sets the total amount of delay for the left channel. |
+| 5 | `DLR` | DelayR | Delay, right | continuous |  | 0.5 to 20.0 ms |  | Sets the total amount of delay for the right channel. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `LC` | LoCut | Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Allows the low frequencies in the signal to be reduced. |
+| 8 | `HC` | Hi Cut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies in the signal to be reduced. |
+| 9 | `PHS` | Phase | Phase | continuous |  | 0.0 to 180.0 |  | Adjusts the phase offset of the LFO between left and right channel. |
+| 10 | `FLC` | FeedLC | Feedback Low Cut | continuous |  | 10.0 to 500.0 Hz | yes | Adjusts the low cut filter frequency in the feedback path. |
+| 11 | `FHC` | FeedHC | Feedback High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Adjusts the high cut filter frequency in the feedback path. |
+| 12 | `FD` | Feed | Feedback | continuous |  | -90.0 to 90.0 % | yes | Controls the percentage of positive or negative feedback. |
+
+<a id="fx-30"></a>
+
+#### Stereo Phaser (Phaser)
+
+`FX Type` 30. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `SPD` | Speed | Speed | continuous |  | 0.0 to 5 Hz | yes | Sets the modulation speed. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `DEP` | Depth | Depth | continuous |  | 0.0 to 100 % | yes | Controls the depth (amount) of modulation. |
+| 3 | `RES` | Reso | Resonance | continuous |  | 0.0 to 100 % | yes | Adjusts the resonance of the multiple filter stages. |
+| 4 | `BAS` | Base Freq | Base Frequency | continuous |  | 20 to 15000 Hz | yes | Adjusts the frequency range of the modulated filters. |
+| 5 | `STG` | Stages | Stages | continuous |  | 2.0 to 12.0 |  | Controls how many filter stages are used. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `WAV` | Wave | Wave | continuous |  | -50.0 to 50.0 |  | Shapes the symmetry of the LFO waveform. |
+| 8 | `PHS` | Phase | Phase | continuous |  | 0.0 to 180.0 deg |  | Adjusts the LFO phase difference between the left and right channel |
+| 9 | `ENV` | EnvMod | Envelope Modulation | continuous |  | -100.0 to 100 % | yes | Adjusts the level of positive or negative envelope modulation. |
+| 10 | `ATK` | Attack | Attack | continuous |  | 10.0 to 1000.0 ms | yes | Controls the envelope attack stage time . |
+| 11 | `HLD` | Hold | Hold | continuous |  | 1.0 to 2000.0 ms | yes | Controls the envelope hold stage time. |
+| 12 | `REL` | Release | Release | continuous |  | 10.0 to 1000.0 ms | yes | Controls the envelope release stage time. |
+
+<a id="fx-31"></a>
+
+#### Moog-Type Filter (MoodFilter)
+
+`FX Type` 31. 11 slots, shown as rows of 6 and 5.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `SPD` | Speed | Speed | continuous |  | 0.0 to 20.0 Hz |  | Sets the modulation speed. Time synchronised options from 4 to 1/64 bars. |
+| 2 | `DEP` | Depth | Depth | continuous |  | 0.0 to 100 % | yes | Controls the depth (amount) of modulation. |
+| 3 | `RES` | Resonance | Resonance | continuous |  | 0.0 to 100 % | yes | Adjusts the resonance of the filter. |
+| 4 | `FRQ` | Base Freq | Base Frequency | continuous |  | 20 to 15000 Hz | yes | Adjusts the level of positive or negative envelope modulation. |
+| 5 | `TYP` | Type | Type | selector |  | LP, HP, BP |  | Selects between low pass (LP), high-pass (HP), band- pass (BP) and Notch (NOT). |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `WAV` | Wave | Wave | selector |  | Triangle, Sine, Saw Up, Saw Down, Square, Random, Envelope |  | Selects modulation waveform Triangular, Sine, Saw Up, Saw Down, Ramp, Square or Random. |
+| 8 | `ENV` | EnvMod | Envelope Modulation | continuous |  | -100.0 to 100 % | yes | Adjusts the level of positive or negative envelope modulation. |
+| 9 | `ATK` | Attack | Attack | continuous |  | 10.0 to 249.9 ms | yes | Controls the filter attack time. |
+| 10 | `REL` | Release | Release | continuous |  | 10.0 to 500.0 ms | yes | Controls the filter release time. |
+| 11 | `DRV` | Drive | Drive | continuous |  | 0.0 to 100 % | yes | Adjusts the level, also introduces an overdrive effect if pushed hard. 124P4-Pole--2P 4P100.0Adjusts the slope of the filter from 2-pole to 4-pole (steeper). |
+
+<a id="fx-32"></a>
+
+#### Dual Pitch Shifter (DualPitch)
+
+`FX Type` 32. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `SM1` | Semi1 | Semitones, channel 1 | continuous | channel-1 | -12.0 to 12.0 | yes | Adjusts the pitch of the first channel in semi-tones. |
+| 2 | `CN1` | Cent1 | Cents, channel 1 | continuous | channel-1 | -50.0 to 50.0 | yes | Adjusts the pitch of the first channel in cents. |
+| 3 | `DL1` | Delay1 | Delay, channel 1 | continuous | channel-1 | 1.0 to 500.0 ms |  | Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars. |
+| 4 | `GN1` | Gain1 | Gain, channel 1 | continuous | channel-1 | 0.0 to 100 % | yes | Allows gain compensation to be applied to the first channel. |
+| 5 | `PN1` | Pan1 | Pan, channel 1 | continuous | channel-1 | -100.0 to 100 % | yes | Allows panning of the first channel. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `SM2` | Semi2 | Semitones, channel 2 | continuous | channel-2 | -12.0 to 12.0 | yes | Adjusts the pitch of the second channel in semi-tones. |
+| 8 | `CN2` | Cent2 | Cents, channel 2 | continuous | channel-2 | -50.0 to 50.0 | yes | Adjusts the pitch of the second channel in cents . |
+| 9 | `DL2` | Delay2 | Delay, channel 2 | continuous | channel-2 | 1.0 to 500.0 ms |  | Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars. |
+| 10 | `GN2` | Gain2 | Gain, channel 2 | continuous | channel-2 | 0.0 to 100 % | yes | Allows gain compensation to be applied to the second channel. |
+| 11 | `PN2` | Pan2 | Pan, channel 2 | continuous | channel-2 | -100.0 to 100 % | yes | Allows panning of the second channel. |
+| 12 | `HIC` | HiCut | High Cut | continuous |  | 200.0 to 20000.0 Hz | yes | Allows the high frequencies affected by the pitch shifting to be reduced. |
+
+<a id="fx-33"></a>
+
+#### Dual Pitch Shifter (Vintage Pitch)
+
+`FX Type` 33. 12 slots, shown as rows of 6 and 6.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `SM1` | Semi1 | Semitones, channel 1 | continuous | channel-1 | -12.0 to 12.0 | yes | Adjusts the pitch of the first channel in semi-tones. |
+| 2 | `CN1` | Cent1 | Cents, channel 1 | continuous | channel-1 | -50.0 to 50.0 | yes | Adjusts the pitch of the first channel in cents. |
+| 3 | `DL1` | Delay1 | Delay, channel 1 | continuous | channel-1 | 1.0 to 500.0 ms |  | Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars. |
+| 4 | `FB1` | Feedback1 | Feedback, channel 1 | continuous | channel-1 | 0.0 to 100 % | yes | Allows feedback to be applied to the first channel. |
+| 5 | `PN1` | Pan1 | Pan, channel 1 | continuous | channel-1 | -100.0 to 100 % | yes | Allows panning of the first channel. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `SM2` | Semi2 | Semitones, channel 2 | continuous | channel-2 | -12.0 to 12.0 | yes | Adjusts the pitch of the second channel in semi-tones. |
+| 8 | `CN2` | Cent2 | Cents, channel 2 | continuous | channel-2 | -50.0 to 50.0 | yes | Adjusts the pitch of the second channel in cents . |
+| 9 | `DL2` | Delay2 | Delay, channel 2 | continuous | channel-2 | 1.0 to 500.0 ms |  | Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars. |
+| 10 | `FB2` | Feedback2 | Feedback, channel 2 | continuous | channel-2 | 0.0 to 100 % | yes | Allows feedback to be applied to the second channel. |
+| 11 | `PN2` | Pan2 | Pan, channel 2 | continuous | channel-2 | -100.0 to 100 % | yes | Allows panning of the second channel. |
+| 12 | `HIC` | HiCut | High Cut | continuous |  | 2000 to 20000 k Hz | yes | Allows the high frequencies affected by the pitch shifting to be reduced. |
+
+<a id="fx-34"></a>
+
+#### Rotary Speaker (RotarySpkr)
+
+`FX Type` 34. 8 slots, shown as rows of 6 and 2.
+
+| Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `LOS` | LoSpeed | Low Speed | continuous |  | 0.1 to 4.0 Hz | yes | Adjusts the rotational speed when the Low Speed operation is selected. |
+| 2 | `HIS` | HiSpeed | High Speed | continuous |  | 2.0 to 9.9 Hz | yes | Adjusts the rotational speed when the High Speed operation is selected. |
+| 3 | `ACC` | Accel | Acceleration | continuous |  | 0.0 to 100 % | yes | Adjusts how quickly the speed increases and decreases from the Slow mode to the Fast mode. |
+| 4 | `DIS` | Distance | Distance | continuous |  | 0.0 to 100 % | yes | Adjusts the distance between the Rotary speakers and the virtual microphone. |
+| 5 | `BAL` | Balance | Balance | continuous |  | -100.0 to 100.0 | yes | Adjusts the balance between the virtual horn and virtual drum controlling the signal tone. |
+| 6 | `MIX` | Mix | Mix | continuous |  | 0.0 to 100 % | yes | Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals. |
+| 7 | `MOT` | Motor | Motor | switch |  | RUN, STOP | yes | Allows the rotation effect of the motor to be disengaged (STOP). |
+| 8 | `SPD` | Speed | Speed | selector |  | SLOW, FAST | yes | SLOWFASTSelects either the slow or fast speeds for rotation. |
+
+<!-- /generated:effects -->
+
 ## Corrections to the manual
 
 Where this document departs from what the manual prints, and why.
@@ -1414,7 +2475,7 @@ Where this document departs from what the manual prints, and why.
 
 ## Open questions
 
-Four things the manual does not settle. Each needs a hardware session.
+Six things the manual does not settle. Each needs a hardware session.
 
 - **The global dump layout.** The dump carries 45 bytes and nothing maps them to
   settings. This makes every row in [Global settings](#global-settings)
@@ -1425,11 +2486,156 @@ Four things the manual does not settle. Each needs a hardware session.
   marked unconfirmed.
 - **Four controller assignments.** CC 40, 44, 52 and 56, where the controller
   map's labels do not line up with its own attack, decay, sustain, release runs.
+- **How a raw byte maps onto a displayed range.** Both ends are known: section
+  9.3 gives every effect parameter a displayed minimum and maximum, and the NRPN
+  table does the same for the rest. What is missing is the curve between them,
+  and it cannot be guessed from the endpoints. The manual's own figures settle
+  part of it for two program parameters and none of it for the 329 effect
+  ranges. See [Scaling](#scaling-raw-values-to-displayed-values).
+- **One modulation destination on firmware 1.0.** The derived firmware 1.0
+  destination table offers 129. The manual's page 19 diagram, read with the
+  convention its own source count uses, says 130. The table is marked
+  unconfirmed and nothing here guesses which entry is missing.
 - **Where VCA Mode lives.** Section 8.6.2 describes a per-program VCA Mode,
   Ballsy or Transparent, with no NRPN number anywhere in the manual. Protocol
   version 7 added three bytes at offsets 242-244 which are zero in every factory
   program, so that is the likely home for it and for anything else firmware 1.1
   added.
+
+## Scaling raw values to displayed values
+
+Every parameter is one byte on the wire and every displayed range has two known
+ends, so the only missing piece is the shape in between. Neither of the two
+obvious guesses is safe.
+
+Logarithmic does not fit most of them. Of the 329 effect parameters with a
+numeric range, 201 either start at zero or cross it, which no logarithmic curve
+can do.
+
+Linear does not follow from that, and the manual supplies its own counterexample.
+OSC 1 Pitch Mod Depth runs from 0.00 cents to 36.0 semitones, starts at zero, and
+section 8.3.1 says outright that the fader "has a non-linear response which gives
+more resolution at smaller settings". So a range that starts at zero rules out
+logarithmic and says nothing else.
+
+### What the manual can be made to give up
+
+Two kinds of figure carry more than the prose does.
+
+The first is the response graph section 8.3.1 prints for the OSC 1 Pitch Mod
+fader. It is a drawing rather than a table, but it is a drawing of a specific
+shape: two straight segments meeting at a breakpoint about 40% of the way along
+the fader, shallow below and steep above, reaching the full 36 semitones at the
+top of the travel. Not a smooth curve, and not one curve.
+
+The second is the PROG screen, and it is the useful one. Section 7.1.7 calls the
+number at the top of its left-hand strip the CURRENT PARAMETER MIDI VALUE and
+says it is "a simple value (0-255)", which is the value on the wire. Section
+7.1.9 says the line along the bottom of the same screen carries "a more accurate
+value of the parameter being adjusted" and its units. The manual screenshots that
+screen beside nearly every fader it describes, so each one is a raw value printed
+next to what the synthesizer makes of it.
+
+<!-- generated:measurements -->
+
+| Offset | Parameter | Raw | Displayed | Fits | Note |
+|---|---|---|---|---|---|
+| 0 | LFO 1 Rate | 0 | 24.1 s | endpoint | The slowest rate. A period of 24.1 s is 0.0415 Hz, agreeing with the 0.041 Hz the parameter table gives as the bottom of the range. |
+| 0 | LFO 1 Rate | 12 | 17.0 s | exponential | Exponential in frequency between the ends, not in period. Linear in frequency would show 0.32 s here. |
+| 1 | LFO 1 Delay / Fade | 193 | 4.99 s | linear |  |
+| 21 | OSC 1 Pitch Mod Depth | 121 | +/-4.5 semitones | piecewise | Bipolar, from an LFO source. The magnitude is the same as a unipolar source gives. |
+| 21 | OSC 1 Pitch Mod Depth | 135 | +7.8 semitones | piecewise |  |
+| 25 | OSC 1 PWM Depth | 118 | 72.6 % | linear | Pulse width, which is what this fader sets while the PWM source is Manual. |
+| 25 | OSC 1 PWM Depth | 101 | +/-19.4 % | linear | Modulation depth, which is what the same fader sets once the PWM source is not Manual. A different range on the same offset, so the two readings do not contradict each other. |
+| 26 | OSC 2 Level | 0 | Off | endpoint |  |
+| 26 | OSC 2 Level | 255 | 0.0 dB | endpoint |  |
+| 27 | OSC 2 Pitch | 121 | -7.0 cents | none | Seven cents below centre at six and a half steps below centre, on a fader the manual gives a range of plus or minus 12 semitones. Linear would show -61 cents. The fader has to be far finer near the centre than at its ends, which the manual does not say anywhere. |
+| 28 | OSC 2 Tone Mod Depth | 255 | 100.0 % | endpoint | Tone modulation, which is what this fader sets while the source is Manual. |
+| 28 | OSC 2 Tone Mod Depth | 255 | +/-49 | endpoint | Modulation depth, which is what the same fader sets once the source is not Manual. |
+| 29 | OSC 2 Pitch Mod Depth | 135 | +7.8 semitones | piecewise | The same reading at the same raw value as OSC 1 Pitch Mod Depth at offset 21, so the two oscillators share one fader response. |
+| 33 | Noise Level | 255 | 0.0 dB | endpoint |  |
+| 39 | VCF Frequency | 98 | 500.0 Hz | exponential | An exponential sweep from 50 Hz to 20 kHz gives 500.0005 Hz here. Linear would give 7717 Hz, so this rules linear out rather than merely fitting. |
+| 40 | VCF HighPass Frequency | 0 | 20.0 Hz | endpoint |  |
+| 40 | VCF HighPass Frequency | 88 | 98.0 Hz | exponential | An exponential sweep from 20 Hz to 2 kHz gives 97.99 Hz here. Linear would give 703 Hz. |
+| 41 | VCF Resonance | 255 | 100.0 % | endpoint |  |
+| 42 | VCF Envelope Depth | 153 | 60.0 % | linear |  |
+| 45 | VCF LFO Depth | 102 | 40.0 % | linear |  |
+| 49 | VCF Keyboard Tracking | 68 | 26.6 % | linear |  |
+| 49 | VCF Keyboard Tracking | 153 | 60.0 % | linear |  |
+| 54 | VCA Envelope Decay Time | 128 | 1.13 s | untested | The parameter table carries no displayed range for the envelope times, so this is the only figure there is for one. |
+| 56 | VCA Envelope Release Time | 255 | 32.0 s | untested | The top of the range, for a parameter the manual gives no range for. The longest release the VCA envelope reaches is 32 seconds. |
+| 80 | VCA Level | 181 | 2.50 dB | none | Linear between the stated -12.0 dB and +6.0 dB would show 0.78 dB. A fader that is linear in amplitude rather than in decibels comes closer, at 3.0 dB, but does not land on it either. |
+| 87 | Unison Detune | 34 | +/-6.6 cents | linear |  |
+| 87 | Unison Detune | 255 | +/-50.0 cents | endpoint | The example the manual works through in section 7.1, where this reading is printed alongside a stored value of 20. |
+| 160 | Arp Gate Time | 112 | 43.9 % | linear | Against a range of 0 to 100%, which the parameter table does not state for this offset. Two readings agreeing with it is the reason to think that is the range. |
+| 160 | Arp Gate Time | 128 | 50.1 % | linear |  |
+
+29 readings across 20 parameters: 10 match a linear interpolation between the parameter's stated ends, 3 an exponential one, 3 sit on the two-segment fader response section 8.3.1 draws, 9 are at an end of a range rather than inside it, 2 are of a parameter the manual states no range for, and 2 match nothing simple.
+
+<!-- /generated:measurements -->
+
+### What the readings say
+
+**Most faders are linear.** Ten readings across seven parameters land on a
+straight line between the parameter's two stated ends, to the digit the screen
+prints: `50.0 + 118/255 x 49.0` is 72.675 against a displayed 72.6, `153/255 x
+100` is 60.0 against 60.0, `34/255 x 50` is 6.667 against 6.6.
+
+**Frequencies are exponential, and this is not a close call.** VCF Frequency at
+raw 98 displays 500.0 Hz. An exponential sweep between its stated 50 Hz and
+20000 Hz gives 500.0005 Hz there; a straight line gives 7717 Hz. The high pass
+behaves the same way, showing 98.0 Hz at raw 88 where an exponential sweep
+between 20 Hz and 2000 Hz gives 97.99 and a straight line gives 703. LFO 1 Rate
+is exponential in frequency rather than in the period it displays: 17.0 s at raw
+12, where an exponential sweep predicts 17.04 s and a linear one predicts 0.32 s.
+One interior reading cannot prove a curve, but it can kill one, and it has.
+
+**The pitch mod fader is the piecewise one the graph draws.** Its two readings
+fall on a line of 0.2357 semitones per raw step. That line reaches 36.09
+semitones at raw 255, where the display maximum is 36.0, and crosses zero at raw
+102. Reading the breakpoint off the graph instead gives raw 104. A drawing and a
+pair of displayed numbers are independent evidence and they land within two raw
+steps of each other, which pins the steep upper segment. Both oscillators share
+the response: offsets 21 and 29 show the same 7.8 semitones at the same raw 135.
+
+**Two faders match nothing simple, and the manual does not warn about either.**
+OSC 2 Pitch shows -7.0 cents at raw 121, six and a half steps below centre, on a
+fader the manual gives a range of plus or minus 12 semitones; linear would show
+-61 cents, so that fader must be far finer near its centre than at its ends. VCA
+Level shows 2.50 dB at raw 181 where linear between -12.0 dB and +6.0 dB gives
+0.78 dB.
+
+**Two readings fill gaps the manual leaves.** The parameter table carries no
+displayed range for the envelope times; the screenshots give VCA release 32.0 s
+at raw 255 and VCA decay 1.13 s at raw 128. And Arp Gate Time, which also has no
+stated range, produces 43.9% and 50.1% at raw 112 and 128, both of which are what
+a plain 0 to 100% would give.
+
+### What that means for the rest
+
+It generalises as method, not as numbers. Every reading above is of a program
+parameter. They cover none of the 329 effect ranges, because the manual prints
+no PROG screen and no response graph for any effect parameter: the FX pages show
+displayed values only, with no raw value anywhere on screen.
+
+They also stop short of a conversion even where they are strongest. A single
+interior point fixes a curve only if you already know its family, and the two
+faders that match nothing simple are the reminder of what assuming the family
+costs. So nothing here is wired into a conversion. `raw()` always works; `hz()`
+waits.
+
+The remaining procedure is mechanical once the wire layer exists: send an NRPN
+edit for a known raw value, read the value the synthesizer displays, repeat
+across the range, and fit. It has to be done per parameter, because the manual
+describes bespoke fader responses rather than one house curve, and because the
+readings above show at least four different shapes already. The rows in
+`spec/measurements.toml` are what that pass should reproduce before anyone trusts
+the rest of its output.
+
+Until then this specification records the two ends, the readings, and no curve,
+and a host should show raw values rather than invent displayed ones. Inventing
+them would put plausible, wrong numbers in front of a musician, which is worse
+than showing a number that is honestly raw.
 
 ## Cross-verification
 
@@ -1441,6 +2647,25 @@ says Release Curve and the manual repeats "Attack Curve".
 The controller map is a third source and corroborates the firmware 1.1 reading:
 it puts the 3D axes on CC 115, 116 and 117, matching the modulation source list
 in the newer manual rather than the CC 114-116 of the older one.
+
+The firmware 1.1 modulation tables are confirmed by a count the manual states in
+its own words. Section 2.7 says "Modulation Sources (24)" and "Modulation
+Destinations (132)", which is exactly what `enums.toml` holds once the `Off`
+entry is set aside. That is worth having because those lists were transcribed
+name by name and a dropped line would otherwise be invisible.
+
+The same manual contradicts itself twice, both times in a summary rather than a
+reference section, and both stale rather than wrong:
+
+- The mod matrix diagram on page 19 says 22 sources and 130 destinations and
+  multiplies them out to 22,880 possible modulations. Those are the firmware 1.0
+  numbers; the diagram was not redrawn when the lists grew. Taken with the
+  counting convention its source figure uses, it also says the derived firmware
+  1.0 destination table here is one entry short. See
+  [Open questions](#open-questions).
+- The FX algorithm list in section 2.6 names 34 algorithms and leaves out
+  DecimDelay, which section 9.3 documents in full. The table here follows section
+  9.3 and carries all 35.
 
 ## Sources
 

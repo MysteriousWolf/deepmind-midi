@@ -1,0 +1,136 @@
+# How addresses and values reach the wire.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# The other spec files say what exists: parameters, value tables, effects,
+# controllers. This one says how a program talks about them, so a host that is
+# not this library can be driven from the same data rather than from
+# hard-coded byte patterns.
+#
+# Byte patterns are written as hex literals with `<name>` standing for a field
+# defined under the same transport. `cn` is a status nibble carrying the MIDI
+# channel.
+
+[meta]
+note = """
+A parameter's 14-bit NRPN number is its byte offset in an unpacked program \
+dump. One number addresses a parameter for editing and locates it in a dump, \
+which is why there is no separate address table here."""
+
+# ---------------------------------------------------------------------------
+
+[[transport]]
+id = "nrpn"
+name = "NRPN edit"
+summary = "Sets one program parameter. The only way to reach every parameter."
+pattern = "Bn 63 <number_msb> Bn 62 <number_lsb> Bn 06 <value_msb> Bn 26 <value_lsb>"
+note = """
+Running status collapses this to a single status byte. The selected parameter \
+persists, so sweeping one control means sending the selection once and then \
+data entry pairs alone. Each interface (DIN, USB, Wi-Fi) keeps its own \
+selected-parameter register."""
+
+[[transport.field]]
+name = "number_msb"
+source = "parameter.offset"
+encoding = "shift_right_7"
+bits = 7
+
+[[transport.field]]
+name = "number_lsb"
+source = "parameter.offset"
+encoding = "low_7"
+bits = 7
+
+[[transport.field]]
+name = "value_msb"
+source = "value"
+encoding = "shift_right_7"
+bits = 7
+optional = true
+optional_when = "The parameter's maximum is 127 or less."
+
+[[transport.field]]
+name = "value_lsb"
+source = "value"
+encoding = "low_7"
+bits = 7
+
+# ---------------------------------------------------------------------------
+
+[[transport]]
+id = "cc"
+name = "Control change"
+summary = "Reaches 90 of the 242 parameters, one byte of resolution each."
+pattern = "Bn <cc> <value>"
+note = """
+A shortcut, not a second address space: controllers.toml maps each controller \
+number onto the parameter offset it drives. A parameter whose range exceeds \
+0-127 loses resolution here, so NRPN is the general path."""
+
+[[transport.field]]
+name = "cc"
+source = "controller.cc"
+bits = 7
+
+[[transport.field]]
+name = "value"
+source = "value"
+encoding = "scale_to_7"
+bits = 7
+
+# ---------------------------------------------------------------------------
+
+[[transport]]
+id = "sysex"
+name = "SysEx"
+summary = "Bulk data: program dumps, bank dumps, globals, patterns, inquiries."
+pattern = "F0 00 20 32 20 <device> <command> <payload> F7"
+note = """
+`00 20 32` is Behringer's manufacturer ID and `20` the shared DeepMind model \
+ID; no model in the range identifies itself further. Commands are listed in \
+messages.toml."""
+
+[[transport.field]]
+name = "device"
+source = "device_id"
+bits = 7
+note = "The unit's global MIDI channel, or 7F to address every unit on the port."
+
+[[transport.field]]
+name = "command"
+source = "message.command"
+bits = 7
+
+[[transport.field]]
+name = "payload"
+source = "message.payload"
+encoding = "packed_ms_bit"
+note = "Bulk payloads only. Short commands carry their arguments unpacked."
+
+# ---------------------------------------------------------------------------
+
+[[encoding]]
+id = "low_7"
+name = "Low seven bits"
+rule = "value & 0x7F"
+
+[[encoding]]
+id = "shift_right_7"
+name = "High seven bits"
+rule = "(value >> 7) & 0x7F"
+
+[[encoding]]
+id = "scale_to_7"
+name = "Scaled to seven bits"
+rule = "value * 127 / maximum"
+note = "Lossy for a parameter whose range exceeds 0-127."
+
+[[encoding]]
+id = "packed_ms_bit"
+name = "Packed MS-bit"
+rule = "Seven raw bytes become eight: one byte of their high bits, then the seven with bit 7 cleared."
+note = """
+SysEx data bytes cannot set bit 7, so bulk payloads carry it separately. The \
+last group is short when the payload length is not a multiple of seven."""
