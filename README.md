@@ -17,10 +17,11 @@ down. The code layers are landing one at a time. Not yet usable.
 
 | | |
 |---|---|
-| [Protocol](docs/midi-spec.md) | Signal path, SysEx, NRPN, all 242 parameters, the CC map, value tables, every effect |
+| [Protocol](docs/midi-spec.md) | Signal path, SysEx, NRPN, all 242 parameters, the CC map, value tables |
+| [Effects](docs/effects.md) | All 35 algorithms: a drawing of each panel and what its twelve slots do |
 | [Architecture](docs/architecture.md) | Design, layering, roadmap |
 | [`spec/`](spec/) | The same protocol as TOML. Source of truth for the docs and the code |
-| [NOTICE](NOTICE) | Where the parameter descriptions come from |
+| [NOTICE](NOTICE) | Where the descriptions and panel colours come from |
 | `cargo doc --open` | API reference |
 
 ## Hardware
@@ -43,7 +44,8 @@ cargo +1.85.0 check --workspace --all-features   # the MSRV, which CI also check
 A current toolchain accepts things 1.85 does not, so the last line is worth
 running before pushing.
 
-Documentation and diagrams are generated from `spec/`:
+Documentation, diagrams and the effect panel drawings are generated from
+`spec/`:
 
 ```sh
 cargo xtask docs            # regenerate

@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 84.8" width="768" height="509" role="img" aria-label="Stereo Delay front panel" font-family="ui-sans-serif, system-ui, sans-serif">
+<title>Stereo Delay (Delay)</title>
+<rect width="128" height="84.8" fill="#272727"/>
+<text x="4" y="8.6" font-size="5.6" font-weight="600" fill="#ededed">Delay</text>
+<text x="124" y="8.6" font-size="4.2" text-anchor="end" fill="#888888">Delay</text>
+<rect x="4" y="11.2" width="120" height="0.5" fill="#67d301"/>
+  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">MIX</text>
+  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="26.35" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <circle cx="19.76" cy="19.40" r="0.9" fill="#67d301"/>
+  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Mix</text>
+  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">TIM</text>
+  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="26.35" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Time</text>
+  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">MOD</text>
+  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="26.35" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <line x1="50.99" y1="28.86" x2="49.93" y2="29.92" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="50.99" y1="23.84" x2="49.93" y2="22.78" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="56.01" y1="23.84" x2="57.07" y2="22.78" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="56.01" y1="28.86" x2="57.07" y2="29.92" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Mode</text>
+  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">FCL</text>
+  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="26.35" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <line x1="70.99" y1="28.86" x2="69.93" y2="29.92" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="70.02" y1="27.04" x2="68.55" y2="27.34" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="70.22" y1="24.99" x2="68.83" y2="24.42" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="71.53" y1="23.40" x2="70.69" y2="22.15" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="73.50" y1="22.80" x2="73.50" y2="21.30" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="75.47" y1="23.40" x2="76.31" y2="22.15" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="76.78" y1="24.99" x2="78.17" y2="24.42" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="76.98" y1="27.04" x2="78.45" y2="27.34" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="76.01" y1="28.86" x2="77.07" y2="29.92" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Delay</text>
+  <text x="73.50" y="41.10" font-size="3" text-anchor="middle" fill="#888888">Factor,</text>
+  <text x="73.50" y="45.30" font-size="3" text-anchor="middle" fill="#888888">left</text>
+  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">FCR</text>
+  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="26.35" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <line x1="90.99" y1="28.86" x2="89.93" y2="29.92" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="90.02" y1="27.04" x2="88.55" y2="27.34" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="90.22" y1="24.99" x2="88.83" y2="24.42" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="91.53" y1="23.40" x2="90.69" y2="22.15" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="93.50" y1="22.80" x2="93.50" y2="21.30" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="95.47" y1="23.40" x2="96.31" y2="22.15" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="96.78" y1="24.99" x2="98.17" y2="24.42" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="96.98" y1="27.04" x2="98.45" y2="27.34" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="96.01" y1="28.86" x2="97.07" y2="29.92" stroke="#67d301" stroke-width="0.7" stroke-linecap="round"/>
+  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Delay</text>
+  <text x="93.50" y="41.10" font-size="3" text-anchor="middle" fill="#888888">Factor,</text>
+  <text x="93.50" y="45.30" font-size="3" text-anchor="middle" fill="#888888">right</text>
+  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">OFS</text>
+  <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="26.35" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Offset</text>
+  <text x="13.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">LC</text>
+  <path d="M 8.02 65.73 A 7.75 7.75 0 1 1 18.98 65.73" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="60.25" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <circle cx="19.76" cy="53.30" r="0.9" fill="#67d301"/>
+  <text x="13.50" y="70.80" font-size="3" text-anchor="middle" fill="#888888">Low Cut</text>
+  <text x="33.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">HC</text>
+  <path d="M 28.02 65.73 A 7.75 7.75 0 1 1 38.98 65.73" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="60.25" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <circle cx="39.76" cy="53.30" r="0.9" fill="#67d301"/>
+  <text x="33.50" y="70.80" font-size="3" text-anchor="middle" fill="#888888">High Cut</text>
+  <text x="53.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">FLC</text>
+  <path d="M 48.02 65.73 A 7.75 7.75 0 1 1 58.98 65.73" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="60.25" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <circle cx="59.76" cy="53.30" r="0.9" fill="#67d301"/>
+  <text x="53.50" y="70.80" font-size="3" text-anchor="middle" fill="#888888">Feedback</text>
+  <text x="53.50" y="75.00" font-size="3" text-anchor="middle" fill="#888888">Low Cut</text>
+  <text x="73.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">FBL</text>
+  <path d="M 68.02 65.73 A 7.75 7.75 0 1 1 78.98 65.73" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="60.25" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <circle cx="79.76" cy="53.30" r="0.9" fill="#67d301"/>
+  <text x="73.50" y="70.80" font-size="3" text-anchor="middle" fill="#888888">Feedback,</text>
+  <text x="73.50" y="75.00" font-size="3" text-anchor="middle" fill="#888888">left</text>
+  <text x="93.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">FBR</text>
+  <path d="M 88.02 65.73 A 7.75 7.75 0 1 1 98.98 65.73" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="60.25" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <circle cx="99.76" cy="53.30" r="0.9" fill="#67d301"/>
+  <text x="93.50" y="70.80" font-size="3" text-anchor="middle" fill="#888888">Feedback,</text>
+  <text x="93.50" y="75.00" font-size="3" text-anchor="middle" fill="#888888">right</text>
+  <text x="113.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">FHC</text>
+  <path d="M 108.02 65.73 A 7.75 7.75 0 1 1 118.98 65.73" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="60.25" r="5.95" fill="#565656" stroke="#919191" stroke-width="0.6"/>
+  <circle cx="119.76" cy="53.30" r="0.9" fill="#67d301"/>
+  <text x="113.50" y="70.80" font-size="3" text-anchor="middle" fill="#888888">Feedback</text>
+  <text x="113.50" y="75.00" font-size="3" text-anchor="middle" fill="#888888">High Cut</text>
+</svg>

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 68.0" width="768" height="408" role="img" aria-label="Flanger and Reverb front panel" font-family="ui-sans-serif, system-ui, sans-serif">
+<title>Flanger and Reverb (FlangVerb)</title>
+<rect width="128" height="68.0" fill="#272727"/>
+<text x="4" y="8.6" font-size="5.6" font-weight="600" fill="#ededed">FlangVerb</text>
+<text x="124" y="8.6" font-size="4.2" text-anchor="end" fill="#888888">Reverb</text>
+<rect x="4" y="11.2" width="120" height="0.5" fill="#005aeb"/>
+  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">SPD</text>
+  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="26.35" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <circle cx="19.76" cy="19.40" r="0.9" fill="#005aeb"/>
+  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Speed</text>
+  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">DEP</text>
+  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="26.35" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <circle cx="39.76" cy="19.40" r="0.9" fill="#005aeb"/>
+  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Depth</text>
+  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">DLY</text>
+  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="26.35" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Delay</text>
+  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">PHS</text>
+  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="26.35" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <circle cx="79.76" cy="19.40" r="0.9" fill="#005aeb"/>
+  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Phase</text>
+  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">FBK</text>
+  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="26.35" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <circle cx="99.76" cy="19.40" r="0.9" fill="#005aeb"/>
+  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Feedback</text>
+  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">BAL</text>
+  <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="26.35" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <circle cx="119.76" cy="19.40" r="0.9" fill="#005aeb"/>
+  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#888888">Balance</text>
+  <text x="13.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">PRE</text>
+  <path d="M 8.02 57.33 A 7.75 7.75 0 1 1 18.98 57.33" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="51.85" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <text x="13.50" y="62.40" font-size="3" text-anchor="middle" fill="#888888">Pre-Delay</text>
+  <text x="33.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">DCY</text>
+  <path d="M 28.02 57.33 A 7.75 7.75 0 1 1 38.98 57.33" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="51.85" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <circle cx="39.76" cy="44.90" r="0.9" fill="#005aeb"/>
+  <text x="33.50" y="62.40" font-size="3" text-anchor="middle" fill="#888888">Decay</text>
+  <text x="53.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">SIZ</text>
+  <path d="M 48.02 57.33 A 7.75 7.75 0 1 1 58.98 57.33" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="51.85" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <text x="53.50" y="62.40" font-size="3" text-anchor="middle" fill="#888888">Size</text>
+  <text x="73.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">DMP</text>
+  <path d="M 68.02 57.33 A 7.75 7.75 0 1 1 78.98 57.33" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="51.85" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <circle cx="79.76" cy="44.90" r="0.9" fill="#005aeb"/>
+  <text x="73.50" y="62.40" font-size="3" text-anchor="middle" fill="#888888">Damping</text>
+  <text x="93.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">LC</text>
+  <path d="M 88.02 57.33 A 7.75 7.75 0 1 1 98.98 57.33" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="51.85" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <circle cx="99.76" cy="44.90" r="0.9" fill="#005aeb"/>
+  <text x="93.50" y="62.40" font-size="3" text-anchor="middle" fill="#888888">Low Cut</text>
+  <text x="113.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#ededed">MIX</text>
+  <path d="M 108.02 57.33 A 7.75 7.75 0 1 1 118.98 57.33" fill="none" stroke="#888888" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="51.85" r="5.95" fill="#1acdfe" stroke="#6adefe" stroke-width="0.6"/>
+  <circle cx="119.76" cy="44.90" r="0.9" fill="#005aeb"/>
+  <text x="113.50" y="62.40" font-size="3" text-anchor="middle" fill="#888888">Mix</text>
+</svg>

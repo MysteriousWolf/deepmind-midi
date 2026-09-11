@@ -569,13 +569,14 @@ parameters = [
     { slot = 2, ref = "DEP", name = "Depth", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the depth (amount) of modulation." },
     { slot = 3, ref = "RES", name = "Resonance", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the resonance of the filter." },
     { slot = 4, ref = "FRQ", name = "Base Freq", unit = "Hz", min = "20", max = "15000", mod_dest = true, description = "Adjusts the level of positive or negative envelope modulation." },
-    { slot = 5, ref = "TYP", name = "Type", values = "LP, HP, BP", description = "Selects between low pass (LP), high-pass (HP), band- pass (BP) and Notch (NOT)." },
+    { slot = 5, ref = "TYP", name = "Type", values = "LP, HP, BP, NOT", description = "Selects between low pass (LP), high-pass (HP), band- pass (BP) and Notch (NOT).", correction = "The options were read off the first three words of the description and lost Notch. The manual states four; the table cell states none." },
     { slot = 6, ref = "MIX", name = "Mix", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals." },
     { slot = 7, ref = "WAV", name = "Wave", values = "Triangle, Sine, Saw Up, Saw Down, Square, Random, Envelope", description = "Selects modulation waveform Triangular, Sine, Saw Up, Saw Down, Ramp, Square or Random." },
     { slot = 8, ref = "ENV", name = "EnvMod", unit = "%", min = "-100.0", max = "100", mod_dest = true, description = "Adjusts the level of positive or negative envelope modulation." },
     { slot = 9, ref = "ATK", name = "Attack", unit = "ms", min = "10.0", max = "249.9", mod_dest = true, description = "Controls the filter attack time." },
     { slot = 10, ref = "REL", name = "Release", unit = "ms", min = "10.0", max = "500.0", mod_dest = true, description = "Controls the filter release time." },
-    { slot = 11, ref = "DRV", name = "Drive", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the level, also introduces an overdrive effect if pushed hard. 124P4-Pole--2P 4P100.0Adjusts the slope of the filter from 2-pole to 4-pole (steeper)." },
+    { slot = 11, ref = "DRV", name = "Drive", unit = "%", min = "0.0", max = "100", mod_dest = true, description = "Adjusts the level, also introduces an overdrive effect if pushed hard." },
+    { slot = 12, ref = "4P", name = "4-Pole", values = "2P, 4P", description = "Adjusts the slope of the filter from 2-pole to 4-pole (steeper).", correction = "The manual's own table is malformed for this row: MIN reads \"2P 4P\" and MAX reads \"100.0\". Read as a two-state 2P to 4P, which is what the FX page screenshot beside the table shows, labelled POL and reading 4P." },
 ]
 
 [[effect]]

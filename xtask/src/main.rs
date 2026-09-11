@@ -1,4 +1,4 @@
-//! Generates `docs/midi-spec.md` and `docs/diagrams/*.mmd` from `spec/`.
+//! Generates `docs/midi-spec.md`, `docs/effects.md` and `docs/diagrams/` from `spec/`.
 //!
 //! ```text
 //! cargo xtask docs            regenerate
@@ -15,6 +15,7 @@
 
 mod diagrams;
 mod docs;
+mod fx;
 mod spec;
 
 use std::path::{Path, PathBuf};
@@ -48,9 +49,9 @@ fn usage() {
     println!("usage: cargo xtask <command>");
     println!();
     println!("commands:");
-    println!("  docs [--check]  regenerate docs/midi-spec.md and docs/diagrams/*.mmd");
-    println!("                  from spec/, or report whether they are current without");
-    println!("                  writing");
+    println!("  docs [--check]  regenerate docs/midi-spec.md, docs/effects.md and");
+    println!("                  docs/diagrams/ from spec/, or report whether they are");
+    println!("                  current without writing");
     println!("  help            show this message");
 }
 
@@ -65,15 +66,19 @@ fn root() -> PathBuf {
 fn docs_command(check: bool) -> Result<(), String> {
     match docs::run(&root(), check)? {
         docs::Outcome::Current => {
-            println!("{} is up to date", docs::DOC_PATH);
+            println!(
+                "{} and {} are up to date",
+                docs::DOC_PATH,
+                docs::EFFECTS_PATH
+            );
             Ok(())
         }
-        docs::Outcome::Stale if check => Err(format!(
-            "{} is out of date with spec/. Run `cargo xtask docs` and commit the result.",
-            docs::DOC_PATH
-        )),
+        docs::Outcome::Stale if check => Err(
+            "docs/ is out of date with spec/. Run `cargo xtask docs` and commit the result."
+                .to_owned(),
+        ),
         docs::Outcome::Stale => {
-            println!("regenerated {}", docs::DOC_PATH);
+            println!("regenerated docs/ from spec/");
             Ok(())
         }
     }
