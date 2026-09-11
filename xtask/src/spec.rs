@@ -155,6 +155,9 @@ pub struct EffectParameter {
     /// `Fx <engine> Param <slot>`; this says the engine acts on what arrives.
     #[serde(default)]
     pub mod_dest: bool,
+    /// What the parameter does, from the manual. See NOTICE.
+    #[serde(default)]
+    pub description: Option<String>,
     /// Free-form note.
     #[serde(default)]
     pub note: Option<String>,

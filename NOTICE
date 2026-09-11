@@ -1,0 +1,26 @@
+deepmind-midi
+Copyright the deepmind-midi contributors.
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+This project is not affiliated with, endorsed by, or sponsored by Behringer or
+Music Tribe. "Behringer" and "DeepMind" are trademarks of their respective
+owners and are used here only to say which hardware this software talks to.
+
+
+Third-party content
+-------------------
+
+The parameter descriptions in `spec/effects.toml`, and the tables generated from
+them in `docs/midi-spec.md`, are taken from section 9.3 of the DeepMind 12 User
+Manual, published by Music Tribe. They are reproduced so that a program can tell
+a musician what a parameter does, which is what the protocol data on its own
+cannot convey.
+
+Everything else in `spec/` is factual interface data: parameter numbers, byte
+offsets, names, ranges, units and value lists. Facts about how a device behaves
+are not themselves creative work, and recording them is what makes an
+independent implementation possible.
+
+If Music Tribe or Behringer would prefer the descriptions were not reproduced
+here, open an issue and they will be removed. Nothing else in this repository
+depends on them: they are one optional field, and the library works without it.
