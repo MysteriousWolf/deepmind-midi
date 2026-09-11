@@ -237,6 +237,13 @@ pub struct PanelSlot {
     pub modulatable: bool,
 }
 
+/// Presentation facts that hold for every effect.
+#[derive(Debug, Deserialize)]
+pub struct PanelMeta {
+    /// Slots per row on the synthesizer's own FX page.
+    pub columns: u8,
+}
+
 /// The presentation of one effect algorithm's slots.
 #[derive(Debug, Deserialize)]
 pub struct Panel {
@@ -388,6 +395,7 @@ struct Controllers {
 
 #[derive(Debug, Deserialize)]
 struct Panels {
+    meta: PanelMeta,
     panel: Vec<Panel>,
 }
 
@@ -441,6 +449,8 @@ pub struct Spec {
     pub transports: Vec<Transport>,
     /// Rules turning a value into wire bytes.
     pub encodings: Vec<Encoding>,
+    /// Presentation facts shared by every effect.
+    pub panel_meta: PanelMeta,
     /// How each effect presents its slots, ordered by `FX Type` value.
     pub panels: Vec<Panel>,
     /// How the four engines can be wired, ordered by `FX Routing` value.
@@ -481,6 +491,7 @@ impl Spec {
             firmwares: firmwares.firmware,
             transports: mapping.transport,
             encodings: mapping.encodings,
+            panel_meta: panels.meta,
             panels: panels.panel,
             routings: routings.routing,
             fx_modes: routings.mode,

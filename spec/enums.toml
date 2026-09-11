@@ -584,7 +584,15 @@ entries = [
 id = "mod_destination"
 name = "Modulation Matrix Destination (firmware 1.0)"
 firmware = "1.0"
-note = "Value 0 selects Off. Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual."
+note = """
+Value 0 selects Off. Derived from the firmware 1.1 table by the renumbering \
+rule the manual states, not transcribed from a firmware 1.0 manual. It offers \
+129 destinations, and the mod matrix diagram on page 19 of the firmware 1.1 \
+manual, which was left at its firmware 1.0 numbers, says 130. That diagram \
+counts 22 sources, which is this table's companion mod_source list with Off \
+excluded, so by the same convention 130 means 130 selectable destinations and \
+this table is one entry short. Which entry is missing needs a firmware 1.0 \
+manual or the hardware."""
 confirmed = false
 entries = [
     { value = 0, name = "Off" },

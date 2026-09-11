@@ -3,14 +3,21 @@
 # Generated documentation is built from this file. Edit it here, then run
 # `cargo xtask docs` to refresh docs/midi-spec.md.
 #
-# This is deliberately semantic, not visual. It says what a slot is called in
-# full, what kind of control it is, and which slots belong together, so a host
-# can lay out a panel that behaves like the hardware. It carries no pixels,
-# colours or fonts: Behringer publishes no panel geometry for the effects, and
-# inventing some and attributing it to them would be worse than leaving it to
-# the host.
+# It says what a slot is called in full, what kind of control it is, which slots
+# belong together, and the one piece of arrangement the manual actually shows:
+# the grid the synthesizer's own FX page draws. It carries no pixels, colours or
+# fonts, which Behringer does not publish for the effects.
 
 [meta]
+columns = 6
+layout = """
+The synthesizer lays an effect's slots out on one page as a grid, six to a row, \
+in slot order, wrapping onto a second row: ten slots show as six then four, and \
+twelve as six then six. That is Behringer's arrangement, not this project's, \
+transcribed from the screenshot printed beside every algorithm in section 9.3 \
+of the manual. It is the whole of what the manual shows: the page has no \
+geometry, no sizes and no grouping marks, so everything else here is still \
+derived."""
 titles = """
 The manual names parameters as the synthesizer's display does, abbreviated to \
 fit: HiSvFreq, LMF Spread, Rtype. effects.toml keeps those verbatim, for a host \

@@ -43,11 +43,13 @@ Each block is a parameter group, labelled with its offsets. Solid arrows carry a
 ```mermaid
 flowchart LR
     OSC["OSC 1 + OSC 2<br>noise<br><small>14-38</small>"]
-    VCF["VCF<br>low pass + high pass<br><small>39-52</small>"]
+    VCF["VCF<br>low pass<br><small>39-52</small>"]
     VCA["VCA<br><small>80-83</small>"]
     FX["FX<br>4 slots<br><small>165-222</small>"]
+    HPF["high pass + boost<br><small>40, 52</small>"]
     OUT([output])
-    OSC --> VCF --> VCA --> FX --> OUT
+    OSC --> VCF --> VCA --> HPF --> FX --> OUT
+    HPF -- analog path --> OUT
 
     VCAENV("VCA envelope<br><small>53-61</small>")
     VCFENV("VCF envelope<br><small>62-70</small>")
@@ -67,6 +69,8 @@ flowchart LR
     MOD -.-> VCA
     MOD -.-> FX
 ```
+
+Offsets 40 and 52, the high pass frequency and the bass boost, appear twice on purpose. The front panel groups them with the VCF and this specification follows the panel, but the block diagram in section 6 of the manual places both after the VCA, where they act on the mixed voices rather than on one. The analog path is the route that skips the FX block; which of the two paths carry signal is the [`FX Mode`](#fx-routing) parameter's job.
 
 ### Modulation matrix
 
@@ -1458,7 +1462,7 @@ Firmware 1.1+.
 
 Firmware 1.0.
 
-Value 0 selects Off. Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual.
+Value 0 selects Off. Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual. It offers 129 destinations, and the mod matrix diagram on page 19 of the firmware 1.1 manual, which was left at its firmware 1.0 numbers, says 130. That diagram counts 22 sources, which is this table's companion mod_source list with Off excluded, so by the same convention 130 means 130 selectable destinations and this table is one entry short. Which entry is missing needs a firmware 1.0 manual or the hardware.
 
 > Unconfirmed. This mapping is inferred and needs checking against hardware.
 
@@ -1745,13 +1749,20 @@ parameter as responding, and the pattern holds up: of the 30 parameters that
 select between options rather than sweep a range, 27 are blank, as are the
 structural ones such as reverb size and pre-delay.
 
+Each heading also gives the shape of the synthesizer's own FX page for that
+algorithm. It draws the slots as a grid six to a row, in slot order, wrapping
+onto a second row, so a twelve-slot algorithm reads as six and six. That is the
+one piece of arrangement the manual publishes; everything else in the `Reads as`,
+`Control` and `Group` columns is derived by this project. See
+[`spec/panels.toml`](../spec/panels.toml).
+
 <!-- generated:effects -->
 
 <a id="fx-0"></a>
 
 #### TC Deep Reverb (TC-DeepVRB)
 
-`FX Type` 0.
+`FX Type` 0. 5 slots, shown as one row of 5.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1765,7 +1776,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Ambient Reverb (AmbVerb)
 
-`FX Type` 1.
+`FX Type` 1. 10 slots, shown as rows of 6 and 4.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1784,7 +1795,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Room Reverb (RoomRev)
 
-`FX Type` 2.
+`FX Type` 2. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1805,7 +1816,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Vintage Room Reverb (VintageRev)
 
-`FX Type` 3.
+`FX Type` 3. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1826,7 +1837,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Hall Reverb (HallRev)
 
-`FX Type` 4.
+`FX Type` 4. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1847,7 +1858,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Chamber Reverb (ChamberRev)
 
-`FX Type` 5.
+`FX Type` 5. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1868,7 +1879,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Plate Reverb (PlateRev)
 
-`FX Type` 6.
+`FX Type` 6. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1889,7 +1900,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Rich Plate Reverb (RichPltRev)
 
-`FX Type` 7.
+`FX Type` 7. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1910,7 +1921,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Gated Reverb (GatedRev)
 
-`FX Type` 8.
+`FX Type` 8. 10 slots, shown as rows of 6 and 4.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1929,7 +1940,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Reverse Reverb (Reverse)
 
-`FX Type` 9.
+`FX Type` 9. 9 slots, shown as rows of 6 and 3.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1947,7 +1958,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Chorus and Reverb (ChorusVerb)
 
-`FX Type` 10.
+`FX Type` 10. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1968,7 +1979,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Delay and Reverb (DelayVerb)
 
-`FX Type` 11.
+`FX Type` 11. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -1989,7 +2000,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Flanger and Reverb (FlangVerb)
 
-`FX Type` 12.
+`FX Type` 12. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2010,7 +2021,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Midas Equaliser (MidasEQ)
 
-`FX Type` 13.
+`FX Type` 13. 11 slots, shown as rows of 6 and 5.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2030,7 +2041,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Enhancing EQ (Enhancer)
 
-`FX Type` 14.
+`FX Type` 14. 9 slots, shown as rows of 6 and 3.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2048,7 +2059,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Compressor (FairComp)
 
-`FX Type` 15.
+`FX Type` 15. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2069,7 +2080,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Multiband Distortion (MulBndDist)
 
-`FX Type` 16.
+`FX Type` 16. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2090,7 +2101,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Rack Amplifier (RackAmp)
 
-`FX Type` 17.
+`FX Type` 17. 9 slots, shown as rows of 6 and 3.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2108,7 +2119,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Stereo Imaging (EdisonEX1)
 
-`FX Type` 18.
+`FX Type` 18. 8 slots, shown as rows of 6 and 2.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2125,7 +2136,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Auto Panning (Auto Pan)
 
-`FX Type` 19.
+`FX Type` 19. 9 slots, shown as rows of 6 and 3.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2143,7 +2154,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Noise Gate (NoiseGate)
 
-`FX Type` 20.
+`FX Type` 20. 8 slots, shown as rows of 6 and 2.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2160,7 +2171,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Stereo Delay (Delay)
 
-`FX Type` 21.
+`FX Type` 21. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2181,7 +2192,7 @@ structural ones such as reverb size and pre-delay.
 
 #### 3-Tap Delay (3TapDelay)
 
-`FX Type` 22.
+`FX Type` 22. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2202,7 +2213,7 @@ structural ones such as reverb size and pre-delay.
 
 #### 4-Tap Delay (4TapDelay)
 
-`FX Type` 23.
+`FX Type` 23. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2223,7 +2234,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Tel-Ray Delay (T-RayDelay)
 
-`FX Type` 24.
+`FX Type` 24. 5 slots, shown as one row of 5.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2237,7 +2248,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Decimator Delay (DecimDelay)
 
-`FX Type` 25.
+`FX Type` 25. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2258,7 +2269,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Modulation, Delay and Reverb (ModDlyRev)
 
-`FX Type` 26.
+`FX Type` 26. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2279,7 +2290,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Stereo Chorus (Chorus)
 
-`FX Type` 27.
+`FX Type` 27. 11 slots, shown as rows of 6 and 5.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2299,7 +2310,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Dimensional Chorus (Chorus-D)
 
-`FX Type` 28.
+`FX Type` 28. 7 slots, shown as rows of 6 and 1.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2315,7 +2326,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Stereo Flanger (Flanger)
 
-`FX Type` 29.
+`FX Type` 29. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2336,7 +2347,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Stereo Phaser (Phaser)
 
-`FX Type` 30.
+`FX Type` 30. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2357,7 +2368,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Moog-Type Filter (MoodFilter)
 
-`FX Type` 31.
+`FX Type` 31. 11 slots, shown as rows of 6 and 5.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2377,7 +2388,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Dual Pitch Shifter (DualPitch)
 
-`FX Type` 32.
+`FX Type` 32. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2398,7 +2409,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Dual Pitch Shifter (Vintage Pitch)
 
-`FX Type` 33.
+`FX Type` 33. 12 slots, shown as rows of 6 and 6.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2419,7 +2430,7 @@ structural ones such as reverb size and pre-delay.
 
 #### Rotary Speaker (RotarySpkr)
 
-`FX Type` 34.
+`FX Type` 34. 8 slots, shown as rows of 6 and 2.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -2464,7 +2475,7 @@ Where this document departs from what the manual prints, and why.
 
 ## Open questions
 
-Five things the manual does not settle. Each needs a hardware session.
+Six things the manual does not settle. Each needs a hardware session.
 
 - **The global dump layout.** The dump carries 45 bytes and nothing maps them to
   settings. This makes every row in [Global settings](#global-settings)
@@ -2478,8 +2489,13 @@ Five things the manual does not settle. Each needs a hardware session.
 - **How a raw byte maps onto a displayed range.** Both ends are known: section
   9.3 gives every effect parameter a displayed minimum and maximum, and the NRPN
   table does the same for the rest. What is missing is the curve between them,
-  and it cannot be guessed from the endpoints. See
-  [Scaling](#scaling-raw-values-to-displayed-values).
+  and it cannot be guessed from the endpoints. The manual's own figures settle
+  part of it for two program parameters and none of it for the 329 effect
+  ranges. See [Scaling](#scaling-raw-values-to-displayed-values).
+- **One modulation destination on firmware 1.0.** The derived firmware 1.0
+  destination table offers 129. The manual's page 19 diagram, read with the
+  convention its own source count uses, says 130. The table is marked
+  unconfirmed and nothing here guesses which entry is missing.
 - **Where VCA Mode lives.** Section 8.6.2 describes a per-program VCA Mode,
   Ballsy or Transparent, with no NRPN number anywhere in the manual. Protocol
   version 7 added three bytes at offsets 242-244 which are zero in every factory
@@ -2490,23 +2506,73 @@ Five things the manual does not settle. Each needs a hardware session.
 
 Every parameter is one byte on the wire and every displayed range has two known
 ends, so the only missing piece is the shape in between. Neither of the two
-obvious guesses is safe, and the manual supplies its own counterexample.
+obvious guesses is safe.
 
 Logarithmic does not fit most of them. Of the 329 effect parameters with a
 numeric range, 201 either start at zero or cross it, which no logarithmic curve
 can do.
 
-Linear does not follow from that either. OSC 1 Pitch Mod Depth runs from 0.00
-cents to 36.0 semitones, starts at zero, and section 8.3.1 says outright that
-the fader "has a non-linear response which gives more resolution at smaller
-settings". The manual prints that response as a graph with no numbers on it. So
-a range that starts at zero tells you the curve is not logarithmic, and nothing
-more.
+Linear does not follow from that, and the manual supplies its own counterexample.
+OSC 1 Pitch Mod Depth runs from 0.00 cents to 36.0 semitones, starts at zero, and
+section 8.3.1 says outright that the fader "has a non-linear response which gives
+more resolution at smaller settings". So a range that starts at zero rules out
+logarithmic and says nothing else.
 
-That leaves measurement. The procedure is mechanical once the wire layer exists:
-send an NRPN edit for a known raw value, read the value the synthesizer displays,
-repeat across the range, and fit. It has to be done per parameter, because the
-manual describes bespoke fader responses rather than one house curve.
+### What the manual can be made to give up
+
+Two kinds of figure carry more than the prose does.
+
+The first is the response graph section 8.3.1 prints for the OSC 1 Pitch Mod
+fader. It is a drawing rather than a table, but it is a drawing of a specific
+shape: two straight segments meeting at a breakpoint about 40% of the way along
+the fader, shallow below and steep above, reaching the full 36 semitones at the
+top of the travel. Not a smooth curve, and not one curve.
+
+The second is the PROG screen. Whenever the manual illustrates a fader it
+screenshots that screen, and the screen shows the raw value of the fader above
+the value stored in the program, with the displayed value spelled out along the
+bottom. Every one of those screenshots is therefore a raw value paired with what
+the synthesizer makes of it. Sections 8.3.1 and 8.3.2 give four.
+
+| Parameter | Displayed range | Raw | Shown |
+|---|---|---|---|
+| OSC 1 PWM | 50.0% to 99.0% | 118 | 72.6% |
+| OSC 1 PWM, as modulation depth | 0 to +/-49% | 101 | +/-19.4% |
+| OSC 1 Pitch Mod Depth | 0.00 cents to 36.0 semitones | 121 | +/-4.5 semitones |
+| OSC 1 Pitch Mod Depth | 0.00 cents to 36.0 semitones | 135 | +7.8 semitones |
+
+The two PWM readings are both linear on 0-255 to the precision the screen shows:
+50.0 + 118/255 x 49.0 is 72.675, displayed as 72.6, and 101/255 x 49.0 is 19.408,
+displayed as 19.4. Two values off the same fader agreeing with one rule to three
+decimals is also the reason to treat these screenshots as captures of a real
+instrument rather than mock-ups.
+
+The two pitch mod readings fall on a line of 0.2357 semitones per raw step. That
+line reaches 36.09 semitones at raw 255, where the display maximum is 36.0, and
+crosses zero at raw 102. Reading the breakpoint straight off the graph instead
+puts it at roughly 41% of travel, which is raw 104. A drawing and a pair of
+displayed numbers are independent evidence, and they land within two raw steps of
+each other, which is the useful part: the steep upper segment of that fader runs
+from about raw 102 to raw 255 across 0 to 36 semitones.
+
+What is still not known for that fader is the shallow segment below the
+breakpoint. The graph draws it rising to about 2.5 semitones by the breakpoint,
+which the displayed values contradict: they put the upper segment at zero there.
+The figure is good for the shape and the breakpoint and is not to scale in its
+lower half, so no conversion is recorded for the region below raw 102.
+
+### What that means for the rest
+
+It generalises as method, not as numbers. Every effect parameter still has two
+ends and no measured interior, and the manual prints no response graph for any of
+them. The four readings above cover two program parameters, not the 329 effect
+ranges.
+
+The procedure is mechanical once the wire layer exists: send an NRPN edit for a
+known raw value, read the value the synthesizer displays, repeat across the
+range, and fit. It has to be done per parameter, because the manual describes
+bespoke fader responses rather than one house curve, and because the one fader it
+does describe turns out to be piecewise rather than any named curve.
 
 Until then this specification records the two ends and no curve, and a host
 should show raw values rather than invent displayed ones. Inventing them would
@@ -2523,6 +2589,25 @@ says Release Curve and the manual repeats "Attack Curve".
 The controller map is a third source and corroborates the firmware 1.1 reading:
 it puts the 3D axes on CC 115, 116 and 117, matching the modulation source list
 in the newer manual rather than the CC 114-116 of the older one.
+
+The firmware 1.1 modulation tables are confirmed by a count the manual states in
+its own words. Section 2.7 says "Modulation Sources (24)" and "Modulation
+Destinations (132)", which is exactly what `enums.toml` holds once the `Off`
+entry is set aside. That is worth having because those lists were transcribed
+name by name and a dropped line would otherwise be invisible.
+
+The same manual contradicts itself twice, both times in a summary rather than a
+reference section, and both stale rather than wrong:
+
+- The mod matrix diagram on page 19 says 22 sources and 130 destinations and
+  multiplies them out to 22,880 possible modulations. Those are the firmware 1.0
+  numbers; the diagram was not redrawn when the lists grew. Taken with the
+  counting convention its source figure uses, it also says the derived firmware
+  1.0 destination table here is one entry short. See
+  [Open questions](#open-questions).
+- The FX algorithm list in section 2.6 names 34 algorithms and leaves out
+  DecimDelay, which section 9.3 documents in full. The table here follows section
+  9.3 and carries all 35.
 
 ## Sources
 

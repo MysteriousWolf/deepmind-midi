@@ -163,6 +163,15 @@ fn render_structure(spec: &Spec, all: &[diagrams::Diagram]) -> Result<String, St
                   arrows carry audio, dashed arrows carry modulation.\n\n",
     );
     let _ = writeln!(out, "```mermaid\n{}\n```\n", source("signal-path")?);
+    out.push_str(
+        "Offsets 40 and 52, the high pass frequency and the bass boost, appear \
+         twice on purpose. The front panel groups them with the VCF and this \
+         specification follows the panel, but the block diagram in section 6 of \
+         the manual places both after the VCA, where they act on the mixed voices \
+         rather than on one. The analog path is the route that skips the FX \
+         block; which of the two paths carry signal is the \
+         [`FX Mode`](#fx-routing) parameter's job.\n\n",
+    );
 
     let _ = writeln!(out, "### {}\n", title("modulation-matrix")?);
     out.push_str("Eight independent busses, each a source, a destination and a signed depth.\n\n");
@@ -476,16 +485,30 @@ fn render_controllers(spec: &Spec) -> String {
 /// parameters means when that algorithm is loaded.
 fn render_effects(spec: &Spec) -> String {
     let mut out = String::new();
+    let columns = usize::from(spec.panel_meta.columns);
     for effect in &spec.effects {
+        // The FX page fills rows of `columns` in slot order, so the shape of the
+        // page follows from the parameter count.
+        let rows: Vec<String> = effect
+            .parameters
+            .chunks(columns)
+            .map(|row| row.len().to_string())
+            .collect();
         let _ = write!(
             out,
-            "\n<a id=\"fx-{}\"></a>\n\n#### {} ({})\n\n`FX Type` {}.\n\n\
+            "\n<a id=\"fx-{}\"></a>\n\n#### {} ({})\n\n`FX Type` {}. \
+             {} slots, shown as {}.\n\n\
              | Slot | Ref | Parameter | Reads as | Control | Group | Range | \
              Mod | Description |\n|---|---|---|---|---|---|---|---|---|\n",
             effect.r#type,
             cell(&effect.full_name),
             cell(&effect.name),
             effect.r#type,
+            effect.parameters.len(),
+            match rows.len() {
+                1 => format!("one row of {}", rows[0]),
+                _ => format!("rows of {}", rows.join(" and ")),
+            },
         );
         let panel = spec.panels.iter().find(|p| p.r#type == effect.r#type);
         for parameter in &effect.parameters {
