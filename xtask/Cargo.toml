@@ -11,6 +11,11 @@ license.workspace = true
 serde = { version = "1", features = ["derive"] }
 toml = { version = "0.9", default-features = false, features = ["parse", "serde"] }
 
+# The library's own tables are checked against the spec files here, where the
+# spec loader already lives. Nothing in the generator depends on the library.
+[dev-dependencies]
+deepmind-midi = { path = "../deepmind-midi" }
+
 # Deliberately not the workspace lint set. The no-panic rules exist to keep the
 # library safe against untrusted MIDI input; xtask is a build tool, where a panic
 # is an acceptable and loud failure.

@@ -36,7 +36,12 @@ direction = "from_device"
 payload = "Version, bank, program, packed program data"
 raw_len = 242
 packed_len = 278
-note = "Protocol version 7 carries 245 raw bytes in 280 packed, for a 291 byte message."
+note = """
+Protocol version 7 carries 245 raw bytes in 280 packed, for a 291 byte message. \
+The 278 printed here for version 6 matches neither packing rule: padding the \
+last group gives 280, sending it short gives 277. Every other packed length in \
+this table is the padded rule exactly, so the figure is recorded as printed and \
+nothing depends on it."""
 
 [[message]]
 command = 0x03

@@ -1278,3 +1278,115 @@ fn read<T: serde::de::DeserializeOwned>(path: &Path) -> Result<T, String> {
     let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
     toml::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use deepmind_midi::sysex::packed::packed_len;
+    use deepmind_midi::sysex::{
+        BANK_NAMES_LEN, CHORD_MEMORY_LEN, Command, Direction, GLOBAL_DATA_LEN, PATTERN_DATA_LEN,
+        POLY_CHORD_MEMORY_LEN, PROGRAM_NAME_LEN,
+    };
+
+    use super::Spec;
+
+    fn spec() -> Spec {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap_or(Path::new("."));
+        Spec::load(root).expect("spec/ loads")
+    }
+
+    /// Fails when the library's command table drifts from `spec/messages.toml`.
+    ///
+    /// The library cannot read the spec files at runtime, so the table is
+    /// written out by hand there. This is what keeps the two copies the same
+    /// one.
+    #[test]
+    fn the_library_command_table_matches_the_spec() {
+        let spec = spec();
+        assert_eq!(
+            spec.messages.len(),
+            Command::ALL.len(),
+            "messages.toml has {} commands, the library has {}",
+            spec.messages.len(),
+            Command::ALL.len()
+        );
+        for (message, command) in spec.messages.iter().zip(Command::ALL) {
+            assert_eq!(
+                command.to_byte(),
+                message.command,
+                "{} is command {:#04X} in the library and {:#04X} in the spec",
+                message.name,
+                command.to_byte(),
+                message.command
+            );
+            assert_eq!(
+                command.name(),
+                message.name,
+                "command {:#04X}",
+                message.command
+            );
+            let direction = match message.direction.as_str() {
+                "to_device" => Direction::ToDevice,
+                "from_device" => Direction::FromDevice,
+                other => panic!("messages.toml: unknown direction {other:?}"),
+            };
+            assert_eq!(command.direction(), direction, "{}", message.name);
+        }
+    }
+
+    /// Fails when a payload length the library hard-codes leaves the spec behind.
+    #[test]
+    fn the_library_payload_lengths_match_the_spec() {
+        let spec = spec();
+        let lengths = [
+            (Command::GlobalParameterDumpResponse, GLOBAL_DATA_LEN),
+            (Command::UserPatternDumpResponse, PATTERN_DATA_LEN),
+            (Command::BankProgramNamesDumpResponse, BANK_NAMES_LEN),
+            (Command::SingleProgramNameDumpResponse, PROGRAM_NAME_LEN),
+            (Command::ChordMemoryDumpResponse, CHORD_MEMORY_LEN),
+            (Command::PolyChordMemoryDumpResponse, POLY_CHORD_MEMORY_LEN),
+        ];
+        for (command, expected) in lengths {
+            let message = spec
+                .messages
+                .iter()
+                .find(|m| m.command == command.to_byte())
+                .unwrap_or_else(|| panic!("{command} is not in messages.toml"));
+            assert_eq!(
+                message.raw_len.map(|len| len as usize),
+                Some(expected),
+                "{} carries {expected} unpacked bytes in the library",
+                message.name
+            );
+        }
+    }
+
+    /// The manual's own packed lengths, checked against the codec.
+    ///
+    /// Five of the six agree exactly with padding the last group out to eight
+    /// bytes, which is why the library packs that way. The sixth is the program
+    /// dump, printed as 278 packed bytes for 242 raw where padding gives 280 and
+    /// a short last group gives 277. It matches no rule and is recorded as an
+    /// open question rather than reproduced.
+    #[test]
+    fn the_tabulated_packed_lengths_follow_the_padded_rule_bar_the_program_dump() {
+        let mut checked = 0;
+        for message in &spec().messages {
+            let (Some(raw), Some(packed)) = (message.raw_len, message.packed_len) else {
+                continue;
+            };
+            let (raw, packed) = (raw as usize, packed as usize);
+            if raw == 242 {
+                assert_eq!(packed, 278, "{}: the printed figure moved", message.name);
+                assert_ne!(packed_len(raw), packed);
+                continue;
+            }
+            assert_eq!(packed_len(raw), packed, "{}", message.name);
+            checked += 1;
+        }
+        assert_eq!(checked, 6, "expected six figures to check");
+    }
+}

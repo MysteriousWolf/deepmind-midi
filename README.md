@@ -11,7 +11,8 @@ DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 ```
 
 **Status: early.** The protocol is reverse-engineered, verified and written
-down. The code layers are landing one at a time. Not yet usable.
+down. The code layers are landing one at a time: MIDI decoding and SysEx are in,
+parameters and programs are not. Not yet usable.
 
 ## Documentation
 
