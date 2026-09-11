@@ -248,6 +248,49 @@ pub struct Panel {
     pub slots: Vec<PanelSlot>,
 }
 
+/// One effect slot's place in a routing topology.
+#[derive(Debug, Deserialize)]
+pub struct RoutingSlot {
+    /// Which of the four engines this is, counting from 1.
+    pub slot: u8,
+    /// What reaches this slot: 0 is the FX block's input, 1-4 are other slots.
+    pub from: Vec<u8>,
+}
+
+/// One of the ten ways the four effect engines can be wired together.
+#[derive(Debug, Deserialize)]
+pub struct Routing {
+    /// Value of the `FX Routing` parameter that selects this topology.
+    pub value: u16,
+    /// The manual's label for it, `M-1` through `M-10`.
+    pub label: String,
+    /// Name, matching the `fx_routing` value table.
+    pub name: String,
+    /// `true` when the topology contains a feedback loop.
+    #[serde(default)]
+    pub feedback: bool,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+    /// The four slots, ordered.
+    pub slots: Vec<RoutingSlot>,
+    /// Slots whose outputs are summed to leave the FX block.
+    pub output: Vec<u8>,
+}
+
+/// What one `FX Mode` setting does to the two paths through the instrument.
+#[derive(Debug, Deserialize)]
+pub struct FxMode {
+    /// Value of the `FX Mode` parameter that selects this setting.
+    pub value: u16,
+    /// Name, matching the `fx_mode` value table.
+    pub name: String,
+    /// `true` when the analog path from the voices to the output stage is live.
+    pub analog_path: bool,
+    /// `true` when the voices also run through the FX block.
+    pub digital_path: bool,
+}
+
 /// One field of a transport's byte pattern.
 #[derive(Debug, Deserialize)]
 pub struct MappingField {
@@ -349,6 +392,12 @@ struct Panels {
 }
 
 #[derive(Debug, Deserialize)]
+struct Routings {
+    routing: Vec<Routing>,
+    mode: Vec<FxMode>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Mapping {
     transport: Vec<Transport>,
     #[serde(rename = "encoding")]
@@ -394,6 +443,10 @@ pub struct Spec {
     pub encodings: Vec<Encoding>,
     /// How each effect presents its slots, ordered by `FX Type` value.
     pub panels: Vec<Panel>,
+    /// How the four engines can be wired, ordered by `FX Routing` value.
+    pub routings: Vec<Routing>,
+    /// What each `FX Mode` setting does to the analog and digital paths.
+    pub fx_modes: Vec<FxMode>,
 }
 
 impl Spec {
@@ -416,6 +469,7 @@ impl Spec {
         let firmwares: Firmwares = read(&spec.join("firmware.toml"))?;
         let mapping: Mapping = read(&spec.join("mapping.toml"))?;
         let panels: Panels = read(&spec.join("panels.toml"))?;
+        let routings: Routings = read(&spec.join("routing.toml"))?;
 
         let this = Self {
             parameters: parameters.parameter,
@@ -428,6 +482,8 @@ impl Spec {
             transports: mapping.transport,
             encodings: mapping.encodings,
             panels: panels.panel,
+            routings: routings.routing,
+            fx_modes: routings.mode,
         };
         this.validate()?;
         Ok(this)
@@ -467,6 +523,7 @@ impl Spec {
         self.validate_parameters()?;
         self.validate_controllers()?;
         self.validate_effects()?;
+        self.validate_routing()?;
         self.validate_mapping()?;
         self.validate_messages()
     }
@@ -635,6 +692,209 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    /// Checks the ten routing topologies against the value tables and themselves.
+    ///
+    /// The graph checks matter because these were transcribed by eye from ten
+    /// small printed diagrams. A slot that nothing feeds, or that reaches no
+    /// output, is a misread line rather than a topology the hardware offers.
+    fn validate_routing(&self) -> Result<(), String> {
+        let table = self
+            .table("fx_routing")
+            .ok_or("enums.toml: no fx_routing table to check routing.toml against")?;
+        if self.routings.len() != table.entries.len() {
+            return Err(format!(
+                "routing.toml has {} routings but fx_routing lists {}",
+                self.routings.len(),
+                table.entries.len()
+            ));
+        }
+        for (index, routing) in self.routings.iter().enumerate() {
+            if u16::try_from(index) != Ok(routing.value) {
+                return Err(format!(
+                    "routing.toml: {} has value {} at position {index}",
+                    routing.label, routing.value
+                ));
+            }
+            let listed = table
+                .entries
+                .iter()
+                .find(|e| e.value == routing.value)
+                .ok_or_else(|| format!("fx_routing has no value {}", routing.value))?;
+            if listed.name != routing.name {
+                return Err(format!(
+                    "routing.toml: value {} is {:?} but fx_routing calls it {:?}",
+                    routing.value, routing.name, listed.name
+                ));
+            }
+
+            let slots: Vec<u8> = routing.slots.iter().map(|s| s.slot).collect();
+            if slots != [1, 2, 3, 4] {
+                return Err(format!(
+                    "routing.toml: {} lists slots {slots:?}, want 1 to 4 in order",
+                    routing.label
+                ));
+            }
+            for slot in &routing.slots {
+                if slot.from.is_empty() {
+                    return Err(format!(
+                        "routing.toml: {} slot {} has nothing feeding it",
+                        routing.label, slot.slot
+                    ));
+                }
+                for &from in &slot.from {
+                    if from > 4 {
+                        return Err(format!(
+                            "routing.toml: {} slot {} is fed by {from}, which is not a slot",
+                            routing.label, slot.slot
+                        ));
+                    }
+                    if from == slot.slot {
+                        return Err(format!(
+                            "routing.toml: {} slot {} feeds itself",
+                            routing.label, slot.slot
+                        ));
+                    }
+                }
+            }
+            if routing.output.is_empty() {
+                return Err(format!(
+                    "routing.toml: {} sends no slot to the output",
+                    routing.label
+                ));
+            }
+            for &slot in &routing.output {
+                if slot == 0 || slot > 4 {
+                    return Err(format!(
+                        "routing.toml: {} sends {slot} to the output, which is not a slot",
+                        routing.label
+                    ));
+                }
+            }
+            Self::validate_routing_graph(routing)?;
+        }
+        self.validate_fx_modes()
+    }
+
+    /// Checks the three FX modes against the `fx_mode` value table.
+    fn validate_fx_modes(&self) -> Result<(), String> {
+        let table = self
+            .table("fx_mode")
+            .ok_or("enums.toml: no fx_mode table to check routing.toml against")?;
+        if self.fx_modes.len() != table.entries.len() {
+            return Err(format!(
+                "routing.toml has {} modes but fx_mode lists {}",
+                self.fx_modes.len(),
+                table.entries.len()
+            ));
+        }
+        for mode in &self.fx_modes {
+            let listed = table
+                .entries
+                .iter()
+                .find(|e| e.value == mode.value)
+                .ok_or_else(|| format!("fx_mode has no value {}", mode.value))?;
+            if listed.name != mode.name {
+                return Err(format!(
+                    "routing.toml: mode {} is {:?} but fx_mode calls it {:?}",
+                    mode.value, mode.name, listed.name
+                ));
+            }
+            if !mode.analog_path && !mode.digital_path {
+                return Err(format!(
+                    "routing.toml: mode {} leaves no path to the output",
+                    mode.name
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks that a topology is connected and that `feedback` matches the graph.
+    ///
+    /// Every slot must be reachable from the block input and must reach the
+    /// block output, and a loop must be declared rather than discovered.
+    fn validate_routing_graph(routing: &Routing) -> Result<(), String> {
+        let feeds = |slot: u8| -> &[u8] {
+            routing
+                .slots
+                .iter()
+                .find(|s| s.slot == slot)
+                .map_or(&[][..], |s| s.from.as_slice())
+        };
+
+        // Walk forwards from the input, ignoring edges that close a loop.
+        let mut reached = [false; 5];
+        reached[0] = true;
+        for _ in 0..4 {
+            for slot in 1..=4u8 {
+                if feeds(slot).iter().any(|&f| reached[usize::from(f)]) {
+                    reached[usize::from(slot)] = true;
+                }
+            }
+        }
+        for slot in 1..=4u8 {
+            if !reached[usize::from(slot)] {
+                return Err(format!(
+                    "routing.toml: {} slot {slot} is not reachable from the input",
+                    routing.label
+                ));
+            }
+        }
+
+        // Walk backwards from the output the same way.
+        let mut leads_out = [false; 5];
+        for &slot in &routing.output {
+            leads_out[usize::from(slot)] = true;
+        }
+        for _ in 0..4 {
+            for slot in 1..=4u8 {
+                let downstream = (1..=4u8)
+                    .any(|other| leads_out[usize::from(other)] && feeds(other).contains(&slot));
+                if downstream {
+                    leads_out[usize::from(slot)] = true;
+                }
+            }
+        }
+        for slot in 1..=4u8 {
+            if !leads_out[usize::from(slot)] {
+                return Err(format!(
+                    "routing.toml: {} slot {slot} reaches no output",
+                    routing.label
+                ));
+            }
+        }
+
+        // A loop exists when some slot feeds itself through the others.
+        let mut cyclic = false;
+        for start in 1..=4u8 {
+            let mut seen = [false; 5];
+            let mut frontier = vec![start];
+            while let Some(slot) = frontier.pop() {
+                for &from in feeds(slot) {
+                    if from == 0 {
+                        continue;
+                    }
+                    if from == start {
+                        cyclic = true;
+                    }
+                    if !seen[usize::from(from)] {
+                        seen[usize::from(from)] = true;
+                        frontier.push(from);
+                    }
+                }
+            }
+        }
+        if cyclic != routing.feedback {
+            return Err(format!(
+                "routing.toml: {} declares feedback = {} but its graph {} a loop",
+                routing.label,
+                routing.feedback,
+                if cyclic { "has" } else { "has no" }
+            ));
+        }
         Ok(())
     }
 

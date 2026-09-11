@@ -23,6 +23,7 @@ by hand: change the spec and run `cargo xtask docs`.
 - [Firmware versions](#firmware-versions)
 - [Value tables](#value-tables)
 - [Global settings](#global-settings)
+- [FX routing](#fx-routing)
 - [Effect parameters](#effect-parameters)
 - [Corrections to the manual](#corrections-to-the-manual)
 - [Scaling](#scaling-raw-values-to-displayed-values)
@@ -1680,6 +1681,50 @@ within that dump, so the offsets are still unknown.
 | Keyboard Octave | 0-7 | Octave shift. At 0 the leftmost key is C0. |
 
 <!-- /generated:globals -->
+
+## FX routing
+
+The `FX Routing` parameter at offset 165 picks one of ten fixed wirings of the
+four engines. `enums.toml` carries the manual's name for each, and a name is not
+enough: what the `Mix` and `Level` of a slot do depends on where the routing puts
+that slot, since the manual defines `Level` as the output level of effects
+"configured in parallel, or any effects which are the last effect before
+reaching the output stage". So the topologies are recorded as graphs.
+
+Two of the manual's names read ambiguously and its diagrams settle both. M-3,
+"Parallel 1/2 Parallel 3/4", is two serial pairs side by side, 1 into 2 alongside
+3 into 4, rather than slot 1 alongside slot 2. M-9 and M-10 put their numbered
+slots in a feedback loop around the main path rather than in the path.
+
+<!-- generated:routing -->
+
+| Value | | Routing | Slot 1 from | Slot 2 from | Slot 3 from | Slot 4 from | To output |
+|---|---|---|---|---|---|---|---|
+| 0 | M-1 | Serial 1-2-3-4 | input | 1 | 2 | 3 | 4 |
+| 1 | M-2 | Parallel 1/2, serial 3-4 | input | input | 1 + 2 | 3 | 4 |
+| 2 | M-3 | Parallel 1/2, parallel 3/4 | input | 1 | input | 3 | 2 + 4 |
+| 3 | M-4 | Parallel 1/2/3/4 | input | input | input | input | 1 + 2 + 3 + 4 |
+| 4 | M-5 | Parallel 1/2/3, serial 4 | input | input | input | 1 + 2 + 3 | 4 |
+| 5 | M-6 | Serial 1-2, parallel 3/4 | input | 1 | 2 | 2 | 3 + 4 |
+| 6 | M-7 | Serial 1, parallel 2/3/4 | input | 1 | 1 | 1 | 2 + 3 + 4 |
+| 7 | M-8 | Parallel (serial 1-2-3)/4 | input | 1 | 2 | input | 3 + 4 |
+| 8 | M-9 | Serial 3-4 feedback 4(1-2) | 4 | 1 | input | 3 + 2 | 4 |
+| 9 | M-10 | Serial 4 feedback 4(1-2-3) | 4 | 1 | 2 | input + 3 | 4 |
+
+A feedback routing feeds a slot, directly or through others, from a slot downstream of it. The manual notes a 30 Hz high pass filter in the feedback path of these.
+
+- **M-9**, Serial 3-4 feedback 4(1-2). The input reaches slot 3 and the output leaves slot 4. Slots 1 and 2 sit in a loop that taps slot 4's output and returns ahead of slot 4.
+- **M-10**, Serial 4 feedback 4(1-2-3). The input reaches slot 4 and the output leaves it. Slots 1, 2 and 3 sit in a loop that taps slot 4's output and returns ahead of slot 4.
+
+The `FX Mode` parameter at offset 222 decides which paths the voices take. The analog path runs from the voices to the output stage untouched; the digital path runs them through the FX block. Bypass is a true bypass, with the DSP out of circuit rather than muted.
+
+| Value | Mode | Analog path | Digital path |
+|---|---|---|---|
+| 0 | Insert | off | on |
+| 1 | Send | on | on |
+| 2 | Bypass | on | off |
+
+<!-- /generated:routing -->
 
 ## Effect parameters
 

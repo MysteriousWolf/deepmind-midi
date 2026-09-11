@@ -56,6 +56,7 @@ pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
         ("value-tables", render_value_tables(&spec)),
         ("globals", render_globals(&spec)),
         ("controllers", render_controllers(&spec)),
+        ("routing", render_routing(&spec)),
         ("effects", render_effects(&spec)),
         ("corrections", render_corrections(&spec)),
     ] {
@@ -519,6 +520,95 @@ fn render_effects(spec: &Spec) -> String {
                 cell(parameter.description.as_deref().unwrap_or(""))
             );
         }
+    }
+    out
+}
+
+/// Renders the ten FX topologies and the three FX modes.
+///
+/// Each slot's cell says what reaches it, which together with the output column
+/// is the edge list of the diagram the manual prints.
+fn render_routing(spec: &Spec) -> String {
+    let slots = |routing: &crate::spec::Routing, slot: u8| -> String {
+        routing
+            .slots
+            .iter()
+            .find(|s| s.slot == slot)
+            .map_or_else(String::new, |s| {
+                s.from
+                    .iter()
+                    .map(|&f| {
+                        if f == 0 {
+                            "input".to_owned()
+                        } else {
+                            f.to_string()
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" + ")
+            })
+    };
+
+    let mut out = String::from(
+        "| Value | | Routing | Slot 1 from | Slot 2 from | Slot 3 from | \
+         Slot 4 from | To output |\n|---|---|---|---|---|---|---|---|\n",
+    );
+    for routing in &spec.routings {
+        let _ = writeln!(
+            out,
+            "| {} | {} | {} | {} | {} | {} | {} | {} |",
+            routing.value,
+            cell(&routing.label),
+            cell(&routing.name),
+            slots(routing, 1),
+            slots(routing, 2),
+            slots(routing, 3),
+            slots(routing, 4),
+            routing
+                .output
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join(" + "),
+        );
+    }
+
+    let feedback: Vec<&crate::spec::Routing> =
+        spec.routings.iter().filter(|r| r.feedback).collect();
+    if !feedback.is_empty() {
+        out.push_str(
+            "\nA feedback routing feeds a slot, directly or through others, from \
+             a slot downstream of it. The manual notes a 30 Hz high pass filter \
+             in the feedback path of these.\n\n",
+        );
+        for routing in feedback {
+            let _ = writeln!(
+                out,
+                "- **{}**, {}. {}",
+                cell(&routing.label),
+                cell(&routing.name),
+                cell(routing.note.as_deref().unwrap_or("")).trim()
+            );
+        }
+    }
+
+    out.push_str(
+        "\nThe `FX Mode` parameter at offset 222 decides which paths the voices \
+         take. The analog path runs from the voices to the output stage \
+         untouched; the digital path runs them through the FX block. Bypass is a \
+         true bypass, with the DSP out of circuit rather than muted.\n\n\
+         | Value | Mode | Analog path | Digital path |\n|---|---|---|---|\n",
+    );
+    let mark = |on: bool| if on { "on" } else { "off" };
+    for mode in &spec.fx_modes {
+        let _ = writeln!(
+            out,
+            "| {} | {} | {} | {} |",
+            mode.value,
+            cell(&mode.name),
+            mark(mode.analog_path),
+            mark(mode.digital_path)
+        );
     }
     out
 }
