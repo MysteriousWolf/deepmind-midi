@@ -54,6 +54,7 @@ pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
         ("value-tables", render_value_tables(&spec)),
         ("globals", render_globals(&spec)),
         ("controllers", render_controllers(&spec)),
+        ("effects", render_effects(&spec)),
         ("corrections", render_corrections(&spec)),
     ] {
         updated = splice(&updated, marker, &body)?;
@@ -376,6 +377,51 @@ fn render_controllers(spec: &Spec) -> String {
                 );
             }
             let _ = writeln!(out, " {notes} |");
+        }
+    }
+    out
+}
+
+/// Renders one table per algorithm: what each of an engine's twelve raw
+/// parameters means when that algorithm is loaded.
+fn render_effects(spec: &Spec) -> String {
+    let mut out = String::new();
+    for effect in &spec.effects {
+        let _ = write!(
+            out,
+            "\n<a id=\"fx-{}\"></a>\n\n#### {} ({})\n\n`FX Type` {}.\n\n\
+             | Slot | Ref | Parameter | Range | Mod |\n|---|---|---|---|---|\n",
+            effect.r#type,
+            cell(&effect.full_name),
+            cell(&effect.name),
+            effect.r#type,
+        );
+        for parameter in &effect.parameters {
+            let range = match (&parameter.values, &parameter.min, &parameter.max) {
+                (Some(values), _, _) => cell(values),
+                (_, Some(min), Some(max)) => {
+                    let unit = parameter.unit.as_deref().unwrap_or("");
+                    let unit = if unit.is_empty() {
+                        String::new()
+                    } else {
+                        format!(" {unit}")
+                    };
+                    format!("{min} to {max}{unit}")
+                }
+                _ => String::new(),
+            };
+            let range = match &parameter.note {
+                Some(note) => format!("{range}. {}", cell(note)),
+                None => range,
+            };
+            let _ = writeln!(
+                out,
+                "| {} | `{}` | {} | {range} | {} |",
+                parameter.slot,
+                cell(&parameter.r#ref),
+                cell(&parameter.name),
+                if parameter.mod_dest { "yes" } else { "" }
+            );
         }
     }
     out

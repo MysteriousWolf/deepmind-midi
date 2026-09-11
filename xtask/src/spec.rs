@@ -125,6 +125,54 @@ pub struct Controller {
     pub note: Option<String>,
 }
 
+/// One parameter of one effect algorithm.
+///
+/// An engine holds twelve raw bytes whatever it is running; `slot` says which
+/// of those twelve this is, and the meaning comes from the algorithm.
+#[derive(Debug, Deserialize)]
+pub struct EffectParameter {
+    /// Position within the engine's twelve parameters, counting from 1.
+    pub slot: u8,
+    /// Short name as the synthesizer's display shows it.
+    pub r#ref: String,
+    /// Full parameter name.
+    pub name: String,
+    /// Unit of the displayed value, where there is one.
+    #[serde(default)]
+    pub unit: Option<String>,
+    /// Lowest displayed value, for a parameter with a numeric range.
+    #[serde(default)]
+    pub min: Option<String>,
+    /// Highest displayed value, for a parameter with a numeric range.
+    #[serde(default)]
+    pub max: Option<String>,
+    /// Options this parameter selects between, for a parameter without a range.
+    #[serde(default)]
+    pub values: Option<String>,
+    /// `true` when the manual marks the parameter as responding to modulation.
+    ///
+    /// Every slot is addressable from the modulation matrix regardless, as
+    /// `Fx <engine> Param <slot>`; this says the engine acts on what arrives.
+    #[serde(default)]
+    pub mod_dest: bool,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+/// An effect algorithm and the twelve parameters it gives its engine.
+#[derive(Debug, Deserialize)]
+pub struct Effect {
+    /// Value of the `FX Type` parameter that selects this algorithm.
+    pub r#type: u16,
+    /// Short name, matching the `fx_type` value table.
+    pub name: String,
+    /// Full name as the manual writes it.
+    pub full_name: String,
+    /// The parameters, ordered by slot.
+    pub parameters: Vec<EffectParameter>,
+}
+
 /// A device-wide setting.
 #[derive(Debug, Deserialize)]
 pub struct Global {
@@ -164,6 +212,11 @@ struct Controllers {
 }
 
 #[derive(Debug, Deserialize)]
+struct Effects {
+    effect: Vec<Effect>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Globals {
     #[serde(rename = "global")]
     globals: Vec<Global>,
@@ -182,6 +235,8 @@ pub struct Spec {
     pub globals: Vec<Global>,
     /// Continuous controllers, ordered by number.
     pub controllers: Vec<Controller>,
+    /// Effect algorithms, ordered by `FX Type` value.
+    pub effects: Vec<Effect>,
 }
 
 impl Spec {
@@ -200,6 +255,7 @@ impl Spec {
         let messages: Messages = read(&spec.join("messages.toml"))?;
         let globals: Globals = read(&spec.join("globals.toml"))?;
         let controllers: Controllers = read(&spec.join("controllers.toml"))?;
+        let effects: Effects = read(&spec.join("effects.toml"))?;
 
         let this = Self {
             parameters: parameters.parameter,
@@ -207,6 +263,7 @@ impl Spec {
             messages: messages.message,
             globals: globals.globals,
             controllers: controllers.controller,
+            effects: effects.effect,
         };
         this.validate()?;
         Ok(this)
@@ -219,6 +276,13 @@ impl Spec {
     }
 
     fn validate(&self) -> Result<(), String> {
+        self.validate_parameters()?;
+        self.validate_controllers()?;
+        self.validate_effects()?;
+        self.validate_messages()
+    }
+
+    fn validate_parameters(&self) -> Result<(), String> {
         let offsets: Vec<u16> = self.parameters.iter().map(|p| p.offset).collect();
         let expected: Vec<u16> = (0..242).collect();
         if offsets != expected {
@@ -258,6 +322,10 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    fn validate_controllers(&self) -> Result<(), String> {
         let mut seen_cc: Vec<u8> = Vec::new();
         for controller in &self.controllers {
             if seen_cc.contains(&controller.cc) {
@@ -289,6 +357,60 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    fn validate_effects(&self) -> Result<(), String> {
+        let fx_types: Vec<u16> = self.effects.iter().map(|e| e.r#type).collect();
+        let expected_types: Vec<u16> = (0..35).collect();
+        if fx_types != expected_types {
+            return Err(format!(
+                "effects.toml: type values must be 0..=34 in order, found {} entries",
+                fx_types.len()
+            ));
+        }
+        let fx_table = self
+            .table("fx_type")
+            .ok_or("enums.toml: no fx_type table to check effects.toml against")?;
+        for effect in &self.effects {
+            let listed = fx_table
+                .entries
+                .iter()
+                .find(|e| e.value == effect.r#type)
+                .ok_or_else(|| format!("fx_type has no value {}", effect.r#type))?;
+            if listed.name != effect.name {
+                return Err(format!(
+                    "effects.toml: type {} is {:?} but fx_type calls it {:?}",
+                    effect.r#type, effect.name, listed.name
+                ));
+            }
+            if effect.parameters.len() > 12 {
+                return Err(format!(
+                    "effects.toml: {} has {} parameters, an engine holds 12",
+                    effect.name,
+                    effect.parameters.len()
+                ));
+            }
+            for (index, parameter) in effect.parameters.iter().enumerate() {
+                if usize::from(parameter.slot) != index + 1 {
+                    return Err(format!(
+                        "effects.toml: {} slot {} is out of order",
+                        effect.name, parameter.slot
+                    ));
+                }
+                if parameter.values.is_none() && parameter.min.is_none() {
+                    return Err(format!(
+                        "effects.toml: {} slot {} has neither a range nor a value list",
+                        effect.name, parameter.slot
+                    ));
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn validate_messages(&self) -> Result<(), String> {
         let mut commands: Vec<u8> = self.messages.iter().map(|m| m.command).collect();
         commands.sort_unstable();
         if commands.windows(2).any(|w| w[0] == w[1]) {

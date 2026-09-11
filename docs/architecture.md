@@ -114,6 +114,7 @@ collapses NRPN edits, dump parsing and dump building into a single table.
 | `spec/controllers.toml` | 112 MIDI controllers, 90 mapped to a parameter |
 | `spec/messages.toml` | 22 SysEx messages |
 | `spec/globals.toml` | 25 device-wide settings |
+| `spec/effects.toml` | 370 effect parameters across 35 algorithms |
 
 `cargo xtask docs` renders the tables and Mermaid diagrams in
 [`midi-spec.md`](midi-spec.md), and writes the diagram sources to
@@ -244,17 +245,7 @@ built-in token; any failure there leaves the generated notes alone.
 | 7 | `transport`: the blocking adapter |
 | 8 | `deepmind-cli` |
 
-### Next: per-effect parameter names
+### Next: the wire layer
 
-Each FX slot has 12 raw parameters at offsets 167-178, 180-191, 193-204 and
-206-217. Their meaning depends on that slot's algorithm, so `FX 1 Param 3` is
-Size on a Room Reverb and something else on a Phaser. Without this table, 48
-bytes of every program are unlabelled, which defeats the point.
-
-Section 9.3 of the manual documents all 35 algorithms with a display reference, a
-full name, units, a range, a description, and a marker for the ones that are also
-modulation destinations. Roughly 350 rows. It goes in `spec/effects.toml`, keyed
-by FX type value so it joins to the existing `fx_type` table.
-
-Transcription, not research: the section extracts cleanly. It is separate only
-because 350 rows would make one change unreviewable.
+Framing, the packed MS-bit codec and typed messages. `spec/` now describes every
+byte a program carries, so the remaining steps are code.
