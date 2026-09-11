@@ -1,0 +1,151 @@
+name: Release
+
+# Run this from the Actions tab. It tags and publishes whatever version
+# Cargo.toml currently holds; it never edits the version itself.
+#
+# Bumping is a human step: edit `version` in the root Cargo.toml in a pull
+# request. CI fails any pull request whose version is not ahead of the newest
+# release tag, so the first one merged after a release has to move it.
+#
+# Optional secret. Missing it warns; the release still happens.
+#   CARGO_REGISTRY_TOKEN  publishes to crates.io
+
+on:
+  workflow_dispatch:
+    inputs:
+      summary:
+        description: Write a prose summary above the generated notes, using GitHub Models
+        type: boolean
+        default: true
+      dry_run:
+        description: Print the notes without tagging, releasing or publishing
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  models: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+
+      # Never tag something that does not build.
+      - name: Verify
+        env:
+          RUSTFLAGS: -D warnings
+        run: |
+          cargo fmt --all --check
+          cargo clippy --workspace --all-targets --all-features
+          cargo test --workspace --all-features
+
+      - name: Read version
+        id: version
+        run: |
+          set -euo pipefail
+          version=$(grep -m1 -E '^version = ' Cargo.toml | cut -d'"' -f2)
+          if git rev-parse -q --verify "refs/tags/v${version}" >/dev/null; then
+            echo "::error::v${version} is already tagged. Bump the version in Cargo.toml first."
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "releasing v${version}"
+
+      - name: Collect release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          WANT_SUMMARY: ${{ inputs.summary }}
+        run: |
+          set -euo pipefail
+          previous=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+
+          # GitHub's own notes, categorised by .github/release.yml.
+          if [ -n "$previous" ]; then
+            gh api "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="v${VERSION}" -f previous_tag_name="$previous" \
+              --jq .body > generated.md
+          else
+            gh api "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="v${VERSION}" --jq .body > generated.md
+          fi
+          cp generated.md notes.md
+
+          # Optional opening paragraph, written by a small model on GitHub Models
+          # using the built-in token. Any failure leaves the generated notes as
+          # they are.
+          if [ "$WANT_SUMMARY" != 'true' ]; then
+            echo 'summary not requested'
+          else
+            jq -n --arg notes "$(cat generated.md)" --arg v "$VERSION" '{
+              model: "openai/gpt-4o-mini",
+              messages: [
+                { role: "system",
+                  content: "You write release notes for a Rust library. Reply with two or three plain sentences of prose and nothing else: no heading, no bullet list, no closing line. Say what changed and who it affects. No marketing language, no em dashes." },
+                { role: "user",
+                  content: ("Version " + $v + " of deepmind-midi, a library for the Behringer DeepMind MIDI protocol.\n\n" + $notes) }
+              ]
+            }' > request.json
+
+            if curl -sS --fail-with-body --max-time 60 \
+                 https://models.github.ai/inference/chat/completions \
+                 -H 'content-type: application/json' \
+                 -H "authorization: Bearer ${GH_TOKEN}" \
+                 -d @request.json > response.json; then
+              jq -r '.choices[0].message.content // empty' response.json > summary.md
+              if [ -s summary.md ]; then
+                { cat summary.md; printf '\n\n'; cat generated.md; } > notes.md
+              else
+                echo '::warning::GitHub Models returned nothing, using the generated notes alone'
+              fi
+            else
+              echo '::warning::GitHub Models request failed, using the generated notes alone'
+              cat response.json || true
+            fi
+          fi
+
+          echo '--- release notes ---'
+          cat notes.md
+
+      - name: Tag
+        if: ${{ !inputs.dry_run }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git tag -a "v${VERSION}" -m "v${VERSION}"
+          git push origin "v${VERSION}"
+
+      - name: Create GitHub release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: gh release create "v${VERSION}" --title "v${VERSION}" --notes-file notes.md
+
+      - name: Publish to crates.io
+        if: ${{ !inputs.dry_run }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CARGO_REGISTRY_TOKEN:-}" ]; then
+            echo '::warning::CARGO_REGISTRY_TOKEN is not set, skipping the crates.io publish'
+            exit 0
+          fi
+          cargo publish --package deepmind-midi

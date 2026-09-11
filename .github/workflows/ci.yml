@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  check:
+    name: format, lint, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The version guard below reads release tags from the local checkout.
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features
+
+      # Includes generated_documentation_is_current, which fails when
+      # docs/midi-spec.md does not match spec/.
+      - name: Test
+        run: cargo test --workspace --all-features
+
+      - name: Generated documentation is current
+        run: cargo xtask docs --check
+
+      # The first change merged after a release has to move the version.
+      # A repository with no release tags yet passes: nothing to be behind.
+      - name: Version is ahead of the last release
+        run: |
+          set -euo pipefail
+          current=$(grep -m1 -E '^version = ' Cargo.toml | cut -d'"' -f2)
+          latest=$(git tag --list 'v*' | sed 's/^v//' | sort -V | tail -1)
+          if [ -z "$latest" ]; then
+            echo "$current (no release tags yet)"
+            exit 0
+          fi
+          if [ "$(printf '%s\n%s\n' "$current" "$latest" | sort -V | head -1)" = "$current" ]; then
+            echo "::error::Cargo.toml is at $current but v$latest is already released. Bump the version in Cargo.toml before merging."
+            exit 1
+          fi
+          echo "$current is ahead of the last release, v$latest"
+
+  features:
+    name: feature combinations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: no default features
+        run: cargo build -p deepmind-midi --no-default-features
+
+      - name: alloc only
+        run: cargo build -p deepmind-midi --no-default-features --features alloc
+
+      - name: serde without std
+        run: cargo build -p deepmind-midi --no-default-features --features alloc,serde
+
+  msrv:
+    name: minimum supported Rust version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.85.0
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo check --workspace --all-features
+
+  docs:
+    name: rustdoc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+      - name: Build rustdoc
+        run: cargo doc --workspace --all-features --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings --cfg docsrs
