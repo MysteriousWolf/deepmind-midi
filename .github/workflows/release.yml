@@ -3,12 +3,9 @@ name: Release
 # Run this from the Actions tab. It tags and publishes whatever version
 # Cargo.toml currently holds; it never edits the version itself.
 #
-# Bumping is a human step, done in a pull request:
-#   cargo xtask release --bump patch     26.1.0 -> 26.1.1
-#   cargo xtask release --bump release   26.1.3 -> 26.2.0, or 27.1.0 in a new year
-#
-# CI fails any pull request whose version is not ahead of the newest release tag,
-# so the first one merged after a release has to move it.
+# Bumping is a human step: edit `version` in the root Cargo.toml in a pull
+# request. CI fails any pull request whose version is not ahead of the newest
+# release tag, so the first one merged after a release has to move it.
 #
 # Optional secret. Missing it warns; the release still happens.
 #   CARGO_REGISTRY_TOKEN  publishes to crates.io
@@ -59,7 +56,7 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          version=$(cargo xtask version)
+          version=$(grep -m1 -E '^version = ' Cargo.toml | cut -d'"' -f2)
           if git rev-parse -q --verify "refs/tags/v${version}" >/dev/null; then
             echo "::error::v${version} is already tagged. Bump the version in Cargo.toml first."
             exit 1

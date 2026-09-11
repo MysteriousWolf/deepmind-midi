@@ -43,23 +43,19 @@ Documentation and diagrams are generated from `spec/`:
 ```sh
 cargo xtask docs            # regenerate
 cargo xtask docs --check    # fail if stale
-cargo xtask hooks install   # regenerate and stage on every commit
 ```
 
 Editing a spec file without regenerating fails `cargo test`.
 
 ## Releasing
 
-Bump the version in `Cargo.toml`, in a pull request:
+Versions are `YY.RELEASE.PATCH`: `26.1.0` is the first release of 2026, `26.1.1`
+its first patch, `26.2.0` the second release of the year.
 
-```sh
-cargo xtask release --bump patch     # 26.1.0 -> 26.1.1
-cargo xtask release --bump release   # 26.1.3 -> 26.2.0, or 27.1.0 in a new year
-```
-
-CI fails any pull request whose version is not ahead of the newest release tag.
-Then run the Release workflow from the Actions tab; it tags and publishes what
-`Cargo.toml` holds.
+Edit `version` in `Cargo.toml`, in a pull request. CI fails any pull request
+whose version is not ahead of the newest release tag, so the first one merged
+after a release has to move it. Then run the Release workflow from the Actions
+tab; it tags and publishes what `Cargo.toml` holds.
 
 ## License
 

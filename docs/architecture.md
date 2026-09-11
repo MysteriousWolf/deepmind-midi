@@ -118,24 +118,22 @@ collapses NRPN edits, dump parsing and dump building into a single table.
 `cargo xtask docs` renders the tables and Mermaid diagrams in
 [`midi-spec.md`](midi-spec.md), and writes the diagram sources to
 `docs/diagrams/*.mmd`. The diagrams are embedded inline as well, from the same
-strings, so nothing needs a build step to read. `cargo xtask diagrams` renders
-them to SVG as standalone images.
+strings, so nothing needs a build step to read.
 
 The same files will generate the `Program` struct, its typed fields and its
 conversions. A correction gets made once.
 
 ### Keeping generated output honest
 
-The failure mode is silent, so it is caught three ways:
+The failure mode is silent, so it is caught twice:
 
-- `cargo xtask docs --check` reports staleness without writing. CI runs it.
-- `generated_documentation_is_current` runs the same comparison as a test, so a
-  stale checkout fails `cargo test` whether or not anyone remembers the check.
-- `cargo xtask hooks install` adds a pre-commit hook that regenerates and stages,
-  so a commit cannot carry a stale document at all.
+- `generated_documentation_is_current` compares the checked-in document against a
+  fresh render, so a stale checkout fails `cargo test`.
+- `cargo xtask docs --check` does the same without writing, and names the command
+  to run. CI runs it for the clearer error.
 
-The hook is opt-in. CI auto-committing to contributor branches is worse than a
-clear failure naming the command to run.
+CI does not regenerate and commit. Auto-committing to contributor branches is
+worse than a failure that says what to run.
 
 The loader validates before rendering: offsets must cover 0..=241 exactly, every
 referenced value table must exist, an enumerated parameter's maximum must match
@@ -187,7 +185,7 @@ blind-relaying that bricks synthesizers.
 ```
 spec/            the machine-readable specification
 deepmind-midi/   the library
-xtask/           doc generation, drift checks, version bumps
+xtask/           generates the documentation from spec/
 deepmind-cli/    a midir host: dump banks, import packs, monitor traffic
 ```
 
@@ -216,10 +214,10 @@ a small synthetic fixture and expected checksums.
 `YY.RELEASE.PATCH`: `26.1.0` is the first release of 2026, `26.1.1` its first
 patch, `26.2.0` the second release of the year.
 
-A human owns it. `cargo xtask version --check` fails in CI when the version is
-not ahead of the newest release tag, so the first pull request merged after a
-release has to move it. `cargo xtask release --bump patch` makes that edit
-locally and never runs in CI.
+A human owns it, editing one line by hand. CI fails when the version is not
+ahead of the newest release tag, so the first pull request merged after a
+release has to move it. That check is eight lines of shell in the workflow,
+where anyone reading the workflow can see it.
 
 Having the release workflow bump and commit instead would make the version in
 the tree a lie between releases, and would need write access to the default
