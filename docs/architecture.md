@@ -154,6 +154,32 @@ built from the manual, then checked against a MIDI Designer layout that had no
 part in building it. All 35 of its named NRPN controls agree, including the three
 offsets where this specification departs from the manual's printed names.
 
+## Decoding borrows, it does not copy
+
+A bank program names dump is 2354 bytes on the wire. Handing a host an owned
+copy of that would put an allocator on the path of every message, which is the
+one thing a `no_std` library cannot do, so nothing on the way in is copied.
+
+The decoder owns one buffer and reassembles frames into it. `Event::SysEx`
+borrows that buffer and lives until the next byte is fed in, which is long
+enough to parse and not long enough to hold. `Frame::parse` then borrows again:
+a `Message` carries its bulk payload as a `&[u8]`, still packed. Unpacking is a
+separate call, into a buffer the caller owns, because only the caller knows
+where 245 bytes can go.
+
+The buffer size is a const parameter defaulting to the longest documented frame.
+A host that only sends NRPN edits and reads the edit buffer can say
+`Decoder<300>` and save two kilobytes of stack; one that talks to something else
+on the same port can say more. A frame that does not fit is dropped with one
+error rather than truncated into something that would parse.
+
+The decoder reports what arrived rather than tidying it. A note-on with velocity
+zero stays a note-on, since the wire distinguishes them and some devices mean
+the difference. Running status, real-time bytes inside a `SysEx` frame and a
+status byte that ends one early are all handled, because they are what a MIDI
+port actually delivers and a library that only worked on clean input would put
+that work in every host.
+
 ## Firmware is a dimension, not a footnote
 
 Firmware 1.1 renumbered three value tables rather than only appending to them.
@@ -392,7 +418,11 @@ built-in token; any failure there leaves the generated notes alone.
 | 7 | `transport`: the blocking adapter |
 | 8 | `deepmind-cli` |
 
-### Next: the wire layer
+Steps 1 to 3 have landed.
 
-Framing, the packed MS-bit codec and typed messages. `spec/` now describes every
-byte a program carries, so the remaining steps are code.
+### Next: the parameter layer
+
+`param`: the 242 parameters, their NRPN numbers, ranges and value tables,
+generated from `spec/` rather than written out again. The wire is now readable
+and writable, so what is missing is meaning: a program dump arrives as 242 bytes
+that nothing yet names.
