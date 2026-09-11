@@ -14,13 +14,16 @@
 //! test runs the same comparison, so a stale checkout fails `cargo test`.
 
 use std::fmt::Write as _;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
-use crate::diagrams;
 use crate::spec::Spec;
+use crate::{diagrams, fx};
 
-/// Path of the document this module owns, relative to the repository root.
+/// Path of the protocol document, relative to the repository root.
 pub const DOC_PATH: &str = "docs/midi-spec.md";
+
+/// Path of the effects document, relative to the repository root.
+pub const EFFECTS_PATH: &str = "docs/effects.md";
 
 /// Outcome of a generation run.
 #[derive(Debug, PartialEq, Eq)]
@@ -42,39 +45,100 @@ pub enum Outcome {
 pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
     let spec = Spec::load(root)?;
     let diagrams = diagrams::all(&spec)?;
+    let drawings = fx::all(&spec)?;
     let mut stale = write_diagram_sources(root, &diagrams, check)?;
-    let path: PathBuf = root.join(DOC_PATH);
-    let current = std::fs::read_to_string(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+    stale |= write_drawings(root, &drawings, check)?;
 
-    let mut updated = current.clone();
-    for (marker, body) in [
-        ("structure", render_structure(&spec, &diagrams)?),
-        ("messages", render_messages(&spec)),
-        ("parameters", render_parameters(&spec)),
-        ("firmware", render_firmware(&spec)),
-        ("mapping", render_mapping(&spec)),
-        ("value-tables", render_value_tables(&spec)),
-        ("globals", render_globals(&spec)),
-        ("controllers", render_controllers(&spec)),
-        ("routing", render_routing(&spec)),
-        ("effects", render_effects(&spec)),
-        ("measurements", render_measurements(&spec)),
-        ("corrections", render_corrections(&spec)),
+    for (path, sections) in [
+        (
+            DOC_PATH,
+            vec![
+                ("structure", render_structure(&spec, &diagrams)?),
+                ("messages", render_messages(&spec)),
+                ("parameters", render_parameters(&spec)),
+                ("firmware", render_firmware(&spec)),
+                ("mapping", render_mapping(&spec)),
+                ("value-tables", render_value_tables(&spec)),
+                ("globals", render_globals(&spec)),
+                ("controllers", render_controllers(&spec)),
+                ("routing", render_routing(&spec)),
+                ("measurements", render_measurements(&spec)),
+                ("corrections", render_corrections(&spec)),
+            ],
+        ),
+        (
+            EFFECTS_PATH,
+            vec![
+                ("grid", render_grid(&spec)),
+                ("effect-index", render_effect_index(&spec)),
+                ("effects", render_effects(&spec, &drawings)),
+                ("effect-corrections", render_effect_corrections(&spec)),
+            ],
+        ),
     ] {
-        updated = splice(&updated, marker, &body)?;
-    }
-
-    if updated != current {
-        stale = true;
-        if !check {
-            std::fs::write(&path, updated).map_err(|e| format!("{}: {e}", path.display()))?;
+        let file = root.join(path);
+        let current =
+            std::fs::read_to_string(&file).map_err(|e| format!("{}: {e}", file.display()))?;
+        let mut updated = current.clone();
+        for (marker, body) in sections {
+            updated = splice(path, &updated, marker, &body)?;
+        }
+        if updated != current {
+            stale = true;
+            if !check {
+                std::fs::write(&file, updated).map_err(|e| format!("{}: {e}", file.display()))?;
+            }
         }
     }
+
     Ok(if stale {
         Outcome::Stale
     } else {
         Outcome::Current
     })
+}
+
+/// Writes each effect drawing to `docs/diagrams/fx/<id>.svg`, or reports staleness.
+///
+/// Returns whether any file differed from what is on disk.
+fn write_drawings(root: &Path, all: &[fx::Drawing], check: bool) -> Result<bool, String> {
+    let dir = root.join(fx::DIR);
+    if !check {
+        std::fs::create_dir_all(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
+    }
+    let mut stale = false;
+    for drawing in all {
+        let path = dir.join(format!("{}.svg", drawing.id));
+        if std::fs::read_to_string(&path).is_ok_and(|found| found == drawing.source) {
+            continue;
+        }
+        stale = true;
+        if !check {
+            std::fs::write(&path, &drawing.source)
+                .map_err(|e| format!("{}: {e}", path.display()))?;
+        }
+    }
+
+    // A drawing whose effect was renamed leaves its old file behind, and a
+    // stale panel in the directory is worse than no panel.
+    let wanted: Vec<String> = all.iter().map(|d| format!("{}.svg", d.id)).collect();
+    if let Ok(entries) = std::fs::read_dir(&dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().is_none_or(|e| e != "svg") {
+                continue;
+            }
+            let name = entry.file_name().to_string_lossy().into_owned();
+            if wanted.contains(&name) {
+                continue;
+            }
+            stale = true;
+            if !check {
+                std::fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+            }
+        }
+    }
+    Ok(stale)
 }
 
 /// Writes each diagram to `docs/diagrams/<id>.mmd`, or reports staleness.
@@ -109,18 +173,18 @@ fn write_diagram_sources(
 }
 
 /// Replaces the text between `<!-- generated:NAME -->` and `<!-- /generated:NAME -->`.
-fn splice(document: &str, marker: &str, body: &str) -> Result<String, String> {
+fn splice(path: &str, document: &str, marker: &str, body: &str) -> Result<String, String> {
     let open = format!("<!-- generated:{marker} -->");
     let close = format!("<!-- /generated:{marker} -->");
     let start = document
         .find(&open)
-        .ok_or_else(|| format!("{DOC_PATH}: missing marker {open}"))?
+        .ok_or_else(|| format!("{path}: missing marker {open}"))?
         + open.len();
     let end = document
         .find(&close)
-        .ok_or_else(|| format!("{DOC_PATH}: missing marker {close}"))?;
+        .ok_or_else(|| format!("{path}: missing marker {close}"))?;
     if end < start {
-        return Err(format!("{DOC_PATH}: marker {close} precedes {open}"));
+        return Err(format!("{path}: marker {close} precedes {open}"));
     }
     Ok(format!(
         "{}\n\n{}\n\n{}",
@@ -482,36 +546,143 @@ fn render_controllers(spec: &Spec) -> String {
     out
 }
 
-/// Renders one table per algorithm: what each of an engine's twelve raw
-/// parameters means when that algorithm is loaded.
-fn render_effects(spec: &Spec) -> String {
+/// Renders the measured grid, so the numbers the drawings are built from are
+/// readable next to them.
+fn render_grid(spec: &Spec) -> String {
+    let grid = &spec.grid;
+    let rows = [
+        ("Columns".to_owned(), grid.columns.to_string()),
+        ("Rows".to_owned(), grid.rows.to_string()),
+        ("Fill order".to_owned(), cell(&grid.order)),
+        (
+            "Alignment of a row that is not full".to_owned(),
+            cell(&grid.align),
+        ),
+        (
+            "Shape the FX page draws for every slot".to_owned(),
+            cell(&grid.shape),
+        ),
+        (
+            "Display measured on".to_owned(),
+            format!(
+                "{:.0} x {:.0} pixels",
+                grid.display_width, grid.display_height
+            ),
+        ),
+        (
+            "First control centre".to_owned(),
+            format!("{:.1}, {:.1}", grid.first_x, grid.first_y),
+        ),
+        (
+            "Column pitch".to_owned(),
+            format!("{:.1}", grid.column_pitch),
+        ),
+        ("Row pitch".to_owned(), format!("{:.1}", grid.row_pitch)),
+        (
+            "Control diameter".to_owned(),
+            format!("{:.1}", grid.control_diameter),
+        ),
+    ];
+
+    let mut out = String::from("| Property | Value |\n|---|---|\n");
+    for (property, value) in rows {
+        let _ = writeln!(out, "| {property} | {value} |");
+    }
+    let _ = write!(
+        out,
+        "\nThe drawings below space their rows further apart than {:.1} pixels, because \
+         the synthesizer has room for a three-letter label and these have room for the \
+         parameter's name. Everything across a row is as measured. The shape at each \
+         position is not: the FX page draws every slot as a circle, and the drawings \
+         use what the effect's own panel uses instead. Every handle is drawn at the \
+         {}.\n",
+        grid.row_pitch,
+        fx::handle_note(),
+    );
+    out
+}
+
+/// Renders the list of algorithms, grouped as the manual's effects table groups
+/// them.
+fn render_effect_index(spec: &Spec) -> String {
     let mut out = String::new();
-    let columns = usize::from(spec.panel_meta.columns);
-    for effect in &spec.effects {
-        // The FX page fills rows of `columns` in slot order, so the shape of the
-        // page follows from the parameter count.
-        let rows: Vec<String> = effect
-            .parameters
-            .chunks(columns)
-            .map(|row| row.len().to_string())
-            .collect();
+    let mut seen: Vec<&str> = Vec::new();
+    for layout in &spec.layouts {
+        if !seen.contains(&layout.category.as_str()) {
+            seen.push(&layout.category);
+        }
+    }
+    for category in seen {
         let _ = write!(
             out,
-            "\n<a id=\"fx-{}\"></a>\n\n#### {} ({})\n\n`FX Type` {}. \
-             {} slots, shown as {}.\n\n\
-             | Slot | Ref | Parameter | Reads as | Control | Group | Range | \
-             Mod | Description |\n|---|---|---|---|---|---|---|---|---|\n",
-            effect.r#type,
+            "\n### {category}\n\n| `FX Type` | Effect | Name | Slots | Page | Panel |\n\
+             |---|---|---|---|---|---|\n"
+        );
+        for layout in spec.layouts.iter().filter(|l| l.category == category) {
+            let Some(effect) = spec.effects.iter().find(|e| e.r#type == layout.r#type) else {
+                continue;
+            };
+            let rows: Vec<String> = layout
+                .rows
+                .iter()
+                .map(|r| r.slots.len().to_string())
+                .collect();
+            let _ = writeln!(
+                out,
+                "| {} | [{}](#{}) | {} | {} | {} | {} |",
+                layout.r#type,
+                cell(&effect.name),
+                fx::stem(effect.r#type, &effect.full_name),
+                cell(&effect.full_name),
+                effect.parameters.len(),
+                match rows.len() {
+                    1 => format!("one row of {}", rows[0]),
+                    _ => format!("rows of {}", rows.join(" and ")),
+                },
+                cell(&layout.control),
+            );
+        }
+    }
+    out
+}
+
+/// Renders one section per algorithm: the drawing of its page, then what each
+/// of an engine's twelve raw parameters means when that algorithm is loaded.
+fn render_effects(spec: &Spec, drawings: &[fx::Drawing]) -> String {
+    let mut out = String::new();
+    for effect in &spec.effects {
+        let layout = spec.layouts.iter().find(|l| l.r#type == effect.r#type);
+        let panel = spec.panels.iter().find(|p| p.r#type == effect.r#type);
+        let stem = fx::stem(effect.r#type, &effect.full_name);
+        let drawing = drawings.iter().find(|d| d.id == stem);
+        let _ = write!(
+            out,
+            "\n<a id=\"{}\"></a>\n\n### {} ({})\n\n",
+            stem,
             cell(&effect.full_name),
             cell(&effect.name),
-            effect.r#type,
-            effect.parameters.len(),
-            match rows.len() {
-                1 => format!("one row of {}", rows[0]),
-                _ => format!("rows of {}", rows.join(" and ")),
-            },
         );
-        let panel = spec.panels.iter().find(|p| p.r#type == effect.r#type);
+        if let Some(drawing) = drawing {
+            let _ = write!(
+                out,
+                "<img src=\"diagrams/fx/{}.svg\" alt=\"{} front panel\" width=\"720\">\n\n",
+                drawing.id,
+                cell(&drawing.title),
+            );
+        }
+        let _ = write!(
+            out,
+            "`FX Type` {}{}. {} slots{}.\n\n\
+             | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | \
+             Description |\n|---|---|---|---|---|---|---|---|---|\n",
+            effect.r#type,
+            layout.map_or(String::new(), |l| format!(
+                ", {}",
+                l.category.to_lowercase()
+            )),
+            effect.parameters.len(),
+            layout.map_or(String::new(), |l| format!(", drawn as {}s", l.control)),
+        );
         for parameter in &effect.parameters {
             let slot = panel.and_then(|p| p.slots.iter().find(|s| s.slot == parameter.slot));
             let range = match (&parameter.values, &parameter.min, &parameter.max) {
@@ -546,6 +717,34 @@ fn render_effects(spec: &Spec) -> String {
         }
     }
     out
+}
+
+/// Renders the rows of the manual's effect tables that had to be corrected.
+fn render_effect_corrections(spec: &Spec) -> String {
+    let mut out = String::from("| Effect | Slot | Parameter | Correction |\n|---|---|---|---|\n");
+    let mut any = false;
+    for effect in &spec.effects {
+        for parameter in &effect.parameters {
+            let Some(correction) = parameter.correction.as_deref() else {
+                continue;
+            };
+            any = true;
+            let _ = writeln!(
+                out,
+                "| [{}](#{}) | {} | {} | {} |",
+                cell(&effect.name),
+                fx::stem(effect.r#type, &effect.full_name),
+                parameter.slot,
+                cell(&parameter.name),
+                cell(correction),
+            );
+        }
+    }
+    if any {
+        out
+    } else {
+        "None recorded.".to_owned()
+    }
 }
 
 /// Renders the ten FX topologies and the three FX modes.
@@ -741,29 +940,38 @@ mod tests {
         let root = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .unwrap_or(Path::new("."));
-        let document = std::fs::read_to_string(root.join(DOC_PATH)).expect("document is readable");
-
         let columns = |line: &str| line.trim().trim_matches('|').split('|').count();
-        let mut expected: Option<usize> = None;
-        for (number, line) in document.lines().enumerate() {
-            let line = line.trim();
-            if !line.starts_with('|') {
-                expected = None;
-                continue;
-            }
-            // The dashed rule under a header sets the width for the rows that follow.
-            if line.chars().all(|c| "|-: ".contains(c)) {
-                expected = Some(columns(line));
-                continue;
-            }
-            if let Some(want) = expected {
-                assert_eq!(
-                    columns(line),
-                    want,
-                    "{DOC_PATH} line {}: table row has {} columns, header has {want}",
-                    number + 1,
-                    columns(line)
+        for path in [DOC_PATH, EFFECTS_PATH] {
+            let document = std::fs::read_to_string(root.join(path)).expect("document is readable");
+            let mut expected: Option<usize> = None;
+            for (number, raw) in document.lines().enumerate() {
+                let line = raw.trim();
+                // An indented row is a code block to Markdown, not a table. The
+                // continuations in a Rust string literal make that easy to do by
+                // accident and impossible to see in the source.
+                assert!(
+                    !line.starts_with('|') || raw.starts_with('|'),
+                    "{path} line {}: table row is indented",
+                    number + 1
                 );
+                if !line.starts_with('|') {
+                    expected = None;
+                    continue;
+                }
+                // The dashed rule under a header sets the width for the rows that follow.
+                if line.chars().all(|c| "|-: ".contains(c)) {
+                    expected = Some(columns(line));
+                    continue;
+                }
+                if let Some(want) = expected {
+                    assert_eq!(
+                        columns(line),
+                        want,
+                        "{path} line {}: table row has {} columns, header has {want}",
+                        number + 1,
+                        columns(line)
+                    );
+                }
             }
         }
     }

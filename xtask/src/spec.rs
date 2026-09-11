@@ -202,6 +202,9 @@ pub struct EffectParameter {
     /// Free-form note.
     #[serde(default)]
     pub note: Option<String>,
+    /// What this row reads in the manual, where the manual is wrong.
+    #[serde(default)]
+    pub correction: Option<String>,
 }
 
 /// An effect algorithm and the twelve parameters it gives its engine.
@@ -237,11 +240,73 @@ pub struct PanelSlot {
     pub modulatable: bool,
 }
 
-/// Presentation facts that hold for every effect.
+/// The grid the synthesizer draws its FX page on, in display pixels.
+///
+/// Measured from the 35 screenshots in section 9.3 of the manual, which all
+/// agree: one circle per slot, on six columns and two rows, filled in slot
+/// order from the top left.
 #[derive(Debug, Deserialize)]
-pub struct PanelMeta {
-    /// Slots per row on the synthesizer's own FX page.
+pub struct Grid {
+    /// Slots per row.
     pub columns: u8,
+    /// Rows per page.
+    pub rows: u8,
+    /// What a row that is not full does with the space left over.
+    pub align: String,
+    /// The order slots are placed in.
+    pub order: String,
+    /// The shape the synthesizer draws for every slot on its own FX page.
+    pub shape: String,
+    /// Width of the display the grid was measured on.
+    pub display_width: f32,
+    /// Height of the display the grid was measured on.
+    pub display_height: f32,
+    /// Centre of the first column.
+    pub first_x: f32,
+    /// Centre of the first row.
+    pub first_y: f32,
+    /// Distance between column centres.
+    pub column_pitch: f32,
+    /// Distance between row centres.
+    pub row_pitch: f32,
+    /// Diameter of the circle drawn for a slot.
+    pub control_diameter: f32,
+}
+
+/// One row of an effect's FX page.
+#[derive(Debug, Deserialize)]
+pub struct LayoutRow {
+    /// Slots on this row, in the order they are drawn.
+    pub slots: Vec<u8>,
+    /// What this row does with the space left over when it is not full.
+    pub align: String,
+}
+
+/// Where one effect's controls sit, and what colour its panel is.
+#[derive(Debug, Deserialize)]
+pub struct Layout {
+    /// Value of the `FX Type` parameter that selects this algorithm.
+    pub r#type: u16,
+    /// Short name, matching the effect and the `fx_type` value table.
+    pub name: String,
+    /// The manual's own classification: Reverb, Processing, Delay or Creative.
+    pub category: String,
+    /// What the effect's own editor panel uses for a sweeping parameter:
+    /// `knob`, `fader` or `display`.
+    ///
+    /// This is not the FX page, which draws every slot as a circle. It is the
+    /// panel printed beside it, and the two disagree for five effects.
+    pub control: String,
+    /// The case around the controls.
+    pub chassis: String,
+    /// The surface the controls sit on.
+    pub face: String,
+    /// The part a finger moves: a knob body or a fader cap.
+    pub cap: String,
+    /// Most saturated colour covering a visible share of the panel.
+    pub accent: String,
+    /// The rows, in the order they are drawn.
+    pub rows: Vec<LayoutRow>,
 }
 
 /// The presentation of one effect algorithm's slots.
@@ -416,8 +481,20 @@ struct Controllers {
 
 #[derive(Debug, Deserialize)]
 struct Panels {
-    meta: PanelMeta,
     panel: Vec<Panel>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Layouts {
+    meta: LayoutMeta,
+    grid: Grid,
+    layout: Vec<Layout>,
+}
+
+#[derive(Debug, Deserialize)]
+struct LayoutMeta {
+    aligns: Vec<String>,
+    controls: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -475,8 +552,14 @@ pub struct Spec {
     pub transports: Vec<Transport>,
     /// Rules turning a value into wire bytes.
     pub encodings: Vec<Encoding>,
-    /// Presentation facts shared by every effect.
-    pub panel_meta: PanelMeta,
+    /// The grid every effect's FX page is drawn on.
+    pub grid: Grid,
+    /// Where each effect's controls sit and what colour it is, by `FX Type`.
+    pub layouts: Vec<Layout>,
+    /// The alignments a row may declare.
+    pub aligns: Vec<String>,
+    /// The control shapes a layout may declare.
+    pub controls: Vec<String>,
     /// How each effect presents its slots, ordered by `FX Type` value.
     pub panels: Vec<Panel>,
     /// How the four engines can be wired, ordered by `FX Routing` value.
@@ -507,6 +590,7 @@ impl Spec {
         let firmwares: Firmwares = read(&spec.join("firmware.toml"))?;
         let mapping: Mapping = read(&spec.join("mapping.toml"))?;
         let panels: Panels = read(&spec.join("panels.toml"))?;
+        let layouts: Layouts = read(&spec.join("layout.toml"))?;
         let routings: Routings = read(&spec.join("routing.toml"))?;
         let measurements: Measurements = read(&spec.join("measurements.toml"))?;
 
@@ -520,7 +604,10 @@ impl Spec {
             firmwares: firmwares.firmware,
             transports: mapping.transport,
             encodings: mapping.encodings,
-            panel_meta: panels.meta,
+            grid: layouts.grid,
+            layouts: layouts.layout,
+            aligns: layouts.meta.aligns,
+            controls: layouts.meta.controls,
             panels: panels.panel,
             routings: routings.routing,
             fx_modes: routings.mode,
@@ -564,6 +651,7 @@ impl Spec {
         self.validate_parameters()?;
         self.validate_controllers()?;
         self.validate_effects()?;
+        self.validate_layout()?;
         self.validate_routing()?;
         self.validate_measurements()?;
         self.validate_mapping()?;
@@ -684,6 +772,87 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    /// Checks that every effect has a layout that places each of its slots once.
+    ///
+    /// The layout is a measurement of the manual's screenshots, so a slot count
+    /// that disagrees with `effects.toml` means one of the two misread the
+    /// manual. That is how the missing twelfth slot of `MoodFilter` was found.
+    fn validate_layout(&self) -> Result<(), String> {
+        if self.layouts.len() != self.effects.len() {
+            return Err(format!(
+                "layout.toml: {} layouts for {} effects",
+                self.layouts.len(),
+                self.effects.len()
+            ));
+        }
+        for effect in &self.effects {
+            let layout = self
+                .layouts
+                .iter()
+                .find(|l| l.r#type == effect.r#type)
+                .ok_or_else(|| format!("layout.toml: no layout for type {}", effect.r#type))?;
+            if layout.name != effect.name {
+                return Err(format!(
+                    "layout.toml: type {} is {:?} but effects.toml calls it {:?}",
+                    layout.r#type, layout.name, effect.name
+                ));
+            }
+            if !self.controls.contains(&layout.control) {
+                return Err(format!(
+                    "layout.toml: {} has control {:?}, which meta.controls does not list",
+                    layout.name, layout.control
+                ));
+            }
+            for colour in [&layout.chassis, &layout.face, &layout.cap, &layout.accent] {
+                if colour.len() != 7
+                    || !colour.starts_with('#')
+                    || !colour[1..].chars().all(|c| c.is_ascii_hexdigit())
+                {
+                    return Err(format!(
+                        "layout.toml: {} has {colour:?}, which is not an #rrggbb colour",
+                        layout.name
+                    ));
+                }
+            }
+            if layout.rows.len() > usize::from(self.grid.rows) {
+                return Err(format!(
+                    "layout.toml: {} has {} rows, the page holds {}",
+                    layout.name,
+                    layout.rows.len(),
+                    self.grid.rows
+                ));
+            }
+            let mut placed: Vec<u8> = Vec::new();
+            for row in &layout.rows {
+                if !self.aligns.contains(&row.align) {
+                    return Err(format!(
+                        "layout.toml: {} has align {:?}, which meta.aligns does not list",
+                        layout.name, row.align
+                    ));
+                }
+                if row.slots.len() > usize::from(self.grid.columns) {
+                    return Err(format!(
+                        "layout.toml: {} has a row of {}, the grid is {} wide",
+                        layout.name,
+                        row.slots.len(),
+                        self.grid.columns
+                    ));
+                }
+                placed.extend(&row.slots);
+            }
+            let wanted: Vec<u8> =
+                (1..=u8::try_from(effect.parameters.len()).unwrap_or(u8::MAX)).collect();
+            if placed != wanted {
+                return Err(format!(
+                    "layout.toml: {} places slots {placed:?}, but effects.toml has {} of them",
+                    layout.name,
+                    effect.parameters.len()
+                ));
+            }
+        }
         Ok(())
     }
 

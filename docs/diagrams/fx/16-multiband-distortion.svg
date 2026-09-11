@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 84.8" width="768" height="509" role="img" aria-label="Multiband Distortion front panel" font-family="ui-sans-serif, system-ui, sans-serif">
+<title>Multiband Distortion (MulBndDist)</title>
+<rect width="128" height="84.8" fill="#30413c"/>
+<text x="2.5" y="8.4" font-size="5.6" font-weight="600" fill="#eeefef">MulBndDist</text>
+<text x="125.5" y="8.4" font-size="4.2" text-anchor="end" fill="#97a09d">Processing</text>
+<rect x="2.5" y="11.0" width="123.0" height="71.8" rx="1.5" fill="#4e6f65" stroke="#293c37" stroke-width="0.4"/>
+  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">IPG</text>
+  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="26.35" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="13.50" y1="25.16" x2="13.50" y2="21.71" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="19.76" cy="19.40" r="0.9" fill="#293c37"/>
+  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#9dafaa">Input Gain</text>
+  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">DST</text>
+  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="26.35" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="33.50" y1="25.16" x2="33.50" y2="21.71" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="30.99" y1="28.86" x2="29.93" y2="29.92" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="29.99" y1="25.79" x2="28.51" y2="25.56" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="31.89" y1="23.19" x2="31.21" y2="21.85" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="35.11" y1="23.19" x2="35.79" y2="21.85" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="37.01" y1="25.79" x2="38.49" y2="25.56" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="36.01" y1="28.86" x2="37.07" y2="29.92" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#9dafaa">Distortion</text>
+  <text x="33.50" y="41.10" font-size="3" text-anchor="middle" fill="#9dafaa">Type</text>
+  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">LBL</text>
+  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="26.35" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="53.50" y1="25.16" x2="53.50" y2="21.71" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="59.76" cy="19.40" r="0.9" fill="#293c37"/>
+  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#9dafaa">Low Band</text>
+  <text x="53.50" y="41.10" font-size="3" text-anchor="middle" fill="#9dafaa">Level</text>
+  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">LDR</text>
+  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="26.35" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="73.50" y1="25.16" x2="73.50" y2="21.71" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="79.76" cy="19.40" r="0.9" fill="#293c37"/>
+  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#9dafaa">Low Band</text>
+  <text x="73.50" y="41.10" font-size="3" text-anchor="middle" fill="#9dafaa">Drive</text>
+  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">XV1</text>
+  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="26.35" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="93.50" y1="25.16" x2="93.50" y2="21.71" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="99.76" cy="19.40" r="0.9" fill="#293c37"/>
+  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#9dafaa">Crossover</text>
+  <text x="93.50" y="41.10" font-size="3" text-anchor="middle" fill="#9dafaa">Frequency</text>
+  <text x="93.50" y="45.30" font-size="3" text-anchor="middle" fill="#9dafaa">1</text>
+  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">MBL</text>
+  <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="26.35" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="113.50" y1="25.16" x2="113.50" y2="21.71" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="119.76" cy="19.40" r="0.9" fill="#293c37"/>
+  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#9dafaa">Mid Band</text>
+  <text x="113.50" y="41.10" font-size="3" text-anchor="middle" fill="#9dafaa">Level</text>
+  <text x="13.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">MDR</text>
+  <path d="M 8.02 65.73 A 7.75 7.75 0 1 1 18.98 65.73" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="60.25" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="13.50" y1="59.06" x2="13.50" y2="55.61" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="19.76" cy="53.30" r="0.9" fill="#293c37"/>
+  <text x="13.50" y="70.80" font-size="3" text-anchor="middle" fill="#9dafaa">Mid Band</text>
+  <text x="13.50" y="75.00" font-size="3" text-anchor="middle" fill="#9dafaa">Drive</text>
+  <text x="33.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">XV2</text>
+  <path d="M 28.02 65.73 A 7.75 7.75 0 1 1 38.98 65.73" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="60.25" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="33.50" y1="59.06" x2="33.50" y2="55.61" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="39.76" cy="53.30" r="0.9" fill="#293c37"/>
+  <text x="33.50" y="70.80" font-size="3" text-anchor="middle" fill="#9dafaa">Crossover</text>
+  <text x="33.50" y="75.00" font-size="3" text-anchor="middle" fill="#9dafaa">Frequency</text>
+  <text x="33.50" y="79.20" font-size="3" text-anchor="middle" fill="#9dafaa">2</text>
+  <text x="53.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">HBL</text>
+  <path d="M 48.02 65.73 A 7.75 7.75 0 1 1 58.98 65.73" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="60.25" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="53.50" y1="59.06" x2="53.50" y2="55.61" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="59.76" cy="53.30" r="0.9" fill="#293c37"/>
+  <text x="53.50" y="70.80" font-size="3" text-anchor="middle" fill="#9dafaa">High Band</text>
+  <text x="53.50" y="75.00" font-size="3" text-anchor="middle" fill="#9dafaa">Level</text>
+  <text x="73.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">HDR</text>
+  <path d="M 68.02 65.73 A 7.75 7.75 0 1 1 78.98 65.73" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="60.25" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="73.50" y1="59.06" x2="73.50" y2="55.61" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="79.76" cy="53.30" r="0.9" fill="#293c37"/>
+  <text x="73.50" y="70.80" font-size="3" text-anchor="middle" fill="#9dafaa">High Band</text>
+  <text x="73.50" y="75.00" font-size="3" text-anchor="middle" fill="#9dafaa">Drive</text>
+  <text x="93.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">CAB</text>
+  <path d="M 88.02 65.73 A 7.75 7.75 0 1 1 98.98 65.73" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="60.25" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="93.50" y1="59.06" x2="93.50" y2="55.61" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="90.99" y1="62.76" x2="89.93" y2="63.82" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="90.02" y1="60.94" x2="88.55" y2="61.24" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="90.22" y1="58.89" x2="88.83" y2="58.32" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="91.53" y1="57.30" x2="90.69" y2="56.05" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="93.50" y1="56.70" x2="93.50" y2="55.20" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="95.47" y1="57.30" x2="96.31" y2="56.05" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="96.78" y1="58.89" x2="98.17" y2="58.32" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="96.98" y1="60.94" x2="98.45" y2="61.24" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="96.01" y1="62.76" x2="97.07" y2="63.82" stroke="#293c37" stroke-width="0.7" stroke-linecap="round"/>
+  <text x="93.50" y="70.80" font-size="3" text-anchor="middle" fill="#9dafaa">Cabinet</text>
+  <text x="113.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f3f2">OPG</text>
+  <path d="M 108.02 65.73 A 7.75 7.75 0 1 1 118.98 65.73" fill="none" stroke="#9dafaa" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="60.25" r="5.95" fill="#6da092" stroke="#a0c1b8" stroke-width="0.6"/>
+  <line x1="113.50" y1="59.06" x2="113.50" y2="55.61" stroke="#a0c1b8" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="119.76" cy="53.30" r="0.9" fill="#293c37"/>
+  <text x="113.50" y="70.80" font-size="3" text-anchor="middle" fill="#9dafaa">Output</text>
+  <text x="113.50" y="75.00" font-size="3" text-anchor="middle" fill="#9dafaa">Gain</text>
+</svg>

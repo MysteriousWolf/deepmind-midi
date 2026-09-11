@@ -1,0 +1,572 @@
+# Where an effect's controls sit, and what colour its panel is.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/effects.md and docs/diagrams/fx/*.svg.
+#
+# panels.toml says what a slot is: its name in full, its control kind, which
+# slots belong together. This file says where it goes and what it looks like.
+# The two are separate because they have different sources and different
+# reliability: everything here is measured off a figure in the manual, and
+# nothing here is needed to talk to the synthesizer.
+
+[meta]
+layout_source = """
+The 35 screenshots of the synthesizer's own FX page in section 9.3 of the \
+DeepMind 12 User Manual. Each draws one circle per slot. The circles were \
+found by filling and labelling the ink in the printed screenshot, and their \
+centres are the grid below."""
+layout_result = """
+All 35 pages agree exactly. Every circle centre falls on one of six columns \
+and one of two rows, the count of circles matches the slot count for all 35 \
+algorithms, and a row that is not full stops early rather than spreading or \
+centring. So the layout is one grid, shared by every effect, filled in slot \
+order from the top left."""
+control_source = """
+The same pictures. The panels are not all built from the same control: 29 use \
+rotary knobs, 5 use vertical faders on a cream surface with a lit label strip, \
+and the Vintage Room Reverb uses numeric displays with a single knob. \
+`control` is which one, read off the picture. It is the shape the panel uses \
+for a parameter that sweeps a range; a switch or a selector is drawn as a \
+button whatever the panel, and which slots those are is in panels.toml."""
+colour_source = """
+The picture of the effect's own editor panel printed beside each screenshot \
+in section 9.3. The panels differ per algorithm, so their colours are a fact \
+about the effect rather than a house style."""
+colour_method = """
+Four colours are taken by where they sit rather than by coverage alone. \
+`chassis` is the commonest colour in a band along the four edges, which is the \
+case around the controls. `face` is the commonest in the middle, which is the \
+surface the controls sit on. `cap` is the next surface in from `face`, \
+skipping anything close to `face` or `chassis` and anything saturated enough \
+to be a label or an indicator, which leaves the part a finger moves: a knob \
+body or a fader cap. \
+`accent` is the most saturated colour still covering a visible share: a label \
+colour on a panel that has one, an LED on one that does not, and `cap` \
+again on a panel with neither."""
+colour_precision = """
+Two details decide whether the numbers come out right. `face` and `cap` \
+are measured on the picture shrunk eightfold, because a fader panel draws its \
+travel as a ladder of thin dark lines across the whole surface and at full \
+size those lines outvote the surface they are drawn on. And colours closer \
+together than a threshold are merged before ranking, because a shaded surface \
+spreads over several buckets while a flat one stays in one: without merging, \
+the cream of a fader panel splits six ways and loses to its black label strip. \
+Twelve bytes per effect, and no artwork is reproduced."""
+aligns = ["left", "right", "centre", "spread"]
+controls = ["knob", "fader", "display"]
+
+# The grid the synthesizer draws on its FX page, in pixels of its 128x64
+# display. Positions come from here; the shape drawn at each position comes
+# from the effect's own editor panel, which is `control` on each layout below.
+#
+# `align` says what a row that is not full does with the space left over.
+# Measured as left on every row of every effect; the field exists so a host
+# with a different panel width can say what it does instead.
+[grid]
+columns = 6
+rows = 2
+align = "left"
+order = "slot"
+shape = "circle"
+display_width = 128
+display_height = 64
+first_x = 13.5
+first_y = 14.4
+column_pitch = 20.0
+row_pitch = 18.6
+control_diameter = 11.9
+shape_note = """
+The synthesizer draws every slot as a circle, switches and selectors \
+included, and prints the slot's short name above it and its current value \
+below. That is the FX page. What the effect's own editor panel uses instead \
+is `control` on each layout, and the two disagree: five effects are faders \
+there and circles here."""
+
+[[layout]]
+type = 0
+name = "TC-DeepVRB"
+category = "Reverb"
+control = "knob"
+chassis = "#5e667d"
+face = "#5d6379"
+cap = "#333945"
+accent = "#424c68"
+rows = [
+    { slots = [1, 2, 3, 4, 5], align = "left" },
+]
+
+[[layout]]
+type = 1
+name = "AmbVerb"
+category = "Reverb"
+control = "fader"
+chassis = "#e7dcc2"
+face = "#e7decc"
+cap = "#6c665e"
+accent = "#03fcfb"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10], align = "left" },
+]
+
+[[layout]]
+type = 2
+name = "RoomRev"
+category = "Reverb"
+control = "fader"
+chassis = "#e4d8bf"
+face = "#ddd1c0"
+cap = "#989388"
+accent = "#fa9803"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 3
+name = "VintageRev"
+category = "Reverb"
+control = "display"
+chassis = "#15192b"
+face = "#4d535c"
+cap = "#81838a"
+accent = "#ed0102"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 4
+name = "HallRev"
+category = "Reverb"
+control = "fader"
+chassis = "#e3d6bc"
+face = "#e5dac4"
+cap = "#6f6a63"
+accent = "#fb0103"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 5
+name = "ChamberRev"
+category = "Reverb"
+control = "fader"
+chassis = "#e5d8bf"
+face = "#e3d9c3"
+cap = "#9b9789"
+accent = "#f8fa03"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 6
+name = "PlateRev"
+category = "Reverb"
+control = "knob"
+chassis = "#111111"
+face = "#2e2e2e"
+cap = "#626262"
+accent = "#005ae9"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 7
+name = "RichPltRev"
+category = "Reverb"
+control = "fader"
+chassis = "#e6d9bf"
+face = "#e7decc"
+cap = "#777268"
+accent = "#0afc02"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 8
+name = "GatedRev"
+category = "Reverb"
+control = "knob"
+chassis = "#0f0f0f"
+face = "#2e302f"
+cap = "#616161"
+accent = "#32c663"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10], align = "left" },
+]
+
+[[layout]]
+type = 9
+name = "Reverse"
+category = "Reverb"
+control = "knob"
+chassis = "#0c0c0c"
+face = "#2f302f"
+cap = "#646464"
+accent = "#31c261"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9], align = "left" },
+]
+
+[[layout]]
+type = 10
+name = "ChorusVerb"
+category = "Reverb"
+control = "knob"
+chassis = "#0d0d0d"
+face = "#2e2e2f"
+cap = "#535f61"
+accent = "#0059e9"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 11
+name = "DelayVerb"
+category = "Reverb"
+control = "knob"
+chassis = "#111111"
+face = "#2e2f2f"
+cap = "#5d5f5f"
+accent = "#0059e9"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 12
+name = "FlangVerb"
+category = "Reverb"
+control = "knob"
+chassis = "#101010"
+face = "#2f2f2f"
+cap = "#606161"
+accent = "#0059e9"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 13
+name = "MidasEQ"
+category = "Processing"
+control = "knob"
+chassis = "#245771"
+face = "#303236"
+cap = "#636468"
+accent = "#2a6887"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11], align = "left" },
+]
+
+[[layout]]
+type = 14
+name = "Enhancer"
+category = "Processing"
+control = "knob"
+chassis = "#d1b96a"
+face = "#e8d18d"
+cap = "#a99a6d"
+accent = "#d6bd6e"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9], align = "left" },
+]
+
+[[layout]]
+type = 15
+name = "FairComp"
+category = "Processing"
+control = "knob"
+chassis = "#1d2528"
+face = "#262e30"
+cap = "#585d61"
+accent = "#585d61"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 16
+name = "MulBndDist"
+category = "Processing"
+control = "knob"
+chassis = "#30413c"
+face = "#4e6f65"
+cap = "#6da092"
+accent = "#77b3a3"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 17
+name = "RackAmp"
+category = "Processing"
+control = "knob"
+chassis = "#282828"
+face = "#4e4e4e"
+cap = "#777777"
+accent = "#777777"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9], align = "left" },
+]
+
+[[layout]]
+type = 18
+name = "EdisonEX1"
+category = "Processing"
+control = "knob"
+chassis = "#d3d3d3"
+face = "#313231"
+cap = "#656565"
+accent = "#5c4301"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8], align = "left" },
+]
+
+[[layout]]
+type = 19
+name = "Auto Pan"
+category = "Processing"
+control = "knob"
+chassis = "#298f6e"
+face = "#4d4d4d"
+cap = "#828282"
+accent = "#299571"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9], align = "left" },
+]
+
+[[layout]]
+type = 20
+name = "NoiseGate"
+category = "Processing"
+control = "knob"
+chassis = "#a32521"
+face = "#dcdcdc"
+cap = "#a8a7a6"
+accent = "#a42522"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8], align = "left" },
+]
+
+[[layout]]
+type = 21
+name = "Delay"
+category = "Delay"
+control = "knob"
+chassis = "#101010"
+face = "#2d2d2d"
+cap = "#5e5e5e"
+accent = "#56c502"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 22
+name = "3TapDelay"
+category = "Delay"
+control = "knob"
+chassis = "#121212"
+face = "#2d2d2d"
+cap = "#5b5c5c"
+accent = "#5b5c5c"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 23
+name = "4TapDelay"
+category = "Delay"
+control = "knob"
+chassis = "#141414"
+face = "#2f2f2f"
+cap = "#5b5b5b"
+accent = "#5b5b5b"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 24
+name = "T-RayDelay"
+category = "Delay"
+control = "knob"
+chassis = "#b0b8ba"
+face = "#b0e9ed"
+cap = "#222224"
+accent = "#222224"
+rows = [
+    { slots = [1, 2, 3, 4, 5], align = "left" },
+]
+
+[[layout]]
+type = 25
+name = "DecimDelay"
+category = "Delay"
+control = "knob"
+chassis = "#172d30"
+face = "#29525e"
+cap = "#567c87"
+accent = "#31788b"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 26
+name = "ModDlyRev"
+category = "Delay"
+control = "knob"
+chassis = "#101010"
+face = "#171717"
+cap = "#454545"
+accent = "#01e501"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 27
+name = "Chorus"
+category = "Creative"
+control = "knob"
+chassis = "#118cac"
+face = "#4d4d4d"
+cap = "#818181"
+accent = "#1992b2"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11], align = "left" },
+]
+
+[[layout]]
+type = 28
+name = "Chorus-D"
+category = "Creative"
+control = "knob"
+chassis = "#181818"
+face = "#171616"
+cap = "#bbbab9"
+accent = "#8e1d02"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7], align = "left" },
+]
+
+[[layout]]
+type = 29
+name = "Flanger"
+category = "Creative"
+control = "knob"
+chassis = "#8e10aa"
+face = "#4d4d4d"
+cap = "#7e7c7e"
+accent = "#9613af"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 30
+name = "Phaser"
+category = "Creative"
+control = "knob"
+chassis = "#267327"
+face = "#4d4d4d"
+cap = "#818181"
+accent = "#268126"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 31
+name = "MoodFilter"
+category = "Creative"
+control = "knob"
+chassis = "#282828"
+face = "#323535"
+cap = "#3c6974"
+accent = "#25accd"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 32
+name = "DualPitch"
+category = "Creative"
+control = "knob"
+chassis = "#131313"
+face = "#2c2c2c"
+cap = "#646464"
+accent = "#646464"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 33
+name = "Vintage Pitch"
+category = "Creative"
+control = "knob"
+chassis = "#330909"
+face = "#ddd1ba"
+cap = "#5a5757"
+accent = "#de0606"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8, 9, 10, 11, 12], align = "left" },
+]
+
+[[layout]]
+type = 34
+name = "RotarySpkr"
+category = "Creative"
+control = "knob"
+chassis = "#4e0f06"
+face = "#7c7776"
+cap = "#4e4543"
+accent = "#7c2c13"
+rows = [
+    { slots = [1, 2, 3, 4, 5, 6], align = "left" },
+    { slots = [7, 8], align = "left" },
+]
+

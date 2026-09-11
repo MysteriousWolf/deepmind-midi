@@ -114,17 +114,19 @@ collapses NRPN edits, dump parsing and dump building into a single table.
 | `spec/controllers.toml` | 112 MIDI controllers, 90 mapped to a parameter |
 | `spec/messages.toml` | 22 SysEx messages |
 | `spec/globals.toml` | 25 device-wide settings |
-| `spec/effects.toml` | 370 effect parameters across 35 algorithms |
-| `spec/panels.toml` | how those 370 slots present themselves |
+| `spec/effects.toml` | 371 effect parameters across 35 algorithms |
+| `spec/panels.toml` | how those 371 slots present themselves |
+| `spec/layout.toml` | where each slot sits on the FX page, and the panel colours |
 | `spec/mapping.toml` | how an address and a value become bytes |
 | `spec/routing.toml` | how the four FX engines can be wired together |
 | `spec/measurements.toml` | 29 raw values with what the synthesizer displayed |
 | `spec/firmware.toml` | firmware versions that change the protocol |
 
 `cargo xtask docs` renders the tables and Mermaid diagrams in
-[`midi-spec.md`](midi-spec.md), and writes the diagram sources to
-`docs/diagrams/*.mmd`. The diagrams are embedded inline as well, from the same
-strings, so nothing needs a build step to read.
+[`midi-spec.md`](midi-spec.md), the algorithms in [`effects.md`](effects.md), the
+diagram sources in `docs/diagrams/*.mmd`, and a panel drawing per effect in
+`docs/diagrams/fx/*.svg`. The Mermaid diagrams are embedded inline as well, from
+the same strings, so nothing needs a build step to read.
 
 The same files will generate the `Program` struct, its typed fields and its
 conversions. A correction gets made once.
@@ -186,24 +188,50 @@ many bytes a dump carries, not what a value means.
 
 ## Presentation is separate from protocol
 
-`spec/effects.toml` says what a parameter is. `spec/panels.toml` says how to
-show it: continuous, switch or selector, which slots belong together, such as the
-two sides of the compressor or the two channels of the pitch shifter, and the
-grid the synthesizer's own FX page draws.
+Three files, because three different questions have three different sources.
 
-Those two files are split because their provenance differs, and the split runs
-through `panels.toml` itself. The grid is Behringer's: the manual screenshots the
-FX page beside every algorithm in section 9.3, and all 35 lay the slots out six
-to a row in slot order, wrapping onto a second row. That is transcribed, and the
-file says so. The full titles, the control kinds and the grouping are derived
-from `effects.toml` by this project, and the file says that too.
+`spec/effects.toml` says what a parameter is: its name as the manual writes it,
+its range, its unit, whether the engine acts on modulation reaching it.
 
-What the manual does not publish is geometry: no sizes, no positions beyond the
-grid, no colours, no fonts. So `panels.toml` carries none, and a host is free to
-lay the slots out its own way knowing which arrangement the hardware uses.
+`spec/panels.toml` says what kind of control it is - continuous, switch or
+selector - what it is called in full, and which slots belong together, such as
+the two sides of the compressor or the two channels of the pitch shifter. All of
+that is derived from `effects.toml` by this project, and the file says so.
 
-Loading checks `panels.toml` and `effects.toml` line up slot for slot, since they
-are generated together and a mismatch means one was hand-edited.
+`spec/layout.toml` says where the control goes, what it is, and what colour it
+is. All of that is measured from the manual's figures, and the file says how.
+
+The grid came from filling and labelling the ink in the 35 FX-page screenshots
+of section 9.3 and reading off the circle centres: six columns at a 20-pixel
+pitch, two rows, filled in slot order, a short row stopping rather than
+spreading. The control and the colours came from the effect's own editor panel,
+printed beside each screenshot: 29 are knobs, five are vertical faders, one is a
+set of numeric displays, and four colours per panel are sampled by where they
+sit - the case, the surface, the part a finger moves, and the one saturated
+colour a label or an LED uses. Nothing there is a house style or a guess.
+
+The two figures disagree about one thing, and the disagreement is the point. The
+FX page draws every slot as a circle because a 128x64 display has room for one
+shape. The panel draws what the effect actually is. A host that wants to look
+like the synthesizer reads `grid.shape`; one that wants to look like the effect
+reads `control` on the layout. Both are in the file, each labelled with where it
+came from.
+
+Splitting derived from measured is not bookkeeping. A derived field can be
+argued with; a measured one can only be re-measured. Keeping them in separate
+files means a host can tell which is which without reading prose.
+
+The measurement earns its keep beyond drawing. It counts controls, and
+`Spec::load` checks that count against `effects.toml`. That check found a
+twelfth slot on `MoodFilter` that the text extraction had swallowed into the
+eleventh row's description: the screenshot draws twelve circles and the table
+had eleven. One algorithm out of 35 was wrong, and now the other 34 are
+confirmed by something that had no part in building them.
+
+What the manual still does not publish is geometry beyond that grid - no sizes
+for anything but the circles, no fonts, no arrangement other than the one the
+synthesizer itself uses. So `layout.toml` carries none, and a host is free to lay
+the slots out its own way knowing what the hardware does.
 
 ## Routing is a graph, not a name
 

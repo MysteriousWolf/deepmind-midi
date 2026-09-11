@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 42.5" width="768" height="255" role="img" aria-label="TC Deep Reverb front panel" font-family="ui-sans-serif, system-ui, sans-serif">
+<title>TC Deep Reverb (TC-DeepVRB)</title>
+<rect width="128" height="42.5" fill="#707589"/>
+<text x="2.5" y="8.4" font-size="5.6" font-weight="600" fill="#f2f2f4">TC-DeepVRB</text>
+<text x="125.5" y="8.4" font-size="4.2" text-anchor="end" fill="#aeb2be">Reverb</text>
+<rect x="2.5" y="11.0" width="123.0" height="29.5" rx="1.5" fill="#5d6379" stroke="#b1b3b8" stroke-width="0.4"/>
+  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f2f2f4">PST</text>
+  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#a5a9b5" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="26.35" r="5.95" fill="#333945" stroke="#7a7e86" stroke-width="0.6"/>
+  <line x1="13.50" y1="25.16" x2="13.50" y2="21.71" stroke="#7a7e86" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="10.99" y1="28.86" x2="9.93" y2="29.92" stroke="#b1b3b8" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="10.02" y1="27.04" x2="8.55" y2="27.34" stroke="#b1b3b8" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="10.22" y1="24.99" x2="8.83" y2="24.42" stroke="#b1b3b8" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="11.53" y1="23.40" x2="10.69" y2="22.15" stroke="#b1b3b8" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="13.50" y1="22.80" x2="13.50" y2="21.30" stroke="#b1b3b8" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="15.47" y1="23.40" x2="16.31" y2="22.15" stroke="#b1b3b8" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="16.78" y1="24.99" x2="18.17" y2="24.42" stroke="#b1b3b8" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="16.98" y1="27.04" x2="18.45" y2="27.34" stroke="#b1b3b8" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="16.01" y1="28.86" x2="17.07" y2="29.92" stroke="#b1b3b8" stroke-width="0.7" stroke-linecap="round"/>
+  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#a5a9b5">Preset</text>
+  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f2f2f4">DCY</text>
+  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#a5a9b5" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="26.35" r="5.95" fill="#333945" stroke="#7a7e86" stroke-width="0.6"/>
+  <line x1="33.50" y1="25.16" x2="33.50" y2="21.71" stroke="#7a7e86" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="39.76" cy="19.40" r="0.9" fill="#b1b3b8"/>
+  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#a5a9b5">Decay</text>
+  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f2f2f4">TON</text>
+  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#a5a9b5" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="26.35" r="5.95" fill="#333945" stroke="#7a7e86" stroke-width="0.6"/>
+  <line x1="53.50" y1="25.16" x2="53.50" y2="21.71" stroke="#7a7e86" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="59.76" cy="19.40" r="0.9" fill="#b1b3b8"/>
+  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#a5a9b5">Tone</text>
+  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f2f2f4">PDY</text>
+  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#a5a9b5" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="26.35" r="5.95" fill="#333945" stroke="#7a7e86" stroke-width="0.6"/>
+  <line x1="73.50" y1="25.16" x2="73.50" y2="21.71" stroke="#7a7e86" stroke-width="0.8" stroke-linecap="round"/>
+  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#a5a9b5">Pre-Delay</text>
+  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f2f2f4">MIX</text>
+  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#a5a9b5" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="26.35" r="5.95" fill="#333945" stroke="#7a7e86" stroke-width="0.6"/>
+  <line x1="93.50" y1="25.16" x2="93.50" y2="21.71" stroke="#7a7e86" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="99.76" cy="19.40" r="0.9" fill="#b1b3b8"/>
+  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#a5a9b5">Mix</text>
+</svg>

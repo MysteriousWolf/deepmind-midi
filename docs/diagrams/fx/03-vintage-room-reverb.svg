@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 84.8" width="768" height="509" role="img" aria-label="Vintage Room Reverb front panel" font-family="ui-sans-serif, system-ui, sans-serif">
+<title>Vintage Room Reverb (VintageRev)</title>
+<rect width="128" height="84.8" fill="#15192b"/>
+<text x="2.5" y="8.4" font-size="5.6" font-weight="600" fill="#ececee">VintageRev</text>
+<text x="125.5" y="8.4" font-size="4.2" text-anchor="end" fill="#8a8c95">Reverb</text>
+<rect x="2.5" y="11.0" width="123.0" height="71.8" rx="1.5" fill="#4d535c" stroke="#ed0102" stroke-width="0.4"/>
+  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">PRE</text>
+  <rect x="5.05" y="21.59" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="8.43" y="25.95" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#9da0a5">Pre-Delay</text>
+  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">SIZ</text>
+  <rect x="25.05" y="21.59" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="28.43" y="25.95" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#9da0a5">Size</text>
+  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">DCY</text>
+  <rect x="45.05" y="21.59" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="48.43" y="25.95" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <circle cx="61.95" cy="21.59" r="0.9" fill="#ed0102"/>
+  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#9da0a5">Decay</text>
+  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">LFX</text>
+  <rect x="65.05" y="21.59" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="68.43" y="25.95" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <circle cx="81.95" cy="21.59" r="0.9" fill="#ed0102"/>
+  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#9da0a5">Low</text>
+  <text x="73.50" y="41.10" font-size="3" text-anchor="middle" fill="#9da0a5">Multiplier</text>
+  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">HFX</text>
+  <rect x="85.05" y="21.59" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="88.43" y="25.95" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <circle cx="101.95" cy="21.59" r="0.9" fill="#ed0102"/>
+  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#9da0a5">High</text>
+  <text x="93.50" y="41.10" font-size="3" text-anchor="middle" fill="#9da0a5">Multiplier</text>
+  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">DEN</text>
+  <rect x="105.05" y="21.59" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="108.43" y="25.95" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <circle cx="121.95" cy="21.59" r="0.9" fill="#ed0102"/>
+  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#9da0a5">Density</text>
+  <text x="13.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">LC</text>
+  <rect x="5.05" y="55.49" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="8.43" y="59.85" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <circle cx="21.95" cy="55.49" r="0.9" fill="#ed0102"/>
+  <text x="13.50" y="70.80" font-size="3" text-anchor="middle" fill="#9da0a5">Low Cut</text>
+  <text x="33.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">HC</text>
+  <rect x="25.05" y="55.49" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="28.43" y="59.85" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <circle cx="41.95" cy="55.49" r="0.9" fill="#ed0102"/>
+  <text x="33.50" y="70.80" font-size="3" text-anchor="middle" fill="#9da0a5">High Cut</text>
+  <text x="53.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">ERL</text>
+  <rect x="45.05" y="55.49" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="48.43" y="59.85" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <circle cx="61.95" cy="55.49" r="0.9" fill="#ed0102"/>
+  <text x="53.50" y="70.80" font-size="3" text-anchor="middle" fill="#9da0a5">Early</text>
+  <text x="53.50" y="75.00" font-size="3" text-anchor="middle" fill="#9da0a5">Reflection</text>
+  <text x="53.50" y="79.20" font-size="3" text-anchor="middle" fill="#9da0a5">Level</text>
+  <text x="73.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">ERD</text>
+  <rect x="65.05" y="55.49" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="68.43" y="59.85" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <text x="73.50" y="70.80" font-size="3" text-anchor="middle" fill="#9da0a5">Early</text>
+  <text x="73.50" y="75.00" font-size="3" text-anchor="middle" fill="#9da0a5">Reflection</text>
+  <text x="73.50" y="79.20" font-size="3" text-anchor="middle" fill="#9da0a5">Delay</text>
+  <text x="93.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">MIX</text>
+  <rect x="85.05" y="55.49" width="16.90" height="9.52" rx="1" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <rect x="88.43" y="59.85" width="10.14" height="0.8" rx="0.4" fill="#ed0102" opacity="0.85"/>
+  <circle cx="101.95" cy="55.49" r="0.9" fill="#ed0102"/>
+  <text x="93.50" y="70.80" font-size="3" text-anchor="middle" fill="#9da0a5">Mix</text>
+  <text x="113.50" y="51.30" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f0f1f1">FRZ</text>
+  <path d="M 108.02 65.73 A 7.75 7.75 0 1 1 118.98 65.73" fill="none" stroke="#9da0a5" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="60.25" r="5.95" fill="#81838a" stroke="#adaeb2" stroke-width="0.6"/>
+  <line x1="113.50" y1="59.06" x2="113.50" y2="55.61" stroke="#adaeb2" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="110.99" y1="62.76" x2="109.93" y2="63.82" stroke="#ed0102" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="116.01" y1="62.76" x2="117.07" y2="63.82" stroke="#ed0102" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="121.95" cy="55.49" r="0.9" fill="#ed0102"/>
+  <text x="113.50" y="70.80" font-size="3" text-anchor="middle" fill="#9da0a5">Freeze</text>
+</svg>

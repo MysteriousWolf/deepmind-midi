@@ -11,16 +11,26 @@ Third-party content
 -------------------
 
 The parameter descriptions in `spec/effects.toml`, and the tables generated from
-them in `docs/midi-spec.md`, are taken from section 9.3 of the DeepMind 12 User
+them in `docs/effects.md`, are taken from section 9.3 of the DeepMind 12 User
 Manual, published by Music Tribe. They are reproduced so that a program can tell
 a musician what a parameter does, which is what the protocol data on its own
 cannot convey.
 
-Everything else in `spec/` is factual interface data: parameter numbers, byte
-offsets, names, ranges, units and value lists. Facts about how a device behaves
-are not themselves creative work, and recording them is what makes an
-independent implementation possible.
+The colours in `spec/layout.toml` were measured from the effect panels pictured
+in the same section: four colours per effect, taken by where they sit in the
+picture and how much of it they cover. The result is twelve bytes per effect
+and no artwork. Which control each panel uses - knob, fader or numeric display -
+was read off the same pictures, one word per effect. The drawings in
+`docs/diagrams/fx/` are generated from those two facts and from the parameter
+tables; they are not traced from, and do not resemble, Behringer's panels.
 
-If Music Tribe or Behringer would prefer the descriptions were not reproduced
-here, open an issue and they will be removed. Nothing else in this repository
-depends on them: they are one optional field, and the library works without it.
+Everything else in `spec/` is factual interface data: parameter numbers, byte
+offsets, names, ranges, units, value lists, and where the synthesizer's own
+display puts a control. Facts about how a device behaves are not themselves
+creative work, and recording them is what makes an independent implementation
+possible.
+
+If Music Tribe or Behringer would prefer the descriptions or the sampled colours
+were not reproduced here, open an issue and they will be removed. Nothing else in
+this repository depends on either: both are optional fields, and the library
+works without them.
