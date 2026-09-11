@@ -77,41 +77,76 @@ impl fmt::Display for DeviceId {
     }
 }
 
-/// Synthesizer model, identified by the model ID byte that follows the
-/// manufacturer ID.
+/// Synthesizer model.
 ///
-/// All current `DeepMind` variants share model ID `0x20` and one protocol; they
-/// differ in voice count and keyboard. The distinction is carried so that
-/// voice-indexed messages and UI-facing metadata stay correct.
+/// Every variant shares model ID `0x20` and one protocol, so the wire cannot tell
+/// them apart. They differ only in voice count and whether there is a keyboard.
+/// The X series is a later reskin with the same architecture and specification.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum Model {
-    /// `DeepMind` 6, 6 voices, 37 keys.
+    /// 6 voices, 37 keys.
     DeepMind6,
-    /// `DeepMind` 12, 12 voices, 49 keys.
+    /// 6 voices, 37 keys.
+    DeepMind6X,
+    /// 12 voices, 49 keys.
     #[default]
     DeepMind12,
-    /// `DeepMind` 12D, 12 voices, desktop.
+    /// 12 voices, 49 keys.
+    DeepMind12X,
+    /// 12 voices, desktop.
     DeepMind12D,
+    /// 12 voices, desktop.
+    DeepMind12XD,
 }
 
 impl Model {
-    /// Model ID byte shared by every `DeepMind` variant.
+    /// Model ID byte shared by every variant.
     pub const MODEL_ID: u8 = 0x20;
+
+    /// Every known variant.
+    pub const ALL: [Self; 6] = [
+        Self::DeepMind6,
+        Self::DeepMind6X,
+        Self::DeepMind12,
+        Self::DeepMind12X,
+        Self::DeepMind12D,
+        Self::DeepMind12XD,
+    ];
 
     /// Returns the number of analog voices.
     #[must_use]
     pub const fn voice_count(self) -> u8 {
         match self {
-            Self::DeepMind6 => 6,
-            Self::DeepMind12 | Self::DeepMind12D => 12,
+            Self::DeepMind6 | Self::DeepMind6X => 6,
+            Self::DeepMind12 | Self::DeepMind12X | Self::DeepMind12D | Self::DeepMind12XD => 12,
         }
     }
 
     /// Returns `true` if the model has a keyboard.
     #[must_use]
     pub const fn has_keyboard(self) -> bool {
-        !matches!(self, Self::DeepMind12D)
+        !matches!(self, Self::DeepMind12D | Self::DeepMind12XD)
+    }
+
+    /// Returns the model name as Behringer writes it.
+    #[must_use]
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::DeepMind6 => "DeepMind 6",
+            Self::DeepMind6X => "DeepMind 6X",
+            Self::DeepMind12 => "DeepMind 12",
+            Self::DeepMind12X => "DeepMind 12X",
+            Self::DeepMind12D => "DeepMind 12D",
+            Self::DeepMind12XD => "DeepMind 12XD",
+        }
+    }
+}
+
+impl fmt::Display for Model {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.name())
     }
 }
 
@@ -275,6 +310,16 @@ mod tests {
         assert!(DeviceId::Broadcast.addresses(unit_3));
         assert!(unit_3.addresses(unit_3));
         assert!(!unit_3.addresses(DeviceId::Unit(4)));
+    }
+
+    #[test]
+    fn every_model_reports_a_plausible_voice_count_and_name() {
+        for model in Model::ALL {
+            assert!(matches!(model.voice_count(), 6 | 12));
+            assert!(model.name().starts_with("DeepMind "));
+        }
+        assert!(!Model::DeepMind12XD.has_keyboard());
+        assert!(Model::DeepMind6X.has_keyboard());
     }
 
     #[test]

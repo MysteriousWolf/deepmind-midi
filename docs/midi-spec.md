@@ -1,12 +1,12 @@
 # DeepMind MIDI specification
 
-Everything here comes from the DeepMind 12 user manual, cross-checked against
-the Behringer *Retro Electro* and *Synth Wizards* factory preset packs. Where
-the manual and the hardware disagree, the hardware wins and the difference is
-recorded.
+Built from the DeepMind 12 user manual and checked against real dumps, a
+community controller map and a third-party editor layout. Where sources
+disagree, the hardware wins and the difference is recorded. Full list at the
+[end](#sources).
 
-The tables below are generated from `spec/*.toml`. Do not edit them by hand:
-change the spec and run `cargo xtask docs`.
+The tables and diagrams below are generated from `spec/*.toml`. Do not edit them
+by hand: change the spec and run `cargo xtask docs`.
 
 ## Contents
 
@@ -108,8 +108,12 @@ xychart-beta
 | Field | Value |
 |---|---|
 | Manufacturer ID | `00 20 32` (Behringer) |
-| Model ID | `20`, shared by DeepMind 6, 12 and 12D |
+| Model ID | `20`, shared by every variant |
 | Device ID | `00`-`0F`, or `7F` to broadcast |
+
+The model ID does not identify the variant. DeepMind 6, 6X, 12, 12X, 12D and
+12XD all answer to `20` and speak the same protocol; they differ only in voice
+count and whether there is a keyboard. To tell them apart, ask the user.
 
 The device ID doubles as the synthesizer's global MIDI channel: a unit set to
 channel 1 answers SysEx addressed to device ID `00`.
@@ -1383,7 +1387,8 @@ within that dump, so the offsets are still unknown.
 
 ## Corrections to the manual
 
-Rows where this specification departs from what the manual prints, and why.
+Where this specification departs from what the manual prints, and why. Rows
+marked resolved are ones a second part of the manual settles.
 
 <!-- generated:corrections -->
 
