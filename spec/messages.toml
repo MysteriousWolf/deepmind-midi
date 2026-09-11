@@ -1,0 +1,173 @@
+# DeepMind SysEx messages.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# Every message is framed as:
+#   F0 00 20 32 20 <device> <command> <payload...> F7
+# except the universal device inquiry, which uses the MIDI non-realtime form.
+
+[meta]
+source = "DeepMind 12 User Manual, section 19 (MIDI SysEx Commands)"
+manufacturer_id = "00 20 32"
+model_id = "20"
+
+[[message]]
+command = 0x00
+name = "Control App Notify Request"
+direction = "to_device"
+payload = "One reserved byte"
+note = """
+Tells the synthesizer that a control application is attached to this interface. \
+It responds by enabling NRPN and SysEx on that interface and emitting extra \
+traffic such as key-down and voice-allocation updates. Nothing enables that \
+stream implicitly."""
+
+[[message]]
+command = 0x01
+name = "Program Dump Request"
+direction = "to_device"
+payload = "Bank (0-7), program (0-127)"
+
+[[message]]
+command = 0x02
+name = "Program Dump Response"
+direction = "from_device"
+payload = "Version, bank, program, packed program data"
+raw_len = 242
+packed_len = 278
+note = "Protocol version 7 carries 245 raw bytes in 280 packed, for a 291 byte message."
+
+[[message]]
+command = 0x03
+name = "Edit Buffer Dump Request"
+direction = "to_device"
+
+[[message]]
+command = 0x04
+name = "Edit Buffer Dump Response"
+direction = "from_device"
+payload = "Version, packed program data"
+raw_len = 242
+packed_len = 278
+
+[[message]]
+command = 0x05
+name = "Global Parameter Dump Request"
+direction = "to_device"
+
+[[message]]
+command = 0x06
+name = "Global Parameter Dump Response"
+direction = "from_device"
+payload = "Version, packed global data"
+raw_len = 45
+packed_len = 56
+
+[[message]]
+command = 0x07
+name = "Single User Pattern Dump Request"
+direction = "to_device"
+payload = "Pattern (0-31)"
+
+[[message]]
+command = 0x08
+name = "User Pattern Dump Response"
+direction = "from_device"
+payload = "Version, optional pattern number, packed pattern data"
+raw_len = 65
+packed_len = 80
+note = """
+The manual assigns this command to both the single pattern response and the \
+edit buffer pattern response. They are told apart by length: the single pattern \
+form carries a pattern number byte before the payload. Pattern data is one \
+length byte, then 32 step velocities, then 32 step gates."""
+
+[[message]]
+command = 0x09
+name = "Program Bank Dump Request"
+direction = "to_device"
+payload = "Bank (0-7), first program (0-127), last program (0-127)"
+note = """
+Answered by a sequence of individual program dump responses, one per program, \
+not by a single aggregate message."""
+
+[[message]]
+command = 0x0A
+name = "Bank Program Names Dump Request"
+direction = "to_device"
+payload = "Bank (0-7)"
+
+[[message]]
+command = 0x0B
+name = "Bank Program Names Dump Response"
+direction = "from_device"
+payload = "Version, bank, packed names"
+raw_len = 2048
+packed_len = 2344
+note = "128 programs of 16 bytes. The cheapest way to index a bank without pulling full programs."
+
+[[message]]
+command = 0x0C
+name = "Single Program Name Dump Request"
+direction = "to_device"
+payload = "Bank (0-7), program (0-127)"
+
+[[message]]
+command = 0x0D
+name = "Single Program Name Dump Response"
+direction = "from_device"
+payload = "Version, bank, packed name"
+raw_len = 16
+packed_len = 24
+
+[[message]]
+command = 0x0E
+name = "Edit Buffer Pattern Dump Request"
+direction = "to_device"
+
+[[message]]
+command = 0x10
+name = "Control App Notify Response"
+direction = "from_device"
+payload = "Rx channel (0-16), tx channel (0-15), interface (0 MIDI, 1 USB, 2 Wi-Fi), bank, program"
+
+[[message]]
+command = 0x11
+name = "Calibration Data Dump Request"
+direction = "to_device"
+
+[[message]]
+command = 0x12
+name = "Calibration Data Dump Response"
+direction = "from_device"
+payload = "Version, packed voice and controller calibration data"
+packed_len = 688
+
+[[message]]
+command = 0x1B
+name = "Chord Memory Dump Request"
+direction = "to_device"
+
+[[message]]
+command = 0x1C
+name = "Chord Memory Dump Response"
+direction = "from_device"
+payload = "Version, packed chord memory"
+raw_len = 26
+packed_len = 32
+note = "Unused locations are set to 0xFF."
+
+[[message]]
+command = 0x1D
+name = "Poly Chord Memory Dump Request"
+direction = "to_device"
+
+[[message]]
+command = 0x1E
+name = "Poly Chord Memory Dump Response"
+direction = "from_device"
+payload = "Version, packed poly chord memory"
+raw_len = 512
+packed_len = 592
+note = "Unused locations are set to 0xFF."

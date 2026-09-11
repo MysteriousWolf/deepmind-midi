@@ -16,7 +16,9 @@
 //! | [`error`] | Crate-wide error type                                        |
 //!
 //! Further layers (`wire`, `sysex`, `param`, `program`, `device`, `syx`) land in
-//! subsequent changes. See `docs/architecture.md` for the full design.
+//! subsequent changes, generated where possible from the machine-readable
+//! specification in `spec/`. See `docs/architecture.md` for the design and
+//! `docs/midi-spec.md` for the protocol itself.
 //!
 //! # Feature flags
 //!

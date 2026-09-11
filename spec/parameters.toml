@@ -1,0 +1,1931 @@
+# DeepMind program parameters.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# `offset` is both the parameter's 14-bit NRPN number and its byte offset in
+# an unpacked program dump. The two are the same number.
+
+[meta]
+source = "DeepMind 12 User Manual, section 17 (MIDI NRPN Commands)"
+program_data_len = { v6 = 242, v7 = 245 }
+reserved_offsets = "242-244, present only in protocol version 7, zero in all factory programs examined"
+
+[[parameter]]
+offset = 0
+name = "LFO 1 Rate"
+group = "LFO 1"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 1
+name = "LFO 1 Delay / Fade"
+group = "LFO 1"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 2
+name = "LFO 1 Shape"
+group = "LFO 1"
+min = 0
+max = 6
+enum = "lfo_shape"
+
+[[parameter]]
+offset = 3
+name = "LFO 1 Key Sync"
+group = "LFO 1"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 4
+name = "LFO 1 Arp Sync"
+group = "LFO 1"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 5
+name = "LFO 1 Mono Mode"
+group = "LFO 1"
+min = 0
+max = 255
+enum = "lfo_mono_mode"
+correction = "The manual prints 0-1, but its own note describes Poly (0), Mono (1) and SPREAD-1 (2) through SPREAD-254 (255), matching LFO 2 Mono Mode at offset 12."
+
+[[parameter]]
+offset = 6
+name = "LFO 1 Slew Rate"
+group = "LFO 1"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 7
+name = "LFO 2 Rate"
+group = "LFO 2"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 8
+name = "LFO 2 Delay / Fade"
+group = "LFO 2"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 9
+name = "LFO 2 Shape"
+group = "LFO 2"
+min = 0
+max = 6
+enum = "lfo_shape"
+
+[[parameter]]
+offset = 10
+name = "LFO 2 Key Sync"
+group = "LFO 2"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 11
+name = "LFO 2 Arp Sync"
+group = "LFO 2"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 12
+name = "LFO 2 Mono Mode"
+group = "LFO 2"
+min = 0
+max = 255
+enum = "lfo_mono_mode"
+
+[[parameter]]
+offset = 13
+name = "LFO 2 Slew Rate"
+group = "LFO 2"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 14
+name = "OSC 1 Range"
+group = "Oscillators"
+min = 0
+max = 2
+enum = "osc_range"
+correction = "The manual prints \"0-216' (0), 8' (1), 4' (2)\". The range is 0-2."
+
+[[parameter]]
+offset = 15
+name = "OSC 2 Range"
+group = "Oscillators"
+min = 0
+max = 2
+enum = "osc_range"
+correction = "Same run-together as offset 14. The range is 0-2."
+
+[[parameter]]
+offset = 16
+name = "OSC 1 PWM Source"
+group = "Oscillators"
+min = 0
+max = 5
+enum = "pwm_source"
+
+[[parameter]]
+offset = 17
+name = "OSC 2 Tone Mod Source"
+group = "Oscillators"
+min = 0
+max = 5
+enum = "tone_mod_source"
+
+[[parameter]]
+offset = 18
+name = "OSC 1 Pulse Enable"
+group = "Oscillators"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 19
+name = "OSC 1 Saw Enable"
+group = "Oscillators"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 20
+name = "OSC Sync Enable"
+group = "Oscillators"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 21
+name = "OSC 1 Pitch Mod Depth"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 22
+name = "OSC 1 Pitch Mod Select"
+group = "Oscillators"
+min = 0
+max = 6
+enum = "pitch_mod_source"
+
+[[parameter]]
+offset = 23
+name = "OSC 1 Aftertouch > Pitch Mod Depth"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 24
+name = "OSC 1 Mod Wheel > Pitch Mod Depth"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 25
+name = "OSC 1 PWM Depth"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 26
+name = "OSC 2 Level"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 27
+name = "OSC 2 Pitch"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 28
+name = "OSC 2 Tone Mod Depth"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 29
+name = "OSC 2 Pitch Mod Depth"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 30
+name = "OSC 2 Aftertouch > Pitch Mod Depth"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 31
+name = "OSC 2 Mod Wheel > Pitch Mod Depth"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 32
+name = "OSC 2 Pitch Mod Select"
+group = "Oscillators"
+min = 0
+max = 6
+enum = "pitch_mod_source"
+
+[[parameter]]
+offset = 33
+name = "Noise Level"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 34
+name = "Portamento time"
+group = "Oscillators"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 35
+name = "Portamento mode"
+group = "Oscillators"
+min = 0
+max = 13
+enum = "portamento_mode"
+
+[[parameter]]
+offset = 36
+name = "Pitch bend Up depth"
+group = "Oscillators"
+min = 0
+max = 24
+note = "In steps of 1 semitone"
+
+[[parameter]]
+offset = 37
+name = "Pitch bend Down depth"
+group = "Oscillators"
+min = 0
+max = 24
+note = "In steps of 1 semitone"
+
+[[parameter]]
+offset = 38
+name = "OSC 1 Pitch Mod Mode"
+group = "Oscillators"
+min = 0
+max = 1
+enum = "osc1_pitch_mod_mode"
+correction = "The manual prints \"0-10 (OSC1+2), 1 (OSC 1 Only)\". The range is 0-1."
+
+[[parameter]]
+offset = 39
+name = "VCF Frequency"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 40
+name = "VCF HighPass Frequency"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 41
+name = "VCF Resonance"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 42
+name = "VCF Envelope Depth"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 43
+name = "VCF Envelope Velocity Sensitivity"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 44
+name = "VCF Pitch Bend to Freq Depth"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 45
+name = "VCF LFO Depth"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 46
+name = "VCF LFO Select"
+group = "VCF"
+min = 0
+max = 1
+enum = "vcf_lfo_select"
+
+[[parameter]]
+offset = 47
+name = "VCF Aftertouch > LFO Depth"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 48
+name = "VCF Mod Wheel > LFO Depth"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 49
+name = "VCF Keyboard Tracking"
+group = "VCF"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 50
+name = "VCF Envelope Polarity"
+group = "VCF"
+min = 0
+max = 1
+enum = "vcf_envelope_polarity"
+
+[[parameter]]
+offset = 51
+name = "VCF 2 Pole Mode"
+group = "VCF"
+min = 0
+max = 1
+enum = "vcf_pole_mode"
+correction = "The manual prints \"0-14 Pole (0), 2 Pole (1)\". The range is 0-1."
+
+[[parameter]]
+offset = 52
+name = "VCF Bass Boost"
+group = "VCF"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 53
+name = "VCA Envelope Attack Time"
+group = "VCA Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 54
+name = "VCA Envelope Decay Time"
+group = "VCA Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 55
+name = "VCA Envelope Sustain Level"
+group = "VCA Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 56
+name = "VCA Envelope Release Time"
+group = "VCA Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 57
+name = "VCA Envelope Trigger Mode"
+group = "VCA Envelope"
+min = 0
+max = 4
+enum = "envelope_trigger"
+
+[[parameter]]
+offset = 58
+name = "VCA Envelope Attack Curve"
+group = "VCA Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 59
+name = "VCA Envelope Decay Curve"
+group = "VCA Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 60
+name = "VCA Envelope Sustain Curve"
+group = "VCA Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 61
+name = "VCA Envelope Release Curve"
+group = "VCA Envelope"
+min = 0
+max = 255
+correction = "The manual repeats \"Attack Curve\" here. Offsets 58-61 are the attack, decay, sustain and release curves, matching the Env1 AtCur / DcyCur / SuSCur / RelCur modulation destinations."
+
+[[parameter]]
+offset = 62
+name = "VCF Envelope Attack Time"
+group = "VCF Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 63
+name = "VCF Envelope Decay Time"
+group = "VCF Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 64
+name = "VCF Envelope Sustain Level"
+group = "VCF Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 65
+name = "VCF Envelope Release Time"
+group = "VCF Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 66
+name = "VCF Envelope Trigger Mode"
+group = "VCF Envelope"
+min = 0
+max = 4
+enum = "envelope_trigger"
+
+[[parameter]]
+offset = 67
+name = "VCF Envelope Attack Curve"
+group = "VCF Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 68
+name = "VCF Envelope Decay Curve"
+group = "VCF Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 69
+name = "VCF Envelope Sustain Curve"
+group = "VCF Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 70
+name = "VCF Envelope Release Curve"
+group = "VCF Envelope"
+min = 0
+max = 255
+correction = "Same repeated-name error as offset 61."
+
+[[parameter]]
+offset = 71
+name = "Mod Envelope Attack Time"
+group = "Mod Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 72
+name = "Mod Envelope Decay Time"
+group = "Mod Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 73
+name = "Mod Envelope Sustain Level"
+group = "Mod Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 74
+name = "Mod Envelope Release Time"
+group = "Mod Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 75
+name = "Mod Envelope Trigger Mode"
+group = "Mod Envelope"
+min = 0
+max = 4
+enum = "envelope_trigger"
+
+[[parameter]]
+offset = 76
+name = "Mod Envelope Attack Curve"
+group = "Mod Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 77
+name = "Mod Envelope Decay Curve"
+group = "Mod Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 78
+name = "Mod Envelope Sustain Curve"
+group = "Mod Envelope"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 79
+name = "Mod Envelope Release Curve"
+group = "Mod Envelope"
+min = 0
+max = 255
+correction = "Same repeated-name error as offset 61."
+
+[[parameter]]
+offset = 80
+name = "VCA Level"
+group = "VCA"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 81
+name = "VCA Envelope Depth"
+group = "VCA"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 82
+name = "VCA Envelope Velocity Sensitivity"
+group = "VCA"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 83
+name = "VCA Pan Spread"
+group = "VCA"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 84
+name = "Voice Priority Mode"
+group = "Voicing"
+min = 0
+max = 2
+enum = "voice_priority"
+
+[[parameter]]
+offset = 85
+name = "Polyphony Mode"
+group = "Voicing"
+min = 0
+max = 12
+enum = "polyphony_mode"
+
+[[parameter]]
+offset = 86
+name = "Envelope Trigger Mode"
+group = "Voicing"
+min = 0
+max = 3
+enum = "key_assign_mode"
+
+[[parameter]]
+offset = 87
+name = "Unison Detune"
+group = "Voicing"
+min = 0
+max = 255
+note = "Sets the amount phatness!"
+
+[[parameter]]
+offset = 88
+name = "Voice Drift"
+group = "Voicing"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 89
+name = "Parameter Drift"
+group = "Voicing"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 90
+name = "Drift Rate"
+group = "Voicing"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 91
+name = "OSC Portamento Balance"
+group = "Voicing"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 92
+name = "OSC Key Down Reset"
+group = "Voicing"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 93
+name = "Mod 1 Source"
+group = "Mod Matrix"
+min = 0
+max = 24
+enum = "mod_source"
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 94
+name = "Mod 1 Destination"
+group = "Mod Matrix"
+min = 0
+max = 132
+enum = "mod_destination"
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 95
+name = "Mod 1 Depth"
+group = "Mod Matrix"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 96
+name = "Mod 2 Source"
+group = "Mod Matrix"
+min = 0
+max = 24
+enum = "mod_source"
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 97
+name = "Mod 2 Destination"
+group = "Mod Matrix"
+min = 0
+max = 132
+enum = "mod_destination"
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 98
+name = "Mod 2 Depth"
+group = "Mod Matrix"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 99
+name = "Mod 3 Source"
+group = "Mod Matrix"
+min = 0
+max = 24
+enum = "mod_source"
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 100
+name = "Mod 3 Destination"
+group = "Mod Matrix"
+min = 0
+max = 132
+enum = "mod_destination"
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 101
+name = "Mod 3 Depth"
+group = "Mod Matrix"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 102
+name = "Mod 4 Source"
+group = "Mod Matrix"
+min = 0
+max = 24
+enum = "mod_source"
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 103
+name = "Mod 4 Destination"
+group = "Mod Matrix"
+min = 0
+max = 132
+enum = "mod_destination"
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 104
+name = "Mod 4 Depth"
+group = "Mod Matrix"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 105
+name = "Mod 5 Source"
+group = "Mod Matrix"
+min = 0
+max = 24
+enum = "mod_source"
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 106
+name = "Mod 5 Destination"
+group = "Mod Matrix"
+min = 0
+max = 132
+enum = "mod_destination"
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 107
+name = "Mod 5 Depth"
+group = "Mod Matrix"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 108
+name = "Mod 6 Source"
+group = "Mod Matrix"
+min = 0
+max = 24
+enum = "mod_source"
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 109
+name = "Mod 6 Destination"
+group = "Mod Matrix"
+min = 0
+max = 132
+enum = "mod_destination"
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 110
+name = "Mod 6 Depth"
+group = "Mod Matrix"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 111
+name = "Mod 7 Source"
+group = "Mod Matrix"
+min = 0
+max = 24
+enum = "mod_source"
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 112
+name = "Mod 7 Destination"
+group = "Mod Matrix"
+min = 0
+max = 132
+enum = "mod_destination"
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 113
+name = "Mod 7 Depth"
+group = "Mod Matrix"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 114
+name = "Mod 8 Source"
+group = "Mod Matrix"
+min = 0
+max = 24
+enum = "mod_source"
+correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 115
+name = "Mod 8 Destination"
+group = "Mod Matrix"
+min = 0
+max = 132
+enum = "mod_destination"
+correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 116
+name = "Mod 8 Depth"
+group = "Mod Matrix"
+min = 0
+max = 255
+note = "-128 (0) to +127 (255)"
+
+[[parameter]]
+offset = 117
+name = "Ctrl Sequencer Enable"
+group = "Control Sequencer"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 118
+name = "Ctrl Sequencer Clock Divider"
+group = "Control Sequencer"
+min = 0
+max = 15
+enum = "sequencer_clock"
+
+[[parameter]]
+offset = 119
+name = "Sequence Length"
+group = "Control Sequencer"
+min = 0
+max = 31
+note = "1 (0) to 32 (31) steps"
+correction = "The manual prints the range and the first note value as one run, \"0-311 (0) to 32 (31) steps\". The range is 0-31."
+
+[[parameter]]
+offset = 120
+name = "Sequencer Swing Timing"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "0% (0) to 75% (25)"
+correction = "The manual gives the upper endpoint as 25 on a 0-255 parameter, which is almost certainly a typo for 255. Left verbatim pending hardware confirmation."
+
+[[parameter]]
+offset = 121
+name = "Key Sync & Loop"
+group = "Control Sequencer"
+min = 0
+max = 2
+enum = "sequencer_sync"
+
+[[parameter]]
+offset = 122
+name = "Slew Rate"
+group = "Control Sequencer"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 123
+name = "Seq Step Value 1"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 124
+name = "Seq Step Value 2"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 125
+name = "Seq Step Value 3"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 126
+name = "Seq Step Value 4"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 127
+name = "Seq Step Value 5"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 128
+name = "Seq Step Value 6"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 129
+name = "Seq Step Value 7"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 130
+name = "Seq Step Value 8"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 131
+name = "Seq Step Value 9"
+group = "Control Sequencer"
+min = 0
+max = 255
+kind = "switch"
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 132
+name = "Seq Step Value 10"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 133
+name = "Seq Step Value 11"
+group = "Control Sequencer"
+min = 0
+max = 255
+kind = "switch"
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 134
+name = "Seq Step Value 12"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 135
+name = "Seq Step Value 13"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 136
+name = "Seq Step Value 14"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 137
+name = "Seq Step Value 15"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 138
+name = "Seq Step Value 16"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 139
+name = "Seq Step Value 17"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 140
+name = "Seq Step Value 18"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 141
+name = "Seq Step Value 19"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 142
+name = "Seq Step Value 20"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 143
+name = "Seq Step Value 21"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 144
+name = "Seq Step Value 22"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 145
+name = "Seq Step Value 23"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 146
+name = "Seq Step Value 24"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 147
+name = "Seq Step Value 25"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 148
+name = "Seq Step Value 26"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 149
+name = "Seq Step Value 27"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 150
+name = "Seq Step Value 28"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 151
+name = "Seq Step Value 29"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 152
+name = "Seq Step Value 30"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 153
+name = "Seq Step Value 31"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 154
+name = "Seq Step Value 32"
+group = "Control Sequencer"
+min = 0
+max = 255
+note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+
+[[parameter]]
+offset = 155
+name = "Arp On/Off"
+group = "Arpeggiator"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 156
+name = "Arp Mode"
+group = "Arpeggiator"
+min = 0
+max = 10
+enum = "arp_mode"
+
+[[parameter]]
+offset = 157
+name = "Arp Rate (tempo)"
+group = "Arpeggiator"
+min = 0
+max = 255
+note = "20 bpm (0) to 275 bpm (255)"
+
+[[parameter]]
+offset = 158
+name = "Arp Clock"
+group = "Arpeggiator"
+min = 0
+max = 12
+enum = "arp_clock"
+
+[[parameter]]
+offset = 159
+name = "Arp Key Sync"
+group = "Arpeggiator"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 160
+name = "Arp Gate Time"
+group = "Arpeggiator"
+min = 0
+max = 255
+
+[[parameter]]
+offset = 161
+name = "Arp Hold"
+group = "Arpeggiator"
+min = 0
+max = 1
+kind = "switch"
+note = "Off (0), On (1)"
+
+[[parameter]]
+offset = 162
+name = "Arp Pattern"
+group = "Arpeggiator"
+min = 0
+max = 64
+enum = "arp_pattern"
+
+[[parameter]]
+offset = 163
+name = "Arp Swing"
+group = "Arpeggiator"
+min = 0
+max = 255
+note = "0% (0) to 75% (25)"
+correction = "Same suspected typo as offset 120."
+
+[[parameter]]
+offset = 164
+name = "Arp Octaves"
+group = "Arpeggiator"
+min = 0
+max = 5
+note = "1 to 6 octaves"
+correction = "The manual prints \"0-51 to 6 Octaves\". The range is 0-5."
+
+[[parameter]]
+offset = 165
+name = "FX Routing"
+group = "Effects"
+min = 0
+max = 9
+enum = "fx_routing"
+
+[[parameter]]
+offset = 166
+name = "FX 1 Type"
+group = "Effects"
+min = 0
+max = 34
+enum = "fx_type"
+correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 167
+name = "FX 1 Param 1"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 168
+name = "FX 1 Param 2"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 169
+name = "FX 1 Param 3"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 170
+name = "FX 1 Param 4"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 171
+name = "FX 1 Param 5"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 172
+name = "FX 1 Param 6"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 173
+name = "FX 1 Param 7"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 174
+name = "FX 1 Param 8"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 175
+name = "FX 1 Param 9"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 176
+name = "FX 1 Param 10"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 177
+name = "FX 1 Param 11"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 178
+name = "FX 1 Param 12"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 1 Type"
+
+[[parameter]]
+offset = 179
+name = "FX 2 Type"
+group = "Effects"
+min = 0
+max = 34
+enum = "fx_type"
+correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 180
+name = "FX 2 Param 1"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 181
+name = "FX 2 Param 2"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 182
+name = "FX 2 Param 3"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 183
+name = "FX 2 Param 4"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 184
+name = "FX 2 Param 5"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 185
+name = "FX 2 Param 6"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 186
+name = "FX 2 Param 7"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 187
+name = "FX 2 Param 8"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 188
+name = "FX 2 Param 9"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 189
+name = "FX 2 Param 10"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 190
+name = "FX 2 Param 11"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 191
+name = "FX 2 Param 12"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 2 Type"
+
+[[parameter]]
+offset = 192
+name = "FX 3 Type"
+group = "Effects"
+min = 0
+max = 34
+enum = "fx_type"
+correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 193
+name = "FX 3 Param 1"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 194
+name = "FX 3 Param 2"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 195
+name = "FX 3 Param 3"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 196
+name = "FX 3 Param 4"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 197
+name = "FX 3 Param 5"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 198
+name = "FX 3 Param 6"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 199
+name = "FX 3 Param 7"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 200
+name = "FX 3 Param 8"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 201
+name = "FX 3 Param 9"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 202
+name = "FX 3 Param 10"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 203
+name = "FX 3 Param 11"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 204
+name = "FX 3 Param 12"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 3 Type"
+
+[[parameter]]
+offset = 205
+name = "FX 4 Type"
+group = "Effects"
+min = 0
+max = 34
+enum = "fx_type"
+correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual’s NRPN table still prints the firmware 1.0 range."
+
+[[parameter]]
+offset = 206
+name = "FX 4 Param 1"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 207
+name = "FX 4 Param 2"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 208
+name = "FX 4 Param 3"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 209
+name = "FX 4 Param 4"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 210
+name = "FX 4 Param 5"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 211
+name = "FX 4 Param 6"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 212
+name = "FX 4 Param 7"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 213
+name = "FX 4 Param 8"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 214
+name = "FX 4 Param 9"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 215
+name = "FX 4 Param 10"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 216
+name = "FX 4 Param 11"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 217
+name = "FX 4 Param 12"
+group = "Effects"
+min = 0
+max = 255
+note = "Meaning depends on FX 4 Type"
+
+[[parameter]]
+offset = 218
+name = "FX 1 Output Gain"
+group = "Effects"
+min = 0
+max = 150
+
+[[parameter]]
+offset = 219
+name = "FX 2 Output Gain"
+group = "Effects"
+min = 0
+max = 150
+
+[[parameter]]
+offset = 220
+name = "FX 3 Output Gain"
+group = "Effects"
+min = 0
+max = 150
+
+[[parameter]]
+offset = 221
+name = "FX 4 Output Gain"
+group = "Effects"
+min = 0
+max = 150
+
+[[parameter]]
+offset = 222
+name = "FX Mode"
+group = "Effects"
+min = 0
+max = 2
+enum = "fx_mode"
+
+[[parameter]]
+offset = 223
+name = "Program Name Char 1"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 224
+name = "Program Name Char 2"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 225
+name = "Program Name Char 3"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 226
+name = "Program Name Char 4"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 227
+name = "Program Name Char 5"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 228
+name = "Program Name Char 6"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 229
+name = "Program Name Char 7"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 230
+name = "Program Name Char 8"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 231
+name = "Program Name Char 9"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 232
+name = "Program Name Char 10"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 233
+name = "Program Name Char 11"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 234
+name = "Program Name Char 12"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 235
+name = "Program Name Char 13"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 236
+name = "Program Name Char 14"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 237
+name = "Program Name Char 15"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 238
+name = "Program Name Char 16"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 239
+name = "Program Name Char 17"
+group = "Program"
+min = 0
+max = 127
+note = "Null-terminated 16 char ASCII string"
+
+[[parameter]]
+offset = 240
+name = "Program Category"
+group = "Program"
+min = 0
+max = 16
+enum = "program_category"
+
+[[parameter]]
+offset = 241
+name = "Program Transpose"
+group = "Program"
+min = 80
+max = 176
+note = "-48 (80) ... 0 (128) ... +48 (176)"

@@ -1,0 +1,549 @@
+# Value tables referenced by spec/parameters.toml.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+
+[[enum]]
+id = "lfo_shape"
+name = "LFO Shape"
+entries = [
+    { value = 0, name = "Sine" },
+    { value = 1, name = "Triangle" },
+    { value = 2, name = "Square" },
+    { value = 3, name = "Ramp Up" },
+    { value = 4, name = "Ramp Down" },
+    { value = 5, name = "Sample & Hold" },
+    { value = 6, name = "Sample & Glide" },
+]
+
+[[enum]]
+id = "osc_range"
+name = "Oscillator Range"
+entries = [
+    { value = 0, name = "16'" },
+    { value = 1, name = "8'" },
+    { value = 2, name = "4'" },
+]
+
+[[enum]]
+id = "pwm_source"
+name = "OSC 1 PWM Source"
+entries = [
+    { value = 0, name = "Manual" },
+    { value = 1, name = "LFO 1" },
+    { value = 2, name = "LFO 2" },
+    { value = 3, name = "VCA Env" },
+    { value = 4, name = "VCF Env" },
+    { value = 5, name = "Mod Env" },
+]
+
+[[enum]]
+id = "tone_mod_source"
+name = "OSC 2 Tone Mod Source"
+entries = [
+    { value = 0, name = "Manual" },
+    { value = 1, name = "LFO 1" },
+    { value = 2, name = "LFO 2" },
+    { value = 3, name = "VCA Env" },
+    { value = 4, name = "VCF Env" },
+    { value = 5, name = "Mod Env" },
+]
+
+[[enum]]
+id = "pitch_mod_source"
+name = "Oscillator Pitch Mod Source"
+entries = [
+    { value = 0, name = "LFO 1" },
+    { value = 1, name = "LFO 2" },
+    { value = 2, name = "VCA Env" },
+    { value = 3, name = "VCF Env" },
+    { value = 4, name = "Mod Env" },
+    { value = 5, name = "LFO 1 Unipolar" },
+    { value = 6, name = "LFO 2 Unipolar" },
+]
+
+[[enum]]
+id = "portamento_mode"
+name = "Portamento Mode"
+entries = [
+    { value = 0, name = "Normal" },
+    { value = 1, name = "Fingered" },
+    { value = 2, name = "Fixed Rate" },
+    { value = 3, name = "Fixed Rate Fingered" },
+    { value = 4, name = "Exponential" },
+    { value = 5, name = "Exponential Fingered" },
+    { value = 6, name = "Fixed +2" },
+    { value = 7, name = "Fixed -2" },
+    { value = 8, name = "Fixed +5" },
+    { value = 9, name = "Fixed -5" },
+    { value = 10, name = "Fixed +12" },
+    { value = 11, name = "Fixed -12" },
+    { value = 12, name = "Fixed +24" },
+    { value = 13, name = "Fixed -24" },
+]
+
+[[enum]]
+id = "osc1_pitch_mod_mode"
+name = "OSC 1 Pitch Mod Mode"
+entries = [
+    { value = 0, name = "OSC 1 + 2" },
+    { value = 1, name = "OSC 1 only" },
+]
+
+[[enum]]
+id = "vcf_lfo_select"
+name = "VCF LFO Select"
+entries = [
+    { value = 0, name = "LFO 1" },
+    { value = 1, name = "LFO 2" },
+]
+
+[[enum]]
+id = "vcf_envelope_polarity"
+name = "VCF Envelope Polarity"
+entries = [
+    { value = 0, name = "Negative" },
+    { value = 1, name = "Positive" },
+]
+
+[[enum]]
+id = "vcf_pole_mode"
+name = "VCF Pole Mode"
+entries = [
+    { value = 0, name = "4 Pole" },
+    { value = 1, name = "2 Pole" },
+]
+
+[[enum]]
+id = "envelope_trigger"
+name = "Envelope Trigger Source"
+entries = [
+    { value = 0, name = "Key" },
+    { value = 1, name = "LFO 1" },
+    { value = 2, name = "LFO 2" },
+    { value = 3, name = "Loop" },
+    { value = 4, name = "Control Sequencer Step" },
+]
+
+[[enum]]
+id = "voice_priority"
+name = "Voice Priority Mode"
+entries = [
+    { value = 0, name = "Lowest" },
+    { value = 1, name = "Highest" },
+    { value = 2, name = "Last" },
+]
+
+[[enum]]
+id = "polyphony_mode"
+name = "Polyphony Mode"
+entries = [
+    { value = 0, name = "Poly" },
+    { value = 1, name = "Unison 2" },
+    { value = 2, name = "Unison 3" },
+    { value = 3, name = "Unison 4" },
+    { value = 4, name = "Unison 6" },
+    { value = 5, name = "Unison 12" },
+    { value = 6, name = "Mono" },
+    { value = 7, name = "Mono 2" },
+    { value = 8, name = "Mono 3" },
+    { value = 9, name = "Mono 4" },
+    { value = 10, name = "Mono 6" },
+    { value = 11, name = "Poly 6" },
+    { value = 12, name = "Poly 8" },
+]
+
+[[enum]]
+id = "key_assign_mode"
+name = "Envelope Trigger Mode"
+entries = [
+    { value = 0, name = "Mono" },
+    { value = 1, name = "Re-Trigger" },
+    { value = 2, name = "Legato" },
+    { value = 3, name = "One-Shot" },
+]
+
+[[enum]]
+id = "sequencer_sync"
+name = "Control Sequencer Key Sync and Loop"
+entries = [
+    { value = 0, name = "Loop on" },
+    { value = 1, name = "Key sync on" },
+    { value = 2, name = "Loop and key sync on" },
+]
+
+[[enum]]
+id = "arp_mode"
+name = "Arpeggiator Mode"
+entries = [
+    { value = 0, name = "Up" },
+    { value = 1, name = "Down" },
+    { value = 2, name = "Up & Down" },
+    { value = 3, name = "Up Inv" },
+    { value = 4, name = "Down Inv" },
+    { value = 5, name = "Up & Down Inv" },
+    { value = 6, name = "Up Alt" },
+    { value = 7, name = "Down Alt" },
+    { value = 8, name = "Random" },
+    { value = 9, name = "As Played" },
+    { value = 10, name = "Chord" },
+]
+
+[[enum]]
+id = "fx_routing"
+name = "FX Connection Mode"
+entries = [
+    { value = 0, name = "Serial 1-2-3-4" },
+    { value = 1, name = "Parallel 1/2, serial 3-4" },
+    { value = 2, name = "Parallel 1/2, parallel 3/4" },
+    { value = 3, name = "Parallel 1/2/3/4" },
+    { value = 4, name = "Parallel 1/2/3, serial 4" },
+    { value = 5, name = "Serial 1-2, parallel 3/4" },
+    { value = 6, name = "Serial 1, parallel 2/3/4" },
+    { value = 7, name = "Parallel (serial 1-2-3)/4" },
+    { value = 8, name = "Serial 3-4 feedback 4(1-2)" },
+    { value = 9, name = "Serial 4 feedback 4(1-2-3)" },
+]
+
+[[enum]]
+id = "fx_mode"
+name = "FX Mode"
+entries = [
+    { value = 0, name = "Insert" },
+    { value = 1, name = "Send" },
+    { value = 2, name = "Bypass" },
+]
+
+[[enum]]
+id = "program_category"
+name = "Program Category"
+entries = [
+    { value = 0, name = "None" },
+    { value = 1, name = "Bass" },
+    { value = 2, name = "Pad" },
+    { value = 3, name = "Lead" },
+    { value = 4, name = "Mono" },
+    { value = 5, name = "Poly" },
+    { value = 6, name = "Stab" },
+    { value = 7, name = "SFX" },
+    { value = 8, name = "Arp" },
+    { value = 9, name = "Seq" },
+    { value = 10, name = "Perc" },
+    { value = 11, name = "Ambient" },
+    { value = 12, name = "Modular" },
+    { value = 13, name = "User-1" },
+    { value = 14, name = "User-2" },
+    { value = 15, name = "User-3" },
+    { value = 16, name = "User-4" },
+]
+
+[[enum]]
+id = "lfo_mono_mode"
+name = "LFO Mono Mode"
+note = "Values 2 through 255 select SPREAD-1 through SPREAD-254."
+partial = true
+entries = [
+    { value = 0, name = "Poly" },
+    { value = 1, name = "Mono" },
+    { value = 2, name = "SPREAD-1", description = "Through SPREAD-254 at value 255" },
+]
+
+[[enum]]
+id = "arp_pattern"
+name = "Arpeggiator Pattern"
+note = "Values 1-32 select the presets, 33-64 the user patterns."
+partial = true
+entries = [
+    { value = 0, name = "None" },
+    { value = 1, name = "Preset-1", description = "Through Preset-32 at value 32" },
+    { value = 33, name = "User-1", description = "Through User-32 at value 64" },
+]
+
+[[enum]]
+id = "arp_clock"
+name = "Arpeggiator Clock Divider"
+note = "The manual lists the available sync ratios in Appendix 2 but does not print the value-to-ratio mapping. The ratios below are the candidates, in the order the appendix lists them. The mapping needs confirmation against hardware before it is relied on."
+confirmed = false
+entries = [
+    { value = 0, name = "1" },
+    { value = 1, name = "1/2" },
+    { value = 2, name = "3/8" },
+    { value = 3, name = "1/3" },
+    { value = 4, name = "1/4" },
+    { value = 5, name = "3/16" },
+    { value = 6, name = "1/6" },
+    { value = 7, name = "1/8" },
+    { value = 8, name = "3/32" },
+    { value = 9, name = "1/12" },
+    { value = 10, name = "1/16" },
+    { value = 11, name = "3/64" },
+    { value = 12, name = "1/24" },
+]
+
+[[enum]]
+id = "sequencer_clock"
+name = "Control Sequencer Clock Divider"
+note = "The manual lists the available sync ratios in Appendix 2 but does not print the value-to-ratio mapping. The ratios below are the candidates, in the order the appendix lists them. The mapping needs confirmation against hardware before it is relied on."
+confirmed = false
+entries = [
+    { value = 0, name = "1" },
+    { value = 1, name = "1/2" },
+    { value = 2, name = "3/8" },
+    { value = 3, name = "1/3" },
+    { value = 4, name = "1/4" },
+    { value = 5, name = "3/16" },
+    { value = 6, name = "1/6" },
+    { value = 7, name = "1/8" },
+    { value = 8, name = "3/32" },
+    { value = 9, name = "1/12" },
+    { value = 10, name = "1/16" },
+    { value = 11, name = "3/64" },
+    { value = 12, name = "1/24" },
+    { value = 13, name = "1/32" },
+    { value = 14, name = "3/128" },
+    { value = 15, name = "1/48" },
+]
+
+[[enum]]
+id = "mod_source"
+name = "Modulation Matrix Source"
+note = "Value 0 selects Off. Firmware 1.1 inserted Expression at 6 and Uni Voice at 21, renumbering everything after each, and moved the CC axes from CC 114-116 to CC 115-117. See mod_source_fw10 for the earlier ordering."
+entries = [
+    { value = 0, name = "Off" },
+    { value = 1, name = "Pitch Bend", description = "Pitch bend wheel" },
+    { value = 2, name = "Mod Wheel", description = "Modulation wheel" },
+    { value = 3, name = "Foot Ctrl", description = "Foot controller" },
+    { value = 4, name = "BreathCtrl", description = "Breath controller" },
+    { value = 5, name = "Pressure", description = "Aftertouch pressure" },
+    { value = 6, name = "Expression", description = "Expression pedal" },
+    { value = 7, name = "LFO1", description = "LFO 1" },
+    { value = 8, name = "LFO2", description = "LFO 2" },
+    { value = 9, name = "Env 1", description = "VCA envelope" },
+    { value = 10, name = "Env 2", description = "VCF envelope" },
+    { value = 11, name = "Env 3", description = "Mod envelope" },
+    { value = 12, name = "Note Num", description = "Note number" },
+    { value = 13, name = "Note Vel", description = "Note velocity" },
+    { value = 14, name = "Note Off Vel", description = "Note off velocity" },
+    { value = 15, name = "Ctrl Seq", description = "Control sequencer" },
+    { value = 16, name = "LFO1 (Uni)", description = "LFO 1, unipolar" },
+    { value = 17, name = "LFO2 (Uni)", description = "LFO 2, unipolar" },
+    { value = 18, name = "LFO1 (Fade)", description = "LFO 1 fade envelope" },
+    { value = 19, name = "LFO2 (Fade)", description = "LFO 2 fade envelope" },
+    { value = 20, name = "Voice Num", description = "Voice number" },
+    { value = 21, name = "Uni Voice", description = "Unison voice number" },
+    { value = 22, name = "CC X (115)", description = "Continuous controller X axis, CC 115" },
+    { value = 23, name = "CC Y (116)", description = "Continuous controller Y axis, CC 116" },
+    { value = 24, name = "CC Z (117)", description = "Continuous controller Z axis, CC 117" },
+]
+
+[[enum]]
+id = "mod_source_fw10"
+name = "Modulation Matrix Source (firmware 1.0)"
+note = "Superseded by mod_source on firmware 1.1 and later. Value 0 selects Off."
+entries = [
+    { value = 0, name = "Off" },
+    { value = 1, name = "Pitch Bend" },
+    { value = 2, name = "Mod Wheel" },
+    { value = 3, name = "Foot Ctrl" },
+    { value = 4, name = "BreathCtrl" },
+    { value = 5, name = "Pressure" },
+    { value = 6, name = "LFO1" },
+    { value = 7, name = "LFO2" },
+    { value = 8, name = "Env 1" },
+    { value = 9, name = "Env 2" },
+    { value = 10, name = "Env 3" },
+    { value = 11, name = "Note Num" },
+    { value = 12, name = "Note Vel" },
+    { value = 13, name = "Ctrl Seq" },
+    { value = 14, name = "LFO1 (Uni)" },
+    { value = 15, name = "LFO2 (Uni)" },
+    { value = 16, name = "LFO1 (Fade)" },
+    { value = 17, name = "LFO2 (Fade)" },
+    { value = 18, name = "NoteOff Vel" },
+    { value = 19, name = "Voice Num" },
+    { value = 20, name = "CC X (114)" },
+    { value = 21, name = "CC Y (115)" },
+    { value = 22, name = "CC Z (116)" },
+]
+
+[[enum]]
+id = "mod_destination"
+name = "Modulation Matrix Destination"
+note = "Value 0 selects Off. Firmware 1.0 had 129 destinations; firmware 1.1 inserted OSC1+2 Fine, OSC1 Fine and OSC2 Fine at values 10, 12 and 14. To read a firmware 1.0 value: 1-9 are unchanged, 10 becomes 11, 11 becomes 13, and 12 or above gain 3."
+entries = [
+    { value = 0, name = "Off" },
+    { value = 1, name = "LFO1 Rate" },
+    { value = 2, name = "LFO1 Delay" },
+    { value = 3, name = "LFO1 Slew" },
+    { value = 4, name = "LFO1 Shape" },
+    { value = 5, name = "LFO2 Rate" },
+    { value = 6, name = "LFO2 Delay" },
+    { value = 7, name = "LFO2 Slew" },
+    { value = 8, name = "LFO2 Shape" },
+    { value = 9, name = "OSC1+2 Pit" },
+    { value = 10, name = "OSC1+2 Fine" },
+    { value = 11, name = "OSC1 Pitch" },
+    { value = 12, name = "OSC1 Fine" },
+    { value = 13, name = "OSC2 Pitch" },
+    { value = 14, name = "OSC2 Fine" },
+    { value = 15, name = "OSC1 PM Dep" },
+    { value = 16, name = "PWM Depth" },
+    { value = 17, name = "TMod Depth" },
+    { value = 18, name = "OSC2 PM Dep" },
+    { value = 19, name = "Porta Time" },
+    { value = 20, name = "VCF Freq" },
+    { value = 21, name = "VCF Res" },
+    { value = 22, name = "VCF Env" },
+    { value = 23, name = "VCF LFO" },
+    { value = 24, name = "Env Rates" },
+    { value = 25, name = "All Attack" },
+    { value = 26, name = "All Decay" },
+    { value = 27, name = "All Sus" },
+    { value = 28, name = "All Rel" },
+    { value = 29, name = "Env1 Rates" },
+    { value = 30, name = "Env2 Rates" },
+    { value = 31, name = "Env3 Rates" },
+    { value = 32, name = "Env1CurveS" },
+    { value = 33, name = "Env2CurveS" },
+    { value = 34, name = "Env3CurveS" },
+    { value = 35, name = "Env1 Attack" },
+    { value = 36, name = "Env1 Decay" },
+    { value = 37, name = "Env1 Sus" },
+    { value = 38, name = "Env1 Rel" },
+    { value = 39, name = "Env1 AtCur" },
+    { value = 40, name = "Env1 DcyCur" },
+    { value = 41, name = "Env1 SuSCur" },
+    { value = 42, name = "Env1 RelCur" },
+    { value = 43, name = "Env2 Attack" },
+    { value = 44, name = "Env2 Decay" },
+    { value = 45, name = "Env2 Sus" },
+    { value = 46, name = "Env2 Rel" },
+    { value = 47, name = "Env2 AtCur" },
+    { value = 48, name = "Env2 DcyCur" },
+    { value = 49, name = "Env2 SuSCur" },
+    { value = 50, name = "Env2 RelCur" },
+    { value = 51, name = "Env3 Attack" },
+    { value = 52, name = "Env3 Decay" },
+    { value = 53, name = "Env3 Sus" },
+    { value = 54, name = "Env3 Rel" },
+    { value = 55, name = "Env3 AtCur" },
+    { value = 56, name = "Env3 DcyCur" },
+    { value = 57, name = "Env3 SuSCur" },
+    { value = 58, name = "Env3 RelCur" },
+    { value = 59, name = "VCA All" },
+    { value = 60, name = "VCA Active" },
+    { value = 61, name = "VCA EnvDep" },
+    { value = 62, name = "Pan Spread" },
+    { value = 63, name = "VCA Pan" },
+    { value = 64, name = "OSC2 Lvl" },
+    { value = 65, name = "Noise Lvl" },
+    { value = 66, name = "HP Freq" },
+    { value = 67, name = "Uni Detune" },
+    { value = 68, name = "OSC Drift" },
+    { value = 69, name = "Param Drift" },
+    { value = 70, name = "Drift Rate" },
+    { value = 71, name = "Arp Gate" },
+    { value = 72, name = "Seq Slew" },
+    { value = 73, name = "Mod 1 Dep" },
+    { value = 74, name = "Mod 2 Dep" },
+    { value = 75, name = "Mod 3 Dep" },
+    { value = 76, name = "Mod 4 Dep" },
+    { value = 77, name = "Mod 5 Dep" },
+    { value = 78, name = "Mod 6 Dep" },
+    { value = 79, name = "Mod 7 Dep" },
+    { value = 80, name = "Mod 8 Dep" },
+    { value = 81, name = "Fx 1 Param 1" },
+    { value = 82, name = "Fx 1 Param 2" },
+    { value = 83, name = "Fx 1 Param 3" },
+    { value = 84, name = "Fx 1 Param 4" },
+    { value = 85, name = "Fx 1 Param 5" },
+    { value = 86, name = "Fx 1 Param 6" },
+    { value = 87, name = "Fx 1 Param 7" },
+    { value = 88, name = "Fx 1 Param 8" },
+    { value = 89, name = "Fx 1 Param 9" },
+    { value = 90, name = "Fx 1 Param 10" },
+    { value = 91, name = "Fx 1 Param 11" },
+    { value = 92, name = "Fx 1 Param 12" },
+    { value = 93, name = "Fx 2 Param 1" },
+    { value = 94, name = "Fx 2 Param 2" },
+    { value = 95, name = "Fx 2 Param 3" },
+    { value = 96, name = "Fx 2 Param 4" },
+    { value = 97, name = "Fx 2 Param 5" },
+    { value = 98, name = "Fx 2 Param 6" },
+    { value = 99, name = "Fx 2 Param 7" },
+    { value = 100, name = "Fx 2 Param 8" },
+    { value = 101, name = "Fx 2 Param 9" },
+    { value = 102, name = "Fx 2 Param 10" },
+    { value = 103, name = "Fx 2 Param 11" },
+    { value = 104, name = "Fx 2 Param 12" },
+    { value = 105, name = "Fx 3 Param 1" },
+    { value = 106, name = "Fx 3 Param 2" },
+    { value = 107, name = "Fx 3 Param 3" },
+    { value = 108, name = "Fx 3 Param 4" },
+    { value = 109, name = "Fx 3 Param 5" },
+    { value = 110, name = "Fx 3 Param 6" },
+    { value = 111, name = "Fx 3 Param 7" },
+    { value = 112, name = "Fx 3 Param 8" },
+    { value = 113, name = "Fx 3 Param 9" },
+    { value = 114, name = "Fx 3 Param 10" },
+    { value = 115, name = "Fx 3 Param 11" },
+    { value = 116, name = "Fx 3 Param 12" },
+    { value = 117, name = "Fx 4 Param 1" },
+    { value = 118, name = "Fx 4 Param 2" },
+    { value = 119, name = "Fx 4 Param 3" },
+    { value = 120, name = "Fx 4 Param 4" },
+    { value = 121, name = "Fx 4 Param 5" },
+    { value = 122, name = "Fx 4 Param 6" },
+    { value = 123, name = "Fx 4 Param 7" },
+    { value = 124, name = "Fx 4 Param 8" },
+    { value = 125, name = "Fx 4 Param 9" },
+    { value = 126, name = "Fx 4 Param 10" },
+    { value = 127, name = "Fx 4 Param 11" },
+    { value = 128, name = "Fx 4 Param 12" },
+    { value = 129, name = "Fx 1 Level" },
+    { value = 130, name = "Fx 2 Level" },
+    { value = 131, name = "Fx 3 Level" },
+    { value = 132, name = "Fx 4 Level" },
+]
+
+[[enum]]
+id = "fx_type"
+name = "FX Type"
+note = "Firmware 1.1 added Vintage Pitch at value 33, shifting Rotary Speaker to 34. Firmware 1.0 stopped at 33."
+entries = [
+    { value = 0, name = "TC-DeepVRB", description = "TC Deep Reverb (Reverb)" },
+    { value = 1, name = "AmbVerb", description = "Ambient Reverb (Reverb)" },
+    { value = 2, name = "RoomRev", description = "Room Reverb (Reverb)" },
+    { value = 3, name = "VintageRev", description = "Vintage Room Reverb (Reverb)" },
+    { value = 4, name = "HallRev", description = "Hall Reverb (Reverb)" },
+    { value = 5, name = "ChamberRev", description = "Chamber Reverb (Reverb)" },
+    { value = 6, name = "PlateRev", description = "Plate Reverb (Reverb)" },
+    { value = 7, name = "RichPltRev", description = "Rich Plate Reverb (Reverb)" },
+    { value = 8, name = "GatedRev", description = "Gated Reverb (Reverb)" },
+    { value = 9, name = "Reverse", description = "Reverse Reverb (Reverb)" },
+    { value = 10, name = "ChorusVerb", description = "Chorus and Reverb (Reverb)" },
+    { value = 11, name = "DelayVerb", description = "Delay and Reverb (Reverb)" },
+    { value = 12, name = "FlangVerb", description = "Flange and Reverb (Reverb)" },
+    { value = 13, name = "MidasEQ", description = "Midas Equaliser (Processing)" },
+    { value = 14, name = "Enhancer", description = "Enhancer (Processing)" },
+    { value = 15, name = "FairComp", description = "Fair Compressor (Processing)" },
+    { value = 16, name = "MulBndDist", description = "Multi-Band Distortion (Processing)" },
+    { value = 17, name = "RackAmp", description = "Rack Amplifier (Processing)" },
+    { value = 18, name = "EdisonEX1", description = "Stereo Imaging (Processing)" },
+    { value = 19, name = "Auto Pan", description = "Auto-Panning (Processing)" },
+    { value = 20, name = "NoiseGate", description = "Noise Gate (Processing)" },
+    { value = 21, name = "Delay", description = "Delay (Delay)" },
+    { value = 22, name = "3TapDelay", description = "3-Tap Delay (Delay)" },
+    { value = 23, name = "4TapDelay", description = "4-Tap Delay (Delay)" },
+    { value = 24, name = "T-RayDelay", description = "Tel-Ray Delay (Delay)" },
+    { value = 25, name = "DecimDelay", description = "Decimator Delay (Delay)" },
+    { value = 26, name = "ModDlyRev", description = "Mod, Delay and Reverb (Delay)" },
+    { value = 27, name = "Chorus", description = "Chorus (Creative)" },
+    { value = 28, name = "Chorus-D", description = "Chorus D (Creative)" },
+    { value = 29, name = "Flanger", description = "Flanger (Creative)" },
+    { value = 30, name = "Phaser", description = "Phaser (Creative)" },
+    { value = 31, name = "MoodFilter", description = "Mood Filter (Creative)" },
+    { value = 32, name = "DualPitch", description = "Dual Pitch Shifter (Creative)" },
+    { value = 33, name = "Vintage Pitch", description = "Vintage Dual Pitch Shifter (Creative)" },
+    { value = 34, name = "RotarySpkr", description = "Rotary Speaker (Creative)" },
+]

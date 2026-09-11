@@ -1,0 +1,152 @@
+name: Release
+
+# Run this from the Actions tab. It bumps the version in Cargo.toml, which is the
+# single source of truth, then tags, releases and publishes.
+#
+# Versions are YY.RELEASE.PATCH: 26.1.0 is the first release of 2026, 26.1.1 its
+# first patch, 26.2.0 the second release of the year.
+#
+# Optional secrets. Neither is required; a missing one warns and the run carries
+# on.
+#   CARGO_REGISTRY_TOKEN  publishes to crates.io
+#   ANTHROPIC_API_KEY     writes a prose summary on top of the generated notes
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which component to advance
+        type: choice
+        required: true
+        default: patch
+        options: [patch, release]
+      dry_run:
+        description: Build and print the notes without tagging, releasing or publishing
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+
+      # Never tag something that does not build.
+      - name: Verify
+        env:
+          RUSTFLAGS: -D warnings
+        run: |
+          cargo fmt --all --check
+          cargo clippy --workspace --all-targets --all-features
+          cargo test --workspace --all-features
+
+      - name: Bump version
+        id: bump
+        run: cargo xtask release --bump '${{ inputs.bump }}'
+
+      - name: Refresh lockfile
+        run: cargo check --workspace --quiet
+
+      - name: Collect release notes
+        id: notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          set -euo pipefail
+          previous=$(git describe --tags --abbrev=0 2>/dev/null || echo '')
+
+          # GitHub's own generated notes list every merged pull request.
+          if [ -n "$previous" ]; then
+            gh api "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="v${VERSION}" -f previous_tag_name="$previous" \
+              --jq .body > generated.md
+            git log --no-merges --pretty='- %s' "${previous}..HEAD" > commits.md
+          else
+            gh api "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="v${VERSION}" --jq .body > generated.md
+            git log --no-merges --pretty='- %s' > commits.md
+          fi
+
+          # A prose summary on top, when a key is available to write one.
+          if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            echo '::warning::ANTHROPIC_API_KEY is not set, releasing with the generated notes only'
+            cp generated.md notes.md
+          else
+            prompt=$(printf 'Write release notes for version %s of deepmind-midi, a Rust library for the Behringer DeepMind MIDI protocol.\n\nOpen with two or three sentences on what changed and why it matters to someone using the library. Then group the changes under short headings. Be concrete and concise. Plain prose, no marketing language, no em dashes. Output Markdown with no title heading.\n\nMerged pull requests:\n%s\n\nCommits:\n%s\n' \
+              "$VERSION" "$(cat generated.md)" "$(cat commits.md)")
+
+            jq -n --arg p "$prompt" '{
+              model: "claude-opus-5",
+              max_tokens: 4000,
+              output_config: { effort: "low" },
+              messages: [{ role: "user", content: $p }]
+            }' > request.json
+
+            if curl -sS --fail-with-body https://api.anthropic.com/v1/messages \
+                 -H "content-type: application/json" \
+                 -H "x-api-key: ${ANTHROPIC_API_KEY}" \
+                 -H "anthropic-version: 2023-06-01" \
+                 -d @request.json > response.json; then
+              jq -r '.content[] | select(.type == "text") | .text' response.json > summary.md
+              if [ -s summary.md ]; then
+                { cat summary.md; printf '\n\n---\n\n'; cat generated.md; } > notes.md
+              else
+                echo '::warning::summary came back empty, releasing with the generated notes only'
+                cp generated.md notes.md
+              fi
+            else
+              echo '::warning::summary request failed, releasing with the generated notes only'
+              cp generated.md notes.md
+            fi
+          fi
+
+          echo '--- release notes ---'
+          cat notes.md
+
+      - name: Tag and push
+        if: ${{ !inputs.dry_run }}
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add Cargo.toml Cargo.lock
+          git commit -m "Release v${VERSION}"
+          git tag -a "v${VERSION}" -m "v${VERSION}"
+          git push origin HEAD "v${VERSION}"
+
+      - name: Create GitHub release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: gh release create "v${VERSION}" --title "v${VERSION}" --notes-file notes.md
+
+      - name: Publish to crates.io
+        if: ${{ !inputs.dry_run }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CARGO_REGISTRY_TOKEN:-}" ]; then
+            echo '::warning::CARGO_REGISTRY_TOKEN is not set, skipping the crates.io publish'
+            exit 0
+          fi
+          cargo publish --package deepmind-midi

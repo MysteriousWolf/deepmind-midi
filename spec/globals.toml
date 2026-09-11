@@ -1,0 +1,158 @@
+# DeepMind global settings.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# These are device-wide settings, not per-program. They are read back with the
+# global parameter dump (command 0x06), which carries 45 raw bytes. The manual
+# lists the settings but does not give their byte offsets within that dump, so
+# no offsets are recorded here yet.
+
+[meta]
+source = "DeepMind 12 User Manual, section 18 (Global Commands)"
+dump_raw_len = 45
+offsets_known = false
+
+[[global]]
+name = "MIDI Channel"
+min = 0
+max = 16
+note = "Rx and Tx channel. 0 is All, 1-16 select a channel. Doubles as the SysEx device ID."
+
+[[global]]
+name = "Keyboard Local"
+min = 0
+max = 1
+note = "Whether the keyboard and wheels drive the synth (1) or only send MIDI (0)."
+
+[[global]]
+name = "Fader Local"
+min = 0
+max = 1
+note = "Whether the faders drive the synth (1) or only send MIDI (0)."
+
+[[global]]
+name = "Global Tune"
+min = 0
+max = 255
+note = "-128 cents (0) through 0 cents (128) to +127 cents (255)."
+
+[[global]]
+name = "MIDI Clock Source"
+min = 0
+max = 2
+note = "Internal (0), MIDI (1), USB (2)."
+
+[[global]]
+name = "MIDI Program Change Mode"
+min = 0
+max = 2
+note = "Rx (0), Tx (1), Both (2)."
+
+[[global]]
+name = "USB Control Mode"
+min = 0
+max = 2
+note = "Whether the synth sends CC or NRPN over USB. Set automatically on receiving an app notify request."
+
+[[global]]
+name = "MIDI Control Mode"
+min = 0
+max = 2
+note = "Whether the synth sends CC or NRPN over DIN MIDI. Set automatically on receiving an app notify request."
+
+[[global]]
+name = "MIDI Soft Thru"
+min = 0
+max = 1
+note = "Forward messages received on MIDI In to MIDI Out."
+
+[[global]]
+name = "USB to MIDI"
+min = 0
+max = 1
+note = "Forward messages received on USB to MIDI Out."
+
+[[global]]
+name = "MIDI to USB"
+min = 0
+max = 1
+note = "Forward messages received on MIDI In to USB."
+
+[[global]]
+name = "Fixed Velocity"
+min = 0
+max = 1
+note = "Keyboard sends fixed (1) or dynamic (0) note-on velocity."
+
+[[global]]
+name = "Velocity"
+min = 0
+max = 127
+note = "The velocity sent when Fixed Velocity is on."
+
+[[global]]
+name = "Velocity Curve"
+min = 0
+max = 127
+note = "Key velocity to MIDI velocity curve. The manual gives the display range as -64 to +63 and marks it TBD."
+
+[[global]]
+name = "Transpose"
+min = 0
+max = 96
+note = "-48 to +48 semitones. Affects both local play and MIDI output."
+
+[[global]]
+name = "Aftertouch Curve"
+min = 0
+max = 127
+note = "Key pressure to MIDI aftertouch curve. The manual gives the display range as -64 to +63 and marks it TBD."
+
+[[global]]
+name = "Pedal CC"
+min = 0
+max = 3
+note = "Foot controller CC: Foot Control CC4 (0), Breath CC2 (1), Volume CC7 (2), Expression CC11 (3)."
+
+[[global]]
+name = "Sustain CC"
+min = 0
+max = 3
+note = "Sustain pedal polarity and function: Normal+ (0), Normal- (1), Arp+ (2), Arp- (3)."
+
+[[global]]
+name = "Fader Pick Up Mode"
+min = 0
+max = 2
+note = "Relative (0), Pass-thru (1), Jump (2)."
+
+[[global]]
+name = "LCD Brightness"
+min = 0
+max = 9
+note = "10% steps."
+
+[[global]]
+name = "LCD Contrast"
+min = 0
+max = 9
+note = "10% steps."
+
+[[global]]
+name = "Arp Send to MIDI"
+min = 0
+max = 1
+note = "Transmit arpeggiator output to MIDI Out and USB."
+
+[[global]]
+name = "Send NRPN on Load"
+min = 0
+max = 2
+note = "Dump NRPN values when a program is loaded: Off (0), MIDI (1), USB (2). The manual marks this as possibly removed before release."
+
+[[global]]
+name = "Keyboard Octave"
+min = 0
+max = 7
+note = "Octave shift. At 0 the leftmost key is C0."

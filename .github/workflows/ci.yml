@@ -26,8 +26,13 @@ jobs:
       - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features
 
+      # Includes generated_documentation_is_current, which fails when
+      # docs/midi-spec.md does not match spec/.
       - name: Test
         run: cargo test --workspace --all-features
+
+      - name: Generated documentation is current
+        run: cargo xtask docs --check
 
   features:
     name: feature combinations
@@ -56,17 +61,13 @@ jobs:
       - run: cargo check --workspace --all-features
 
   docs:
-    name: documentation
+    name: rustdoc
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@v2
-
       - name: Build rustdoc
         run: cargo doc --workspace --all-features --no-deps
         env:
           RUSTDOCFLAGS: -D warnings --cfg docsrs
-
-      - name: Check generated documentation is current
-        run: cargo xtask docs --check
