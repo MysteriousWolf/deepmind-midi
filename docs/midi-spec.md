@@ -2528,56 +2528,114 @@ shape: two straight segments meeting at a breakpoint about 40% of the way along
 the fader, shallow below and steep above, reaching the full 36 semitones at the
 top of the travel. Not a smooth curve, and not one curve.
 
-The second is the PROG screen. Whenever the manual illustrates a fader it
-screenshots that screen, and the screen shows the raw value of the fader above
-the value stored in the program, with the displayed value spelled out along the
-bottom. Every one of those screenshots is therefore a raw value paired with what
-the synthesizer makes of it. Sections 8.3.1 and 8.3.2 give four.
+The second is the PROG screen, and it is the useful one. Section 7.1.7 calls the
+number at the top of its left-hand strip the CURRENT PARAMETER MIDI VALUE and
+says it is "a simple value (0-255)", which is the value on the wire. Section
+7.1.9 says the line along the bottom of the same screen carries "a more accurate
+value of the parameter being adjusted" and its units. The manual screenshots that
+screen beside nearly every fader it describes, so each one is a raw value printed
+next to what the synthesizer makes of it.
 
-| Parameter | Displayed range | Raw | Shown |
-|---|---|---|---|
-| OSC 1 PWM | 50.0% to 99.0% | 118 | 72.6% |
-| OSC 1 PWM, as modulation depth | 0 to +/-49% | 101 | +/-19.4% |
-| OSC 1 Pitch Mod Depth | 0.00 cents to 36.0 semitones | 121 | +/-4.5 semitones |
-| OSC 1 Pitch Mod Depth | 0.00 cents to 36.0 semitones | 135 | +7.8 semitones |
+<!-- generated:measurements -->
 
-The two PWM readings are both linear on 0-255 to the precision the screen shows:
-50.0 + 118/255 x 49.0 is 72.675, displayed as 72.6, and 101/255 x 49.0 is 19.408,
-displayed as 19.4. Two values off the same fader agreeing with one rule to three
-decimals is also the reason to treat these screenshots as captures of a real
-instrument rather than mock-ups.
+| Offset | Parameter | Raw | Displayed | Fits | Note |
+|---|---|---|---|---|---|
+| 0 | LFO 1 Rate | 0 | 24.1 s | endpoint | The slowest rate. A period of 24.1 s is 0.0415 Hz, agreeing with the 0.041 Hz the parameter table gives as the bottom of the range. |
+| 0 | LFO 1 Rate | 12 | 17.0 s | exponential | Exponential in frequency between the ends, not in period. Linear in frequency would show 0.32 s here. |
+| 1 | LFO 1 Delay / Fade | 193 | 4.99 s | linear |  |
+| 21 | OSC 1 Pitch Mod Depth | 121 | +/-4.5 semitones | piecewise | Bipolar, from an LFO source. The magnitude is the same as a unipolar source gives. |
+| 21 | OSC 1 Pitch Mod Depth | 135 | +7.8 semitones | piecewise |  |
+| 25 | OSC 1 PWM Depth | 118 | 72.6 % | linear | Pulse width, which is what this fader sets while the PWM source is Manual. |
+| 25 | OSC 1 PWM Depth | 101 | +/-19.4 % | linear | Modulation depth, which is what the same fader sets once the PWM source is not Manual. A different range on the same offset, so the two readings do not contradict each other. |
+| 26 | OSC 2 Level | 0 | Off | endpoint |  |
+| 26 | OSC 2 Level | 255 | 0.0 dB | endpoint |  |
+| 27 | OSC 2 Pitch | 121 | -7.0 cents | none | Seven cents below centre at six and a half steps below centre, on a fader the manual gives a range of plus or minus 12 semitones. Linear would show -61 cents. The fader has to be far finer near the centre than at its ends, which the manual does not say anywhere. |
+| 28 | OSC 2 Tone Mod Depth | 255 | 100.0 % | endpoint | Tone modulation, which is what this fader sets while the source is Manual. |
+| 28 | OSC 2 Tone Mod Depth | 255 | +/-49 | endpoint | Modulation depth, which is what the same fader sets once the source is not Manual. |
+| 29 | OSC 2 Pitch Mod Depth | 135 | +7.8 semitones | piecewise | The same reading at the same raw value as OSC 1 Pitch Mod Depth at offset 21, so the two oscillators share one fader response. |
+| 33 | Noise Level | 255 | 0.0 dB | endpoint |  |
+| 39 | VCF Frequency | 98 | 500.0 Hz | exponential | An exponential sweep from 50 Hz to 20 kHz gives 500.0005 Hz here. Linear would give 7717 Hz, so this rules linear out rather than merely fitting. |
+| 40 | VCF HighPass Frequency | 0 | 20.0 Hz | endpoint |  |
+| 40 | VCF HighPass Frequency | 88 | 98.0 Hz | exponential | An exponential sweep from 20 Hz to 2 kHz gives 97.99 Hz here. Linear would give 703 Hz. |
+| 41 | VCF Resonance | 255 | 100.0 % | endpoint |  |
+| 42 | VCF Envelope Depth | 153 | 60.0 % | linear |  |
+| 45 | VCF LFO Depth | 102 | 40.0 % | linear |  |
+| 49 | VCF Keyboard Tracking | 68 | 26.6 % | linear |  |
+| 49 | VCF Keyboard Tracking | 153 | 60.0 % | linear |  |
+| 54 | VCA Envelope Decay Time | 128 | 1.13 s | untested | The parameter table carries no displayed range for the envelope times, so this is the only figure there is for one. |
+| 56 | VCA Envelope Release Time | 255 | 32.0 s | untested | The top of the range, for a parameter the manual gives no range for. The longest release the VCA envelope reaches is 32 seconds. |
+| 80 | VCA Level | 181 | 2.50 dB | none | Linear between the stated -12.0 dB and +6.0 dB would show 0.78 dB. A fader that is linear in amplitude rather than in decibels comes closer, at 3.0 dB, but does not land on it either. |
+| 87 | Unison Detune | 34 | +/-6.6 cents | linear |  |
+| 87 | Unison Detune | 255 | +/-50.0 cents | endpoint | The example the manual works through in section 7.1, where this reading is printed alongside a stored value of 20. |
+| 160 | Arp Gate Time | 112 | 43.9 % | linear | Against a range of 0 to 100%, which the parameter table does not state for this offset. Two readings agreeing with it is the reason to think that is the range. |
+| 160 | Arp Gate Time | 128 | 50.1 % | linear |  |
 
-The two pitch mod readings fall on a line of 0.2357 semitones per raw step. That
-line reaches 36.09 semitones at raw 255, where the display maximum is 36.0, and
-crosses zero at raw 102. Reading the breakpoint straight off the graph instead
-puts it at roughly 41% of travel, which is raw 104. A drawing and a pair of
-displayed numbers are independent evidence, and they land within two raw steps of
-each other, which is the useful part: the steep upper segment of that fader runs
-from about raw 102 to raw 255 across 0 to 36 semitones.
+29 readings across 20 parameters: 10 match a linear interpolation between the parameter's stated ends, 3 an exponential one, 3 sit on the two-segment fader response section 8.3.1 draws, 9 are at an end of a range rather than inside it, 2 are of a parameter the manual states no range for, and 2 match nothing simple.
 
-What is still not known for that fader is the shallow segment below the
-breakpoint. The graph draws it rising to about 2.5 semitones by the breakpoint,
-which the displayed values contradict: they put the upper segment at zero there.
-The figure is good for the shape and the breakpoint and is not to scale in its
-lower half, so no conversion is recorded for the region below raw 102.
+<!-- /generated:measurements -->
+
+### What the readings say
+
+**Most faders are linear.** Ten readings across seven parameters land on a
+straight line between the parameter's two stated ends, to the digit the screen
+prints: `50.0 + 118/255 x 49.0` is 72.675 against a displayed 72.6, `153/255 x
+100` is 60.0 against 60.0, `34/255 x 50` is 6.667 against 6.6.
+
+**Frequencies are exponential, and this is not a close call.** VCF Frequency at
+raw 98 displays 500.0 Hz. An exponential sweep between its stated 50 Hz and
+20000 Hz gives 500.0005 Hz there; a straight line gives 7717 Hz. The high pass
+behaves the same way, showing 98.0 Hz at raw 88 where an exponential sweep
+between 20 Hz and 2000 Hz gives 97.99 and a straight line gives 703. LFO 1 Rate
+is exponential in frequency rather than in the period it displays: 17.0 s at raw
+12, where an exponential sweep predicts 17.04 s and a linear one predicts 0.32 s.
+One interior reading cannot prove a curve, but it can kill one, and it has.
+
+**The pitch mod fader is the piecewise one the graph draws.** Its two readings
+fall on a line of 0.2357 semitones per raw step. That line reaches 36.09
+semitones at raw 255, where the display maximum is 36.0, and crosses zero at raw
+102. Reading the breakpoint off the graph instead gives raw 104. A drawing and a
+pair of displayed numbers are independent evidence and they land within two raw
+steps of each other, which pins the steep upper segment. Both oscillators share
+the response: offsets 21 and 29 show the same 7.8 semitones at the same raw 135.
+
+**Two faders match nothing simple, and the manual does not warn about either.**
+OSC 2 Pitch shows -7.0 cents at raw 121, six and a half steps below centre, on a
+fader the manual gives a range of plus or minus 12 semitones; linear would show
+-61 cents, so that fader must be far finer near its centre than at its ends. VCA
+Level shows 2.50 dB at raw 181 where linear between -12.0 dB and +6.0 dB gives
+0.78 dB.
+
+**Two readings fill gaps the manual leaves.** The parameter table carries no
+displayed range for the envelope times; the screenshots give VCA release 32.0 s
+at raw 255 and VCA decay 1.13 s at raw 128. And Arp Gate Time, which also has no
+stated range, produces 43.9% and 50.1% at raw 112 and 128, both of which are what
+a plain 0 to 100% would give.
 
 ### What that means for the rest
 
-It generalises as method, not as numbers. Every effect parameter still has two
-ends and no measured interior, and the manual prints no response graph for any of
-them. The four readings above cover two program parameters, not the 329 effect
-ranges.
+It generalises as method, not as numbers. Every reading above is of a program
+parameter. They cover none of the 329 effect ranges, because the manual prints
+no PROG screen and no response graph for any effect parameter: the FX pages show
+displayed values only, with no raw value anywhere on screen.
 
-The procedure is mechanical once the wire layer exists: send an NRPN edit for a
-known raw value, read the value the synthesizer displays, repeat across the
-range, and fit. It has to be done per parameter, because the manual describes
-bespoke fader responses rather than one house curve, and because the one fader it
-does describe turns out to be piecewise rather than any named curve.
+They also stop short of a conversion even where they are strongest. A single
+interior point fixes a curve only if you already know its family, and the two
+faders that match nothing simple are the reminder of what assuming the family
+costs. So nothing here is wired into a conversion. `raw()` always works; `hz()`
+waits.
 
-Until then this specification records the two ends and no curve, and a host
-should show raw values rather than invent displayed ones. Inventing them would
-put plausible, wrong numbers in front of a musician, which is worse than showing
-a number that is honestly raw.
+The remaining procedure is mechanical once the wire layer exists: send an NRPN
+edit for a known raw value, read the value the synthesizer displays, repeat
+across the range, and fit. It has to be done per parameter, because the manual
+describes bespoke fader responses rather than one house curve, and because the
+readings above show at least four different shapes already. The rows in
+`spec/measurements.toml` are what that pass should reproduce before anyone trusts
+the rest of its output.
+
+Until then this specification records the two ends, the readings, and no curve,
+and a host should show raw values rather than invent displayed ones. Inventing
+them would put plausible, wrong numbers in front of a musician, which is worse
+than showing a number that is honestly raw.
 
 ## Cross-verification
 

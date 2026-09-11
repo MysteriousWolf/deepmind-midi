@@ -118,6 +118,7 @@ collapses NRPN edits, dump parsing and dump building into a single table.
 | `spec/panels.toml` | how those 370 slots present themselves |
 | `spec/mapping.toml` | how an address and a value become bytes |
 | `spec/routing.toml` | how the four FX engines can be wired together |
+| `spec/measurements.toml` | 29 raw values with what the synthesizer displayed |
 | `spec/firmware.toml` | firmware versions that change the protocol |
 
 `cargo xtask docs` renders the tables and Mermaid diagrams in
@@ -244,15 +245,19 @@ logarithmic fit, and the manual documents a fader that starts at zero and is
 still explicitly non-linear.
 
 Almost never, rather than never, because the manual's figures give up more than
-its prose does. Its response graph for the OSC 1 Pitch Mod fader shows two
-straight segments meeting at a breakpoint, and its PROG screenshots pair a raw
-fader value with the value the synthesizer displays for it. Four such pairs,
-across two parameters, are recorded in
-[the specification](midi-spec.md#scaling-raw-values-to-displayed-values). Two of
-them put one fader on a straight line through its stated ends, two more pin the
-upper segment of the non-linear one and leave its lower segment open. Two points
-on a fader are not a measured curve, and none of the four touches the 329 effect
-ranges.
+its prose does. Its PROG screenshots print a parameter's raw MIDI value next to
+the value the synthesizer displays for it, which makes each one a measurement.
+`spec/measurements.toml` collects the 29 of them the manual contains, and
+[the specification](midi-spec.md#scaling-raw-values-to-displayed-values) works
+through what they say. Most faders are linear. The three frequency parameters are
+exponential, and not marginally: VCF Frequency reads 500.0 Hz where an
+exponential sweep predicts 500.0005 and a straight line predicts 7717. Two faders
+match neither, and the manual warns about neither.
+
+None of that is a conversion, and none of it touches the 329 effect ranges, for
+which the manual prints no screenshot and no graph. A single interior reading
+fixes a curve only if the family is already known, and the two faders that match
+nothing are what assuming the family costs.
 
 So `Frequency::hz()` will exist only for parameters whose curve has been measured,
 and `raw()` always works. A conversion that has not been measured is absent rather

@@ -58,6 +58,7 @@ pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
         ("controllers", render_controllers(&spec)),
         ("routing", render_routing(&spec)),
         ("effects", render_effects(&spec)),
+        ("measurements", render_measurements(&spec)),
         ("corrections", render_corrections(&spec)),
     ] {
         updated = splice(&updated, marker, &body)?;
@@ -633,6 +634,54 @@ fn render_routing(spec: &Spec) -> String {
             mark(mode.digital_path)
         );
     }
+    out
+}
+
+/// Renders the raw-to-displayed readings, grouped by parameter.
+fn render_measurements(spec: &Spec) -> String {
+    let mut out = String::from(
+        "| Offset | Parameter | Raw | Displayed | Fits | Note |\n|---|---|---|---|---|---|\n",
+    );
+    for measurement in &spec.measurements {
+        let name = spec
+            .parameters
+            .iter()
+            .find(|p| p.offset == measurement.offset)
+            .map_or("", |p| p.name.as_str());
+        let _ = writeln!(
+            out,
+            "| {} | {} | {} | {} | {} | {} |",
+            measurement.offset,
+            cell(name),
+            measurement.raw,
+            cell(&measurement.shown),
+            cell(&measurement.fit),
+            cell(measurement.note.as_deref().unwrap_or("")),
+        );
+    }
+
+    let count = |fit: &str| spec.measurements.iter().filter(|m| m.fit == fit).count();
+    let parameters = {
+        let mut offsets: Vec<u16> = spec.measurements.iter().map(|m| m.offset).collect();
+        offsets.sort_unstable();
+        offsets.dedup();
+        offsets.len()
+    };
+    let _ = write!(
+        out,
+        "\n{} readings across {parameters} parameters: {} match a linear \
+         interpolation between the parameter's stated ends, {} an exponential \
+         one, {} sit on the two-segment fader response section 8.3.1 draws, {} \
+         are at an end of a range rather than inside it, {} are of a parameter \
+         the manual states no range for, and {} match nothing simple.\n",
+        spec.measurements.len(),
+        count("linear"),
+        count("exponential"),
+        count("piecewise"),
+        count("endpoint"),
+        count("untested"),
+        count("none"),
+    );
     out
 }
 

@@ -255,6 +255,27 @@ pub struct Panel {
     pub slots: Vec<PanelSlot>,
 }
 
+/// A raw parameter value printed beside the value the synthesizer displays.
+///
+/// Taken from the PROG screenshots in the manual, where the upper number is the
+/// parameter's MIDI value and the line along the bottom of the screen is the
+/// same parameter in its own units. These decide which curves are still
+/// possible between a parameter's two stated ends; none of them is a conversion.
+#[derive(Debug, Deserialize)]
+pub struct Measurement {
+    /// Offset of the parameter read, joining to `parameters.toml`.
+    pub offset: u16,
+    /// The value on the wire, 0-255.
+    pub raw: u16,
+    /// What the synthesizer displayed for it, units and all.
+    pub shown: String,
+    /// Which interpolation between the parameter's stated ends reproduces this.
+    pub fit: String,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
 /// One effect slot's place in a routing topology.
 #[derive(Debug, Deserialize)]
 pub struct RoutingSlot {
@@ -400,6 +421,11 @@ struct Panels {
 }
 
 #[derive(Debug, Deserialize)]
+struct Measurements {
+    measurement: Vec<Measurement>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Routings {
     routing: Vec<Routing>,
     mode: Vec<FxMode>,
@@ -457,6 +483,8 @@ pub struct Spec {
     pub routings: Vec<Routing>,
     /// What each `FX Mode` setting does to the analog and digital paths.
     pub fx_modes: Vec<FxMode>,
+    /// Raw values read off the manual's screenshots with what they displayed.
+    pub measurements: Vec<Measurement>,
 }
 
 impl Spec {
@@ -480,6 +508,7 @@ impl Spec {
         let mapping: Mapping = read(&spec.join("mapping.toml"))?;
         let panels: Panels = read(&spec.join("panels.toml"))?;
         let routings: Routings = read(&spec.join("routing.toml"))?;
+        let measurements: Measurements = read(&spec.join("measurements.toml"))?;
 
         let this = Self {
             parameters: parameters.parameter,
@@ -495,6 +524,7 @@ impl Spec {
             panels: panels.panel,
             routings: routings.routing,
             fx_modes: routings.mode,
+            measurements: measurements.measurement,
         };
         this.validate()?;
         Ok(this)
@@ -535,6 +565,7 @@ impl Spec {
         self.validate_controllers()?;
         self.validate_effects()?;
         self.validate_routing()?;
+        self.validate_measurements()?;
         self.validate_mapping()?;
         self.validate_messages()
     }
@@ -905,6 +936,53 @@ impl Spec {
                 routing.feedback,
                 if cyclic { "has" } else { "has no" }
             ));
+        }
+        Ok(())
+    }
+
+    /// Checks each reading against the parameter it claims to be of.
+    ///
+    /// A reading outside the parameter's own range is a misread screenshot, and
+    /// a reading of an offset that does not exist is a typo. Neither is
+    /// recoverable later: these are the only record of what the screen said.
+    fn validate_measurements(&self) -> Result<(), String> {
+        const FITS: [&str; 6] = [
+            "linear",
+            "exponential",
+            "piecewise",
+            "endpoint",
+            "untested",
+            "none",
+        ];
+        for measurement in &self.measurements {
+            let parameter = self
+                .parameters
+                .iter()
+                .find(|p| p.offset == measurement.offset)
+                .ok_or_else(|| {
+                    format!(
+                        "measurements.toml: offset {} is not a parameter",
+                        measurement.offset
+                    )
+                })?;
+            if measurement.raw < parameter.min || measurement.raw > parameter.max {
+                return Err(format!(
+                    "measurements.toml: {} reads {} but the parameter runs {}-{}",
+                    parameter.name, measurement.raw, parameter.min, parameter.max
+                ));
+            }
+            if !FITS.contains(&measurement.fit.as_str()) {
+                return Err(format!(
+                    "measurements.toml: {} has unknown fit {:?}",
+                    parameter.name, measurement.fit
+                ));
+            }
+            if measurement.shown.trim().is_empty() {
+                return Err(format!(
+                    "measurements.toml: {} records no displayed value",
+                    parameter.name
+                ));
+            }
         }
         Ok(())
     }
