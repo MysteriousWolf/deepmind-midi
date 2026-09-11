@@ -132,10 +132,11 @@ impl Rgb {
 const WHITE: Rgb = Rgb(255, 255, 255);
 const BLACK: Rgb = Rgb(0, 0, 0);
 
-/// The colours one drawing uses, resolved from the three the spec measured.
+/// The colours one drawing uses, resolved from the four the spec measured.
 struct Palette {
-    body: String,
-    knob: String,
+    chassis: String,
+    face: String,
+    cap: String,
     edge: String,
     ink: String,
     faint: String,
@@ -145,29 +146,49 @@ struct Palette {
 impl Palette {
     /// Fills in what a measurement could not supply.
     ///
-    /// Some panels are a single colour, so `panel` comes back equal to `body`
-    /// and `accent` can land close to it. Where that happens the drawing shades
-    /// the measured colour rather than substituting an invented one.
+    /// A panel built from one colour measures as one colour, so `cap` can come
+    /// back equal to `face` and `accent` equal to `cap`. Where that happens the
+    /// drawing shades the measured colour rather than substituting an invented
+    /// one, so the page still reads as the panel it came from.
     fn resolve(layout: &Layout) -> Self {
-        let body = Rgb::parse(&layout.body);
-        let ink = if body.luminance() > 500 { BLACK } else { WHITE };
-        let mut knob = Rgb::parse(&layout.panel);
-        if knob.distance(body) < 60 {
-            knob = body.mix(ink, 220);
+        let chassis = Rgb::parse(&layout.chassis);
+        let face = Rgb::parse(&layout.face);
+        let ink = if face.luminance() > 500 { BLACK } else { WHITE };
+        let mut cap = Rgb::parse(&layout.cap);
+        if cap.distance(face) < 60 {
+            cap = face.mix(ink, 220);
         }
         let mut accent = Rgb::parse(&layout.accent);
-        if accent.distance(body) < 90 || accent.distance(knob) < 70 {
-            let against = if knob.luminance() > 500 { BLACK } else { WHITE };
-            accent = knob.mix(against, 620);
+        if accent.distance(face) < 90 || accent.distance(cap) < 70 {
+            let against = if cap.luminance() > 500 { BLACK } else { WHITE };
+            accent = cap.mix(against, 620);
         }
+        // The case reads as a case only when it is not the surface it holds.
+        let chassis = if chassis.distance(face) < 40 {
+            face.mix(ink, 120)
+        } else {
+            chassis
+        };
         Self {
-            body: body.hex(),
-            knob: knob.hex(),
-            edge: knob.mix(ink, 350).hex(),
-            ink: ink.mix(body, 80).hex(),
-            faint: ink.mix(body, 550).hex(),
+            chassis: chassis.hex(),
+            face: face.hex(),
+            cap: cap.hex(),
+            edge: cap.mix(ink, 350).hex(),
+            ink: ink.mix(face, 80).hex(),
+            faint: ink.mix(face, 550).hex(),
             accent: accent.hex(),
         }
+    }
+
+    /// Text that reads on the chassis rather than on the face.
+    fn on_chassis(layout: &Layout) -> (String, String) {
+        let chassis = Rgb::parse(&layout.chassis);
+        let ink = if chassis.luminance() > 500 {
+            BLACK
+        } else {
+            WHITE
+        };
+        (ink.mix(chassis, 80).hex(), ink.mix(chassis, 500).hex())
     }
 }
 
@@ -205,20 +226,42 @@ fn point(cx: f32, cy: f32, radius: f32, degrees: f32) -> (f32, f32) {
     (cx + radius * radians.sin(), cy - radius * radians.cos())
 }
 
-/// Draws the arc a continuous control sweeps through.
+/// Draws the arc a knob sweeps through.
 fn track(cx: f32, cy: f32, radius: f32) -> String {
     let (x1, y1) = point(cx, cy, radius, -SWEEP);
     let (x2, y2) = point(cx, cy, radius, SWEEP);
     format!("M {x1:.2} {y1:.2} A {radius:.2} {radius:.2} 0 1 1 {x2:.2} {y2:.2}")
 }
 
-/// Draws the tick marks that say what kind of control this is.
+/// How many marks a control carries, and in which colour.
 ///
-/// A switch gets one at each end of the sweep, a selector one per option, and a
-/// continuous control none: its arc track is already its whole range. They sit
-/// inside the face, which is the only part of a cell nothing else uses.
-fn ticks(cx: f32, cy: f32, radius: f32, count: usize, colour: &str) -> String {
-    let mut out = String::new();
+/// A switch gets one mark per state and a selector one per option, so the marks
+/// count the positions the control has. A continuous control gets none: its
+/// travel is already drawn, and a mark on it would mean a detent that is not
+/// there.
+fn marks(kind: &str, options: usize) -> usize {
+    match kind {
+        "switch" => 2,
+        "selector" => options.max(2),
+        _ => 0,
+    }
+}
+
+/// Draws a knob: the body, the travel behind it, and any position marks.
+///
+/// The marks sit inside the face, which is the only part of a cell nothing else
+/// uses.
+fn knob(cx: f32, cy: f32, radius: f32, count: usize, colours: &Palette) -> String {
+    let mut out = format!(
+        "\n  <path d=\"{}\" fill=\"none\" stroke=\"{}\" stroke-width=\"0.7\" \
+         stroke-linecap=\"round\"/>\
+         \n  <circle cx=\"{cx:.2}\" cy=\"{cy:.2}\" r=\"{radius:.2}\" fill=\"{}\" \
+         stroke=\"{}\" stroke-width=\"0.6\"/>",
+        track(cx, cy, radius + 1.8),
+        colours.faint,
+        colours.cap,
+        colours.edge,
+    );
     for index in 0..count {
         let fraction = if count == 1 {
             0.5
@@ -231,10 +274,80 @@ fn ticks(cx: f32, cy: f32, radius: f32, count: usize, colour: &str) -> String {
         let _ = write!(
             out,
             "\n  <line x1=\"{x1:.2}\" y1=\"{y1:.2}\" x2=\"{x2:.2}\" y2=\"{y2:.2}\" \
-             stroke=\"{colour}\" stroke-width=\"0.7\" stroke-linecap=\"round\"/>"
+             stroke=\"{}\" stroke-width=\"0.7\" stroke-linecap=\"round\"/>",
+            colours.accent
         );
     }
     out
+}
+
+/// Draws a vertical fader: the slot, the ladder beside it, and any marks.
+///
+/// The panels that use faders draw a ladder of rungs the length of the travel,
+/// so the rungs are the travel here too. Marked positions replace them, in the
+/// accent colour, which keeps a switch and a selector readable at this size.
+fn fader(cx: f32, cy: f32, radius: f32, count: usize, colours: &Palette) -> String {
+    let half = radius * 1.15;
+    let slot = 0.9;
+    let reach = radius * 1.0;
+    let mut out = format!(
+        "\n  <rect x=\"{:.2}\" y=\"{:.2}\" width=\"{slot:.2}\" height=\"{:.2}\" \
+         rx=\"{:.2}\" fill=\"{}\" stroke=\"{}\" stroke-width=\"0.3\"/>",
+        cx - slot / 2.0,
+        cy - half,
+        half * 2.0,
+        slot / 2.0,
+        colours.cap,
+        colours.edge,
+    );
+    let rungs = if count == 0 { 7 } else { count };
+    let colour = if count == 0 {
+        &colours.faint
+    } else {
+        &colours.accent
+    };
+    for index in 0..rungs {
+        let fraction = if rungs == 1 {
+            0.5
+        } else {
+            units(index) / units(rungs - 1)
+        };
+        let y = cy + half - fraction * half * 2.0;
+        let _ = write!(
+            out,
+            "\n  <line x1=\"{:.2}\" y1=\"{y:.2}\" x2=\"{:.2}\" y2=\"{y:.2}\" \
+             stroke=\"{colour}\" stroke-width=\"0.6\" stroke-linecap=\"round\"/>\
+             \n  <line x1=\"{:.2}\" y1=\"{y:.2}\" x2=\"{:.2}\" y2=\"{y:.2}\" \
+             stroke=\"{colour}\" stroke-width=\"0.6\" stroke-linecap=\"round\"/>",
+            cx - reach,
+            cx - slot * 1.8,
+            cx + slot * 1.8,
+            cx + reach,
+        );
+    }
+    out
+}
+
+/// Draws a numeric readout: the bezel and the lit field, with no value in it.
+fn display(cx: f32, cy: f32, radius: f32, colours: &Palette) -> String {
+    let w = radius * 1.42;
+    let h = radius * 0.8;
+    format!(
+        "\n  <rect x=\"{:.2}\" y=\"{:.2}\" width=\"{:.2}\" height=\"{:.2}\" rx=\"1\" \
+         fill=\"{}\" stroke=\"{}\" stroke-width=\"0.6\"/>\
+         \n  <rect x=\"{:.2}\" y=\"{:.2}\" width=\"{:.2}\" height=\"0.8\" rx=\"0.4\" \
+         fill=\"{}\" opacity=\"0.85\"/>",
+        cx - w,
+        cy - h,
+        w * 2.0,
+        h * 2.0,
+        colours.cap,
+        colours.edge,
+        cx - w * 0.6,
+        cy - 0.4,
+        w * 1.2,
+        colours.accent,
+    )
 }
 
 /// Draws one row of controls, honouring what the row says about alignment.
@@ -303,33 +416,26 @@ fn draw_slot(
         out,
         "\n  <text x=\"{cx:.2}\" y=\"{:.2}\" font-size=\"{REF}\" text-anchor=\"middle\" \
          font-family=\"ui-monospace, SFMono-Regular, Menlo, monospace\" \
-         fill=\"{}\">{}</text>\
-         \n  <path d=\"{}\" fill=\"none\" stroke=\"{}\" stroke-width=\"0.7\" \
-         stroke-linecap=\"round\"/>\
-         \n  <circle cx=\"{cx:.2}\" cy=\"{cy:.2}\" r=\"{radius:.2}\" fill=\"{}\" \
-         stroke=\"{}\" stroke-width=\"0.6\"/>",
+         fill=\"{}\">{}</text>",
         top + REF,
         colours.ink,
         escape(&parameter.r#ref),
-        track(cx, cy, radius + 1.8),
-        colours.faint,
-        colours.knob,
-        colours.edge,
     );
 
-    // Ticks say what kind of control this is. A selector shows one per option,
-    // which is also how many positions the control has.
+    // The shape is the one the effect's own editor panel uses. Switches and
+    // selectors keep it and carry their positions as marks, which is what the
+    // panels do too.
     let kind = presentation.map_or("continuous", |s| s.kind.as_str());
     let options = parameter
         .values
         .as_deref()
         .map_or(0, |values| values.split(',').count().min(9));
-    let count = match kind {
-        "switch" => 2,
-        "selector" => options.max(2),
-        _ => 0,
-    };
-    out.push_str(&ticks(cx, cy, radius, count, &colours.accent));
+    let count = marks(kind, options);
+    out.push_str(&match layout.control.as_str() {
+        "fader" => fader(cx, cy, radius, count, colours),
+        "display" if count == 0 => display(cx, cy, radius, colours),
+        _ => knob(cx, cy, radius, count, colours),
+    });
 
     if parameter.mod_dest {
         let (mx, my) = point(cx, cy, radius + 3.4, 42.0);
@@ -389,27 +495,34 @@ fn draw(spec: &Spec, layout: &Layout) -> Result<String, String> {
     let width = grid.display_width;
     let height = HEADER + units(layout.rows.len()) * row_height + FOOTER;
 
+    // A rack unit: the case, then the surface the controls sit on inside it.
+    let (chassis_ink, chassis_faint) = Palette::on_chassis(layout);
+    let inset = 2.5;
     let mut out = format!(
         "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width:.0} {height:.1}\" \
          width=\"{:.0}\" height=\"{:.0}\" role=\"img\" \
          aria-label=\"{} front panel\" font-family=\"ui-sans-serif, system-ui, sans-serif\">\n\
          <title>{} ({})</title>\n\
          <rect width=\"{width:.0}\" height=\"{height:.1}\" fill=\"{}\"/>\n\
-         <text x=\"4\" y=\"8.6\" font-size=\"5.6\" font-weight=\"600\" fill=\"{}\">{}</text>\n\
-         <text x=\"{:.0}\" y=\"8.6\" font-size=\"4.2\" text-anchor=\"end\" fill=\"{}\">{}</text>\n\
-         <rect x=\"4\" y=\"11.2\" width=\"{:.0}\" height=\"0.5\" fill=\"{}\"/>",
+         <text x=\"{inset:.1}\" y=\"8.4\" font-size=\"5.6\" font-weight=\"600\" \
+         fill=\"{chassis_ink}\">{}</text>\n\
+         <text x=\"{:.1}\" y=\"8.4\" font-size=\"4.2\" text-anchor=\"end\" \
+         fill=\"{chassis_faint}\">{}</text>\n\
+         <rect x=\"{inset:.1}\" y=\"{:.1}\" width=\"{:.1}\" height=\"{:.1}\" rx=\"1.5\" \
+         fill=\"{}\" stroke=\"{}\" stroke-width=\"0.4\"/>",
         width * 6.0,
         height * 6.0,
         escape(&effect.full_name),
         escape(&effect.full_name),
         escape(&effect.name),
-        colours.body,
-        colours.ink,
+        colours.chassis,
         escape(&effect.name),
-        width - 4.0,
-        colours.faint,
+        width - inset,
         escape(&layout.category),
-        width - 8.0,
+        HEADER - 2.0,
+        width - inset * 2.0,
+        height - HEADER,
+        colours.face,
         colours.accent,
     );
 

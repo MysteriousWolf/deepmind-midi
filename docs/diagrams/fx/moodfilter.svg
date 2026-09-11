@@ -1,78 +1,78 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 76.4" width="768" height="458" role="img" aria-label="Moog-Type Filter front panel" font-family="ui-sans-serif, system-ui, sans-serif">
 <title>Moog-Type Filter (MoodFilter)</title>
-<rect width="128" height="76.4" fill="#373737"/>
-<text x="4" y="8.6" font-size="5.6" font-weight="600" fill="#efefef">MoodFilter</text>
-<text x="124" y="8.6" font-size="4.2" text-anchor="end" fill="#919191">Creative</text>
-<rect x="4" y="11.2" width="120" height="0.5" fill="#0e404d"/>
-  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">SPD</text>
-  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="13.50" cy="26.35" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#919191">Speed</text>
-  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">DEP</text>
-  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="33.50" cy="26.35" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <circle cx="39.76" cy="19.40" r="0.9" fill="#0e404d"/>
-  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#919191">Depth</text>
-  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">RES</text>
-  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="53.50" cy="26.35" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <circle cx="59.76" cy="19.40" r="0.9" fill="#0e404d"/>
-  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#919191">Resonance</text>
-  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">FRQ</text>
-  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="73.50" cy="26.35" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <circle cx="79.76" cy="19.40" r="0.9" fill="#0e404d"/>
-  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#919191">Base</text>
-  <text x="73.50" y="41.10" font-size="3" text-anchor="middle" fill="#919191">Frequency</text>
-  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">TYP</text>
-  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="93.50" cy="26.35" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <line x1="90.99" y1="28.86" x2="89.93" y2="29.92" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="90.99" y1="23.84" x2="89.93" y2="22.78" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="96.01" y1="23.84" x2="97.07" y2="22.78" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="96.01" y1="28.86" x2="97.07" y2="29.92" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#919191">Type</text>
-  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">MIX</text>
-  <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="113.50" cy="26.35" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <circle cx="119.76" cy="19.40" r="0.9" fill="#0e404d"/>
-  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#919191">Mix</text>
-  <text x="13.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">WAV</text>
-  <path d="M 8.02 61.53 A 7.75 7.75 0 1 1 18.98 61.53" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="13.50" cy="56.05" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <line x1="10.99" y1="58.56" x2="9.93" y2="59.62" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="9.95" y1="56.05" x2="8.45" y2="56.05" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="10.99" y1="53.54" x2="9.93" y2="52.48" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="13.50" y1="52.50" x2="13.50" y2="51.00" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="16.01" y1="53.54" x2="17.07" y2="52.48" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="17.05" y1="56.05" x2="18.55" y2="56.05" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="16.01" y1="58.56" x2="17.07" y2="59.62" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <text x="13.50" y="66.60" font-size="3" text-anchor="middle" fill="#919191">Wave</text>
-  <text x="33.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">ENV</text>
-  <path d="M 28.02 61.53 A 7.75 7.75 0 1 1 38.98 61.53" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="33.50" cy="56.05" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <circle cx="39.76" cy="49.10" r="0.9" fill="#0e404d"/>
-  <text x="33.50" y="66.60" font-size="3" text-anchor="middle" fill="#919191">Envelope</text>
-  <text x="33.50" y="70.80" font-size="3" text-anchor="middle" fill="#919191">Modulation</text>
-  <text x="53.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">ATK</text>
-  <path d="M 48.02 61.53 A 7.75 7.75 0 1 1 58.98 61.53" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="53.50" cy="56.05" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <circle cx="59.76" cy="49.10" r="0.9" fill="#0e404d"/>
-  <text x="53.50" y="66.60" font-size="3" text-anchor="middle" fill="#919191">Attack</text>
-  <text x="73.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">REL</text>
-  <path d="M 68.02 61.53 A 7.75 7.75 0 1 1 78.98 61.53" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="73.50" cy="56.05" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <circle cx="79.76" cy="49.10" r="0.9" fill="#0e404d"/>
-  <text x="73.50" y="66.60" font-size="3" text-anchor="middle" fill="#919191">Release</text>
-  <text x="93.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">DRV</text>
-  <path d="M 88.02 61.53 A 7.75 7.75 0 1 1 98.98 61.53" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="93.50" cy="56.05" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <circle cx="99.76" cy="49.10" r="0.9" fill="#0e404d"/>
-  <text x="93.50" y="66.60" font-size="3" text-anchor="middle" fill="#919191">Drive</text>
-  <text x="113.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#efefef">4P</text>
-  <path d="M 108.02 61.53 A 7.75 7.75 0 1 1 118.98 61.53" fill="none" stroke="#919191" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="113.50" cy="56.05" r="5.95" fill="#25abcb" stroke="#71c8dd" stroke-width="0.6"/>
-  <line x1="110.99" y1="58.56" x2="109.93" y2="59.62" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="116.01" y1="58.56" x2="117.07" y2="59.62" stroke="#0e404d" stroke-width="0.7" stroke-linecap="round"/>
-  <text x="113.50" y="66.60" font-size="3" text-anchor="middle" fill="#919191">4-Pole</text>
+<rect width="128" height="76.4" fill="#4a4d4d"/>
+<text x="2.5" y="8.4" font-size="5.6" font-weight="600" fill="#ededed">MoodFilter</text>
+<text x="125.5" y="8.4" font-size="4.2" text-anchor="end" fill="#939393">Creative</text>
+<rect x="2.5" y="11.0" width="123.0" height="63.4" rx="1.5" fill="#323535" stroke="#25accd" stroke-width="0.4"/>
+  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">SPD</text>
+  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="26.35" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#8e8f8f">Speed</text>
+  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">DEP</text>
+  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="26.35" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <circle cx="39.76" cy="19.40" r="0.9" fill="#25accd"/>
+  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#8e8f8f">Depth</text>
+  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">RES</text>
+  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="26.35" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <circle cx="59.76" cy="19.40" r="0.9" fill="#25accd"/>
+  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#8e8f8f">Resonance</text>
+  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">FRQ</text>
+  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="26.35" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <circle cx="79.76" cy="19.40" r="0.9" fill="#25accd"/>
+  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#8e8f8f">Base</text>
+  <text x="73.50" y="41.10" font-size="3" text-anchor="middle" fill="#8e8f8f">Frequency</text>
+  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">TYP</text>
+  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="26.35" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <line x1="90.99" y1="28.86" x2="89.93" y2="29.92" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="90.99" y1="23.84" x2="89.93" y2="22.78" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="96.01" y1="23.84" x2="97.07" y2="22.78" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="96.01" y1="28.86" x2="97.07" y2="29.92" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#8e8f8f">Type</text>
+  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">MIX</text>
+  <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="26.35" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <circle cx="119.76" cy="19.40" r="0.9" fill="#25accd"/>
+  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#8e8f8f">Mix</text>
+  <text x="13.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">WAV</text>
+  <path d="M 8.02 61.53 A 7.75 7.75 0 1 1 18.98 61.53" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="56.05" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <line x1="10.99" y1="58.56" x2="9.93" y2="59.62" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="9.95" y1="56.05" x2="8.45" y2="56.05" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="10.99" y1="53.54" x2="9.93" y2="52.48" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="13.50" y1="52.50" x2="13.50" y2="51.00" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="16.01" y1="53.54" x2="17.07" y2="52.48" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="17.05" y1="56.05" x2="18.55" y2="56.05" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="16.01" y1="58.56" x2="17.07" y2="59.62" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <text x="13.50" y="66.60" font-size="3" text-anchor="middle" fill="#8e8f8f">Wave</text>
+  <text x="33.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">ENV</text>
+  <path d="M 28.02 61.53 A 7.75 7.75 0 1 1 38.98 61.53" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="56.05" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <circle cx="39.76" cy="49.10" r="0.9" fill="#25accd"/>
+  <text x="33.50" y="66.60" font-size="3" text-anchor="middle" fill="#8e8f8f">Envelope</text>
+  <text x="33.50" y="70.80" font-size="3" text-anchor="middle" fill="#8e8f8f">Modulation</text>
+  <text x="53.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">ATK</text>
+  <path d="M 48.02 61.53 A 7.75 7.75 0 1 1 58.98 61.53" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="56.05" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <circle cx="59.76" cy="49.10" r="0.9" fill="#25accd"/>
+  <text x="53.50" y="66.60" font-size="3" text-anchor="middle" fill="#8e8f8f">Attack</text>
+  <text x="73.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">REL</text>
+  <path d="M 68.02 61.53 A 7.75 7.75 0 1 1 78.98 61.53" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="56.05" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <circle cx="79.76" cy="49.10" r="0.9" fill="#25accd"/>
+  <text x="73.50" y="66.60" font-size="3" text-anchor="middle" fill="#8e8f8f">Release</text>
+  <text x="93.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">DRV</text>
+  <path d="M 88.02 61.53 A 7.75 7.75 0 1 1 98.98 61.53" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="56.05" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <circle cx="99.76" cy="49.10" r="0.9" fill="#25accd"/>
+  <text x="93.50" y="66.60" font-size="3" text-anchor="middle" fill="#8e8f8f">Drive</text>
+  <text x="113.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eeeeee">4P</text>
+  <path d="M 108.02 61.53 A 7.75 7.75 0 1 1 118.98 61.53" fill="none" stroke="#8e8f8f" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="56.05" r="5.95" fill="#3c6974" stroke="#809da4" stroke-width="0.6"/>
+  <line x1="110.99" y1="58.56" x2="109.93" y2="59.62" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="116.01" y1="58.56" x2="117.07" y2="59.62" stroke="#25accd" stroke-width="0.7" stroke-linecap="round"/>
+  <text x="113.50" y="66.60" font-size="3" text-anchor="middle" fill="#8e8f8f">4-Pole</text>
 </svg>

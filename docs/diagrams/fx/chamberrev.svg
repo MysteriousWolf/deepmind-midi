@@ -1,63 +1,219 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 76.4" width="768" height="458" role="img" aria-label="Chamber Reverb front panel" font-family="ui-sans-serif, system-ui, sans-serif">
 <title>Chamber Reverb (ChamberRev)</title>
-<rect width="128" height="76.4" fill="#010001"/>
-<text x="4" y="8.6" font-size="5.6" font-weight="600" fill="#eaeaea">ChamberRev</text>
-<text x="124" y="8.6" font-size="4.2" text-anchor="end" fill="#737273">Reverb</text>
-<rect x="4" y="11.2" width="120" height="0.5" fill="#f8fa03"/>
-  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">PRE</text>
-  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="13.50" cy="26.35" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
-  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#737273">Pre-Delay</text>
-  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">DCY</text>
-  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="33.50" cy="26.35" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
+<rect width="128" height="76.4" fill="#c7beab"/>
+<text x="2.5" y="8.4" font-size="5.6" font-weight="600" fill="#12110f">ChamberRev</text>
+<text x="125.5" y="8.4" font-size="4.2" text-anchor="end" fill="#726c5f">Reverb</text>
+<rect x="2.5" y="11.0" width="123.0" height="63.4" rx="1.5" fill="#e3d9c3" stroke="#f8fa03" stroke-width="0.4"/>
+  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">PRE</text>
+  <rect x="13.05" y="19.51" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="7.55" y1="33.19" x2="11.88" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="33.19" x2="19.45" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="30.91" x2="11.88" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="30.91" x2="19.45" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="28.63" x2="11.88" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="28.63" x2="19.45" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="26.35" x2="11.88" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="26.35" x2="19.45" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="24.07" x2="11.88" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="24.07" x2="19.45" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="21.79" x2="11.88" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="21.79" x2="19.45" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="19.51" x2="11.88" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="19.51" x2="19.45" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#7c776b">Pre-Delay</text>
+  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">DCY</text>
+  <rect x="33.05" y="19.51" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="27.55" y1="33.19" x2="31.88" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="33.19" x2="39.45" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="30.91" x2="31.88" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="30.91" x2="39.45" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="28.63" x2="31.88" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="28.63" x2="39.45" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="26.35" x2="31.88" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="26.35" x2="39.45" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="24.07" x2="31.88" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="24.07" x2="39.45" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="21.79" x2="31.88" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="21.79" x2="39.45" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="19.51" x2="31.88" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="19.51" x2="39.45" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
   <circle cx="39.76" cy="19.40" r="0.9" fill="#f8fa03"/>
-  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#737273">Decay</text>
-  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">SIZ</text>
-  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="53.50" cy="26.35" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
-  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#737273">Size</text>
-  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">DMP</text>
-  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="73.50" cy="26.35" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
+  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#7c776b">Decay</text>
+  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">SIZ</text>
+  <rect x="53.05" y="19.51" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="47.55" y1="33.19" x2="51.88" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="33.19" x2="59.45" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="30.91" x2="51.88" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="30.91" x2="59.45" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="28.63" x2="51.88" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="28.63" x2="59.45" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="26.35" x2="51.88" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="26.35" x2="59.45" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="24.07" x2="51.88" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="24.07" x2="59.45" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="21.79" x2="51.88" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="21.79" x2="59.45" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="19.51" x2="51.88" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="19.51" x2="59.45" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#7c776b">Size</text>
+  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">DMP</text>
+  <rect x="73.05" y="19.51" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="67.55" y1="33.19" x2="71.88" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="33.19" x2="79.45" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="30.91" x2="71.88" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="30.91" x2="79.45" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="28.63" x2="71.88" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="28.63" x2="79.45" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="26.35" x2="71.88" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="26.35" x2="79.45" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="24.07" x2="71.88" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="24.07" x2="79.45" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="21.79" x2="71.88" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="21.79" x2="79.45" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="19.51" x2="71.88" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="19.51" x2="79.45" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
   <circle cx="79.76" cy="19.40" r="0.9" fill="#f8fa03"/>
-  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#737273">Damping</text>
-  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">DIF</text>
-  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="93.50" cy="26.35" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
-  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#737273">Diffusion</text>
-  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">MIX</text>
-  <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="113.50" cy="26.35" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
+  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#7c776b">Damping</text>
+  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">DIF</text>
+  <rect x="93.05" y="19.51" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="87.55" y1="33.19" x2="91.88" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="33.19" x2="99.45" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="30.91" x2="91.88" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="30.91" x2="99.45" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="28.63" x2="91.88" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="28.63" x2="99.45" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="26.35" x2="91.88" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="26.35" x2="99.45" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="24.07" x2="91.88" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="24.07" x2="99.45" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="21.79" x2="91.88" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="21.79" x2="99.45" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="19.51" x2="91.88" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="19.51" x2="99.45" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#7c776b">Diffusion</text>
+  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">MIX</text>
+  <rect x="113.05" y="19.51" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="107.55" y1="33.19" x2="111.88" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="33.19" x2="119.45" y2="33.19" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="30.91" x2="111.88" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="30.91" x2="119.45" y2="30.91" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="28.63" x2="111.88" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="28.63" x2="119.45" y2="28.63" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="26.35" x2="111.88" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="26.35" x2="119.45" y2="26.35" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="24.07" x2="111.88" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="24.07" x2="119.45" y2="24.07" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="21.79" x2="111.88" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="21.79" x2="119.45" y2="21.79" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="19.51" x2="111.88" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="19.51" x2="119.45" y2="19.51" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
   <circle cx="119.76" cy="19.40" r="0.9" fill="#f8fa03"/>
-  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#737273">Mix</text>
-  <text x="13.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">LC</text>
-  <path d="M 8.02 61.53 A 7.75 7.75 0 1 1 18.98 61.53" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="13.50" cy="56.05" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
+  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#7c776b">Mix</text>
+  <text x="13.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">LC</text>
+  <rect x="13.05" y="49.21" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="7.55" y1="62.89" x2="11.88" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="62.89" x2="19.45" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="60.61" x2="11.88" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="60.61" x2="19.45" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="58.33" x2="11.88" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="58.33" x2="19.45" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="56.05" x2="11.88" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="56.05" x2="19.45" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="53.77" x2="11.88" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="53.77" x2="19.45" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="51.49" x2="11.88" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="51.49" x2="19.45" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="7.55" y1="49.21" x2="11.88" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="15.12" y1="49.21" x2="19.45" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
   <circle cx="19.76" cy="49.10" r="0.9" fill="#f8fa03"/>
-  <text x="13.50" y="66.60" font-size="3" text-anchor="middle" fill="#737273">Low Cut</text>
-  <text x="33.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">HC</text>
-  <path d="M 28.02 61.53 A 7.75 7.75 0 1 1 38.98 61.53" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="33.50" cy="56.05" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
+  <text x="13.50" y="66.60" font-size="3" text-anchor="middle" fill="#7c776b">Low Cut</text>
+  <text x="33.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">HC</text>
+  <rect x="33.05" y="49.21" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="27.55" y1="62.89" x2="31.88" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="62.89" x2="39.45" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="60.61" x2="31.88" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="60.61" x2="39.45" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="58.33" x2="31.88" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="58.33" x2="39.45" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="56.05" x2="31.88" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="56.05" x2="39.45" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="53.77" x2="31.88" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="53.77" x2="39.45" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="51.49" x2="31.88" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="51.49" x2="39.45" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="27.55" y1="49.21" x2="31.88" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="35.12" y1="49.21" x2="39.45" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
   <circle cx="39.76" cy="49.10" r="0.9" fill="#f8fa03"/>
-  <text x="33.50" y="66.60" font-size="3" text-anchor="middle" fill="#737273">High Cut</text>
-  <text x="53.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">LFX</text>
-  <path d="M 48.02 61.53 A 7.75 7.75 0 1 1 58.98 61.53" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="53.50" cy="56.05" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
+  <text x="33.50" y="66.60" font-size="3" text-anchor="middle" fill="#7c776b">High Cut</text>
+  <text x="53.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">LFX</text>
+  <rect x="53.05" y="49.21" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="47.55" y1="62.89" x2="51.88" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="62.89" x2="59.45" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="60.61" x2="51.88" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="60.61" x2="59.45" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="58.33" x2="51.88" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="58.33" x2="59.45" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="56.05" x2="51.88" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="56.05" x2="59.45" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="53.77" x2="51.88" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="53.77" x2="59.45" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="51.49" x2="51.88" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="51.49" x2="59.45" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="47.55" y1="49.21" x2="51.88" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="55.12" y1="49.21" x2="59.45" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
   <circle cx="59.76" cy="49.10" r="0.9" fill="#f8fa03"/>
-  <text x="53.50" y="66.60" font-size="3" text-anchor="middle" fill="#737273">Bass</text>
-  <text x="53.50" y="70.80" font-size="3" text-anchor="middle" fill="#737273">Multiplier</text>
-  <text x="73.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">SPR</text>
-  <path d="M 68.02 61.53 A 7.75 7.75 0 1 1 78.98 61.53" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="73.50" cy="56.05" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
-  <text x="73.50" y="66.60" font-size="3" text-anchor="middle" fill="#737273">Spread</text>
-  <text x="93.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">SHP</text>
-  <path d="M 88.02 61.53 A 7.75 7.75 0 1 1 98.98 61.53" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="93.50" cy="56.05" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
+  <text x="53.50" y="66.60" font-size="3" text-anchor="middle" fill="#7c776b">Bass</text>
+  <text x="53.50" y="70.80" font-size="3" text-anchor="middle" fill="#7c776b">Multiplier</text>
+  <text x="73.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">SPR</text>
+  <rect x="73.05" y="49.21" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="67.55" y1="62.89" x2="71.88" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="62.89" x2="79.45" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="60.61" x2="71.88" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="60.61" x2="79.45" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="58.33" x2="71.88" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="58.33" x2="79.45" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="56.05" x2="71.88" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="56.05" x2="79.45" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="53.77" x2="71.88" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="53.77" x2="79.45" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="51.49" x2="71.88" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="51.49" x2="79.45" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="67.55" y1="49.21" x2="71.88" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="75.12" y1="49.21" x2="79.45" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <text x="73.50" y="66.60" font-size="3" text-anchor="middle" fill="#7c776b">Spread</text>
+  <text x="93.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">SHP</text>
+  <rect x="93.05" y="49.21" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="87.55" y1="62.89" x2="91.88" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="62.89" x2="99.45" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="60.61" x2="91.88" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="60.61" x2="99.45" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="58.33" x2="91.88" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="58.33" x2="99.45" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="56.05" x2="91.88" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="56.05" x2="99.45" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="53.77" x2="91.88" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="53.77" x2="99.45" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="51.49" x2="91.88" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="51.49" x2="99.45" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="87.55" y1="49.21" x2="91.88" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="95.12" y1="49.21" x2="99.45" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
   <circle cx="99.76" cy="49.10" r="0.9" fill="#f8fa03"/>
-  <text x="93.50" y="66.60" font-size="3" text-anchor="middle" fill="#737273">Shape</text>
-  <text x="113.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaeaea">SPI</text>
-  <path d="M 108.02 61.53 A 7.75 7.75 0 1 1 118.98 61.53" fill="none" stroke="#737273" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="113.50" cy="56.05" r="5.95" fill="#e3d5ba" stroke="#ece3d2" stroke-width="0.6"/>
-  <text x="113.50" y="66.60" font-size="3" text-anchor="middle" fill="#737273">Spin</text>
+  <text x="93.50" y="66.60" font-size="3" text-anchor="middle" fill="#7c776b">Shape</text>
+  <text x="113.50" y="47.10" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#12110f">SPI</text>
+  <rect x="113.05" y="49.21" width="0.90" height="13.68" rx="0.45" fill="#9b9789" stroke="#646259" stroke-width="0.3"/>
+  <line x1="107.55" y1="62.89" x2="111.88" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="62.89" x2="119.45" y2="62.89" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="60.61" x2="111.88" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="60.61" x2="119.45" y2="60.61" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="58.33" x2="111.88" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="58.33" x2="119.45" y2="58.33" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="56.05" x2="111.88" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="56.05" x2="119.45" y2="56.05" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="53.77" x2="111.88" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="53.77" x2="119.45" y2="53.77" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="51.49" x2="111.88" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="51.49" x2="119.45" y2="51.49" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="107.55" y1="49.21" x2="111.88" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="115.12" y1="49.21" x2="119.45" y2="49.21" stroke="#7c776b" stroke-width="0.6" stroke-linecap="round"/>
+  <text x="113.50" y="66.60" font-size="3" text-anchor="middle" fill="#7c776b">Spin</text>
 </svg>

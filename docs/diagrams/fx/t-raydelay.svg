@@ -1,32 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 42.5" width="768" height="255" role="img" aria-label="Tel-Ray Delay front panel" font-family="ui-sans-serif, system-ui, sans-serif">
 <title>Tel-Ray Delay (T-RayDelay)</title>
-<rect width="128" height="42.5" fill="#ace6ea"/>
-<text x="4" y="8.6" font-size="5.6" font-weight="600" fill="#0d1212">T-RayDelay</text>
-<text x="124" y="8.6" font-size="4.2" text-anchor="end" fill="#5e7e80">Delay</text>
-<rect x="4" y="11.2" width="120" height="0.5" fill="#2b4345"/>
-  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0d1212">MIX</text>
-  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#5e7e80" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="13.50" cy="26.35" r="5.95" fill="#181919" stroke="#0f1010" stroke-width="0.6"/>
-  <circle cx="19.76" cy="19.40" r="0.9" fill="#2b4345"/>
-  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#5e7e80">Mix</text>
-  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0d1212">DLY</text>
-  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#5e7e80" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="33.50" cy="26.35" r="5.95" fill="#181919" stroke="#0f1010" stroke-width="0.6"/>
-  <circle cx="39.76" cy="19.40" r="0.9" fill="#2b4345"/>
-  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#5e7e80">Delay</text>
-  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0d1212">SUS</text>
-  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#5e7e80" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="53.50" cy="26.35" r="5.95" fill="#181919" stroke="#0f1010" stroke-width="0.6"/>
-  <circle cx="59.76" cy="19.40" r="0.9" fill="#2b4345"/>
-  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#5e7e80">Sustain</text>
-  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0d1212">WOB</text>
-  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#5e7e80" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="73.50" cy="26.35" r="5.95" fill="#181919" stroke="#0f1010" stroke-width="0.6"/>
-  <circle cx="79.76" cy="19.40" r="0.9" fill="#2b4345"/>
-  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#5e7e80">Wobble</text>
-  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0d1212">TON</text>
-  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#5e7e80" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="93.50" cy="26.35" r="5.95" fill="#181919" stroke="#0f1010" stroke-width="0.6"/>
-  <circle cx="99.76" cy="19.40" r="0.9" fill="#2b4345"/>
-  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#5e7e80">Tone</text>
+<rect width="128" height="42.5" fill="#b0b8ba"/>
+<text x="2.5" y="8.4" font-size="5.6" font-weight="600" fill="#0e0e0e">T-RayDelay</text>
+<text x="125.5" y="8.4" font-size="4.2" text-anchor="end" fill="#585c5d">Delay</text>
+<rect x="2.5" y="11.0" width="123.0" height="29.5" rx="1.5" fill="#b0e9ed" stroke="#ababab" stroke-width="0.4"/>
+  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">MIX</text>
+  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <circle cx="19.76" cy="19.40" r="0.9" fill="#ababab"/>
+  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Mix</text>
+  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">DLY</text>
+  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <circle cx="39.76" cy="19.40" r="0.9" fill="#ababab"/>
+  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Delay</text>
+  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">SUS</text>
+  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <circle cx="59.76" cy="19.40" r="0.9" fill="#ababab"/>
+  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Sustain</text>
+  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">WOB</text>
+  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <circle cx="79.76" cy="19.40" r="0.9" fill="#ababab"/>
+  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Wobble</text>
+  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#0e1212">TON</text>
+  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#608082" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="26.35" r="5.95" fill="#222224" stroke="#161617" stroke-width="0.6"/>
+  <circle cx="99.76" cy="19.40" r="0.9" fill="#ababab"/>
+  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#608082">Tone</text>
 </svg>

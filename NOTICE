@@ -17,11 +17,12 @@ a musician what a parameter does, which is what the protocol data on its own
 cannot convey.
 
 The colours in `spec/layout.toml` were measured from the effect panels pictured
-in the same section: three colours per effect, taken by ranking the picture's
-own colours by how much of it they cover. The result is nine bytes per effect
-and no artwork. The drawings in `docs/diagrams/fx/` are generated from that
-measurement and from the parameter tables; they are not traced from, and do not
-resemble, Behringer's panels.
+in the same section: four colours per effect, taken by where they sit in the
+picture and how much of it they cover. The result is twelve bytes per effect
+and no artwork. Which control each panel uses - knob, fader or numeric display -
+was read off the same pictures, one word per effect. The drawings in
+`docs/diagrams/fx/` are generated from those two facts and from the parameter
+tables; they are not traced from, and do not resemble, Behringer's panels.
 
 Everything else in `spec/` is factual interface data: parameter numbers, byte
 offsets, names, ranges, units, value lists, and where the synthesizer's own

@@ -1,51 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 68.0" width="768" height="408" role="img" aria-label="Rotary Speaker front panel" font-family="ui-sans-serif, system-ui, sans-serif">
 <title>Rotary Speaker (RotarySpkr)</title>
-<rect width="128" height="68.0" fill="#7b7675"/>
-<text x="4" y="8.6" font-size="5.6" font-weight="600" fill="#f4f4f3">RotarySpkr</text>
-<text x="124" y="8.6" font-size="4.2" text-anchor="end" fill="#b6b3b3">Creative</text>
-<rect x="4" y="11.2" width="120" height="0.5" fill="#873417"/>
-  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f3">LOS</text>
-  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#b6b3b3" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="13.50" cy="26.35" r="5.95" fill="#470b02" stroke="#87605a" stroke-width="0.6"/>
-  <circle cx="19.76" cy="19.40" r="0.9" fill="#873417"/>
-  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b3b3">Low Speed</text>
-  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f3">HIS</text>
-  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#b6b3b3" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="33.50" cy="26.35" r="5.95" fill="#470b02" stroke="#87605a" stroke-width="0.6"/>
-  <circle cx="39.76" cy="19.40" r="0.9" fill="#873417"/>
-  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b3b3">High Speed</text>
-  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f3">ACC</text>
-  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#b6b3b3" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="53.50" cy="26.35" r="5.95" fill="#470b02" stroke="#87605a" stroke-width="0.6"/>
-  <circle cx="59.76" cy="19.40" r="0.9" fill="#873417"/>
-  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b3b3" textLength="17.0" lengthAdjust="spacingAndGlyphs">Acceleration</text>
-  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f3">DIS</text>
-  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#b6b3b3" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="73.50" cy="26.35" r="5.95" fill="#470b02" stroke="#87605a" stroke-width="0.6"/>
-  <circle cx="79.76" cy="19.40" r="0.9" fill="#873417"/>
-  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b3b3">Distance</text>
-  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f3">BAL</text>
-  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#b6b3b3" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="93.50" cy="26.35" r="5.95" fill="#470b02" stroke="#87605a" stroke-width="0.6"/>
-  <circle cx="99.76" cy="19.40" r="0.9" fill="#873417"/>
-  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b3b3">Balance</text>
-  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f3">MIX</text>
-  <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#b6b3b3" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="113.50" cy="26.35" r="5.95" fill="#470b02" stroke="#87605a" stroke-width="0.6"/>
-  <circle cx="119.76" cy="19.40" r="0.9" fill="#873417"/>
-  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b3b3">Mix</text>
-  <text x="13.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f3">MOT</text>
-  <path d="M 8.02 57.33 A 7.75 7.75 0 1 1 18.98 57.33" fill="none" stroke="#b6b3b3" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="13.50" cy="51.85" r="5.95" fill="#470b02" stroke="#87605a" stroke-width="0.6"/>
-  <line x1="10.99" y1="54.36" x2="9.93" y2="55.42" stroke="#873417" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="16.01" y1="54.36" x2="17.07" y2="55.42" stroke="#873417" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="19.76" cy="44.90" r="0.9" fill="#873417"/>
-  <text x="13.50" y="62.40" font-size="3" text-anchor="middle" fill="#b6b3b3">Motor</text>
-  <text x="33.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f3">SPD</text>
-  <path d="M 28.02 57.33 A 7.75 7.75 0 1 1 38.98 57.33" fill="none" stroke="#b6b3b3" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="33.50" cy="51.85" r="5.95" fill="#470b02" stroke="#87605a" stroke-width="0.6"/>
-  <line x1="30.99" y1="54.36" x2="29.93" y2="55.42" stroke="#873417" stroke-width="0.7" stroke-linecap="round"/>
-  <line x1="36.01" y1="54.36" x2="37.07" y2="55.42" stroke="#873417" stroke-width="0.7" stroke-linecap="round"/>
-  <circle cx="39.76" cy="44.90" r="0.9" fill="#873417"/>
-  <text x="33.50" y="62.40" font-size="3" text-anchor="middle" fill="#b6b3b3">Speed</text>
+<rect width="128" height="68.0" fill="#4e0f06"/>
+<text x="2.5" y="8.4" font-size="5.6" font-weight="600" fill="#f0ebeb">RotarySpkr</text>
+<text x="125.5" y="8.4" font-size="4.2" text-anchor="end" fill="#a68782">Creative</text>
+<rect x="2.5" y="11.0" width="123.0" height="55.0" rx="1.5" fill="#7c7776" stroke="#7c2c13" stroke-width="0.4"/>
+  <text x="13.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f4">LOS</text>
+  <path d="M 8.02 31.83 A 7.75 7.75 0 1 1 18.98 31.83" fill="none" stroke="#b6b4b3" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="26.35" r="5.95" fill="#4e4543" stroke="#8b8684" stroke-width="0.6"/>
+  <circle cx="19.76" cy="19.40" r="0.9" fill="#7c2c13"/>
+  <text x="13.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b4b3">Low Speed</text>
+  <text x="33.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f4">HIS</text>
+  <path d="M 28.02 31.83 A 7.75 7.75 0 1 1 38.98 31.83" fill="none" stroke="#b6b4b3" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="26.35" r="5.95" fill="#4e4543" stroke="#8b8684" stroke-width="0.6"/>
+  <circle cx="39.76" cy="19.40" r="0.9" fill="#7c2c13"/>
+  <text x="33.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b4b3">High Speed</text>
+  <text x="53.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f4">ACC</text>
+  <path d="M 48.02 31.83 A 7.75 7.75 0 1 1 58.98 31.83" fill="none" stroke="#b6b4b3" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="53.50" cy="26.35" r="5.95" fill="#4e4543" stroke="#8b8684" stroke-width="0.6"/>
+  <circle cx="59.76" cy="19.40" r="0.9" fill="#7c2c13"/>
+  <text x="53.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b4b3" textLength="17.0" lengthAdjust="spacingAndGlyphs">Acceleration</text>
+  <text x="73.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f4">DIS</text>
+  <path d="M 68.02 31.83 A 7.75 7.75 0 1 1 78.98 31.83" fill="none" stroke="#b6b4b3" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="73.50" cy="26.35" r="5.95" fill="#4e4543" stroke="#8b8684" stroke-width="0.6"/>
+  <circle cx="79.76" cy="19.40" r="0.9" fill="#7c2c13"/>
+  <text x="73.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b4b3">Distance</text>
+  <text x="93.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f4">BAL</text>
+  <path d="M 88.02 31.83 A 7.75 7.75 0 1 1 98.98 31.83" fill="none" stroke="#b6b4b3" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="93.50" cy="26.35" r="5.95" fill="#4e4543" stroke="#8b8684" stroke-width="0.6"/>
+  <circle cx="99.76" cy="19.40" r="0.9" fill="#7c2c13"/>
+  <text x="93.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b4b3">Balance</text>
+  <text x="113.50" y="17.40" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f4">MIX</text>
+  <path d="M 108.02 31.83 A 7.75 7.75 0 1 1 118.98 31.83" fill="none" stroke="#b6b4b3" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="113.50" cy="26.35" r="5.95" fill="#4e4543" stroke="#8b8684" stroke-width="0.6"/>
+  <circle cx="119.76" cy="19.40" r="0.9" fill="#7c2c13"/>
+  <text x="113.50" y="36.90" font-size="3" text-anchor="middle" fill="#b6b4b3">Mix</text>
+  <text x="13.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f4">MOT</text>
+  <path d="M 8.02 57.33 A 7.75 7.75 0 1 1 18.98 57.33" fill="none" stroke="#b6b4b3" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="13.50" cy="51.85" r="5.95" fill="#4e4543" stroke="#8b8684" stroke-width="0.6"/>
+  <line x1="10.99" y1="54.36" x2="9.93" y2="55.42" stroke="#7c2c13" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="16.01" y1="54.36" x2="17.07" y2="55.42" stroke="#7c2c13" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="19.76" cy="44.90" r="0.9" fill="#7c2c13"/>
+  <text x="13.50" y="62.40" font-size="3" text-anchor="middle" fill="#b6b4b3">Motor</text>
+  <text x="33.50" y="42.90" font-size="4.4" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#f4f4f4">SPD</text>
+  <path d="M 28.02 57.33 A 7.75 7.75 0 1 1 38.98 57.33" fill="none" stroke="#b6b4b3" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="33.50" cy="51.85" r="5.95" fill="#4e4543" stroke="#8b8684" stroke-width="0.6"/>
+  <line x1="30.99" y1="54.36" x2="29.93" y2="55.42" stroke="#7c2c13" stroke-width="0.7" stroke-linecap="round"/>
+  <line x1="36.01" y1="54.36" x2="37.07" y2="55.42" stroke="#7c2c13" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="39.76" cy="44.90" r="0.9" fill="#7c2c13"/>
+  <text x="33.50" y="62.40" font-size="3" text-anchor="middle" fill="#b6b4b3">Speed</text>
 </svg>

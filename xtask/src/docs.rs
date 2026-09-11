@@ -538,7 +538,10 @@ fn render_grid(spec: &Spec) -> String {
             "Alignment of a row that is not full".to_owned(),
             cell(&grid.align),
         ),
-        ("Shape drawn for every slot".to_owned(), cell(&grid.control)),
+        (
+            "Shape the FX page draws for every slot".to_owned(),
+            cell(&grid.shape),
+        ),
         (
             "Display measured on".to_owned(),
             format!(
@@ -569,7 +572,9 @@ fn render_grid(spec: &Spec) -> String {
         out,
         "\nThe drawings below space their rows further apart than {:.1} pixels, because \
          the synthesizer has room for a three-letter label and these have room for the \
-         parameter's name. Everything across a row is as measured.\n",
+         parameter's name. Everything across a row is as measured. The shape at each \
+         position is not: the FX page draws every slot as a circle, and the drawings \
+         use what the effect's own panel uses instead.\n",
         grid.row_pitch
     );
     out
@@ -588,7 +593,8 @@ fn render_effect_index(spec: &Spec) -> String {
     for category in seen {
         let _ = write!(
             out,
-            "\n### {category}\n\n| `FX Type` | Effect | Name | Slots | Page |\n|---|---|---|---|---|\n"
+            "\n### {category}\n\n| `FX Type` | Effect | Name | Slots | Page | Panel |\n\
+             |---|---|---|---|---|---|\n"
         );
         for layout in spec.layouts.iter().filter(|l| l.category == category) {
             let Some(effect) = spec.effects.iter().find(|e| e.r#type == layout.r#type) else {
@@ -601,7 +607,7 @@ fn render_effect_index(spec: &Spec) -> String {
                 .collect();
             let _ = writeln!(
                 out,
-                "| {} | [{}](#fx-{}) | {} | {} | {} |",
+                "| {} | [{}](#fx-{}) | {} | {} | {} | {} |",
                 layout.r#type,
                 cell(&effect.name),
                 layout.r#type,
@@ -611,6 +617,7 @@ fn render_effect_index(spec: &Spec) -> String {
                     1 => format!("one row of {}", rows[0]),
                     _ => format!("rows of {}", rows.join(" and ")),
                 },
+                cell(&layout.control),
             );
         }
     }
@@ -642,7 +649,7 @@ fn render_effects(spec: &Spec, drawings: &[fx::Drawing]) -> String {
         }
         let _ = write!(
             out,
-            "`FX Type` {}{}. {} slots.\n\n\
+            "`FX Type` {}{}. {} slots{}.\n\n\
              | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | \
              Description |\n|---|---|---|---|---|---|---|---|---|\n",
             effect.r#type,
@@ -651,6 +658,7 @@ fn render_effects(spec: &Spec, drawings: &[fx::Drawing]) -> String {
                 l.category.to_lowercase()
             )),
             effect.parameters.len(),
+            layout.map_or(String::new(), |l| format!(", drawn as {}s", l.control)),
         );
         for parameter in &effect.parameters {
             let slot = panel.and_then(|p| p.slots.iter().find(|s| s.slot == parameter.slot));

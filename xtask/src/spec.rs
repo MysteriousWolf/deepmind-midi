@@ -255,8 +255,8 @@ pub struct Grid {
     pub align: String,
     /// The order slots are placed in.
     pub order: String,
-    /// The shape the synthesizer draws for every slot.
-    pub control: String,
+    /// The shape the synthesizer draws for every slot on its own FX page.
+    pub shape: String,
     /// Width of the display the grid was measured on.
     pub display_width: f32,
     /// Height of the display the grid was measured on.
@@ -291,10 +291,18 @@ pub struct Layout {
     pub name: String,
     /// The manual's own classification: Reverb, Processing, Delay or Creative.
     pub category: String,
-    /// Commonest colour of the effect's panel in the manual.
-    pub body: String,
-    /// Second surface colour, equal to `body` on a single-surface panel.
-    pub panel: String,
+    /// What the effect's own editor panel uses for a sweeping parameter:
+    /// `knob`, `fader` or `display`.
+    ///
+    /// This is not the FX page, which draws every slot as a circle. It is the
+    /// panel printed beside it, and the two disagree for five effects.
+    pub control: String,
+    /// The case around the controls.
+    pub chassis: String,
+    /// The surface the controls sit on.
+    pub face: String,
+    /// The part a finger moves: a knob body or a fader cap.
+    pub cap: String,
     /// Most saturated colour covering a visible share of the panel.
     pub accent: String,
     /// The rows, in the order they are drawn.
@@ -486,6 +494,7 @@ struct Layouts {
 #[derive(Debug, Deserialize)]
 struct LayoutMeta {
     aligns: Vec<String>,
+    controls: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -549,6 +558,8 @@ pub struct Spec {
     pub layouts: Vec<Layout>,
     /// The alignments a row may declare.
     pub aligns: Vec<String>,
+    /// The control shapes a layout may declare.
+    pub controls: Vec<String>,
     /// How each effect presents its slots, ordered by `FX Type` value.
     pub panels: Vec<Panel>,
     /// How the four engines can be wired, ordered by `FX Routing` value.
@@ -596,6 +607,7 @@ impl Spec {
             grid: layouts.grid,
             layouts: layouts.layout,
             aligns: layouts.meta.aligns,
+            controls: layouts.meta.controls,
             panels: panels.panel,
             routings: routings.routing,
             fx_modes: routings.mode,
@@ -788,7 +800,13 @@ impl Spec {
                     layout.r#type, layout.name, effect.name
                 ));
             }
-            for colour in [&layout.body, &layout.panel, &layout.accent] {
+            if !self.controls.contains(&layout.control) {
+                return Err(format!(
+                    "layout.toml: {} has control {:?}, which meta.controls does not list",
+                    layout.name, layout.control
+                ));
+            }
+            for colour in [&layout.chassis, &layout.face, &layout.cap, &layout.accent] {
                 if colour.len() != 7
                     || !colour.starts_with('#')
                     || !colour[1..].chars().all(|c| c.is_ascii_hexdigit())

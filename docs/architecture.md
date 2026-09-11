@@ -198,13 +198,24 @@ selector - what it is called in full, and which slots belong together, such as
 the two sides of the compressor or the two channels of the pitch shifter. All of
 that is derived from `effects.toml` by this project, and the file says so.
 
-`spec/layout.toml` says where the control goes and what colour it is. All of that
-is measured from the manual's figures, and the file says how. The grid came from
-filling and labelling the ink in the 35 FX-page screenshots of section 9.3 and
-reading off the circle centres: six columns at a 20-pixel pitch, two rows, filled
-in slot order, a short row stopping rather than spreading. The colours came from
-ranking each effect panel picture's own colours by coverage. Nothing there is a
-house style or a guess.
+`spec/layout.toml` says where the control goes, what it is, and what colour it
+is. All of that is measured from the manual's figures, and the file says how.
+
+The grid came from filling and labelling the ink in the 35 FX-page screenshots
+of section 9.3 and reading off the circle centres: six columns at a 20-pixel
+pitch, two rows, filled in slot order, a short row stopping rather than
+spreading. The control and the colours came from the effect's own editor panel,
+printed beside each screenshot: 29 are knobs, five are vertical faders, one is a
+set of numeric displays, and four colours per panel are sampled by where they
+sit - the case, the surface, the part a finger moves, and the one saturated
+colour a label or an LED uses. Nothing there is a house style or a guess.
+
+The two figures disagree about one thing, and the disagreement is the point. The
+FX page draws every slot as a circle because a 128x64 display has room for one
+shape. The panel draws what the effect actually is. A host that wants to look
+like the synthesizer reads `grid.shape`; one that wants to look like the effect
+reads `control` on the layout. Both are in the file, each labelled with where it
+came from.
 
 Splitting derived from measured is not bookkeeping. A derived field can be
 argued with; a measured one can only be re-measured. Keeping them in separate

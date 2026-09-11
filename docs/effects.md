@@ -40,27 +40,31 @@ structural ones such as reverb size and pre-delay.
 
 ## Reading a panel
 
-Each algorithm is drawn as the synthesizer's own FX page draws it: six controls
-to a row, in slot order, wrapping onto a second row, every slot a circle. That
-grid is measured from the 35 screenshots in section 9.3 of the manual, which all
-agree on it. The colours are sampled from the picture of the effect's editor
-panel printed beside each screenshot. Both live in
+Each algorithm is drawn from two figures the manual prints side by side in
+section 9.3: the synthesizer's own FX page, which gives the positions, and the
+effect's editor panel, which gives the control and the colours.
+
+The positions are a grid, measured from all 35 screenshots, which agree on it:
+six controls to a row, in slot order, wrapping onto a second row, left aligned.
+The controls are what the panel beside it uses - 29 effects are knobs, five are
+vertical faders on a cream surface, and the Vintage Room Reverb is numeric
+displays. The colours are sampled from the same picture. All of it lives in
 [`spec/layout.toml`](../spec/layout.toml), which records how each was taken.
 
 The drawings say what is on the page, not what a patch sounds like:
 
 | Mark | Meaning |
 |---|---|
-| Arc behind a circle | The control's full travel |
-| No ticks | Continuous: the whole arc is in range |
-| Two ticks | A switch, one tick per state |
-| Several ticks | A selector, one tick per option |
+| Arc behind a knob, ladder beside a fader | The control's full travel |
+| No marks | Continuous: the whole travel is in range |
+| Two marks | A switch, one mark per state |
+| Several marks | A selector, one mark per option |
 | Dot above right | The engine acts on modulation reaching this slot |
 | Text above | The short name, exactly as the synthesizer's display shows it |
 | Text below | The same parameter written out, expanded by this project |
 
 No control has a position. The specification holds no default value for an
-effect parameter, so a pointer would be claiming one.
+effect parameter, so a pointer or a fader cap would be claiming one.
 
 <!-- generated:grid -->
 
@@ -70,14 +74,14 @@ effect parameter, so a pointer would be claiming one.
 | Rows | 2 |
 | Fill order | slot |
 | Alignment of a row that is not full | left |
-| Shape drawn for every slot | knob |
+| Shape the FX page draws for every slot | circle |
 | Display measured on | 128 x 64 pixels |
 | First control centre | 13.5, 14.4 |
 | Column pitch | 20.0 |
 | Row pitch | 18.6 |
 | Control diameter | 11.9 |
 
-The drawings below space their rows further apart than 18.6 pixels, because the synthesizer has room for a three-letter label and these have room for the parameter's name. Everything across a row is as measured.
+The drawings below space their rows further apart than 18.6 pixels, because the synthesizer has room for a three-letter label and these have room for the parameter's name. Everything across a row is as measured. The shape at each position is not: the FX page draws every slot as a circle, and the drawings use what the effect's own panel uses instead.
 
 <!-- /generated:grid -->
 
@@ -85,58 +89,58 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 ### Reverb
 
-| `FX Type` | Effect | Name | Slots | Page |
-|---|---|---|---|---|
-| 0 | [TC-DeepVRB](#fx-0) | TC Deep Reverb | 5 | one row of 5 |
-| 1 | [AmbVerb](#fx-1) | Ambient Reverb | 10 | rows of 6 and 4 |
-| 2 | [RoomRev](#fx-2) | Room Reverb | 12 | rows of 6 and 6 |
-| 3 | [VintageRev](#fx-3) | Vintage Room Reverb | 12 | rows of 6 and 6 |
-| 4 | [HallRev](#fx-4) | Hall Reverb | 12 | rows of 6 and 6 |
-| 5 | [ChamberRev](#fx-5) | Chamber Reverb | 12 | rows of 6 and 6 |
-| 6 | [PlateRev](#fx-6) | Plate Reverb | 12 | rows of 6 and 6 |
-| 7 | [RichPltRev](#fx-7) | Rich Plate Reverb | 12 | rows of 6 and 6 |
-| 8 | [GatedRev](#fx-8) | Gated Reverb | 10 | rows of 6 and 4 |
-| 9 | [Reverse](#fx-9) | Reverse Reverb | 9 | rows of 6 and 3 |
-| 10 | [ChorusVerb](#fx-10) | Chorus and Reverb | 12 | rows of 6 and 6 |
-| 11 | [DelayVerb](#fx-11) | Delay and Reverb | 12 | rows of 6 and 6 |
-| 12 | [FlangVerb](#fx-12) | Flanger and Reverb | 12 | rows of 6 and 6 |
+| `FX Type` | Effect | Name | Slots | Page | Panel |
+|---|---|---|---|---|---|
+| 0 | [TC-DeepVRB](#fx-0) | TC Deep Reverb | 5 | one row of 5 | knob |
+| 1 | [AmbVerb](#fx-1) | Ambient Reverb | 10 | rows of 6 and 4 | fader |
+| 2 | [RoomRev](#fx-2) | Room Reverb | 12 | rows of 6 and 6 | fader |
+| 3 | [VintageRev](#fx-3) | Vintage Room Reverb | 12 | rows of 6 and 6 | display |
+| 4 | [HallRev](#fx-4) | Hall Reverb | 12 | rows of 6 and 6 | fader |
+| 5 | [ChamberRev](#fx-5) | Chamber Reverb | 12 | rows of 6 and 6 | fader |
+| 6 | [PlateRev](#fx-6) | Plate Reverb | 12 | rows of 6 and 6 | knob |
+| 7 | [RichPltRev](#fx-7) | Rich Plate Reverb | 12 | rows of 6 and 6 | fader |
+| 8 | [GatedRev](#fx-8) | Gated Reverb | 10 | rows of 6 and 4 | knob |
+| 9 | [Reverse](#fx-9) | Reverse Reverb | 9 | rows of 6 and 3 | knob |
+| 10 | [ChorusVerb](#fx-10) | Chorus and Reverb | 12 | rows of 6 and 6 | knob |
+| 11 | [DelayVerb](#fx-11) | Delay and Reverb | 12 | rows of 6 and 6 | knob |
+| 12 | [FlangVerb](#fx-12) | Flanger and Reverb | 12 | rows of 6 and 6 | knob |
 
 ### Processing
 
-| `FX Type` | Effect | Name | Slots | Page |
-|---|---|---|---|---|
-| 13 | [MidasEQ](#fx-13) | Midas Equaliser | 11 | rows of 6 and 5 |
-| 14 | [Enhancer](#fx-14) | Enhancing EQ | 9 | rows of 6 and 3 |
-| 15 | [FairComp](#fx-15) | Compressor | 12 | rows of 6 and 6 |
-| 16 | [MulBndDist](#fx-16) | Multiband Distortion | 12 | rows of 6 and 6 |
-| 17 | [RackAmp](#fx-17) | Rack Amplifier | 9 | rows of 6 and 3 |
-| 18 | [EdisonEX1](#fx-18) | Stereo Imaging | 8 | rows of 6 and 2 |
-| 19 | [Auto Pan](#fx-19) | Auto Panning | 9 | rows of 6 and 3 |
-| 20 | [NoiseGate](#fx-20) | Noise Gate | 8 | rows of 6 and 2 |
+| `FX Type` | Effect | Name | Slots | Page | Panel |
+|---|---|---|---|---|---|
+| 13 | [MidasEQ](#fx-13) | Midas Equaliser | 11 | rows of 6 and 5 | knob |
+| 14 | [Enhancer](#fx-14) | Enhancing EQ | 9 | rows of 6 and 3 | knob |
+| 15 | [FairComp](#fx-15) | Compressor | 12 | rows of 6 and 6 | knob |
+| 16 | [MulBndDist](#fx-16) | Multiband Distortion | 12 | rows of 6 and 6 | knob |
+| 17 | [RackAmp](#fx-17) | Rack Amplifier | 9 | rows of 6 and 3 | knob |
+| 18 | [EdisonEX1](#fx-18) | Stereo Imaging | 8 | rows of 6 and 2 | knob |
+| 19 | [Auto Pan](#fx-19) | Auto Panning | 9 | rows of 6 and 3 | knob |
+| 20 | [NoiseGate](#fx-20) | Noise Gate | 8 | rows of 6 and 2 | knob |
 
 ### Delay
 
-| `FX Type` | Effect | Name | Slots | Page |
-|---|---|---|---|---|
-| 21 | [Delay](#fx-21) | Stereo Delay | 12 | rows of 6 and 6 |
-| 22 | [3TapDelay](#fx-22) | 3-Tap Delay | 12 | rows of 6 and 6 |
-| 23 | [4TapDelay](#fx-23) | 4-Tap Delay | 12 | rows of 6 and 6 |
-| 24 | [T-RayDelay](#fx-24) | Tel-Ray Delay | 5 | one row of 5 |
-| 25 | [DecimDelay](#fx-25) | Decimator Delay | 12 | rows of 6 and 6 |
-| 26 | [ModDlyRev](#fx-26) | Modulation, Delay and Reverb | 12 | rows of 6 and 6 |
+| `FX Type` | Effect | Name | Slots | Page | Panel |
+|---|---|---|---|---|---|
+| 21 | [Delay](#fx-21) | Stereo Delay | 12 | rows of 6 and 6 | knob |
+| 22 | [3TapDelay](#fx-22) | 3-Tap Delay | 12 | rows of 6 and 6 | knob |
+| 23 | [4TapDelay](#fx-23) | 4-Tap Delay | 12 | rows of 6 and 6 | knob |
+| 24 | [T-RayDelay](#fx-24) | Tel-Ray Delay | 5 | one row of 5 | knob |
+| 25 | [DecimDelay](#fx-25) | Decimator Delay | 12 | rows of 6 and 6 | knob |
+| 26 | [ModDlyRev](#fx-26) | Modulation, Delay and Reverb | 12 | rows of 6 and 6 | knob |
 
 ### Creative
 
-| `FX Type` | Effect | Name | Slots | Page |
-|---|---|---|---|---|
-| 27 | [Chorus](#fx-27) | Stereo Chorus | 11 | rows of 6 and 5 |
-| 28 | [Chorus-D](#fx-28) | Dimensional Chorus | 7 | rows of 6 and 1 |
-| 29 | [Flanger](#fx-29) | Stereo Flanger | 12 | rows of 6 and 6 |
-| 30 | [Phaser](#fx-30) | Stereo Phaser | 12 | rows of 6 and 6 |
-| 31 | [MoodFilter](#fx-31) | Moog-Type Filter | 12 | rows of 6 and 6 |
-| 32 | [DualPitch](#fx-32) | Dual Pitch Shifter | 12 | rows of 6 and 6 |
-| 33 | [Vintage Pitch](#fx-33) | Dual Pitch Shifter | 12 | rows of 6 and 6 |
-| 34 | [RotarySpkr](#fx-34) | Rotary Speaker | 8 | rows of 6 and 2 |
+| `FX Type` | Effect | Name | Slots | Page | Panel |
+|---|---|---|---|---|---|
+| 27 | [Chorus](#fx-27) | Stereo Chorus | 11 | rows of 6 and 5 | knob |
+| 28 | [Chorus-D](#fx-28) | Dimensional Chorus | 7 | rows of 6 and 1 | knob |
+| 29 | [Flanger](#fx-29) | Stereo Flanger | 12 | rows of 6 and 6 | knob |
+| 30 | [Phaser](#fx-30) | Stereo Phaser | 12 | rows of 6 and 6 | knob |
+| 31 | [MoodFilter](#fx-31) | Moog-Type Filter | 12 | rows of 6 and 6 | knob |
+| 32 | [DualPitch](#fx-32) | Dual Pitch Shifter | 12 | rows of 6 and 6 | knob |
+| 33 | [Vintage Pitch](#fx-33) | Dual Pitch Shifter | 12 | rows of 6 and 6 | knob |
+| 34 | [RotarySpkr](#fx-34) | Rotary Speaker | 8 | rows of 6 and 2 | knob |
 
 <!-- /generated:effect-index -->
 
@@ -150,7 +154,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/tc-deepvrb.svg" alt="TC Deep Reverb front panel" width="720">
 
-`FX Type` 0, reverb. 5 slots.
+`FX Type` 0, reverb. 5 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -166,7 +170,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/ambverb.svg" alt="Ambient Reverb front panel" width="720">
 
-`FX Type` 1, reverb. 10 slots.
+`FX Type` 1, reverb. 10 slots, drawn as faders.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -187,7 +191,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/roomrev.svg" alt="Room Reverb front panel" width="720">
 
-`FX Type` 2, reverb. 12 slots.
+`FX Type` 2, reverb. 12 slots, drawn as faders.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -210,7 +214,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/vintagerev.svg" alt="Vintage Room Reverb front panel" width="720">
 
-`FX Type` 3, reverb. 12 slots.
+`FX Type` 3, reverb. 12 slots, drawn as displays.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -233,7 +237,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/hallrev.svg" alt="Hall Reverb front panel" width="720">
 
-`FX Type` 4, reverb. 12 slots.
+`FX Type` 4, reverb. 12 slots, drawn as faders.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -256,7 +260,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/chamberrev.svg" alt="Chamber Reverb front panel" width="720">
 
-`FX Type` 5, reverb. 12 slots.
+`FX Type` 5, reverb. 12 slots, drawn as faders.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -279,7 +283,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/platerev.svg" alt="Plate Reverb front panel" width="720">
 
-`FX Type` 6, reverb. 12 slots.
+`FX Type` 6, reverb. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -302,7 +306,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/richpltrev.svg" alt="Rich Plate Reverb front panel" width="720">
 
-`FX Type` 7, reverb. 12 slots.
+`FX Type` 7, reverb. 12 slots, drawn as faders.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -325,7 +329,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/gatedrev.svg" alt="Gated Reverb front panel" width="720">
 
-`FX Type` 8, reverb. 10 slots.
+`FX Type` 8, reverb. 10 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -346,7 +350,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/reverse.svg" alt="Reverse Reverb front panel" width="720">
 
-`FX Type` 9, reverb. 9 slots.
+`FX Type` 9, reverb. 9 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -366,7 +370,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/chorusverb.svg" alt="Chorus and Reverb front panel" width="720">
 
-`FX Type` 10, reverb. 12 slots.
+`FX Type` 10, reverb. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -389,7 +393,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/delayverb.svg" alt="Delay and Reverb front panel" width="720">
 
-`FX Type` 11, reverb. 12 slots.
+`FX Type` 11, reverb. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -412,7 +416,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/flangverb.svg" alt="Flanger and Reverb front panel" width="720">
 
-`FX Type` 12, reverb. 12 slots.
+`FX Type` 12, reverb. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -435,7 +439,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/midaseq.svg" alt="Midas Equaliser front panel" width="720">
 
-`FX Type` 13, processing. 11 slots.
+`FX Type` 13, processing. 11 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -457,7 +461,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/enhancer.svg" alt="Enhancing EQ front panel" width="720">
 
-`FX Type` 14, processing. 9 slots.
+`FX Type` 14, processing. 9 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -477,7 +481,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/faircomp.svg" alt="Compressor front panel" width="720">
 
-`FX Type` 15, processing. 12 slots.
+`FX Type` 15, processing. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -500,7 +504,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/mulbnddist.svg" alt="Multiband Distortion front panel" width="720">
 
-`FX Type` 16, processing. 12 slots.
+`FX Type` 16, processing. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -523,7 +527,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/rackamp.svg" alt="Rack Amplifier front panel" width="720">
 
-`FX Type` 17, processing. 9 slots.
+`FX Type` 17, processing. 9 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -543,7 +547,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/edisonex1.svg" alt="Stereo Imaging front panel" width="720">
 
-`FX Type` 18, processing. 8 slots.
+`FX Type` 18, processing. 8 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -562,7 +566,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/auto-pan.svg" alt="Auto Panning front panel" width="720">
 
-`FX Type` 19, processing. 9 slots.
+`FX Type` 19, processing. 9 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -582,7 +586,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/noisegate.svg" alt="Noise Gate front panel" width="720">
 
-`FX Type` 20, processing. 8 slots.
+`FX Type` 20, processing. 8 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -601,7 +605,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/delay.svg" alt="Stereo Delay front panel" width="720">
 
-`FX Type` 21, delay. 12 slots.
+`FX Type` 21, delay. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -624,7 +628,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/3tapdelay.svg" alt="3-Tap Delay front panel" width="720">
 
-`FX Type` 22, delay. 12 slots.
+`FX Type` 22, delay. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -647,7 +651,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/4tapdelay.svg" alt="4-Tap Delay front panel" width="720">
 
-`FX Type` 23, delay. 12 slots.
+`FX Type` 23, delay. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -670,7 +674,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/t-raydelay.svg" alt="Tel-Ray Delay front panel" width="720">
 
-`FX Type` 24, delay. 5 slots.
+`FX Type` 24, delay. 5 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -686,7 +690,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/decimdelay.svg" alt="Decimator Delay front panel" width="720">
 
-`FX Type` 25, delay. 12 slots.
+`FX Type` 25, delay. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -709,7 +713,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/moddlyrev.svg" alt="Modulation, Delay and Reverb front panel" width="720">
 
-`FX Type` 26, delay. 12 slots.
+`FX Type` 26, delay. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -732,7 +736,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/chorus.svg" alt="Stereo Chorus front panel" width="720">
 
-`FX Type` 27, creative. 11 slots.
+`FX Type` 27, creative. 11 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -754,7 +758,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/chorus-d.svg" alt="Dimensional Chorus front panel" width="720">
 
-`FX Type` 28, creative. 7 slots.
+`FX Type` 28, creative. 7 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -772,7 +776,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/flanger.svg" alt="Stereo Flanger front panel" width="720">
 
-`FX Type` 29, creative. 12 slots.
+`FX Type` 29, creative. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -795,7 +799,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/phaser.svg" alt="Stereo Phaser front panel" width="720">
 
-`FX Type` 30, creative. 12 slots.
+`FX Type` 30, creative. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -818,7 +822,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/moodfilter.svg" alt="Moog-Type Filter front panel" width="720">
 
-`FX Type` 31, creative. 12 slots.
+`FX Type` 31, creative. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -841,7 +845,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/dualpitch.svg" alt="Dual Pitch Shifter front panel" width="720">
 
-`FX Type` 32, creative. 12 slots.
+`FX Type` 32, creative. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -864,7 +868,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/vintage-pitch.svg" alt="Dual Pitch Shifter front panel" width="720">
 
-`FX Type` 33, creative. 12 slots.
+`FX Type` 33, creative. 12 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
@@ -887,7 +891,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 
 <img src="diagrams/fx/rotaryspkr.svg" alt="Rotary Speaker front panel" width="720">
 
-`FX Type` 34, creative. 8 slots.
+`FX Type` 34, creative. 8 slots, drawn as knobs.
 
 | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Description |
 |---|---|---|---|---|---|---|---|---|
