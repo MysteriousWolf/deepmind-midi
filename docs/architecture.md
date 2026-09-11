@@ -115,6 +115,9 @@ collapses NRPN edits, dump parsing and dump building into a single table.
 | `spec/messages.toml` | 22 SysEx messages |
 | `spec/globals.toml` | 25 device-wide settings |
 | `spec/effects.toml` | 370 effect parameters across 35 algorithms |
+| `spec/panels.toml` | how those 370 slots present themselves |
+| `spec/mapping.toml` | how an address and a value become bytes |
+| `spec/firmware.toml` | firmware versions that change the protocol |
 
 `cargo xtask docs` renders the tables and Mermaid diagrams in
 [`midi-spec.md`](midi-spec.md), and writes the diagram sources to
@@ -146,6 +149,59 @@ Beyond that, correctness comes from disagreeing sources. The parameter table was
 built from the manual, then checked against a MIDI Designer layout that had no
 part in building it. All 35 of its named NRPN controls agree, including the three
 offsets where this specification departs from the manual's printed names.
+
+## Firmware is a dimension, not a footnote
+
+Firmware 1.1 renumbered three value tables rather than only appending to them.
+A program stored on 1.0 using modulation source 23 means something else read
+back on 1.1. That is not a note for a human, it is a lookup key:
+
+```rust
+spec.table_for("mod_source", "1.0")    // 23 entries
+spec.table_for("mod_source", "1.1")    // 25 entries
+```
+
+A table declares the versions it covers: `"1.0"` for exactly that one, `"1.1+"`
+for that one and later, and nothing at all for a table that has never changed.
+Loading fails unless every table identifier resolves to exactly one table for
+every listed version. A gap makes a table unreachable; an overlap makes the
+answer depend on file order, which is how this sort of thing goes wrong
+quietly.
+
+Comms protocol version is a separate axis and stays separate: it decides how
+many bytes a dump carries, not what a value means.
+
+## Presentation is separate from protocol
+
+`spec/effects.toml` says what a parameter is. `spec/panels.toml` says how to
+show it: continuous, switch or selector, and which slots belong together, such
+as the two sides of the compressor or the two channels of the pitch shifter.
+
+Those two files are split because their provenance differs. The protocol data is
+transcribed from the manual. The presentation data is derived from it by this
+project, and says so in its own header. Nothing in `panels.toml` claims to be
+Behringer's design, and it deliberately carries no geometry, colour or font:
+Behringer publishes no panel layout for the effects, and inventing one and
+attributing it to them would be worse than leaving it to the host.
+
+Loading checks the two line up slot for slot, since they are generated together
+and a mismatch means one was hand-edited.
+
+## Strings are reachable by key
+
+Every user-visible string in `spec/` is addressed by a stable path: a parameter
+by its offset, an effect slot by its type and slot number, a value table entry
+by its table and value. Nothing addresses a string by the string.
+
+That is all translation needs from the data model, and it is already true. A
+translation would be an overlay file keyed the same way, merged over the English
+at load. Until someone actually wants one, English lives in the spec files and
+there is no second mechanism to keep in sync. The point is that adding one later
+is not a refactor.
+
+What would not survive translation is anything that parses a display string.
+Ranges are stored as their two ends and a unit, not as `"0.1 to 6.0 s"`, for
+that reason among others.
 
 ## State is a set of claims, not a cache
 

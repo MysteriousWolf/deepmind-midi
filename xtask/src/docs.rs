@@ -52,6 +52,7 @@ pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
         ("messages", render_messages(&spec)),
         ("parameters", render_parameters(&spec)),
         ("firmware", render_firmware(&spec)),
+        ("mapping", render_mapping(&spec)),
         ("value-tables", render_value_tables(&spec)),
         ("globals", render_globals(&spec)),
         ("controllers", render_controllers(&spec)),
@@ -278,6 +279,58 @@ fn render_parameters(spec: &Spec) -> String {
     out
 }
 
+/// Renders each transport's byte pattern, its fields, and the encodings.
+fn render_mapping(spec: &Spec) -> String {
+    let mut out = String::new();
+    for transport in &spec.transports {
+        let _ = write!(
+            out,
+            "\n### {}\n\n{}\n\n```\n{}\n```\n\n",
+            cell(&transport.name),
+            transport.summary,
+            transport.pattern
+        );
+        if let Some(note) = &transport.note {
+            let _ = write!(out, "{note}\n\n");
+        }
+        out.push_str("| Field | From | Encoding | Bits | Notes |\n|---|---|---|---|---|\n");
+        for field in &transport.fields {
+            let note = cell(field.note.as_deref().unwrap_or(""));
+            let notes = if field.optional {
+                let when = cell(field.optional_when.as_deref().unwrap_or(""));
+                format!("Optional. {when} {note}").trim().to_owned()
+            } else {
+                note
+            };
+            let _ = writeln!(
+                out,
+                "| `{}` | `{}` | {} | {} | {notes} |",
+                cell(&field.name),
+                cell(&field.source),
+                field
+                    .encoding
+                    .as_deref()
+                    .map_or_else(|| "-".to_owned(), |id| format!("[{id}](#encodings)")),
+                field.bits.map_or_else(|| "-".to_owned(), |b| b.to_string()),
+            );
+        }
+    }
+
+    out.push_str("\n<a id=\"encodings\"></a>\n\n### Encodings\n\n");
+    out.push_str("| Encoding | Name | Rule | Notes |\n|---|---|---|---|\n");
+    for encoding in &spec.encodings {
+        let _ = writeln!(
+            out,
+            "| `{}` | {} | {} | {} |",
+            cell(&encoding.id),
+            cell(&encoding.name),
+            cell(&encoding.rule),
+            cell(encoding.note.as_deref().unwrap_or(""))
+        );
+    }
+    out
+}
+
 /// Renders the firmware list and what each version changed.
 fn render_firmware(spec: &Spec) -> String {
     let default = spec.default_firmware();
@@ -426,14 +479,16 @@ fn render_effects(spec: &Spec) -> String {
         let _ = write!(
             out,
             "\n<a id=\"fx-{}\"></a>\n\n#### {} ({})\n\n`FX Type` {}.\n\n\
-             | Slot | Ref | Parameter | Range | Mod | Description |\n\
-             |---|---|---|---|---|---|\n",
+             | Slot | Ref | Parameter | Control | Group | Range | Mod | \
+             Description |\n|---|---|---|---|---|---|---|---|\n",
             effect.r#type,
             cell(&effect.full_name),
             cell(&effect.name),
             effect.r#type,
         );
+        let panel = spec.panels.iter().find(|p| p.r#type == effect.r#type);
         for parameter in &effect.parameters {
+            let slot = panel.and_then(|p| p.slots.iter().find(|s| s.slot == parameter.slot));
             let range = match (&parameter.values, &parameter.min, &parameter.max) {
                 (Some(values), _, _) => cell(values),
                 (_, Some(min), Some(max)) => {
@@ -453,10 +508,12 @@ fn render_effects(spec: &Spec) -> String {
             };
             let _ = writeln!(
                 out,
-                "| {} | `{}` | {} | {range} | {} | {} |",
+                "| {} | `{}` | {} | {} | {} | {range} | {} | {} |",
                 parameter.slot,
                 cell(&parameter.r#ref),
                 cell(&parameter.name),
+                slot.map_or("", |s| s.kind.as_str()),
+                slot.and_then(|s| s.group.as_deref()).unwrap_or(""),
                 if parameter.mod_dest { "yes" } else { "" },
                 cell(parameter.description.as_deref().unwrap_or(""))
             );

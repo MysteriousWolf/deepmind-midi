@@ -20,6 +20,7 @@ down. The code layers are landing one at a time. Not yet usable.
 | [Protocol](docs/midi-spec.md) | Signal path, SysEx, NRPN, all 242 parameters, the CC map, value tables, every effect |
 | [Architecture](docs/architecture.md) | Design, layering, roadmap |
 | [`spec/`](spec/) | The same protocol as TOML. Source of truth for the docs and the code |
+| [NOTICE](NOTICE) | Where the parameter descriptions come from |
 | `cargo doc --open` | API reference |
 
 ## Hardware

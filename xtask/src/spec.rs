@@ -217,6 +217,89 @@ pub struct Effect {
     pub parameters: Vec<EffectParameter>,
 }
 
+/// How one effect slot presents itself to a host.
+#[derive(Debug, Deserialize)]
+pub struct PanelSlot {
+    /// Position within the engine's twelve parameters, counting from 1.
+    pub slot: u8,
+    /// `continuous`, `switch` or `selector`.
+    pub kind: String,
+    /// Slots sharing a label belong together, such as one side of a dual engine.
+    #[serde(default)]
+    pub group: Option<String>,
+    /// `true` when the engine acts on modulation reaching this slot.
+    #[serde(default)]
+    pub modulatable: bool,
+}
+
+/// The presentation of one effect algorithm's slots.
+#[derive(Debug, Deserialize)]
+pub struct Panel {
+    /// Value of the `FX Type` parameter that selects this algorithm.
+    pub r#type: u16,
+    /// Short name, matching the effect and the `fx_type` value table.
+    pub name: String,
+    /// The slots, ordered.
+    pub slots: Vec<PanelSlot>,
+}
+
+/// One field of a transport's byte pattern.
+#[derive(Debug, Deserialize)]
+pub struct MappingField {
+    /// Name used by the `<placeholder>` in the pattern.
+    pub name: String,
+    /// Where the value comes from, such as `parameter.offset`.
+    pub source: String,
+    /// Identifier of the encoding applied, if any.
+    #[serde(default)]
+    pub encoding: Option<String>,
+    /// Width in bits, where the field is a fixed-width number.
+    #[serde(default)]
+    pub bits: Option<u8>,
+    /// `true` when the field may be left out.
+    #[serde(default)]
+    pub optional: bool,
+    /// When the field may be left out.
+    #[serde(default)]
+    pub optional_when: Option<String>,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+/// A way of carrying an address and a value over MIDI.
+#[derive(Debug, Deserialize)]
+pub struct Transport {
+    /// Identifier, such as `nrpn`.
+    pub id: String,
+    /// Human-readable name.
+    pub name: String,
+    /// One-line summary of what it reaches.
+    pub summary: String,
+    /// Byte pattern, with `<name>` standing for a field.
+    pub pattern: String,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+    /// The fields the pattern refers to.
+    #[serde(default, rename = "field")]
+    pub fields: Vec<MappingField>,
+}
+
+/// A named rule turning a value into wire bytes.
+#[derive(Debug, Deserialize)]
+pub struct Encoding {
+    /// Identifier referenced by [`MappingField::encoding`].
+    pub id: String,
+    /// Human-readable name.
+    pub name: String,
+    /// The rule itself.
+    pub rule: String,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
 /// A device-wide setting.
 #[derive(Debug, Deserialize)]
 pub struct Global {
@@ -256,6 +339,18 @@ struct Controllers {
 }
 
 #[derive(Debug, Deserialize)]
+struct Panels {
+    panel: Vec<Panel>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Mapping {
+    transport: Vec<Transport>,
+    #[serde(rename = "encoding")]
+    encodings: Vec<Encoding>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Firmwares {
     firmware: Vec<Firmware>,
 }
@@ -288,6 +383,12 @@ pub struct Spec {
     pub effects: Vec<Effect>,
     /// Firmware versions that change the protocol, oldest first.
     pub firmwares: Vec<Firmware>,
+    /// Ways of carrying an address and a value over MIDI.
+    pub transports: Vec<Transport>,
+    /// Rules turning a value into wire bytes.
+    pub encodings: Vec<Encoding>,
+    /// How each effect presents its slots, ordered by `FX Type` value.
+    pub panels: Vec<Panel>,
 }
 
 impl Spec {
@@ -308,6 +409,8 @@ impl Spec {
         let controllers: Controllers = read(&spec.join("controllers.toml"))?;
         let effects: Effects = read(&spec.join("effects.toml"))?;
         let firmwares: Firmwares = read(&spec.join("firmware.toml"))?;
+        let mapping: Mapping = read(&spec.join("mapping.toml"))?;
+        let panels: Panels = read(&spec.join("panels.toml"))?;
 
         let this = Self {
             parameters: parameters.parameter,
@@ -317,6 +420,9 @@ impl Spec {
             controllers: controllers.controller,
             effects: effects.effect,
             firmwares: firmwares.firmware,
+            transports: mapping.transport,
+            encodings: mapping.encodings,
+            panels: panels.panel,
         };
         this.validate()?;
         Ok(this)
@@ -356,6 +462,7 @@ impl Spec {
         self.validate_parameters()?;
         self.validate_controllers()?;
         self.validate_effects()?;
+        self.validate_mapping()?;
         self.validate_messages()
     }
 
@@ -523,6 +630,94 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    /// Checks that every pattern placeholder has a field and every field an
+    /// encoding that exists.
+    fn validate_mapping(&self) -> Result<(), String> {
+        for transport in &self.transports {
+            for field in &transport.fields {
+                let placeholder = format!("<{}>", field.name);
+                if !transport.pattern.contains(&placeholder) {
+                    return Err(format!(
+                        "mapping.toml: {} defines field {} which its pattern never uses",
+                        transport.id, field.name
+                    ));
+                }
+                if let Some(id) = &field.encoding
+                    && !self.encodings.iter().any(|e| &e.id == id)
+                {
+                    return Err(format!(
+                        "mapping.toml: {} field {} uses unknown encoding {id}",
+                        transport.id, field.name
+                    ));
+                }
+            }
+            for placeholder in transport.pattern.split('<').skip(1) {
+                let Some(name) = placeholder.split('>').next() else {
+                    continue;
+                };
+                if !transport.fields.iter().any(|f| f.name == name) {
+                    return Err(format!(
+                        "mapping.toml: {} pattern uses <{name}> with no field to fill it",
+                        transport.id
+                    ));
+                }
+            }
+        }
+        self.validate_panels()
+    }
+
+    /// Checks that panels.toml lines up with effects.toml slot for slot.
+    ///
+    /// The two are generated together, so a mismatch means one was edited by
+    /// hand and the other was not.
+    fn validate_panels(&self) -> Result<(), String> {
+        const KINDS: [&str; 3] = ["continuous", "switch", "selector"];
+        if self.panels.len() != self.effects.len() {
+            return Err(format!(
+                "panels.toml has {} panels but effects.toml has {} effects",
+                self.panels.len(),
+                self.effects.len()
+            ));
+        }
+        for (panel, effect) in self.panels.iter().zip(&self.effects) {
+            if panel.r#type != effect.r#type || panel.name != effect.name {
+                return Err(format!(
+                    "panels.toml has {} at type {} where effects.toml has {} at type {}",
+                    panel.name, panel.r#type, effect.name, effect.r#type
+                ));
+            }
+            if panel.slots.len() != effect.parameters.len() {
+                return Err(format!(
+                    "panels.toml: {} has {} slots but effects.toml has {} parameters",
+                    panel.name,
+                    panel.slots.len(),
+                    effect.parameters.len()
+                ));
+            }
+            for (slot, parameter) in panel.slots.iter().zip(&effect.parameters) {
+                if slot.slot != parameter.slot {
+                    return Err(format!(
+                        "panels.toml: {} slot {} does not line up with effects.toml",
+                        panel.name, slot.slot
+                    ));
+                }
+                if !KINDS.contains(&slot.kind.as_str()) {
+                    return Err(format!(
+                        "panels.toml: {} slot {} has unknown kind {:?}",
+                        panel.name, slot.slot, slot.kind
+                    ));
+                }
+                if slot.modulatable != parameter.mod_dest {
+                    return Err(format!(
+                        "panels.toml: {} slot {} disagrees with effects.toml about modulation",
+                        panel.name, slot.slot
+                    ));
+                }
+            }
+        }
         Ok(())
     }
 
