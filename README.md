@@ -12,8 +12,8 @@ DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 
 **Status: early.** The protocol is reverse-engineered, verified and written
 down. The code layers are landing one at a time: MIDI decoding, SysEx, the
-parameter table and programs are in; `.syx` files and device state are not. Not
-yet usable.
+parameter table, programs and `.syx` files are in; device state is not. Not yet
+usable.
 
 ## Documentation
 
@@ -45,6 +45,13 @@ cargo +1.85.0 check --workspace --all-features   # the MSRV, which CI also check
 
 A current toolchain accepts things 1.85 does not, so the last line is worth
 running before pushing.
+
+The factory preset packs are not in the repository, so the tests that read them
+skip unless you point them at your own copy:
+
+```sh
+DEEPMIND_PACKS=/path/to/presets cargo test -p deepmind-midi --test packs
+```
 
 Documentation, diagrams, the effect panel drawings and the library's parameter
 tables are generated from `spec/`:

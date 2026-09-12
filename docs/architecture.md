@@ -253,6 +253,31 @@ status byte that ends one early are all handled, because they are what a MIDI
 port actually delivers and a library that only worked on clean input would put
 that work in every host.
 
+## A file is a run of frames
+
+A `.syx` file has no header, no index and no trailer. A preset pack is 128
+program dumps end to end and a single patch is one dump, so reading a file is
+reading frames and `syx` is the layer that walks them.
+
+It walks the bytes directly rather than feeding them through `Decoder`. The
+decoder exists to reassemble frames that arrive a few bytes at a time over a
+port; a file is already whole, and walking it in place means a program dump is
+borrowed from the file rather than copied into a buffer first. A payload is
+seven-bit data, so an `F0` and the next `F7` delimit a frame exactly.
+
+Files in the wild are padded, concatenated and appended to, so bytes outside a
+frame are walked past. What is inside one is another matter: a frame that does
+not parse is handed back as the error it failed with and the walk goes on, since
+one bad frame is not a reason to lose the 127 good ones. That is why the
+iterators yield a `Result` per item rather than refusing the file.
+
+Writing does not promise to reproduce a file byte for byte, and says so. The
+manual prints 278 packed bytes for a 242-byte program where padding gives 280
+and truncating gives 277; this library pads, for the reason the packed codec
+gives. A file written the other way reads back to identical programs and rewrites
+to a different length. The programs are what a pack is; the padding is not, and
+the golden test checks the programs always and the bytes where the two agree.
+
 ## Firmware is a dimension, not a footnote
 
 Firmware 1.1 renumbered three value tables rather than only appending to them.
@@ -452,8 +477,12 @@ hardware. It is not part of the published surface.
 
 The packs are not committed. Redistribution rights on Behringer sound banks are
 unclear and a library repository is the wrong place to find out. The tests read a
-path from an environment variable and skip when it is unset; the repository holds
-a small synthetic fixture and expected checksums.
+path from `DEEPMIND_PACKS` and skip when it is unset; the repository holds a
+small synthetic fixture and its checksum. The fixture is what this library
+writes, frozen: a change in the encoder arrives in review as a changed fixture
+rather than as a file the next release cannot read. `UPDATE_FIXTURES=1` rewrites
+it and prints the checksum to paste in, so agreeing to the change is an edit
+somebody makes.
 
 ## Versioning and releases
 
@@ -492,16 +521,16 @@ built-in token; any failure there leaves the generated notes alone.
 | 8 | `transport`: the blocking adapter |
 | 9 | `deepmind-cli` |
 
-Steps 1 to 5 have landed.
+Steps 1 to 6 have landed.
 
-### Next: files
+### Next: the device
 
-`syx`: reading and writing the `.syx` files programs are traded in, and the
-preset packs that hold a bank of them. A file is a run of `SysEx` frames, which
-the decoder already reassembles and `Frame::parse` already reads, so what is
-missing is the layer that walks a file, hands out the programs it carries, and
-builds one from programs a host holds. It is also where the golden tests against
-the factory packs go.
+`device`: the state machine a host drives. It is where the layers below meet -
+a dump arriving becomes a confirmed `Program`, an `edit` becomes the NRPN
+messages `Program::changes` already works out, a request that goes unanswered
+becomes a timeout - and it is the first layer that has a clock, in the sense that
+the caller supplies one. `Known<T>` is the shape of what it holds, for the reason
+[State is a set of claims](#state-is-a-set-of-claims-not-a-cache) gives.
 
 ### Not yet possible: the globals and the sequencer
 
