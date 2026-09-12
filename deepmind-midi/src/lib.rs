@@ -18,6 +18,7 @@
 //! | [`sysex`] | `DeepMind` framing, the packed MS-bit codec, typed messages   |
 //! | [`param`] | The 242 program parameters: names, ranges, value tables, NRPN |
 //! | [`program`] | A program: the 242 bytes, typed accessors, names, value types |
+//! | [`syx`]   | `.syx` files: the programs a preset pack carries, and building one |
 //!
 //! Each layer depends only on those above it: [`wire`] does not know what a
 //! `DeepMind` is, and [`sysex`] does not know where its bytes came from.
@@ -38,8 +39,8 @@
 //! });
 //! ```
 //!
-//! Further layers (`device`, `syx`) land in subsequent changes,
-//! generated where possible from the machine-readable specification in `spec/`.
+//! The `device` layer, which tracks what the synthesizer holds and turns edits
+//! into messages, lands in a subsequent change.
 //! See `docs/architecture.md` for the design and `docs/midi-spec.md` for the
 //! protocol itself.
 //!
@@ -60,10 +61,11 @@ pub mod ids;
 pub mod param;
 pub mod program;
 pub mod sysex;
+pub mod syx;
 pub mod wire;
 
 pub use error::{Error, Result};
-pub use ids::{Bank, DeviceId, Model, PatternNumber, ProgramNumber, ProtocolVersion};
+pub use ids::{Bank, DeviceId, Model, PatternNumber, ProgramNumber, ProtocolVersion, Slot};
 pub use param::{Group, NrpnEdit, ParamId};
 pub use program::{Program, ProgramName};
 pub use sysex::{Command, Frame, Message};

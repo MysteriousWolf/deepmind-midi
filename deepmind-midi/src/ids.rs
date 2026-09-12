@@ -286,6 +286,48 @@ impl fmt::Display for ProgramNumber {
     }
 }
 
+/// One of the 1024 places a program is stored: a bank and a number in it.
+///
+/// The two travel together everywhere a stored program does - a dump names both,
+/// a `.syx` file says both, and the front panel shows them as one label.
+///
+/// ```
+/// use deepmind_midi::ids::{Bank, ProgramNumber, Slot};
+///
+/// let slot = Slot::new(Bank::A, ProgramNumber::FIRST);
+/// assert_eq!(slot.to_string(), "A1");
+/// # Ok::<(), deepmind_midi::Error>(())
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Slot {
+    /// Bank the program is stored in.
+    pub bank: Bank,
+    /// Program within that bank.
+    pub number: ProgramNumber,
+}
+
+impl Slot {
+    /// The first program of the first bank.
+    pub const FIRST: Self = Self {
+        bank: Bank::A,
+        number: ProgramNumber::FIRST,
+    };
+
+    /// Builds a slot.
+    #[must_use]
+    pub const fn new(bank: Bank, number: ProgramNumber) -> Self {
+        Self { bank, number }
+    }
+}
+
+impl fmt::Display for Slot {
+    /// Writes the slot the way the front panel does: `A1` through `H128`.
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}{}", self.bank, self.number)
+    }
+}
+
 /// A user arpeggiator or sequencer pattern slot, 0 through 31.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -331,6 +373,12 @@ impl fmt::Display for PatternNumber {
 )]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_slot_reads_as_the_front_panel_writes_it() {
+        assert_eq!(Slot::FIRST.to_string(), "A1");
+        assert_eq!(Slot::new(Bank::H, ProgramNumber::LAST).to_string(), "H128");
+    }
 
     #[test]
     fn device_id_round_trips_through_its_wire_byte() {
