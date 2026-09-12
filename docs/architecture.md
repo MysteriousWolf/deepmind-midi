@@ -20,32 +20,86 @@ holds the synthesizer; changing it is changing the synthesizer.
 ```rust
 let mut synth = Synth::new(DeviceId::Unit(0));
 
-// Read. Typed, grouped like the front panel.
-let cutoff = synth.program().vcf.frequency;
-println!("{cutoff}");                      // 1.2 kHz
+// Read. Named the way the synthesizer's own display names it.
+let program = synth.program();
+println!("{}", program.name());            // Bass Sweep
+let shape = program.lfo1_shape();          // Some(LfoShape::Triangle)
 
 // Write. Mutate; the library works out which messages that implies.
 synth.edit(|p| {
-    p.vcf.frequency = Frequency::hz(1200.0);
-    p.lfo1.shape = LfoShape::Triangle;
-    p.mod_matrix[0] = ModBus::new(ModSource::Lfo2, ModDest::VcfFreq, -40);
+    p.set_vcf_frequency(200);
+    p.set_lfo1_shape(LfoShape::Triangle);
+    p.set_mod1_source(ModSource::Lfo2);
 });
 ```
 
 `edit` diffs the program against what the synthesizer is believed to hold and
-queues NRPN messages for exactly the offsets that changed. Two edits to the same
+queues NRPN messages for exactly the offsets that changed - `Program::changes`
+is that diff, and the device layer is what sends it. Two edits to the same
 parameter in one closure send one message.
 
-Values are newtypes, not bare bytes:
+A parameter with a value table reads as its table, and a switch as a `bool`:
 
 ```rust
-p.vcf.frequency.raw()    // 0..=255, what goes on the wire
-p.vcf.frequency.hz()     // 50.0..=20000.0, what the synthesizer shows
-p.lfo1.shape             // an enum, not a magic number
+program.get(ParamId::Lfo1Shape)   // 1, the byte in the dump
+program.lfo1_shape()              // Some(LfoShape::Triangle)
+program.lfo1_key_sync()           // false
 ```
 
-Both the field layout and the conversions come from `spec/`, so the offset map
+What is not there is a conversion from the raw value to the number the
+synthesizer displays, for the reason [Raw values stay raw until
+measured](#raw-values-stay-raw-until-measured) gives. `program.vcf_frequency()`
+is a byte, not a frequency, until the curve behind that byte is known.
+
+The accessors and the value types are generated from `spec/`, so the offset map
 exists in one place and no host code repeats it.
+
+## A program is its bytes
+
+A `Program` holds the dump it arrived as: 242 bytes, or 245 under comms protocol
+version 7. Reading a parameter is a lookup and writing one is a byte, so a dump
+that goes in comes out byte for byte, and the tests say so over every byte
+pattern.
+
+The alternative - a struct of 242 decoded fields - loses on all three counts
+that matter here. A value no table lists could not be held, and hardware is
+entitled to send one. The reserved bytes of a version 7 dump would have to be
+carried alongside anyway. And three value tables were renumbered by firmware, so
+a decoded field would have to pick a firmware at decode time, when nothing in a
+stored program says which firmware wrote it.
+
+So decoding is a view over the bytes rather than a copy of them. A typed
+accessor answers `Option` where the byte is not a value its table names; the byte
+is still there, and `Program::get` returns it. `Program::invalid` lists the
+parameters holding something they do not accept, rather than a decoder refusing
+the dump over one byte.
+
+## Which value tables become a type
+
+A value table becomes a Rust enum when its entries are a closed set of names:
+`LfoShape::Triangle`, `ModSource::Lfo2`, `FxType::RotarySpkr`. Twenty-two of the
+twenty-seven are.
+
+The other five stay raw bytes with a label, because a type would be a worse way
+of writing what they hold:
+
+- The three clock divider tables list `1/2`, `3/8`, `1/16`. Those are divisions
+  of a bar, not names, and `Div1Over2` says less than `1/2` does.
+- `LFO Mono Mode` and `Arpeggiator Pattern` list the first of a run - `SPREAD-1`
+  stands for `SPREAD-1` through `SPREAD-254` - so an enum of what is listed would
+  answer `None` for almost every value the synthesizer sends.
+
+Which of the two a table is, is read off the table rather than declared in it.
+`spec/` describes the synthesizer; how that lands in Rust is the generator's
+business, and putting the rule in the generator keeps the specification about the
+hardware.
+
+For the three tables firmware renumbered, a variant is what the value *means* and
+`raw_for` is the byte it travels as on a given firmware. `ModSource::Expression`
+is 6 on firmware 1.1 and does not exist on 1.0; `ModSource::Lfo1` is 7 on 1.1 and
+6 on 1.0. The join between the two firmware tables is the entry's name, which is
+also why `NoteOff Vel` and `Note Off Vel` are one variant: firmware respelled the
+name of a value it kept.
 
 ## Sans-IO
 
@@ -94,7 +148,7 @@ error     one error type; every rejection carries the offending value
 wire      MIDI bytes: message decode, running status, SysEx reassembly
 sysex     DeepMind framing, packed MS-bit codec, typed Message enum
 param     the parameter table: IDs, NRPN numbers, ranges, enums, formatting
-program   Program, Global, Pattern, Bank: decode and encode parameter bytes
+program   Program: the dump's bytes, typed accessors, names, value types
 device    the sans-IO state machine: requests, timeouts, known state, events
 syx       .syx files and preset packs
 ```
@@ -131,17 +185,20 @@ the same strings, so nothing needs a build step to read.
 `cargo xtask codegen` renders the parameter table itself into
 `deepmind-midi/src/param/generated.rs`: the 242 parameters as an enum whose
 discriminant is the NRPN number, their groups and ranges, the value tables with
-the firmware each belongs to, and the controller map. The library cannot read
-TOML on a target with no filesystem and no allocator, so the specification is
-compiled in rather than parsed.
+the firmware each belongs to, and the controller map. It renders the program
+layer into `deepmind-midi/src/program/generated.rs`: the value tables as Rust
+types, and the 225 parameters that are not the program's name as a getter and a
+setter each. The library cannot read TOML on a target with no filesystem and no
+allocator, so the specification is compiled in rather than parsed.
 
 Only data is generated. The types it fills and everything that acts on them are
 hand-written beside it, so a specification change arrives in review as a changed
 table rather than as changed logic, and a behaviour change cannot hide in a
 regenerated file.
 
-The same files will generate the `Program` struct, its typed fields and its
-conversions. A correction gets made once.
+The same files generate the program layer: one Rust type per value table and one
+pair of accessors per parameter, in
+`deepmind-midi/src/program/generated.rs`. A correction gets made once.
 
 ### Keeping generated output honest
 
@@ -429,23 +486,32 @@ built-in token; any failure there leaves the generated notes alone.
 | 2 | `spec/effects.toml`: per-effect parameter names, presentation, FX routing |
 | 3 | `wire` and `sysex`: framing, packed MS-bit codec, typed messages |
 | 4 | `param`: code generated from `spec/`, typed values |
-| 5 | `program`: the `Program` struct, decode and encode, `.syx` import and export |
-| 6 | `device`: the state machine, events, timeouts, provenance, `edit` |
-| 7 | `transport`: the blocking adapter |
-| 8 | `deepmind-cli` |
+| 5 | `program`: the `Program` struct, its value types and typed accessors |
+| 6 | `syx`: `.syx` files and preset packs |
+| 7 | `device`: the state machine, events, timeouts, provenance, `edit` |
+| 8 | `transport`: the blocking adapter |
+| 9 | `deepmind-cli` |
 
-Steps 1 to 4 have landed.
+Steps 1 to 5 have landed.
 
-### Next: programs
+### Next: files
 
-`program`: the `Program` struct, its typed fields, and decoding and encoding
-between it and the 242 bytes a dump carries. The parameter layer names every one
-of those bytes and says what its values mean; what is missing is the shape a host
-holds them in, grouped like the front panel rather than addressed by offset, and
-the `.syx` files they are stored in.
+`syx`: reading and writing the `.syx` files programs are traded in, and the
+preset packs that hold a bank of them. A file is a run of `SysEx` frames, which
+the decoder already reassembles and `Frame::parse` already reads, so what is
+missing is the layer that walks a file, hands out the programs it carries, and
+builds one from programs a host holds. It is also where the golden tests against
+the factory packs go.
 
-Two things the parameter layer deliberately left for it. The value tables are
-data, not types: `LfoShape::Triangle` belongs on the field it is assigned to, and
-generating 28 enums before there is anywhere to put them would be generating
-them twice. And nothing converts a raw value into the number the synthesizer
-displays, for the reason the scaling section above gives.
+### Not yet possible: the globals and the sequencer
+
+`Global`, `Pattern` and the chord memories stay opaque payloads for now, and not
+for want of a layer to put them in. The manual lists the 25 device-wide settings
+but never says where in the 45-byte dump each one sits, and it gives the pattern
+and chord dumps a length and nothing else. Naming those bytes needs hardware, not
+another reading of the manual; `spec/globals.toml` records what is known and
+marks the offsets as unknown rather than guessing at them.
+
+The one dump besides the program that is documented well enough to decode is the
+bank program names, which is 128 names of sixteen bytes and is where `BankNames`
+comes from.

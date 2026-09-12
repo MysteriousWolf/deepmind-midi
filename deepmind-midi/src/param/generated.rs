@@ -192,7 +192,7 @@ pub enum ParamId {
     /// VCF Frequency.
     VcfFrequency = 39,
     /// VCF `HighPass` Frequency.
-    VcfHighpassFrequency = 40,
+    VcfHighPassFrequency = 40,
     /// VCF Resonance.
     VcfResonance = 41,
     /// VCF Envelope Depth.
@@ -640,7 +640,7 @@ impl ParamId {
         Self::PitchBendDownDepth,
         Self::Osc1PitchModMode,
         Self::VcfFrequency,
-        Self::VcfHighpassFrequency,
+        Self::VcfHighPassFrequency,
         Self::VcfResonance,
         Self::VcfEnvelopeDepth,
         Self::VcfEnvelopeVelocitySensitivity,
@@ -1128,7 +1128,7 @@ impl ParamId {
                 max: 255,
                 kind: Kind::Continuous,
             },
-            Self::VcfHighpassFrequency => Parameter {
+            Self::VcfHighPassFrequency => Parameter {
                 name: "VCF HighPass Frequency",
                 group: Group::Vcf,
                 min: 0,
@@ -5385,7 +5385,7 @@ pub const CONTROLLERS: [Controller; CONTROLLER_COUNT] = [
         cc: 35,
         name: "VCF HighPass Frequency",
         kind: ControllerKind::Parameter,
-        parameter: Some(ParamId::VcfHighpassFrequency),
+        parameter: Some(ParamId::VcfHighPassFrequency),
     },
     Controller {
         cc: 36,

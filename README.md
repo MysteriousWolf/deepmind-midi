@@ -11,8 +11,9 @@ DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 ```
 
 **Status: early.** The protocol is reverse-engineered, verified and written
-down. The code layers are landing one at a time: MIDI decoding, SysEx and the
-parameter table are in; programs and device state are not. Not yet usable.
+down. The code layers are landing one at a time: MIDI decoding, SysEx, the
+parameter table and programs are in; `.syx` files and device state are not. Not
+yet usable.
 
 ## Documentation
 
@@ -51,7 +52,7 @@ tables are generated from `spec/`:
 ```sh
 cargo xtask docs               # regenerate docs/
 cargo xtask docs --check       # fail if stale
-cargo xtask codegen            # regenerate deepmind-midi/src/param/generated.rs
+cargo xtask codegen            # regenerate the library's generated sources
 cargo xtask codegen --check    # fail if stale
 ```
 
