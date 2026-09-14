@@ -88,6 +88,16 @@ pub enum Error {
     InvalidInterface(u8),
     /// A universal `SysEx` frame was not a `DeepMind` device inquiry response.
     NotAnInquiryResponse,
+    /// An edit was made before any program was known, so nothing said what
+    /// changed.
+    ProgramNotKnown,
+    /// More was queued to send than the outbound queue had room for.
+    QueueFull {
+        /// Items the operation needed room for.
+        needed: usize,
+        /// Items the queue had room for.
+        available: usize,
+    },
 }
 
 impl fmt::Display for Error {
@@ -186,6 +196,10 @@ impl fmt::Display for Error {
                 "invalid interface {byte}, expected 0 (MIDI), 1 (USB) or 2 (Wi-Fi)"
             ),
             Self::NotAnInquiryResponse => f.write_str("not a DeepMind device inquiry response"),
+            Self::ProgramNotKnown => f.write_str("no program known yet, nothing to edit"),
+            Self::QueueFull { needed, available } => {
+                write!(f, "queue has room for {available} items, need {needed}")
+            }
         }
     }
 }

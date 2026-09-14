@@ -19,6 +19,7 @@
 //! | [`param`] | The 242 program parameters: names, ranges, value tables, NRPN |
 //! | [`program`] | A program: the 242 bytes, typed accessors, names, value types |
 //! | [`syx`]   | `.syx` files: the programs a preset pack carries, and building one |
+//! | [`device`] | The state machine: what the synthesizer holds, and what to send |
 //!
 //! Each layer depends only on those above it: [`wire`] does not know what a
 //! `DeepMind` is, and [`sysex`] does not know where its bytes came from.
@@ -39,8 +40,6 @@
 //! });
 //! ```
 //!
-//! The `device` layer, which tracks what the synthesizer holds and turns edits
-//! into messages, lands in a subsequent change.
 //! See `docs/architecture.md` for the design and `docs/midi-spec.md` for the
 //! protocol itself.
 //!
@@ -56,6 +55,7 @@
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+pub mod device;
 pub mod error;
 pub mod ids;
 pub mod param;
@@ -64,6 +64,7 @@ pub mod sysex;
 pub mod syx;
 pub mod wire;
 
+pub use device::{Device, Known};
 pub use error::{Error, Result};
 pub use ids::{Bank, DeviceId, Model, PatternNumber, ProgramNumber, ProtocolVersion, Slot};
 pub use param::{Group, NrpnEdit, ParamId};
