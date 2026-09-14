@@ -183,7 +183,7 @@ lets NRPN edits, dump parsing and dump building share a single table.
 | File | Contents |
 |---|---|
 | `spec/parameters.toml` | 242 program parameters |
-| `spec/enums.toml` | 27 value tables (30 with the firmware 1.0 variants), including 132 modulation destinations |
+| `spec/enums.toml` | 27 value tables (30 with the firmware 1.0 variants), the largest being the modulation destinations: 133 entries on firmware 1.1, 130 on 1.0, each counting Off |
 | `spec/controllers.toml` | 112 MIDI controllers, 90 mapped to a parameter |
 | `spec/messages.toml` | 22 SysEx messages |
 | `spec/globals.toml` | 25 device-wide settings |
@@ -195,13 +195,12 @@ lets NRPN edits, dump parsing and dump building share a single table.
 | `spec/measurements.toml` | 29 raw values with what the synthesizer displayed |
 | `spec/firmware.toml` | firmware versions that change the protocol |
 
-Three things are generated from these files:
+Two commands generate from these files:
 
 | Command | Output |
 |---|---|
-| `cargo xtask docs` | Tables and diagrams in [`midi-spec.md`](midi-spec.md), the algorithms in [`effects.md`](effects.md), `docs/diagrams/*.mmd`, `docs/diagrams/envelope.svg`, and a panel drawing per effect in `docs/diagrams/fx/*.svg` |
-| `cargo xtask codegen` | `deepmind-midi/src/param/generated.rs`: the 242 parameters as an enum whose discriminant is the NRPN number, their groups and ranges, the value tables with the firmware each belongs to, and the controller map |
-| `cargo xtask codegen` | `deepmind-midi/src/program/generated.rs`: one Rust type per value table, and a getter and setter for each of the 225 parameters that are not the program's name |
+| `cargo xtask docs` | The tables in [`midi-spec.md`](midi-spec.md), the algorithms in [`effects.md`](effects.md), and everything under `docs/diagrams/`: the Mermaid sources, the envelope figure and a panel drawing per effect |
+| `cargo xtask codegen` | `deepmind-midi/src/param/generated.rs`, the 242 parameters as an enum whose discriminant is the NRPN number, with their groups, ranges, value tables per firmware and the controller map; and `deepmind-midi/src/program/generated.rs`, one Rust type per value table and a getter and setter for each of the 225 parameters that are not the program's name |
 
 The library is compiled for targets with no filesystem and no allocator, so
 the specification is compiled in rather than parsed at runtime.
@@ -283,9 +282,9 @@ checks the programs always and the bytes where the two agree.
 ## Firmware is a lookup key
 
 Firmware 1.1 renumbered three value tables rather than only appending to them.
-17 of the 23 modulation sources and 120 of the 130 destinations changed
-meaning, so a 1.0 program read with 1.1 tables is mislabelled almost
-everywhere. Only the FX type list is close to a pure extension.
+17 of the 23 entries in the 1.0 modulation source table and 120 of the 130 in
+its destination table changed meaning, so a 1.0 program read with 1.1 tables
+is mislabelled almost everywhere. Only the FX type list is close to a pure extension.
 
 ```rust
 spec.table_for("mod_source", "1.0")    // 23 entries
@@ -599,21 +598,16 @@ does the same job for the fuzzer by giving it the header as a token: without
 it the `frame` target reaches 42 coverage points in twenty seconds, with it
 434.
 
-Fuzzing needs nightly and `cargo-fuzz`:
-
-```sh
-cargo install cargo-fuzz
-cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict
-```
-
-CI runs each target for a minute as a regression check. A real campaign is
+The commands are in the README. CI runs each target for a minute as a
+regression check. A real campaign is
 hours against a kept corpus, and the corpus is not committed: it is derived,
 grows without bound, and regenerating it is one command.
 
 The factory packs are not committed either. Redistribution rights on Behringer
-sound banks are unclear. The tests read a path from `DEEPMIND_PACKS` and skip
-when it is unset; the repository holds a small synthetic fixture and its
-checksum. The fixture is what this library writes, frozen: a change in the
+sound banks are unclear. The tests that read them are ignored by default and
+run with `--include-ignored` once `DEEPMIND_PACKS` names a directory of them,
+so a run that skipped them says so; the repository holds a small synthetic
+fixture and its checksum. The fixture is what this library writes, frozen: a change in the
 encoder arrives in review as a changed fixture. `UPDATE_FIXTURES=1` rewrites
 it and prints the checksum to paste in.
 
@@ -622,6 +616,12 @@ it and prints the checksum to paste in.
 `Cargo.toml` holds the version and nothing else does. The scheme is
 `YY.RELEASE.PATCH`: `26.1.0` is the first release of 2026, `26.1.1` its first
 patch, `26.2.0` the second release of the year.
+
+Cargo reads that as semver, where the year is the major version and a
+release is a minor one: a host depending on `"26"` follows every release of
+the year. So a release within a year must not break the public API, and a
+breaking change is a new year. CI checks the claim with `cargo-semver-checks`
+against the newest release tag, once there is one.
 
 A human edits that one line. CI fails when the version is not ahead of the
 newest release tag, so the first pull request merged after a release has to

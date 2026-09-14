@@ -105,7 +105,11 @@ cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict   # or decoder, file, 
 ```
 
 The factory preset packs are not in the repository. The tests that read them
-skip unless `DEEPMIND_PACKS` points at your own copy.
+are ignored unless `DEEPMIND_PACKS` points at your own copy:
+
+```sh
+DEEPMIND_PACKS=~/deepmind/packs cargo test -p deepmind-midi --test packs -- --include-ignored
+```
 
 ## License
 
