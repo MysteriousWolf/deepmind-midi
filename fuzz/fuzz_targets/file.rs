@@ -3,7 +3,8 @@
 //! A preset pack is a file off the internet, so the reader is untrusted input
 //! in the same sense a port is. Both walks have to terminate, and they
 //! terminate by consuming the file: neither can yield more items than the file
-//! has `F0` bytes to start frames with.
+//! has `F0` bytes to start frames with. And a frame the reader hands back has
+//! to be one the file holds, at the place the reader says it found it.
 
 #![no_main]
 
@@ -23,7 +24,17 @@ fuzz_target!(|data: &[u8]| {
         assert!(seen <= limit, "the frame walk is not consuming the file");
         assert!(frames.offset() >= last, "frames came back out of order");
         last = frames.offset();
-        let _ = frame;
+        if let Ok(frame) = frame {
+            let start = frames.offset();
+            let original = data
+                .get(start..start + frame.encoded_len())
+                .expect("the frame lies inside the file");
+            assert_eq!(
+                frame.to_vec(),
+                original,
+                "a frame re-encoded to bytes the file does not hold at {start}"
+            );
+        }
     }
 
     let mut seen = 0;

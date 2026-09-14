@@ -580,11 +580,12 @@ some, so there are five kinds of test:
   thousand cases per property from a seeded xorshift, so a run is the same
   run on every machine. The invariants: round-trip on every codec, chunking
   invariance in the decoder, termination in both file walks.
-- **Fuzzing** in `fuzz/`, four targets: the decoder, the `SysEx` frame parser,
-  the `.syx` reader and the program decoder. Each asserts more than the absence
-  of a panic: a frame that parses must re-encode to the bytes it came from,
-  since a parser that accepted a frame and reported a payload nobody sent
-  would survive a panic-freedom check and still hand a host the wrong program.
+- **Fuzzing** in `fuzz/`, five targets: the decoder, the `SysEx` frame parser,
+  the `.syx` reader, the program decoder, and the device state machine driven
+  against a simulated synthesizer. Each asserts more than the absence of a
+  panic: a frame that parses must re-encode to the bytes it came from, since
+  a parser that accepted a frame and reported a payload nobody sent would
+  survive a panic-freedom check and still hand a host the wrong program.
 - **Golden tests** against the factory preset packs.
 - **Conversation tests** in `tests/conversation.rs`, which drive `Device` and
   `Transport` against a `sim::Synth`. They are the only tests that cross the

@@ -101,7 +101,7 @@ Fuzzing needs nightly and `cargo-fuzz`:
 
 ```sh
 cargo install cargo-fuzz
-cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict   # or decoder, file, program
+cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict   # or decoder, file, program, device
 ```
 
 The factory preset packs are not in the repository. The tests that read them

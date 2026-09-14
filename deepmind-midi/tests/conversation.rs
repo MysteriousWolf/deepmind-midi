@@ -23,12 +23,16 @@ use std::collections::VecDeque;
 use std::convert::Infallible;
 
 use deepmind_midi::device::{Device, Event, Request};
-use deepmind_midi::ids::{Bank, DeviceId, ProgramNumber, ProtocolVersion, Slot};
+use deepmind_midi::ids::{Bank, DeviceId, ProgramNumber, Slot};
 use deepmind_midi::param::ParamId;
-use deepmind_midi::program::{Program, ProgramName};
+use deepmind_midi::program::Program;
 use deepmind_midi::sim::{Empty, Heard, Library, Synth};
-use deepmind_midi::syx::{self, File, Writer};
+use deepmind_midi::syx::File;
 use deepmind_midi::transport::{Clock, Error as TransportError, Port, Transport};
+
+mod common;
+
+use common::{named, write_bank};
 
 /// A clock that only moves when something waits on it.
 struct Fake(u64);
@@ -105,25 +109,12 @@ impl Port for Deaf {
     }
 }
 
-fn named(name: &str) -> Program {
-    let mut program = Program::new(ProtocolVersion::V7);
-    program.set_name(ProgramName::new(name).expect("a legal name"));
-    program
-}
-
 /// Writes a preset pack holding `count` programs in bank A.
 fn pack(count: u8) -> Vec<u8> {
-    let mut bytes = vec![0; syx::MAX_BANK_LEN];
-    let mut writer = Writer::new(&mut bytes, DeviceId::Unit(0));
-    for index in 0..count {
-        let number = ProgramNumber::new(index).expect("in range");
-        writer
-            .push_program(Bank::A, number, &named(&format!("Preset {index}")))
-            .expect("the buffer fits a bank");
-    }
-    let written = writer.finish();
-    bytes.truncate(written);
-    bytes
+    let programs: Vec<Program> = (0..count)
+        .map(|index| named(&format!("Preset {index}")))
+        .collect();
+    write_bank(DeviceId::Unit(0), Bank::A, &programs)
 }
 
 fn transport<L: Library>(synth: Synth<L>) -> Transport<Cable<L>, Fake> {
@@ -372,7 +363,13 @@ fn a_slot_the_unit_does_not_hold_times_out() {
     let synth: Synth<Empty> = Synth::new(DeviceId::Unit(0), named("Bass Sweep"));
     let mut host = transport(synth);
 
-    let result = host.program(Slot::new(Bank::A, ProgramNumber::FIRST));
+    let slot = Slot::new(Bank::A, ProgramNumber::FIRST);
+    let result = host.program(slot);
 
-    assert!(matches!(result, Err(TransportError::Timeout(_))));
+    // The timeout has to name the slot that went unanswered, since that is what
+    // a host retries or reports.
+    let Err(TransportError::Timeout(request)) = result else {
+        panic!("a slot the unit does not hold times out");
+    };
+    assert_eq!(request, Request::Program(slot));
 }

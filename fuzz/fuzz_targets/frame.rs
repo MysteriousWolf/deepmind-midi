@@ -16,7 +16,11 @@ fuzz_target!(|data: &[u8]| {
         return;
     };
 
-    assert_eq!(frame.encoded_len(), data.len(), "length disagrees: {frame:?}");
+    assert_eq!(
+        frame.encoded_len(),
+        data.len(),
+        "length disagrees: {frame:?}"
+    );
     assert_eq!(frame.to_vec(), data, "re-encoding changed the frame");
 
     // Whatever the frame says about itself has to be reachable without

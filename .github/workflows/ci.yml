@@ -142,7 +142,7 @@ jobs:
           set -euo pipefail
           host=$(rustc -vV | sed -n 's/^host: //p')
           echo "building for $host"
-          for target in decoder frame file program; do
+          for target in decoder frame file program device; do
             echo "::group::$target"
             cargo fuzz run "$target" --target "$host" -- \
               -max_total_time=60 \
