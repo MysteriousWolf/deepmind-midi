@@ -107,12 +107,21 @@ jobs:
       # check that the targets still build and that nothing obvious regressed,
       # which is what a pull request can afford. Real campaigns run for hours
       # against a corpus, locally or on a schedule.
+      #
+      # The explicit --target is not optional. `cargo fuzz` defaults to the
+      # triple its own binary was built for, and the one installed here is
+      # musl-linked, so without this it cross-compiles the targets against a
+      # static libc and the sanitizer refuses: "sanitizer is incompatible with
+      # statically linked libc". Reading the triple off rustc asks the
+      # toolchain that will do the compiling.
       - name: Fuzz
         run: |
           set -euo pipefail
+          host=$(rustc -vV | sed -n 's/^host: //p')
+          echo "building for $host"
           for target in decoder frame file program; do
             echo "::group::$target"
-            cargo fuzz run "$target" -- \
+            cargo fuzz run "$target" --target "$host" -- \
               -max_total_time=60 \
               -dict=fuzz/deepmind.dict \
               -print_final_stats=1
