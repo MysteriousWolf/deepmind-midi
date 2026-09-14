@@ -22,6 +22,9 @@ serde = ["dep:serde"]
 ## Enables the blocking adapter: a port trait, a clock trait and the loop between
 ## them. Needs neither `std` nor an allocator.
 transport = []
+## Enables a simulated synthesizer to drive a host against, for tests that have
+## no `DeepMind` plugged in. Needs neither `std` nor an allocator.
+sim = []
 
 [dependencies]
 serde = { version = "1", optional = true, default-features = false, features = ["derive"] }

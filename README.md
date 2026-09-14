@@ -21,6 +21,32 @@ There is no command-line tool and there will not be one. A host needs a MIDI
 backend, and refusing to have an opinion about which is the point of the
 library.
 
+## Testing a host without a synthesizer
+
+The `sim` feature is the other end of the conversation: something that answers
+requests, applies the edits it is sent and says what it heard, so a host can be
+driven through a whole exchange with nothing plugged in.
+
+```rust
+let mut synth: Synth = Synth::new(DeviceId::Unit(0), sound);
+let mut host: Device = Device::new(DeviceId::Unit(0));
+
+host.request_edit_buffer()?;
+host.drain_tx(|bytes| { synth.feed(bytes); Ok(()) })?;
+synth.drain_tx(|bytes| { host.feed(bytes); Ok(()) })?;
+
+assert!(matches!(host.poll_event(), Some(Event::EditBuffer(_))));
+```
+
+Stored programs come from a `Library`, which `syx::File` implements, so a preset
+pack is the contents of a simulated unit. It has no clock: not draining it is a
+synthesizer that has not replied yet, which is how a host's timeout path gets
+tested.
+
+It is built from the same specification as the rest of this crate, so it will
+never find out that the manual is wrong. What it finds is a host that drives the
+protocol wrongly, which is a different and more common bug.
+
 ## Documentation
 
 | | |

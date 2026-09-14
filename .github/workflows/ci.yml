@@ -79,6 +79,14 @@ jobs:
       - name: transport without std
         run: cargo build -p deepmind-midi --no-default-features --features transport
 
+      # Neither does the simulated synthesizer, which is the point: a host on
+      # bare metal tests against one too.
+      - name: sim without std
+        run: cargo build -p deepmind-midi --no-default-features --features sim
+
+      - name: sim and transport together
+        run: cargo build -p deepmind-midi --no-default-features --features sim,transport
+
   msrv:
     name: minimum supported Rust version
     runs-on: ubuntu-latest

@@ -164,6 +164,7 @@ program   Program: the dump's bytes, typed accessors, names, value types
 device    the sans-IO state machine: requests, timeouts, known state, events
 syx       .syx files and preset packs
 transport the blocking adapter: the port and clock traits, and the loop
+sim       the other end: a synthesizer to drive a host against
 ```
 
 Each layer depends only on those above it. `wire` does not know what a DeepMind
@@ -536,6 +537,51 @@ a knob while a host reads a bank does not lose the knob. That second queue is th
 adapter's one real cost - `EV` more events held inline - and an event that does
 not fit is counted and arrives as `Event::Lost`, the same as in the layer below.
 
+## The other end of the conversation
+
+`device` is the host's end. `sim`, behind a feature of that name, is the
+synthesizer's: `Synth` answers requests, applies the edits it is sent, and
+reports what it heard. It writes the same four-call loop `Device` does, and it
+has no clock, because the test already owns one - not draining a `Synth` is a
+synthesizer that has not replied yet, which is the only way a host's timeout path
+gets exercised without waiting on a real port.
+
+**It cannot find out that the manual is wrong.** Both ends are generated from the
+same `spec/`, so a round trip through it says this library agrees with itself.
+That limit is the same one [What is left is hardware](#what-is-left-is-hardware)
+describes, and nothing in software moves it.
+
+What it does reach is the seam between the layers, which no single-layer test
+sees: an answer that resolves the wrong outstanding request, a dump that lands in
+the wrong place, a bank run that stops one short, a timeout that fires when the
+answer did arrive. And it reaches the same seam in somebody else's host, which is
+the reason it is a feature of the published crate rather than a test helper: a
+host cannot be tested against a `DeepMind` that is not plugged in, and the
+alternative is hand-assembling reply frames in every test.
+
+A `Synth` holds its edit buffer and nothing else. Stored programs come from a
+`Library`, which `syx::File` implements, so a preset pack is the contents of a
+simulated unit:
+
+```rust
+let pack = syx::File::new(&bytes);
+let mut synth: Synth<syx::File<'_>> =
+    Synth::with_library(DeviceId::Unit(0), edit_buffer, pack);
+```
+
+Eight banks of programs are two hundred kilobytes, which is not something to hold
+inline on the target this crate is `no_std` for, and a slot the library does not
+hold goes unanswered rather than being invented. A real unit always has something
+in every slot, so that shape is not one a `DeepMind` takes - but a request that
+goes unanswered is the more useful thing to be able to test, and the alternative
+is making up a program.
+
+It answers every request `Device` can send. The globals, the patterns, the chord
+memories and the calibration data are heard and not answered, for the same reason
+they are opaque everywhere else here: the manual gives those payloads a length
+and never says what is in them. `Heard::Request` carries whether an answer was
+queued, so a test can tell the two apart.
+
 ## Two kinds of version
 
 Independent, and both matter.
@@ -563,7 +609,7 @@ fuzz/            the fuzz targets, a workspace of their own
 
 One library crate. A workspace split buys version churn and nothing else at this
 size. Features cover the axes that matter: `std` (default), `alloc`, `serde`,
-`transport`.
+`transport`, `sim`.
 
 `fuzz/` is outside the workspace because `cargo fuzz` builds it on nightly with
 sanitizer instrumentation, and the library's own build must not inherit that.
@@ -597,6 +643,10 @@ by enumerating some.
   from, since a parser that accepted a frame and reported a payload nobody sent
   would survive a panic-freedom check and still hand a host the wrong program.
 - **Golden tests** against the factory preset packs.
+- **Conversation tests** in `tests/conversation.rs`, which drive `Device` and
+  `Transport` against a `sim::Synth` rather than against bytes somebody wrote
+  down. They are the only tests that cross the seam between layers, and the only
+  ones where neither end is told what the other is about to do.
 
 **A generator that stops reaching the parser is a test that stopped testing.**
 Bytes shaped by guesswork are rejected at the manufacturer ID and never reach
@@ -663,9 +713,16 @@ built-in token; any failure there leaves the generated notes alone.
 | 7 | `device`: the state machine, events, timeouts, provenance, `edit` |
 | 8 | `transport`: the blocking adapter, its port and clock traits |
 | 9 | Randomised invariant tests and the fuzz targets |
+| 10 | `sim`: the synthesizer's end of the conversation, and the tests that cross it |
 
-All nine have landed. Every layer the manual documents is written, and the claim
+All ten have landed. Every layer the manual documents is written, and the claim
 that none of them panics on a hostile port is checked rather than asserted.
+
+Step 10 is what was left once the protocol was written down and checked: the
+other end of it. It does not close the gap below, and the
+[section on it](#the-other-end-of-the-conversation) is explicit that it cannot.
+What it closes is a smaller one - a host had no synthesizer to develop against,
+and the tests here had no way to exercise two layers at once.
 
 Step 9 was `deepmind-cli` until step 8 was written. What that step turned up is
 that the blocking adapter had already answered the question the CLI was there to
@@ -684,7 +741,16 @@ this library agrees with itself.
 
 That is not a layer somebody can write. It wants a DeepMind, a MIDI cable and an
 afternoon, and until then "verified" in this repository means verified against
-the document, not against the instrument.
+the document, not against the instrument. `sim` is the closest software gets and
+it is not close: it is this specification talking to itself.
+
+One thing the manual does not document is worth naming here, because its absence
+is easy to read as an oversight. Every dump in `spec/messages.toml` is
+`from_device`. Nothing describes a message that writes a program *into* a
+synthesizer, so there is no way to send a preset pack back to the instrument it
+came off, and this library does not invent one. Most synthesizers accept their
+own dump format back; whether this one does, and what it does with the bank and
+program bytes when it is not answering a request, is a question for a cable.
 
 ### Not yet possible: the globals and the sequencer
 
