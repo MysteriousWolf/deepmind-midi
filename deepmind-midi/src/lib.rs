@@ -20,6 +20,7 @@
 //! | [`program`] | A program: the 242 bytes, typed accessors, names, value types |
 //! | [`syx`]   | `.syx` files: the programs a preset pack carries, and building one |
 //! | [`device`] | The state machine: what the synthesizer holds, and what to send |
+//! | [`transport`] | The blocking adapter over a port and a clock (`transport`) |
 //!
 //! Each layer depends only on those above it: [`wire`] does not know what a
 //! `DeepMind` is, and [`sysex`] does not know where its bytes came from.
@@ -48,6 +49,8 @@
 //! - `std` (default): `std::error::Error` impls and owned collection helpers.
 //! - `alloc`: APIs that allocate, such as bank decoding and `.syx` handling.
 //! - `serde`: `Serialize`/`Deserialize` derives on the public data types.
+//! - `transport`: the blocking adapter, which is the one part of this crate that
+//!   knows what IO is. Needs neither `std` nor an allocator.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
@@ -60,8 +63,12 @@ pub mod error;
 pub mod ids;
 pub mod param;
 pub mod program;
+mod queue;
 pub mod sysex;
 pub mod syx;
+#[cfg(feature = "transport")]
+#[cfg_attr(docsrs, doc(cfg(feature = "transport")))]
+pub mod transport;
 pub mod wire;
 
 pub use device::{Device, Known};
@@ -70,4 +77,6 @@ pub use ids::{Bank, DeviceId, Model, PatternNumber, ProgramNumber, ProtocolVersi
 pub use param::{Group, NrpnEdit, ParamId};
 pub use program::{Program, ProgramName};
 pub use sysex::{Command, Frame, Message};
+#[cfg(feature = "transport")]
+pub use transport::Transport;
 pub use wire::{Channel, ChannelMessage, Decoder};

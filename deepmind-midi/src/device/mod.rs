@@ -129,7 +129,6 @@
 
 mod event;
 mod known;
-mod queue;
 mod request;
 
 pub use event::Event;
@@ -145,11 +144,10 @@ use crate::param::{
     ParamId,
 };
 use crate::program::Program;
+use crate::queue::Queue;
 use crate::sysex::inquiry::{self, Version};
 use crate::sysex::{Frame, Identity, Message};
 use crate::wire::{Channel, ChannelMessage, Decoder, Event as WireEvent, MAX_SYSEX_LEN};
-
-use queue::Queue;
 
 /// Outbound items a [`Device`] holds by default.
 ///
@@ -316,6 +314,16 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
         self.identity
             .value()
             .map_or(DEFAULT_FIRMWARE, |identity| identity.firmware)
+    }
+
+    /// Returns how long a request waits for its answer.
+    ///
+    /// [`DEFAULT_TIMEOUT_MS`] unless [`with_timeout`](Device::with_timeout) said
+    /// otherwise. A driver loop around this reads it to know how long waiting
+    /// can reasonably last.
+    #[must_use]
+    pub const fn timeout(&self) -> u64 {
+        self.timeout
     }
 
     /// Returns the requests that have been sent and not yet answered.
