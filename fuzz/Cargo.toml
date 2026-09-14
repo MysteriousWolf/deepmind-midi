@@ -1,0 +1,54 @@
+[package]
+name = "deepmind-midi-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+license = "Apache-2.0"
+
+# Its own workspace. The targets are built by `cargo fuzz` on nightly with
+# sanitizer flags the library's own build must not inherit, and the root
+# workspace excludes this directory for the same reason.
+[workspace]
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+arbitrary = { version = "1", features = ["derive"] }
+libfuzzer-sys = "0.4"
+
+[dependencies.deepmind-midi]
+path = "../deepmind-midi"
+features = ["std", "alloc", "serde", "transport"]
+
+# A fuzz target is a build tool, not the library. The no-panic lint set exists
+# to keep the library safe against untrusted input; here a panic is the finding.
+[lints]
+
+[[bin]]
+name = "decoder"
+path = "fuzz_targets/decoder.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "frame"
+path = "fuzz_targets/frame.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "file"
+path = "fuzz_targets/file.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "program"
+path = "fuzz_targets/program.rs"
+test = false
+doc = false
+bench = false

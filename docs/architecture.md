@@ -558,22 +558,65 @@ blind-relaying that bricks synthesizers.
 spec/            the machine-readable specification
 deepmind-midi/   the library
 xtask/           generates the documentation from spec/
-deepmind-cli/    a midir host: dump banks, import packs, monitor traffic
+fuzz/            the fuzz targets, a workspace of their own
 ```
 
 One library crate. A workspace split buys version churn and nothing else at this
 size. Features cover the axes that matter: `std` (default), `alloc`, `serde`,
 `transport`.
 
-`deepmind-cli` exists to prove the library is pleasant to use against real
-hardware. It is not part of the published surface.
+`fuzz/` is outside the workspace because `cargo fuzz` builds it on nightly with
+sanitizer instrumentation, and the library's own build must not inherit that.
+
+**There is no host program here, and there will not be one.** A command-line
+tool would need a MIDI backend, and a MIDI backend is the one thing this library
+has spent every design decision refusing to have an opinion about: which crate,
+which platform, how ports are enumerated, what happens on a disconnect. Adding
+one would put that opinion into the repository's lockfile, its CI runners and
+its minimum toolchain, in service of a binary that nothing here can run - it
+needs a synthesizer on the other end, which no test machine has. A host belongs
+in the host's repository. What this one owes it is the wiring, and
+[Sans-IO](#sans-io) and [The transport is a
+policy](#the-transport-is-a-policy-not-a-protocol) are where that is written
+down.
 
 ## Testing
 
-- **Property tests** on every codec. Round-trip is the invariant.
-- **Fuzzing** on `feed()` and the SysEx parser. A MIDI port is untrusted input
-  and the library must never panic on it.
+Three kinds, because a MIDI port is untrusted input and the library's central
+claim is that it never panics on one. A claim about all inputs cannot be checked
+by enumerating some.
+
+- **Unit tests** beside the code, for the cases somebody reasoned about.
+- **Randomised invariant tests** in `tests/props.rs`, run on every commit. Two
+  thousand cases per property, from a seeded xorshift, so a run is the same run
+  on every machine. The invariants are round-trip on every codec, chunking
+  invariance in the decoder, and termination in both file walks.
+- **Fuzzing** in `fuzz/`, four targets: the decoder, the `SysEx` frame parser,
+  the `.syx` reader and the program decoder. Each one asserts more than the
+  absence of a panic - a frame that parses has to re-encode to the bytes it came
+  from, since a parser that accepted a frame and reported a payload nobody sent
+  would survive a panic-freedom check and still hand a host the wrong program.
 - **Golden tests** against the factory preset packs.
+
+**A generator that stops reaching the parser is a test that stopped testing.**
+Bytes shaped by guesswork are rejected at the manufacturer ID and never reach
+the code that decides what a payload means, so the randomised tests mutate
+frames this library wrote rather than inventing them, and each one asserts that
+enough of its mutants still parse. The same problem in the fuzzer is what
+`fuzz/deepmind.dict` is for: the header as a token. Without it the `frame`
+target reaches 42 coverage points in twenty seconds and with it 434.
+
+Fuzzing needs nightly and `cargo-fuzz`:
+
+```sh
+cargo install cargo-fuzz
+cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict
+```
+
+CI runs each target for a minute, which is a regression check rather than a
+campaign. A campaign is hours against a kept corpus, and the corpus is not
+committed: it is derived, it grows without bound, and regenerating it is one
+command.
 
 The packs are not committed. Redistribution rights on Behringer sound banks are
 unclear and a library repository is the wrong place to find out. The tests read a
@@ -619,20 +662,29 @@ built-in token; any failure there leaves the generated notes alone.
 | 6 | `syx`: `.syx` files and preset packs |
 | 7 | `device`: the state machine, events, timeouts, provenance, `edit` |
 | 8 | `transport`: the blocking adapter, its port and clock traits |
-| 9 | `deepmind-cli` |
+| 9 | Randomised invariant tests and the fuzz targets |
 
-Steps 1 to 8 have landed.
+All nine have landed. Every layer the manual documents is written, and the claim
+that none of them panics on a hostile port is checked rather than asserted.
 
-### Next: the command-line host
+Step 9 was `deepmind-cli` until step 8 was written. What that step turned up is
+that the blocking adapter had already answered the question the CLI was there to
+ask: whether a host can drive this library without reaching for an offset. It
+can, in a dozen lines, and those lines are in the `transport` docs. What a CLI
+would have added on top is a MIDI backend and an argument parser, which are a
+host's problems and not this one's. [Crate layout](#crate-layout) is where that
+is written down.
 
-`deepmind-cli`: a midir host that dumps banks, imports packs and monitors
-traffic. It is the first thing here that opens a port, and it exists to prove the
-library is pleasant to use against real hardware - which is a thing only real
-hardware can say. The `transport` feature is what it will be written against, and
-writing it is how that feature finds out whether it was designed right.
+### What is left is hardware
 
-Nothing in this library has been run against a synthesizer yet. That, rather than
-any missing layer, is the gap between where this is and where it is useful.
+Nothing here has been run against a synthesizer. The specification is
+reverse-engineered from a manual that is wrong in at least one printed figure -
+see the packed length of a program dump - and a round-trip test proves only that
+this library agrees with itself.
+
+That is not a layer somebody can write. It wants a DeepMind, a MIDI cable and an
+afternoon, and until then "verified" in this repository means verified against
+the document, not against the instrument.
 
 ### Not yet possible: the globals and the sequencer
 
