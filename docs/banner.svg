@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" width="960" height="240" role="img" aria-label="deepmind-midi: Rust library for the Behringer DeepMind MIDI protocol">
+  <title>deepmind-midi</title>
+  <!--
+    The front of the unit, wide: wooden end cheeks, a dark panel, the MIDI
+    socket from the logo on the left, and the project name in the same metal
+    with the DeepMind wordmark's slices through it.
+  -->
+  <defs>
+    <clipPath id="case"><rect width="960" height="240" rx="32"/></clipPath>
+    <clipPath id="cheeks">
+      <rect x="0" width="24" height="240"/>
+      <rect x="936" width="24" height="240"/>
+    </clipPath>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a9552c"/>
+      <stop offset="1" stop-color="#8a3f1f"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#282c36"/>
+      <stop offset="1" stop-color="#15181e"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4f5f8"/>
+      <stop offset="0.5" stop-color="#c9cdd6"/>
+      <stop offset="1" stop-color="#8e939f"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f5f8"/>
+      <stop offset="0.55" stop-color="#c9cdd6"/>
+      <stop offset="1" stop-color="#8e939f"/>
+    </linearGradient>
+    <radialGradient id="recess" cx="0.5" cy="0.45" r="0.6">
+      <stop offset="0" stop-color="#3b404b"/>
+      <stop offset="1" stop-color="#1c2027"/>
+    </radialGradient>
+    <mask id="cuts">
+      <rect width="128" height="128" fill="#fff"/>
+      <rect x="0" y="52" width="128" height="1" fill="#000"/>
+      <rect x="0" y="58.5" width="128" height="1.3" fill="#000"/>
+      <rect x="0" y="65" width="128" height="1.6" fill="#000"/>
+      <rect x="0" y="71.5" width="128" height="2" fill="#000"/>
+      <rect x="0" y="78" width="128" height="2.4" fill="#000"/>
+      <rect x="0" y="84.5" width="128" height="2.8" fill="#000"/>
+      <rect x="0" y="91" width="128" height="3.2" fill="#000"/>
+      <rect x="0" y="97.5" width="128" height="3.6" fill="#000"/>
+    </mask>
+    <mask id="textcuts">
+      <rect width="960" height="240" fill="#fff"/>
+      <rect x="0" y="106" width="960" height="1.4" fill="#000"/>
+      <rect x="0" y="113" width="960" height="1.9" fill="#000"/>
+      <rect x="0" y="120.5" width="960" height="2.4" fill="#000"/>
+      <rect x="0" y="128.5" width="960" height="3" fill="#000"/>
+      <rect x="0" y="137" width="960" height="3.6" fill="#000"/>
+    </mask>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.6" flood-color="#000" flood-opacity="0.55"/>
+    </filter>
+    <filter id="textdrop" x="-5%" y="-10%" width="110%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <g clip-path="url(#case)">
+    <rect width="960" height="240" fill="url(#wood)"/>
+    <g clip-path="url(#cheeks)" fill="none" stroke-linecap="round">
+      <g stroke="#6f3116" stroke-width="2" opacity="0.7">
+        <path d="M 6 -6 C 4 56 10 112 7 168 S 6 225 8 246"/>
+        <path d="M 16 -6 C 18 47 13 103 16 159 S 18 216 15 246"/>
+        <path d="M 942 -6 C 940 56 946 112 943 168 S 942 225 944 246"/>
+        <path d="M 952 -6 C 954 47 949 103 952 159 S 954 216 951 246"/>
+      </g>
+      <g stroke="#c26436" stroke-width="1.5" opacity="0.55">
+        <path d="M 11 -6 C 9 65 13 121 11 178 S 10 225 11 246"/>
+        <path d="M 21 -6 C 22 75 19 131 21 187 S 22 234 20 246"/>
+        <path d="M 947 -6 C 945 65 949 121 947 178 S 946 225 947 246"/>
+        <path d="M 957 -6 C 958 75 955 131 957 187 S 958 234 956 246"/>
+      </g>
+    </g>
+    <rect x="24" width="912" height="240" fill="url(#panel)"/>
+    <rect x="24" width="2.4" height="240" fill="#000" opacity="0.5"/>
+    <rect x="933.6" width="2.4" height="240" fill="#000" opacity="0.5"/>
+    <rect x="26.4" width="1.4" height="240" fill="#454b58"/>
+    <rect x="932.2" width="1.4" height="240" fill="#454b58"/>
+  </g>
+
+  <!-- The socket, as drawn in logo.svg. -->
+  <g transform="translate(48 24) scale(1.5)">
+    <circle cx="64" cy="64" r="36" fill="url(#recess)"/>
+    <circle cx="64" cy="64" r="35" fill="none" stroke="#000" stroke-width="2.5" opacity="0.55"/>
+    <g filter="url(#drop)">
+      <circle cx="64" cy="64" r="38" fill="none" stroke="url(#metal)" stroke-width="6" mask="url(#cuts)"/>
+    </g>
+    <circle cx="64" cy="64" r="41" fill="none" stroke="#000" stroke-width="0.8" opacity="0.5" mask="url(#cuts)"/>
+    <g fill="#15181e" stroke="#0b0d11" stroke-width="0.8">
+      <circle cx="64" cy="40" r="5.4"/>
+      <circle cx="47" cy="47" r="5.4"/>
+      <circle cx="81" cy="47" r="5.4"/>
+      <circle cx="40" cy="64" r="5.4"/>
+      <circle cx="88" cy="64" r="5.4"/>
+    </g>
+    <g fill="#040507">
+      <circle cx="64" cy="40" r="3.6"/>
+      <circle cx="47" cy="47" r="3.6"/>
+      <circle cx="81" cy="47" r="3.6"/>
+      <circle cx="40" cy="64" r="3.6"/>
+      <circle cx="88" cy="64" r="3.6"/>
+    </g>
+    <g fill="none" stroke="#7d838f" stroke-width="0.8" stroke-linecap="round" opacity="0.8">
+      <path d="M 60.2 42.9 A 5.4 5.4 0 0 0 67.8 42.9"/>
+      <path d="M 43.2 49.9 A 5.4 5.4 0 0 0 50.8 49.9"/>
+      <path d="M 77.2 49.9 A 5.4 5.4 0 0 0 84.8 49.9"/>
+      <path d="M 36.2 66.9 A 5.4 5.4 0 0 0 43.8 66.9"/>
+      <path d="M 84.2 66.9 A 5.4 5.4 0 0 0 91.8 66.9"/>
+    </g>
+  </g>
+
+  <!-- The name, in the same metal, sliced like the wordmark. -->
+  <g font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <g filter="url(#textdrop)">
+      <text x="272" y="140" font-size="80" font-weight="700" textLength="632" lengthAdjust="spacingAndGlyphs" fill="url(#chrome)" mask="url(#textcuts)">deepmind-midi</text>
+    </g>
+    <text x="274" y="186" font-size="22" textLength="540" lengthAdjust="spacingAndGlyphs" fill="#9aa0ad">Rust library for the Behringer DeepMind MIDI protocol</text>
+  </g>
+</svg>

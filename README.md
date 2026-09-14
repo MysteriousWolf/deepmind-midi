@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="docs/logo.svg" alt="" width="96">
+  <img src="docs/banner.svg" alt="deepmind-midi" width="800">
 </p>
-
-<h1 align="center">deepmind-midi</h1>
 
 <p align="center">
   <a href="https://github.com/MysteriousWolf/deepmind-midi/actions/workflows/ci.yml"><img src="https://github.com/MysteriousWolf/deepmind-midi/actions/workflows/ci.yml/badge.svg" alt="CI"></a>

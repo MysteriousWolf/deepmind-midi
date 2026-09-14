@@ -3,8 +3,8 @@
   <!--
     A dark panel between wooden end cheeks, as on the unit, and a MIDI DIN
     socket whose bezel is sliced by the horizontal lines of the DeepMind
-    wordmark over its lower two thirds. The slices stop short of the bottom,
-    so the bezel stays closed.
+    wordmark over its lower two thirds. The slices stop just short of the
+    bottom, so the bezel stays closed.
   -->
   <defs>
     <clipPath id="case"><rect width="128" height="128" rx="24"/></clipPath>
@@ -38,6 +38,7 @@
       <rect x="0" y="78" width="128" height="2.4" fill="#000"/>
       <rect x="0" y="84.5" width="128" height="2.8" fill="#000"/>
       <rect x="0" y="91" width="128" height="3.2" fill="#000"/>
+      <rect x="0" y="97.5" width="128" height="3.6" fill="#000"/>
     </mask>
     <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
       <feDropShadow dx="0" dy="1.5" stdDeviation="1.6" flood-color="#000" flood-opacity="0.55"/>
@@ -76,19 +77,28 @@
     <circle cx="64" cy="64" r="38" fill="none" stroke="url(#metal)" stroke-width="6" mask="url(#cuts)"/>
   </g>
   <circle cx="64" cy="64" r="41" fill="none" stroke="#000" stroke-width="0.8" opacity="0.5" mask="url(#cuts)"/>
-  <!-- Pins: metal contact sleeves, each with a dark bore. -->
-  <g stroke="#000" stroke-width="0.6" stroke-opacity="0.5">
-    <circle cx="64" cy="40" r="4.8" fill="url(#metal)"/>
-    <circle cx="47" cy="47" r="4.8" fill="url(#metal)"/>
-    <circle cx="81" cy="47" r="4.8" fill="url(#metal)"/>
-    <circle cx="40" cy="64" r="4.8" fill="url(#metal)"/>
-    <circle cx="88" cy="64" r="4.8" fill="url(#metal)"/>
-  </g>
-  <g fill="#06070a">
-    <circle cx="64" cy="40" r="2.4"/>
-    <circle cx="47" cy="47" r="2.4"/>
-    <circle cx="81" cy="47" r="2.4"/>
-    <circle cx="40" cy="64" r="2.4"/>
-    <circle cx="88" cy="64" r="2.4"/>
+  <!-- Pin holes: a shaded rim around a dark bore, lit along the lower edge. -->
+  <g>
+    <g fill="#15181e" stroke="#0b0d11" stroke-width="0.8">
+      <circle cx="64" cy="40" r="5.4"/>
+      <circle cx="47" cy="47" r="5.4"/>
+      <circle cx="81" cy="47" r="5.4"/>
+      <circle cx="40" cy="64" r="5.4"/>
+      <circle cx="88" cy="64" r="5.4"/>
+    </g>
+    <g fill="#040507">
+      <circle cx="64" cy="40" r="3.6"/>
+      <circle cx="47" cy="47" r="3.6"/>
+      <circle cx="81" cy="47" r="3.6"/>
+      <circle cx="40" cy="64" r="3.6"/>
+      <circle cx="88" cy="64" r="3.6"/>
+    </g>
+    <g fill="none" stroke="#7d838f" stroke-width="0.8" stroke-linecap="round" opacity="0.8">
+      <path d="M 60.2 42.9 A 5.4 5.4 0 0 0 67.8 42.9"/>
+      <path d="M 43.2 49.9 A 5.4 5.4 0 0 0 50.8 49.9"/>
+      <path d="M 77.2 49.9 A 5.4 5.4 0 0 0 84.8 49.9"/>
+      <path d="M 36.2 66.9 A 5.4 5.4 0 0 0 43.8 66.9"/>
+      <path d="M 84.2 66.9 A 5.4 5.4 0 0 0 91.8 66.9"/>
+    </g>
   </g>
 </svg>
