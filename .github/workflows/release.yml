@@ -7,22 +7,21 @@ name: Release
 # request. CI fails any pull request whose version is not ahead of the newest
 # release tag, so the first one merged after a release has to move it.
 #
-# Publishing to crates.io authenticates one of two ways, tried in this order:
+# Publishing to crates.io uses trusted publishing: GitHub mints a short-lived
+# OIDC token for this workflow and crates.io exchanges it for a publish token,
+# so the repository holds no long-lived credential. It is configured on the
+# crate's settings page at crates.io, under Trusted Publishing:
 #
-#   1. Trusted publishing. Configure it on the crate's settings page at
-#      crates.io (owner MysteriousWolf, repository deepmind-midi, workflow
-#      release.yml) and no secret is needed. crates.io only offers this for a
-#      crate that already exists, which it now does, so this is the way to
-#      set it up; the CARGO_REGISTRY_TOKEN secret can be deleted afterwards.
-#   2. The CARGO_REGISTRY_TOKEN repository secret: a crates.io API token with
-#      the publish-new and publish-update scopes. The first release used it.
+#   repository owner    MysteriousWolf
+#   repository name     deepmind-midi
+#   workflow filename   release.yml
+#   environment         (none)
 #
-# Until trusted publishing is configured, the step that asks for it logs an
-# error annotation and the run carries on with the secret. That annotation on
-# an otherwise green run is the expected shape of the fallback, not a failure.
+# The owner and name must match this repository and the filename must match
+# this file, or crates.io answers the exchange with 400 and no config found.
 #
-# With `publish` on and neither available, the run fails before tagging, so a
-# version is never tagged and released without reaching crates.io.
+# Authentication happens before the tag is pushed, so a failed exchange leaves
+# nothing tagged or released: fix the configuration and run again.
 
 on:
   workflow_dispatch:
@@ -81,33 +80,14 @@ jobs:
           echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "releasing v${version}"
 
-      # Trusted publishing first. The action fails when the crate has no
-      # trusted publisher configured, which is expected before the first
-      # release, so its failure is tolerated and the secret is tried next.
-      - name: Authenticate with crates.io via trusted publishing
+      # Exchanges this run's OIDC token for a short-lived publish token.
+      # Requires the `id-token: write` permission above and the trusted
+      # publisher described at the top of this file; without the latter
+      # crates.io answers 400 and the run stops here, before tagging.
+      - name: Authenticate with crates.io
         if: ${{ inputs.publish && !inputs.dry_run }}
         id: trusted
-        continue-on-error: true
         uses: rust-lang/crates-io-auth-action@v1
-
-      - name: Choose a crates.io credential
-        if: ${{ inputs.publish && !inputs.dry_run }}
-        id: credential
-        env:
-          TRUSTED_TOKEN: ${{ steps.trusted.outputs.token }}
-          SECRET_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: |
-          set -euo pipefail
-          if [ -n "${TRUSTED_TOKEN:-}" ]; then
-            echo 'using trusted publishing'
-            echo "token=${TRUSTED_TOKEN}" >> "$GITHUB_OUTPUT"
-          elif [ -n "${SECRET_TOKEN:-}" ]; then
-            echo 'using the CARGO_REGISTRY_TOKEN secret'
-            echo "token=${SECRET_TOKEN}" >> "$GITHUB_OUTPUT"
-          else
-            echo '::error::No crates.io credential. Configure trusted publishing on crates.io, add the CARGO_REGISTRY_TOKEN secret, or run again with publish off.'
-            exit 1
-          fi
 
       - name: Collect release notes
         env:
@@ -151,7 +131,7 @@ jobs:
       - name: Publish to crates.io
         if: ${{ inputs.publish && !inputs.dry_run }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.credential.outputs.token }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.trusted.outputs.token }}
         run: cargo publish --package deepmind-midi --no-verify
 
       # `cargo publish` leaves the crate unpacked under target/package, and the
