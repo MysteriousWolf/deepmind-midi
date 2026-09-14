@@ -18,25 +18,28 @@ Nothing in a host program looks up an offset or a controller number. One object
 holds the synthesizer; changing it is changing the synthesizer.
 
 ```rust
-let mut synth = Synth::new(DeviceId::Unit(0));
+let mut device: Device = Device::new(DeviceId::Unit(0));
 
-// Read. Named the way the synthesizer's own display names it.
-let program = synth.program();
-println!("{}", program.name());            // Bass Sweep
-let shape = program.lfo1_shape();          // Some(LfoShape::Triangle)
+// Read. Named the way the synthesizer's own display names it, and carrying
+// where the answer came from.
+if let Some(program) = device.program().value() {
+    println!("{}", program.name());         // Bass Sweep
+    let shape = program.lfo1_shape();       // Some(LfoShape::Triangle)
+}
 
 // Write. Mutate; the library works out which messages that implies.
-synth.edit(|p| {
+device.edit(|p| {
     p.set_vcf_frequency(200);
     p.set_lfo1_shape(LfoShape::Triangle);
     p.set_mod1_source(ModSource::Lfo2);
-});
+})?;
 ```
 
 `edit` diffs the program against what the synthesizer is believed to hold and
 queues NRPN messages for exactly the offsets that changed - `Program::changes`
-is that diff, and the device layer is what sends it. Two edits to the same
-parameter in one closure send one message.
+is that diff, and `drain_tx` is what hands it to the port. Two edits to the same
+parameter in one closure send one message, and an edit that puts a parameter
+back where it was sends none.
 
 A parameter with a value table reads as its table, and a switch as a `bool`:
 
@@ -436,6 +439,55 @@ The host decides whether to trust an assumed value or re-request the edit buffer
 first. After sending edits, an edit buffer dump is the only way to resync, and
 the library never polls on its own.
 
+Inbound traffic makes the same distinction, because a synthesizer whose knob has
+been turned says so. An NRPN carries the parameter's whole value, so applying one
+leaves the tracked program confirmed. A control change carries seven bits of a
+value that usually has eight, so applying one leaves it assumed. The difference
+is not pedantry: a host that redraws a fader from an assumed value and one that
+writes it back to the synthesizer are doing different things with the same
+number.
+
+## The device tracks the sound, and reports the rest
+
+`Device` holds two things: the edit buffer and what a device inquiry answered.
+Everything else a frame can carry is reported by command and not decoded, which
+is a boundary drawn by what is knowable and what fits.
+
+Nothing is knowable about the globals, the patterns or the chord memories - the
+manual gives those dumps a length and no offsets, as [Not yet
+possible](#not-yet-possible-the-globals-and-the-sequencer) says. A bank of
+program names is knowable and is two kilobytes, which is more than an event
+queue with no allocator should carry for the hosts that never ask for one.
+
+A stored program is neither: it decodes, and it is not the sound the synthesizer
+is making, so it arrives as an event and leaves the tracked program alone. That
+is also why a program-bearing event carries the program by value rather than
+pointing at the tracked copy. A bank transfer overwrites that copy 128 times, and
+an event meaning "look at the current one" would be worth nothing by the time
+anyone looked.
+
+Real-time bytes are dropped rather than queued. A running MIDI clock is
+twenty-four messages a beat, none of which says anything about what the
+synthesizer holds, and queuing them would starve the queue of the events that do.
+A host that wants everything on the port drives `Decoder` itself, which is the
+layer for it.
+
+### Queuing is not sending
+
+`request_edit_buffer` and its neighbours put an item in the outbound queue and
+return. The bytes exist when `drain_tx` hands them to the host, and that is when
+the request becomes outstanding and its timeout starts. A host that never drains
+never times out, which is the truthful answer for a request that never went
+anywhere.
+
+The queue holds items rather than bytes, so a request costs a handful of bytes
+and a whole-program edit costs 242 of them rather than the 2,904 bytes they
+encode to. Both queues and the decoder's frame buffer are const parameters with
+defaults, for the reason the decoder's already is: the right numbers differ by
+two orders of magnitude between a desktop host and a microcontroller. An event
+that does not fit is dropped and counted, and the count arrives as `Event::Lost`
+once the queue has room again. Nothing is dropped quietly.
+
 ## Two kinds of version
 
 Independent, and both matter.
@@ -521,16 +573,20 @@ built-in token; any failure there leaves the generated notes alone.
 | 8 | `transport`: the blocking adapter |
 | 9 | `deepmind-cli` |
 
-Steps 1 to 6 have landed.
+Steps 1 to 7 have landed.
 
-### Next: the device
+### Next: the transport
 
-`device`: the state machine a host drives. It is where the layers below meet -
-a dump arriving becomes a confirmed `Program`, an `edit` becomes the NRPN
-messages `Program::changes` already works out, a request that goes unanswered
-becomes a timeout - and it is the first layer that has a clock, in the sense that
-the caller supplies one. `Known<T>` is the shape of what it holds, for the reason
-[State is a set of claims](#state-is-a-set-of-claims-not-a-cache) gives.
+`transport`: the blocking adapter, which is a trait and a driver loop over the
+state machine that is now there. It is the one part of this library that knows
+what IO is, and it stays behind a feature flag for that reason - an async host
+writes its own loop against the core in about thirty lines and keeps control of
+cancellation and backpressure, which is the arrangement [Sans-IO](#sans-io)
+argues for.
+
+After it, `deepmind-cli`: a midir host that dumps banks, imports packs and
+monitors traffic. It exists to prove the library is pleasant to use against real
+hardware, which is a thing only real hardware can say.
 
 ### Not yet possible: the globals and the sequencer
 
