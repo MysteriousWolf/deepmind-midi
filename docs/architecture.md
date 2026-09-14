@@ -636,15 +636,20 @@ release job only reads.
 Releasing is one click. The workflow verifies the build and a `cargo publish
 --dry-run`, reads the version, refuses if that tag exists, then tags, releases
 and publishes. Notes come from GitHub's generator, categorised by label through
-`.github/release.yml`, with an optional opening paragraph from a small model on
-GitHub Models; any failure there leaves the generated notes alone.
+`.github/release.yml`. An earlier version opened them with a paragraph written
+by a small model on GitHub Models; that service is being retired and answers
+the request with a 410, so the step is gone.
 
 crates.io is reached through trusted publishing when the crate has a trusted
 publisher configured, and through the `CARGO_REGISTRY_TOKEN` repository secret
 otherwise. crates.io only offers trusted publishing for a crate that already
-exists, so the first release needs the secret. When publishing is requested
-and neither credential is there, the run fails before it tags, so a version is
-never released on GitHub without reaching crates.io.
+exists, so the first release, `26.1.0`, went out on the secret. The crate
+exists now, so trusted publishing can be configured and the secret deleted.
+Until it is, the step that asks for a trusted-publishing token logs an error
+annotation and the run carries on with the secret: an expected fallback rather
+than a failed release. When publishing is requested and neither credential is
+there, the run fails before it tags, so a version is never released on GitHub
+without reaching crates.io.
 
 Once published, `docs.rs` builds the API reference with every feature on, as
 `[package.metadata.docs.rs]` asks. The README on crates.io uses absolute links
