@@ -13,7 +13,7 @@ use super::{Channel, ChannelMessage, Realtime, SYSEX_END, SYSEX_START, SystemCom
 pub const MAX_SYSEX_LEN: usize = 2354;
 
 /// One whole message pulled out of a byte stream.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum Event<'a> {
     /// A channel voice message and the channel it arrived on.
@@ -65,6 +65,7 @@ pub enum Event<'a> {
 /// });
 /// assert_eq!(frames, 1);
 /// ```
+#[derive(Clone)]
 pub struct Decoder<const N: usize = MAX_SYSEX_LEN> {
     /// `SysEx` frame under construction, starting at its `F0`.
     frame: [u8; N],
@@ -142,8 +143,28 @@ impl<const N: usize> Decoder<N> {
     where
         F: FnMut(Result<Event<'_>>),
     {
-        for &byte in bytes {
-            self.step(byte, &mut on_event);
+        let mut rest = bytes;
+        while let Some((&byte, tail)) = rest.split_first() {
+            if self.in_sysex {
+                // The inside of a frame is a run of data bytes, which is where
+                // the bulk of a dump is spent, so it goes in as one run. The
+                // status byte that ends the run goes through `step` like any
+                // other.
+                let run = rest
+                    .iter()
+                    .position(|byte| *byte >= 0x80)
+                    .unwrap_or(rest.len());
+                let (data, after) = rest.split_at(run);
+                self.push_sysex_run(data, &mut on_event);
+                rest = after;
+                if let Some((&status, after)) = rest.split_first() {
+                    self.step(status, &mut on_event);
+                    rest = after;
+                }
+            } else {
+                self.step(byte, &mut on_event);
+                rest = tail;
+            }
         }
     }
 
@@ -179,11 +200,11 @@ impl<const N: usize> Decoder<N> {
             self.in_sysex = false;
             self.len = 0;
             on_event(Err(Error::SysExInterrupted));
-        } else if byte == SYSEX_END {
-            // An F7 with no F0 in front of it. Nothing to report.
-            return;
         }
 
+        // An F7 with no F0 in front of it reports nothing, and still falls
+        // through: it is a system common byte, and clears the running status
+        // like the others.
         self.have = 0;
         match byte {
             SYSEX_START => {
@@ -269,6 +290,26 @@ impl<const N: usize> Decoder<N> {
         }
         // Out of room. Drop the frame and every byte up to its F7, which then
         // reads as a stray end and is ignored.
+        self.in_sysex = false;
+        self.len = 0;
+        on_event(Err(Error::SysExTooLong(N)));
+    }
+
+    /// Appends a run of data bytes to the frame under construction.
+    fn push_sysex_run<F>(&mut self, data: &[u8], on_event: &mut F)
+    where
+        F: FnMut(Result<Event<'_>>),
+    {
+        if data.is_empty() {
+            return;
+        }
+        let end = self.len.saturating_add(data.len());
+        if let Some(slots) = self.frame.get_mut(self.len..end) {
+            slots.copy_from_slice(data);
+            self.len = end;
+            return;
+        }
+        // Out of room, the same as one byte too many in `push_sysex`.
         self.in_sysex = false;
         self.len = 0;
         on_event(Err(Error::SysExTooLong(N)));
@@ -480,6 +521,23 @@ mod tests {
     #[test]
     fn data_bytes_with_no_status_and_stray_ends_are_ignored() {
         assert_eq!(decode(&[0x40, 0x40, 0xF7, 0x40]), []);
+    }
+
+    /// A stray F7 is a system common byte like F4 and F5, so a data pair split
+    /// by one is not put back together.
+    #[test]
+    fn a_stray_end_clears_the_running_status() {
+        assert_eq!(decode(&[0x90, 0x3C, 0xF7, 0x40, 0x3E, 0x40]), []);
+        assert_eq!(
+            decode(&[0x90, 0xF7, 0x90, 0x3C, 0x40]),
+            [Owned::Channel(
+                Channel::ONE,
+                ChannelMessage::NoteOn {
+                    key: 0x3C,
+                    velocity: 0x40
+                }
+            )]
+        );
     }
 
     #[test]

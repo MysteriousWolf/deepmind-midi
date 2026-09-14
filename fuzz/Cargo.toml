@@ -19,7 +19,7 @@ libfuzzer-sys = "0.4"
 
 [dependencies.deepmind-midi]
 path = "../deepmind-midi"
-features = ["std", "alloc", "serde", "transport"]
+features = ["std", "alloc", "serde", "transport", "sim"]
 
 # A fuzz target is a build tool, not the library. The no-panic lint set exists
 # to keep the library safe against untrusted input; here a panic is the finding.
@@ -49,6 +49,13 @@ bench = false
 [[bin]]
 name = "program"
 path = "fuzz_targets/program.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "device"
+path = "fuzz_targets/device.rs"
 test = false
 doc = false
 bench = false

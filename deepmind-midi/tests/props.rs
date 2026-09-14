@@ -5,11 +5,12 @@
 //! has an inverse must be one. Both are statements about all inputs, and a
 //! handful of hand-written cases cannot say them.
 //!
-//! The generator is a sixty-four bit xorshift seeded from a constant, so a run
-//! is the same run on every machine and a failure is reproducible from the seed
-//! printed with it. `proptest` would shrink a failing case, but it would also
-//! add a dependency and a minimum toolchain to a crate that has neither, and
-//! these inputs are byte strings that print in full when they fail.
+//! The generator is the sixty-four bit xorshift in `common`, seeded from a
+//! constant, so a run is the same run on every machine and a failure is
+//! reproducible from the seed printed with it. `proptest` would shrink a
+//! failing case, but it would also add a dependency and a minimum toolchain to
+//! a crate that has neither, and these inputs are byte strings that print in
+//! full when they fail.
 //!
 //! This file does not search adversarially. [`fuzz/`](../../fuzz) does; these
 //! tests are the part of it that runs on every commit.
@@ -26,8 +27,12 @@ use deepmind_midi::ids::{Bank, DeviceId, ProgramNumber, ProtocolVersion};
 use deepmind_midi::param::{PARAMETER_COUNT, ParamId};
 use deepmind_midi::program::{Program, ProgramName};
 use deepmind_midi::sysex::{self, Frame, Message, packed};
-use deepmind_midi::syx::{File, MAX_BANK_LEN, Writer};
+use deepmind_midi::syx::File;
 use deepmind_midi::wire::{Channel, ChannelMessage, Decoder, Event, Realtime, SystemCommon};
+
+mod common;
+
+use common::{Rng, write_bank};
 
 /// Every real-time status except the two the standard leaves undefined, which
 /// the decoder drops rather than reports.
@@ -39,56 +44,6 @@ const SMALL_BUFFER: usize = 32;
 /// Cases each property runs. Large enough to walk into the corners, small
 /// enough that the whole file is well under a second.
 const CASES: usize = 2_000;
-
-/// Deterministic byte source.
-///
-/// xorshift64*, which is four lines and good enough to produce byte strings
-/// that no hand-written case would think of. Nothing here needs a real
-/// generator, and a real generator would be a dependency.
-struct Rng(u64);
-
-impl Rng {
-    /// Seeds the generator. A zero seed is replaced, since xorshift cannot
-    /// leave it.
-    const fn new(seed: u64) -> Self {
-        Self(if seed == 0 {
-            0x9E37_79B9_7F4A_7C15
-        } else {
-            seed
-        })
-    }
-
-    /// Returns the next value in the sequence.
-    fn next_u64(&mut self) -> u64 {
-        self.0 ^= self.0 << 13;
-        self.0 ^= self.0 >> 7;
-        self.0 ^= self.0 << 17;
-        self.0.wrapping_mul(0x2545_F491_4F6C_DD1D)
-    }
-
-    /// Returns a byte, taken from the middle of the word where the bits are
-    /// best mixed.
-    fn byte(&mut self) -> u8 {
-        self.next_u64().to_le_bytes()[3]
-    }
-
-    /// Returns a value below `bound`, which must not be zero.
-    fn below(&mut self, bound: usize) -> usize {
-        let bound = u64::try_from(bound).unwrap_or(u64::MAX).max(1);
-        usize::try_from(self.next_u64() % bound).unwrap_or_default()
-    }
-
-    /// Returns `len` bytes.
-    fn bytes(&mut self, len: usize) -> Vec<u8> {
-        (0..len).map(|_| self.byte()).collect()
-    }
-
-    /// Returns between zero and `max` bytes.
-    fn bytes_up_to(&mut self, max: usize) -> Vec<u8> {
-        let len = self.below(max + 1);
-        self.bytes(len)
-    }
-}
 
 /// An event with nothing borrowed, so two decoder runs can be compared.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -614,9 +569,9 @@ fn every_request_survives_a_frame() {
 
 /// Returns a program filled with bytes from `rng`, every value in range.
 fn random_program(rng: &mut Rng, version: ProtocolVersion) -> Program {
-    let len = version.program_data_len().expect("a version with a length");
+    let len = version.program_data_len();
     let mut program = Program::from_bytes(version, &vec![0; len]).expect("a zeroed program");
-    for parameter in ParamId::ALL {
+    for parameter in ParamId::ALL.iter().copied() {
         program.set_clamped(parameter, rng.byte());
     }
     program
@@ -631,7 +586,7 @@ fn a_program_is_the_bytes_it_was_built_from() {
         } else {
             ProtocolVersion::V7
         };
-        let len = version.program_data_len().expect("a version with a length");
+        let len = version.program_data_len();
         let bytes = rng.bytes(len);
 
         let program = Program::from_bytes(version, &bytes).expect("the documented length");
@@ -653,7 +608,7 @@ fn a_wrong_length_is_refused_rather_than_padded() {
         let len = rng.below(400);
         let bytes = rng.bytes(len);
         for version in [ProtocolVersion::V6, ProtocolVersion::V7] {
-            let expected = version.program_data_len() == Some(len);
+            let expected = version.program_data_len() == len;
             assert_eq!(
                 Program::from_bytes(version, &bytes).is_ok(),
                 expected,
@@ -688,7 +643,7 @@ fn the_diff_is_exactly_what_it_takes_to_become_the_target() {
                 .expect("a value from a program");
         }
 
-        for parameter in ParamId::ALL {
+        for parameter in ParamId::ALL.iter().copied() {
             assert_eq!(
                 applied.get(parameter),
                 target.get(parameter),
@@ -702,7 +657,7 @@ fn the_diff_is_exactly_what_it_takes_to_become_the_target() {
 fn clamping_always_lands_on_a_value_the_parameter_accepts() {
     let mut rng = Rng::new(0x7072_6F67_0004);
     for _ in 0..CASES {
-        let mut program = Program::new(ProtocolVersion::V7).expect("a default program");
+        let mut program = Program::new(ProtocolVersion::V7);
         for _ in 0..8 {
             let parameter = ParamId::ALL[rng.below(PARAMETER_COUNT)];
             let wanted = rng.byte();
@@ -733,7 +688,7 @@ fn a_name_survives_the_field_it_is_stored_in() {
             .collect();
         let name = ProgramName::new(&text).expect("printable ASCII within sixteen characters");
 
-        let mut program = Program::new(ProtocolVersion::V7).expect("a default program");
+        let mut program = Program::new(ProtocolVersion::V7);
         program.set_name(name);
         assert_eq!(program.name(), name, "name did not survive: {text:?}");
         assert_eq!(program.name().as_str(), text);
@@ -764,18 +719,9 @@ fn a_written_bank_reads_back_as_what_was_written() {
             })
             .collect();
 
-        let mut out = vec![0; MAX_BANK_LEN];
-        let mut writer = Writer::new(&mut out, device);
-        for (index, program) in programs.iter().enumerate() {
-            let number =
-                ProgramNumber::new(u8::try_from(index).expect("fewer than 128")).expect("in range");
-            writer
-                .push_program(bank, number, program)
-                .expect("a bank-sized buffer");
-        }
-        let written = writer.finish();
+        let out = write_bank(device, bank, &programs);
 
-        let file = File::new(&out[..written]);
+        let file = File::new(&out);
         let read: Vec<Program> = file
             .programs()
             .map(|entry| entry.expect("what this library just wrote").program)
@@ -792,23 +738,17 @@ fn a_written_bank_reads_back_as_what_was_written() {
 /// A `.syx` file holding a few programs, as this library writes one.
 fn valid_bank() -> Vec<u8> {
     let mut rng = Rng::new(0x7379_7800_C0DE);
-    let mut out = vec![0; MAX_BANK_LEN];
-    let mut writer = Writer::new(&mut out, DeviceId::Unit(0));
-    for index in 0..6 {
-        let version = if index % 2 == 0 {
-            ProtocolVersion::V6
-        } else {
-            ProtocolVersion::V7
-        };
-        let program = random_program(&mut rng, version);
-        let number = ProgramNumber::new(index).expect("fewer than 128");
-        writer
-            .push_program(Bank::A, number, &program)
-            .expect("a bank-sized buffer");
-    }
-    let written = writer.finish();
-    out.truncate(written);
-    out
+    let programs: Vec<Program> = (0..6)
+        .map(|index| {
+            let version = if index % 2 == 0 {
+                ProtocolVersion::V6
+            } else {
+                ProtocolVersion::V7
+            };
+            random_program(&mut rng, version)
+        })
+        .collect();
+    write_bank(DeviceId::Unit(0), Bank::A, &programs)
 }
 
 #[test]

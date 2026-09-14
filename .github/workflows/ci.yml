@@ -29,6 +29,13 @@ jobs:
       - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features
 
+      # The docs.rs build is the nightly job below; this is what a contributor
+      # sees from `cargo doc` on stable, with broken links as errors.
+      - name: Rustdoc on stable
+        run: cargo doc --workspace --all-features --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
+
       # Includes generated_documentation_is_current and generated_code_is_current,
       # which fail when docs/ or the library's parameter tables do not match spec/.
       - name: Test
@@ -39,6 +46,27 @@ jobs:
 
       - name: Generated parameter tables are current
         run: cargo xtask codegen --check
+
+      # What the release workflow will publish: packages the crate, builds it
+      # from the package and checks the registry metadata, without uploading.
+      - name: Publishable
+        run: cargo publish --package deepmind-midi --dry-run
+
+      # The version scheme promises that a release within a year keeps the
+      # public API, which this checks against the newest release tag. Nothing
+      # to compare against before the first release.
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-semver-checks
+      - name: Public API is compatible with the last release
+        run: |
+          set -euo pipefail
+          latest=$(git tag --list 'v*' | sort -V | tail -1)
+          if [ -z "$latest" ]; then
+            echo "no release tags yet"
+            exit 0
+          fi
+          cargo semver-checks --package deepmind-midi --baseline-rev "$latest"
 
       # The first change merged after a release has to move the version.
       # A repository with no release tags yet passes: nothing to be behind.
@@ -64,28 +92,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-hack
 
-      - name: no default features
-        run: cargo build -p deepmind-midi --no-default-features
-
-      - name: alloc only
-        run: cargo build -p deepmind-midi --no-default-features --features alloc
-
-      - name: serde without std
-        run: cargo build -p deepmind-midi --no-default-features --features alloc,serde
-
-      # The blocking adapter needs neither std nor an allocator, and the only way
-      # that stays true is to keep building it without them.
-      - name: transport without std
-        run: cargo build -p deepmind-midi --no-default-features --features transport
-
-      # Neither does the simulated synthesizer, which is the point: a host on
-      # bare metal tests against one too.
-      - name: sim without std
-        run: cargo build -p deepmind-midi --no-default-features --features sim
-
-      - name: sim and transport together
-        run: cargo build -p deepmind-midi --no-default-features --features sim,transport
+      # Every combination of the five features, which is what keeps the
+      # promises in the manifest true: the blocking adapter and the simulated
+      # synthesizer need neither std nor an allocator, serde works without
+      # std, and the library builds with nothing on at all.
+      - name: Every feature combination builds
+        run: cargo hack check --package deepmind-midi --feature-powerset --no-dev-deps
 
   msrv:
     name: minimum supported Rust version
@@ -126,7 +142,7 @@ jobs:
           set -euo pipefail
           host=$(rustc -vV | sed -n 's/^host: //p')
           echo "building for $host"
-          for target in decoder frame file program; do
+          for target in decoder frame file program device; do
             echo "::group::$target"
             cargo fuzz run "$target" --target "$host" -- \
               -max_total_time=60 \

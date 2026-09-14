@@ -6,8 +6,10 @@
 # without this file and 434 with it. Half a million executions a second and
 # almost no coverage is the shape of a fuzzer bouncing off a magic number.
 #
-# Tokens are in `deepmind_midi::ids` (MANUFACTURER_ID, Model::MODEL_ID) and
-# `deepmind_midi::sysex::Command`.
+# Tokens are in `deepmind_midi::ids` (MANUFACTURER_ID, Model::MODEL_ID),
+# `deepmind_midi::sysex::Command`, `deepmind_midi::sysex::inquiry` and
+# `deepmind_midi::nrpn`. `xtask/tests/fuzz_dict.rs` checks that every command
+# the library knows has a token here.
 
 # The whole header, which is the token that matters: F0, manufacturer, model.
 header="\xF0\x00\x20\x32\x20"
@@ -37,6 +39,26 @@ cmd_bank_names_dump_response="\x0B"
 cmd_single_name_dump_request="\x0C"
 cmd_single_name_dump_response="\x0D"
 cmd_edit_buffer_pattern_dump_request="\x0E"
+cmd_control_app_notify_response="\x10"
+cmd_calibration_data_dump_request="\x11"
+cmd_calibration_data_dump_response="\x12"
+cmd_chord_memory_dump_request="\x1B"
+cmd_chord_memory_dump_response="\x1C"
+cmd_poly_chord_memory_dump_request="\x1D"
+cmd_poly_chord_memory_dump_response="\x1E"
+
+# Universal device inquiry: the non-real-time header, then the general
+# information sub-IDs for the request and the reply.
+inquiry_header="\xF0\x7E"
+inquiry_request="\x06\x01"
+inquiry_reply="\x06\x02"
+
+# NRPN: the parameter number controllers and the data entry controllers, which
+# is how a parameter edit crosses the cable.
+nrpn_msb="\x63"
+nrpn_lsb="\x62"
+data_entry_msb="\x06"
+data_entry_lsb="\x26"
 
 # Comms protocol versions, which decide how long a payload should be.
 version_6="\x06"

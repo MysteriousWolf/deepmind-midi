@@ -40,16 +40,16 @@ pub fn edit_buffer_frame_len(program: &Program) -> usize {
 /// Writes a `.syx` file into a buffer the caller owns.
 ///
 /// A file is its frames and nothing else (no header, no index, no trailer), so
-/// writing one is writing frames in order. The buffer is the caller's because
-/// only the caller knows where forty kilobytes can go; [`MAX_BANK_LEN`] is what
-/// a whole bank needs and [`program_frame_len`] what one program does.
+/// writing one is writing frames in order. The buffer is the caller's:
+/// [`MAX_BANK_LEN`] is what a whole bank needs and [`program_frame_len`] what
+/// one program does.
 ///
 /// ```
 /// use deepmind_midi::ids::{Bank, DeviceId, ProgramNumber, ProtocolVersion};
 /// use deepmind_midi::program::Program;
 /// use deepmind_midi::syx::{self, Writer};
 ///
-/// let program = Program::new(ProtocolVersion::V6)?;
+/// let program = Program::new(ProtocolVersion::V6);
 ///
 /// let mut bytes = [0; syx::MAX_PROGRAM_FRAME_LEN * 2];
 /// let mut writer = Writer::new(&mut bytes, DeviceId::Unit(0));
@@ -74,7 +74,7 @@ impl<'a> Writer<'a> {
     /// whichever synthesizer is listening wants [`DeviceId::Broadcast`]; one
     /// meant for a particular unit wants that unit.
     #[must_use]
-    pub fn new(out: &'a mut [u8], device: DeviceId) -> Self {
+    pub const fn new(out: &'a mut [u8], device: DeviceId) -> Self {
         Self {
             out,
             written: 0,
@@ -174,7 +174,7 @@ impl<'a> Writer<'a> {
 /// use deepmind_midi::program::Program;
 /// use deepmind_midi::syx::{File, bank_to_vec};
 ///
-/// let programs = vec![Program::new(ProtocolVersion::V6)?; 4];
+/// let programs = vec![Program::new(ProtocolVersion::V6); 4];
 /// let bytes = bank_to_vec(
 ///     DeviceId::Broadcast,
 ///     Bank::A,
@@ -236,7 +236,7 @@ mod tests {
     use crate::syx::File;
 
     fn program() -> Program {
-        Program::new(ProtocolVersion::V6).expect("version 6 is supported")
+        Program::new(ProtocolVersion::V6)
     }
 
     fn bank_c() -> Bank {

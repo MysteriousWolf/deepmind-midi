@@ -10,15 +10,24 @@ use core::fmt;
 pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 /// Everything that can go wrong while parsing or building `DeepMind` messages.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum Error {
     /// A device ID byte was neither `0..=15` nor `0x7F`.
     InvalidDeviceId(u8),
     /// A bank index was 8 or greater.
     BankOutOfRange(u8),
+    /// A bank letter was outside `A..=H`.
+    BankLetter(char),
     /// A program number was 128 or greater.
     ProgramOutOfRange(u8),
+    /// A run of programs ended before it started.
+    EmptyRun {
+        /// Program number the run was to start at.
+        first: u8,
+        /// Program number it was to end at, which was lower.
+        last: u8,
+    },
     /// A user pattern number was 32 or greater.
     PatternOutOfRange(u8),
     /// A MIDI channel was 16 or greater.
@@ -73,6 +82,8 @@ pub enum Error {
     },
     /// A packed run ended in a high-bit byte with no data bytes to apply it to.
     PackedRunLength(usize),
+    /// A byte meant for the inside of a `SysEx` frame had its high bit set.
+    NotSevenBit(u8),
     /// An output buffer was too small for what had to be written into it.
     BufferTooSmall {
         /// Bytes the operation needed.
@@ -103,6 +114,7 @@ pub enum Error {
 }
 
 impl fmt::Display for Error {
+    #[expect(clippy::too_many_lines, reason = "one arm per variant")]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidDeviceId(byte) => {
@@ -112,8 +124,15 @@ impl fmt::Display for Error {
                 )
             }
             Self::BankOutOfRange(index) => write!(f, "bank {index} out of range, expected 0..=7"),
+            Self::BankLetter(letter) => write!(f, "bank {letter:?} is not a letter A..=H"),
             Self::ProgramOutOfRange(number) => {
                 write!(f, "program {number} out of range, expected 0..=127")
+            }
+            Self::EmptyRun { first, last } => {
+                write!(
+                    f,
+                    "run from program {first} to {last} ends before it starts"
+                )
             }
             Self::PatternOutOfRange(number) => {
                 write!(f, "pattern {number} out of range, expected 0..=31")
@@ -184,6 +203,9 @@ impl fmt::Display for Error {
                 f,
                 "packed run of {len} bytes ends in a high-bit byte with no data"
             ),
+            Self::NotSevenBit(byte) => {
+                write!(f, "byte {byte:#04X} cannot travel inside a SysEx frame")
+            }
             Self::BufferTooSmall { needed, available } => {
                 write!(f, "buffer of {available} bytes is too small, need {needed}")
             }
@@ -207,5 +229,4 @@ impl fmt::Display for Error {
     }
 }
 
-#[cfg(feature = "std")]
-impl std::error::Error for Error {}
+impl core::error::Error for Error {}

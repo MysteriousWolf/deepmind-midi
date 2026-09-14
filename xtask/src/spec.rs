@@ -71,14 +71,6 @@ pub struct Firmware {
 }
 
 impl Firmware {
-    /// Parses a dotted version into comparable parts.
-    fn parts(version: &str) -> (u32, u32) {
-        let mut split = version.split('.');
-        let major = split.next().and_then(|p| p.parse().ok()).unwrap_or(0);
-        let minor = split.next().and_then(|p| p.parse().ok()).unwrap_or(0);
-        (major, minor)
-    }
-
     /// Returns whether `range` covers `version`.
     ///
     /// A range is a bare version for exactly that one, a version with a
@@ -88,11 +80,20 @@ impl Firmware {
         match range {
             None => true,
             Some(range) => match range.strip_suffix('+') {
-                Some(from) => Self::parts(version) >= Self::parts(from),
+                Some(from) => version_parts(version) >= version_parts(from),
                 None => range == version,
             },
         }
     }
+}
+
+/// Splits a version or version range, `"1.1"` or `"1.1+"`, into its two numbers.
+#[must_use]
+pub fn version_parts(version: &str) -> (u32, u32) {
+    let mut parts = version.trim_end_matches('+').split('.');
+    let major = parts.next().and_then(|p| p.parse().ok()).unwrap_or(0);
+    let minor = parts.next().and_then(|p| p.parse().ok()).unwrap_or(0);
+    (major, minor)
 }
 
 /// A named table of parameter values.
@@ -646,6 +647,19 @@ impl Spec {
         self.table_for(id, self.default_firmware())
     }
 
+    /// Returns every table with this identifier, newest firmware first.
+    ///
+    /// One table for most identifiers; one per firmware version for a table
+    /// that firmware renumbered. An unversioned table sorts last.
+    #[must_use]
+    pub fn versions_of(&self, id: &str) -> Vec<&ValueTable> {
+        let mut versions: Vec<&ValueTable> = self.tables.iter().filter(|t| t.id == id).collect();
+        versions.sort_by_key(|table| {
+            std::cmp::Reverse(version_parts(table.firmware.as_deref().unwrap_or("0.0")))
+        });
+        versions
+    }
+
     fn validate(&self) -> Result<(), String> {
         self.validate_firmware()?;
         self.validate_parameters()?;
@@ -896,7 +910,7 @@ impl Spec {
                 }
                 if parameter.values.is_none() && parameter.min.is_none() {
                     return Err(format!(
-                        "effects.toml: {} slot {} has neither a range nor a value list",
+                        "effects.toml: {} slot {} has neither a range nor a list of options",
                         effect.name, parameter.slot
                     ));
                 }
@@ -908,9 +922,9 @@ impl Spec {
 
     /// Checks the ten routing topologies against the value tables and themselves.
     ///
-    /// The graph checks matter because these were transcribed by eye from ten
-    /// small printed diagrams. A slot that nothing feeds, or that reaches no
-    /// output, is a misread line rather than a topology the hardware offers.
+    /// These were transcribed by eye from ten small printed diagrams. A slot
+    /// that nothing feeds, or that reaches no output, is a misread line rather
+    /// than a topology the hardware offers.
     fn validate_routing(&self) -> Result<(), String> {
         let table = self
             .table("fx_routing")
@@ -1168,8 +1182,8 @@ impl Spec {
                         transport.id, field.name
                     ));
                 }
-                // A let chain would read better but needs Rust 1.88; see the
-                // rust-version in Cargo.toml.
+                // Not a let chain: those need Rust 1.88, and the rust-version
+                // in Cargo.toml is older.
                 if let Some(id) = &field.encoding {
                     if !self.encodings.iter().any(|e| &e.id == id) {
                         return Err(format!(
@@ -1279,23 +1293,28 @@ fn read<T: serde::de::DeserializeOwned>(path: &Path) -> Result<T, String> {
     toml::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))
 }
 
+/// The checked-in specification, loaded once for every test that reads it.
+#[cfg(test)]
+pub(crate) fn shared() -> &'static Spec {
+    static SPEC: std::sync::LazyLock<Spec> =
+        std::sync::LazyLock::new(|| Spec::load(&crate::root()).expect("spec/ loads"));
+    &SPEC
+}
+
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
-
     use deepmind_midi::sysex::packed::packed_len;
     use deepmind_midi::sysex::{
         BANK_NAMES_LEN, CHORD_MEMORY_LEN, Command, Direction, GLOBAL_DATA_LEN, PATTERN_DATA_LEN,
         POLY_CHORD_MEMORY_LEN, PROGRAM_NAME_LEN,
     };
 
-    use super::Spec;
+    use super::{shared as spec, version_parts};
 
-    fn spec() -> Spec {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .unwrap_or(Path::new("."));
-        Spec::load(root).expect("spec/ loads")
+    #[test]
+    fn firmware_ranges_split_into_numbers() {
+        assert_eq!(version_parts("1.1+"), (1, 1));
+        assert_eq!(version_parts("1.0"), (1, 0));
     }
 
     /// Fails when the library's command table drifts from `spec/messages.toml`.

@@ -37,7 +37,10 @@
 ///             match self.inbound.try_recv() {
 ///                 Ok(message) => self.partial = message,
 ///                 Err(TryRecvError::Empty) => return Ok(0),
-///                 Err(TryRecvError::Disconnected) => return Ok(0),
+///                 // A gone connection is an error, never a quiet one.
+///                 Err(TryRecvError::Disconnected) => {
+///                     return Err(std::io::ErrorKind::BrokenPipe.into());
+///                 }
 ///             }
 ///         }
 ///         let taken = self.partial.len().min(into.len());

@@ -91,6 +91,7 @@ pub const DATA_ENTRY_LSB: u8 = 38;
 /// at a time through the methods of the same names.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[non_exhaustive]
 pub struct Parameter {
     /// Name as the synthesizer's display writes it.
     pub name: &'static str,
@@ -108,6 +109,7 @@ pub struct Parameter {
 /// How a parameter's raw value is to be read.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum Kind {
     /// A sweep. The raw value is the value, and what the synthesizer displays
     /// for it is a curve this library does not guess at.
@@ -121,6 +123,7 @@ pub enum Kind {
 /// One value of an enumerated parameter.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[non_exhaustive]
 pub struct ValueEntry {
     /// The value on the wire.
     pub value: u16,
@@ -135,6 +138,7 @@ pub struct ValueEntry {
 /// methods are what pick between them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[non_exhaustive]
 pub struct ValueTable {
     /// Identifier this table answers to.
     pub id: TableId,
@@ -176,6 +180,7 @@ impl fmt::Display for ValueTable {
 /// What a MIDI continuous controller reaches.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum ControllerKind {
     /// Drives one program parameter, named in [`Controller::parameter`].
     Parameter,
@@ -192,6 +197,7 @@ pub enum ControllerKind {
 /// resolution through it. NRPN is the general path.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[non_exhaustive]
 pub struct Controller {
     /// Controller number, `0..=127`.
     pub cc: u8,
@@ -205,9 +211,15 @@ pub struct Controller {
 
 impl Controller {
     /// Returns the controller with this number, if the synthesizer answers it.
+    ///
+    /// The table is in controller number order, so this is a binary search;
+    /// it runs on every control change a port delivers.
     #[must_use]
     pub fn for_cc(cc: u8) -> Option<&'static Self> {
-        CONTROLLERS.iter().find(|controller| controller.cc == cc)
+        CONTROLLERS
+            .binary_search_by_key(&cc, |controller| controller.cc)
+            .ok()
+            .and_then(|index| CONTROLLERS.get(index))
     }
 
     /// Returns the controller that drives this parameter, if one does.
@@ -225,6 +237,20 @@ impl Controller {
 impl fmt::Display for Controller {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "CC {} ({})", self.cc, self.name)
+    }
+}
+
+impl TryFrom<u8> for ParamId {
+    type Error = Error;
+
+    fn try_from(offset: u8) -> Result<Self> {
+        Self::from_offset(offset)
+    }
+}
+
+impl From<ParamId> for u8 {
+    fn from(parameter: ParamId) -> Self {
+        parameter.offset()
     }
 }
 
@@ -395,7 +421,8 @@ impl Group {
     /// Allocates nothing: it is a filter over [`ParamId::ALL`].
     pub fn parameters(self) -> impl Iterator<Item = ParamId> {
         ParamId::ALL
-            .into_iter()
+            .iter()
+            .copied()
             .filter(move |parameter| parameter.group() == self)
     }
 }
@@ -522,7 +549,7 @@ mod tests {
 
     #[test]
     fn every_offset_names_exactly_one_parameter() {
-        for (index, parameter) in ParamId::ALL.into_iter().enumerate() {
+        for (index, parameter) in ParamId::ALL.iter().copied().enumerate() {
             let offset = u8::try_from(index).expect("242 offsets fit in a byte");
             assert_eq!(parameter.offset(), offset);
             assert_eq!(ParamId::from_offset(offset), Ok(parameter));
@@ -538,8 +565,8 @@ mod tests {
     #[test]
     fn the_table_is_as_long_as_a_program_dump() {
         assert_eq!(
-            ProtocolVersion(6).program_data_len(),
-            Some(PARAMETER_COUNT),
+            ProtocolVersion::V6.program_data_len(),
+            PARAMETER_COUNT,
             "every byte of a program is a parameter"
         );
     }
@@ -547,7 +574,7 @@ mod tests {
     #[test]
     fn every_parameter_belongs_to_exactly_one_group() {
         let counted: usize = Group::ALL
-            .into_iter()
+            .iter()
             .map(|group| group.parameters().count())
             .sum();
         assert_eq!(counted, PARAMETER_COUNT);
@@ -641,7 +668,7 @@ mod tests {
     /// leave a host with a value it can address and cannot display.
     #[test]
     fn a_complete_value_table_names_every_value_its_parameter_accepts() {
-        for parameter in ParamId::ALL {
+        for parameter in ParamId::ALL.iter().copied() {
             let Kind::Enumerated(id) = parameter.kind() else {
                 continue;
             };
@@ -676,6 +703,16 @@ mod tests {
         assert_eq!(partial.name_of(200), None);
     }
 
+    /// `for_cc` is a binary search, which the table's order has to allow.
+    #[test]
+    fn the_controller_table_is_in_controller_number_order() {
+        assert!(CONTROLLERS.windows(2).all(|pair| match pair {
+            [a, b] => a.cc < b.cc,
+            _ => true,
+        }));
+        assert_eq!(Controller::for_cc(255), None);
+    }
+
     #[test]
     fn controllers_and_parameters_agree_in_both_directions() {
         for controller in &CONTROLLERS {
@@ -694,7 +731,7 @@ mod tests {
     /// NRPN can address. The two ends have to land exactly even so.
     #[test]
     fn a_control_change_reaches_the_ends_of_the_range_it_scales() {
-        for parameter in ParamId::ALL {
+        for parameter in ParamId::ALL.iter().copied() {
             assert_eq!(parameter.to_cc_value(parameter.min()), 0, "{parameter}");
             assert_eq!(parameter.to_cc_value(parameter.max()), 127, "{parameter}");
             assert_eq!(parameter.from_cc_value(0), parameter.min(), "{parameter}");

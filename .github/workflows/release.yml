@@ -7,12 +7,25 @@ name: Release
 # request. CI fails any pull request whose version is not ahead of the newest
 # release tag, so the first one merged after a release has to move it.
 #
-# Optional secret. Missing it warns; the release still happens.
-#   CARGO_REGISTRY_TOKEN  publishes to crates.io
+# Publishing to crates.io authenticates one of two ways, tried in this order:
+#
+#   1. Trusted publishing. Configure it on the crate's settings page at
+#      crates.io (owner MysteriousWolf, repository deepmind-midi, workflow
+#      release.yml) and no secret is needed. crates.io only offers this for a
+#      crate that already exists, so the first release cannot use it.
+#   2. The CARGO_REGISTRY_TOKEN repository secret: a crates.io API token with
+#      the publish-new and publish-update scopes. The first release needs it.
+#
+# With `publish` on and neither available, the run fails before tagging, so a
+# version is never tagged and released without reaching crates.io.
 
 on:
   workflow_dispatch:
     inputs:
+      publish:
+        description: Publish to crates.io as well as tagging and releasing
+        type: boolean
+        default: true
       summary:
         description: Write a prose summary above the generated notes, using GitHub Models
         type: boolean
@@ -24,6 +37,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
   models: read
 
 concurrency:
@@ -43,7 +57,9 @@ jobs:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
 
-      # Never tag something that does not build.
+      # Never tag something that does not build, and never tag something
+      # crates.io would then refuse: the dry run packages the crate, builds it
+      # from the package and checks the registry metadata.
       - name: Verify
         env:
           RUSTFLAGS: -D warnings
@@ -51,6 +67,7 @@ jobs:
           cargo fmt --all --check
           cargo clippy --workspace --all-targets --all-features
           cargo test --workspace --all-features
+          cargo publish --package deepmind-midi --dry-run
 
       - name: Read version
         id: version
@@ -63,6 +80,34 @@ jobs:
           fi
           echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "releasing v${version}"
+
+      # Trusted publishing first. The action fails when the crate has no
+      # trusted publisher configured, which is expected before the first
+      # release, so its failure is tolerated and the secret is tried next.
+      - name: Authenticate with crates.io via trusted publishing
+        if: ${{ inputs.publish && !inputs.dry_run }}
+        id: trusted
+        continue-on-error: true
+        uses: rust-lang/crates-io-auth-action@v1
+
+      - name: Choose a crates.io credential
+        if: ${{ inputs.publish && !inputs.dry_run }}
+        id: credential
+        env:
+          TRUSTED_TOKEN: ${{ steps.trusted.outputs.token }}
+          SECRET_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "${TRUSTED_TOKEN:-}" ]; then
+            echo 'using trusted publishing'
+            echo "token=${TRUSTED_TOKEN}" >> "$GITHUB_OUTPUT"
+          elif [ -n "${SECRET_TOKEN:-}" ]; then
+            echo 'using the CARGO_REGISTRY_TOKEN secret'
+            echo "token=${SECRET_TOKEN}" >> "$GITHUB_OUTPUT"
+          else
+            echo '::error::No crates.io credential. Configure trusted publishing on crates.io, add the CARGO_REGISTRY_TOKEN secret, or run again with publish off.'
+            exit 1
+          fi
 
       - name: Collect release notes
         env:
@@ -139,13 +184,7 @@ jobs:
         run: gh release create "v${VERSION}" --title "v${VERSION}" --notes-file notes.md
 
       - name: Publish to crates.io
-        if: ${{ !inputs.dry_run }}
+        if: ${{ inputs.publish && !inputs.dry_run }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: |
-          set -euo pipefail
-          if [ -z "${CARGO_REGISTRY_TOKEN:-}" ]; then
-            echo '::warning::CARGO_REGISTRY_TOKEN is not set, skipping the crates.io publish'
-            exit 0
-          fi
-          cargo publish --package deepmind-midi
+          CARGO_REGISTRY_TOKEN: ${{ steps.credential.outputs.token }}
+        run: cargo publish --package deepmind-midi --no-verify

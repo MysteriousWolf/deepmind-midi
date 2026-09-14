@@ -2,7 +2,9 @@
 //!
 //! Every type here is a validated newtype. Constructing one is the only place a
 //! range check happens, so downstream code never has to re-check a bank or program
-//! number that it already holds.
+//! number that it already holds. Each converts from its wire byte through
+//! [`TryFrom<u8>`] and back through [`From`], for code that is generic over them;
+//! the inherent constructors say the same thing with a name.
 
 use core::fmt;
 
@@ -68,6 +70,20 @@ impl DeviceId {
     }
 }
 
+impl TryFrom<u8> for DeviceId {
+    type Error = Error;
+
+    fn try_from(byte: u8) -> Result<Self, Error> {
+        Self::from_byte(byte)
+    }
+}
+
+impl From<DeviceId> for u8 {
+    fn from(id: DeviceId) -> Self {
+        id.to_byte()
+    }
+}
+
 impl fmt::Display for DeviceId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -106,7 +122,7 @@ impl Model {
     pub const MODEL_ID: u8 = 0x20;
 
     /// Every known variant.
-    pub const ALL: [Self; 6] = [
+    pub const ALL: &'static [Self] = &[
         Self::DeepMind6,
         Self::DeepMind6X,
         Self::DeepMind12,
@@ -153,11 +169,12 @@ impl fmt::Display for Model {
 /// Comms protocol version carried by every dump response.
 ///
 /// The firmware stamps this into each dump and the payload length depends on it:
-/// version 6 carries 242 bytes of program data, version 7 carries 245. Parsers
-/// must branch on it rather than assume a length.
+/// version 6 carries 242 bytes of program data, version 7 carries 245. Only
+/// those two exist, so a dump stamped with anything else is rejected where it
+/// is parsed, with [`Error::UnsupportedProtocolVersion`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ProtocolVersion(pub u8);
+pub struct ProtocolVersion(u8);
 
 impl ProtocolVersion {
     /// The version documented in the `DeepMind` 12 user manual.
@@ -166,14 +183,45 @@ impl ProtocolVersion {
     /// The version emitted by current firmware and by the factory preset packs.
     pub const V7: Self = Self(7);
 
-    /// Returns the unpacked program data length for this version, if known.
-    #[must_use]
-    pub const fn program_data_len(self) -> Option<usize> {
-        match self.0 {
-            6 => Some(242),
-            7 => Some(245),
-            _ => None,
+    /// Builds a version from its wire byte.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::UnsupportedProtocolVersion`] for anything but 6 and 7.
+    pub const fn new(version: u8) -> Result<Self, Error> {
+        match version {
+            6 | 7 => Ok(Self(version)),
+            _ => Err(Error::UnsupportedProtocolVersion(version)),
         }
+    }
+
+    /// Returns the wire byte.
+    #[must_use]
+    pub const fn get(self) -> u8 {
+        self.0
+    }
+
+    /// Returns how many bytes of program data a dump of this version carries.
+    #[must_use]
+    pub const fn program_data_len(self) -> usize {
+        match self.0 {
+            6 => 242,
+            _ => 245,
+        }
+    }
+}
+
+impl TryFrom<u8> for ProtocolVersion {
+    type Error = Error;
+
+    fn try_from(version: u8) -> Result<Self, Error> {
+        Self::new(version)
+    }
+}
+
+impl From<ProtocolVersion> for u8 {
+    fn from(version: ProtocolVersion) -> Self {
+        version.get()
     }
 }
 
@@ -211,12 +259,12 @@ impl Bank {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::BankOutOfRange`] for a letter outside `A..=H`.
+    /// Returns [`Error::BankLetter`] for a character outside `A..=H`.
     pub const fn from_letter(letter: char) -> Result<Self, Error> {
         match letter {
             'A'..='H' => Self::new(letter as u8 - b'A'),
             'a'..='h' => Self::new(letter as u8 - b'a'),
-            _ => Err(Error::BankOutOfRange(u8::MAX)),
+            _ => Err(Error::BankLetter(letter)),
         }
     }
 
@@ -233,18 +281,23 @@ impl Bank {
     }
 }
 
+impl TryFrom<u8> for Bank {
+    type Error = Error;
+
+    fn try_from(index: u8) -> Result<Self, Error> {
+        Self::new(index)
+    }
+}
+
+impl From<Bank> for u8 {
+    fn from(bank: Bank) -> Self {
+        bank.index()
+    }
+}
+
 impl fmt::Display for Bank {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(match self.0 {
-            0 => "A",
-            1 => "B",
-            2 => "C",
-            3 => "D",
-            4 => "E",
-            5 => "F",
-            6 => "G",
-            _ => "H",
-        })
+        write!(f, "{}", self.letter())
     }
 }
 
@@ -276,6 +329,20 @@ impl ProgramNumber {
     #[must_use]
     pub const fn get(self) -> u8 {
         self.0
+    }
+}
+
+impl TryFrom<u8> for ProgramNumber {
+    type Error = Error;
+
+    fn try_from(number: u8) -> Result<Self, Error> {
+        Self::new(number)
+    }
+}
+
+impl From<ProgramNumber> for u8 {
+    fn from(number: ProgramNumber) -> Self {
+        number.get()
     }
 }
 
@@ -359,6 +426,20 @@ impl PatternNumber {
     }
 }
 
+impl TryFrom<u8> for PatternNumber {
+    type Error = Error;
+
+    fn try_from(number: u8) -> Result<Self, Error> {
+        Self::new(number)
+    }
+}
+
+impl From<PatternNumber> for u8 {
+    fn from(number: PatternNumber) -> Self {
+        number.get()
+    }
+}
+
 impl fmt::Display for PatternNumber {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // The front panel numbers patterns from 1.
@@ -400,7 +481,7 @@ mod tests {
 
     #[test]
     fn every_model_reports_a_plausible_voice_count_and_name() {
-        for model in Model::ALL {
+        for model in Model::ALL.iter().copied() {
             assert!(matches!(model.voice_count(), 6 | 12));
             assert!(model.name().starts_with("DeepMind "));
         }
@@ -420,7 +501,8 @@ mod tests {
             );
         }
         assert!(Bank::new(BANK_COUNT).is_err());
-        assert!(Bank::from_letter('I').is_err());
+        assert_eq!(Bank::from_letter('I'), Err(Error::BankLetter('I')));
+        assert_eq!(Bank::H.to_string(), "H");
     }
 
     #[test]
@@ -437,8 +519,23 @@ mod tests {
 
     #[test]
     fn protocol_versions_carry_their_program_data_length() {
-        assert_eq!(ProtocolVersion::V6.program_data_len(), Some(242));
-        assert_eq!(ProtocolVersion::V7.program_data_len(), Some(245));
-        assert_eq!(ProtocolVersion(99).program_data_len(), None);
+        assert_eq!(ProtocolVersion::V6.program_data_len(), 242);
+        assert_eq!(ProtocolVersion::V7.program_data_len(), 245);
+        assert_eq!(ProtocolVersion::new(7), Ok(ProtocolVersion::V7));
+        assert_eq!(
+            ProtocolVersion::new(99),
+            Err(Error::UnsupportedProtocolVersion(99))
+        );
+    }
+
+    #[test]
+    fn every_id_converts_from_its_byte_and_back() {
+        assert_eq!(Bank::try_from(7).map(u8::from), Ok(7));
+        assert_eq!(ProgramNumber::try_from(127).map(u8::from), Ok(127));
+        assert_eq!(PatternNumber::try_from(31).map(u8::from), Ok(31));
+        assert_eq!(DeviceId::try_from(0x7F), Ok(DeviceId::Broadcast));
+        assert_eq!(u8::from(DeviceId::Unit(3)), 3);
+        assert_eq!(ProtocolVersion::try_from(6).map(u8::from), Ok(6));
+        assert!(Bank::try_from(8).is_err());
     }
 }

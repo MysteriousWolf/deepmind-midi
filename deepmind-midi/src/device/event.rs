@@ -85,9 +85,9 @@ pub enum Event {
     },
     /// Events were dropped because the queue was full, and how many.
     ///
-    /// Raised once the queue has room again, so the count is what was missed
-    /// between the last event polled and the next one. A host seeing this is
-    /// feeding more between drains than its queue holds.
+    /// Polled once the queue has been emptied, so the count is what was missed
+    /// since the events before it. A host seeing this is feeding more between
+    /// polls than its queue holds.
     Lost(u16),
 }
 
@@ -98,7 +98,7 @@ impl fmt::Display for Event {
             Self::Program { slot, program } => write!(f, "{slot}: {}", program.name()),
             Self::Identity(identity) => write!(f, "firmware {}", identity.firmware),
             Self::Parameter { parameter, value } => write!(f, "{parameter} = {value}"),
-            Self::Channel { channel, message } => write!(f, "channel {channel}: {message:?}"),
+            Self::Channel { channel, message } => write!(f, "channel {channel}: {message}"),
             Self::Timeout(request) => write!(f, "no answer to the {request}"),
             Self::Unhandled(command) => write!(f, "untracked {command}"),
             Self::Failed(error) => write!(f, "unreadable frame: {error}"),

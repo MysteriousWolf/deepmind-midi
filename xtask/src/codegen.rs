@@ -11,13 +11,13 @@
 //! `deepmind-midi/src/program/mod.rs`, so reviewing a specification change means
 //! reading a table rather than logic.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write as _;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::Command;
 
-use crate::docs::Outcome;
-use crate::spec::{Spec, ValueTable};
+use crate::output::Output;
+use crate::spec::{Spec, ValueTable, version_parts};
 
 /// Path of the generated parameter tables, relative to the repository root.
 pub const CODE_PATH: &str = "deepmind-midi/src/param/generated.rs";
@@ -25,69 +25,70 @@ pub const CODE_PATH: &str = "deepmind-midi/src/param/generated.rs";
 /// Every generated source file, in the order they are written.
 pub const CODE_PATHS: [&str; 2] = [CODE_PATH, crate::program::CODE_PATH];
 
-/// Renders the generated source files and compares them against the files on
-/// disk.
-///
-/// Writes each one that differs, unless `check` is set.
+/// Loads the spec, then renders the generated source files as [`generate`].
 ///
 /// # Errors
 ///
-/// Returns a message when the spec cannot be loaded, a name in it does not make
-/// a usable Rust identifier, `rustfmt` cannot be run, or a file cannot be
-/// written.
-pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
-    let spec = Spec::load(root)?;
-    let files = [
-        (CODE_PATH, render(&spec)?),
-        (crate::program::CODE_PATH, crate::program::render(&spec)?),
-    ];
-
-    let mut outcome = Outcome::Current;
-    for (path, source) in files {
-        if write_if_changed(root, path, &format(root, &source)?, check)? == Outcome::Stale {
-            outcome = Outcome::Stale;
-        }
-    }
-    Ok(outcome)
+/// As [`generate`], or a message when the spec cannot be loaded.
+pub fn run(root: &Path, check: bool) -> Result<Vec<String>, String> {
+    generate(&Spec::load(root)?, root, check)
 }
 
-/// Writes one rendered file, reporting whether the copy on disk was stale.
-fn write_if_changed(
-    root: &Path,
-    path: &str,
-    rendered: &str,
-    check: bool,
-) -> Result<Outcome, String> {
-    let path = root.join(path);
-    if std::fs::read_to_string(&path).is_ok_and(|found| found == rendered) {
-        return Ok(Outcome::Current);
+/// Renders the generated source files and compares them against the files on
+/// disk.
+///
+/// Writes each one that differs, unless `check` is set. Returns the paths,
+/// relative to the root, of the files that differed.
+///
+/// # Errors
+///
+/// Returns a message when a name in the spec does not make a usable Rust
+/// identifier, `rustfmt` cannot be run, or a file cannot be written.
+pub fn generate(spec: &Spec, root: &Path, check: bool) -> Result<Vec<String>, String> {
+    let idents = Identifiers::new(spec)?;
+    let files = [
+        (CODE_PATH, render(spec, &idents)?),
+        (
+            crate::program::CODE_PATH,
+            crate::program::render(spec, &idents)?,
+        ),
+    ];
+
+    let mut output = Output::new(root, check);
+    for (path, source) in files {
+        output.write(path, &format(root, path, &source)?)?;
     }
-    if !check {
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
-        }
-        std::fs::write(&path, rendered).map_err(|e| format!("{}: {e}", path.display()))?;
-    }
-    Ok(Outcome::Stale)
+    Ok(output.stale())
 }
 
 /// Runs the rendered source through `rustfmt`, so that `cargo fmt --check` has
 /// nothing to say about a file nobody edits by hand.
 ///
-/// It goes through a file under `target/` rather than a pipe: a quarter of a
-/// megabyte of source deadlocks a pipe that nothing is draining, and a scratch
-/// file costs one write.
-fn format(root: &Path, source: &str) -> Result<String, String> {
+/// `rustfmt` reads a file, so the source goes through one under `target/`,
+/// named after the file it is destined for and rewritten only when the render
+/// changed.
+fn format(root: &Path, path: &str, source: &str) -> Result<String, String> {
     let scratch = root.join("target").join("xtask");
     std::fs::create_dir_all(&scratch).map_err(|e| format!("{}: {e}", scratch.display()))?;
-    let file: PathBuf = scratch.join("generated.rs");
-    std::fs::write(&file, source).map_err(|e| format!("{}: {e}", file.display()))?;
+    let stem = Path::new(path)
+        .parent()
+        .and_then(Path::file_name)
+        .map_or_else(
+            || "generated".to_owned(),
+            |dir| dir.to_string_lossy().into_owned(),
+        );
+    let file = scratch.join(format!("{stem}-generated.rs"));
+    if !std::fs::read_to_string(&file).is_ok_and(|found| found == source) {
+        std::fs::write(&file, source).map_err(|e| format!("{}: {e}", file.display()))?;
+    }
 
     let output = Command::new("rustfmt")
         .arg("--edition")
         .arg("2024")
         .arg("--config-path")
         .arg(root.join("rustfmt.toml"))
+        .arg("--emit")
+        .arg("stdout")
         .arg(&file)
         .output()
         .map_err(|e| format!("rustfmt: {e}. Install it with `rustup component add rustfmt`"))?;
@@ -97,18 +98,54 @@ fn format(root: &Path, source: &str) -> Result<String, String> {
             String::from_utf8_lossy(&output.stderr).trim()
         ));
     }
-    std::fs::read_to_string(&file).map_err(|e| format!("{}: {e}", file.display()))
+    // Emitting to stdout prefixes the source with the file's name and a blank line.
+    let formatted = String::from_utf8_lossy(&output.stdout);
+    let header = format!("{}:\n\n", file.display());
+    Ok(formatted
+        .strip_prefix(&header)
+        .unwrap_or(&formatted)
+        .to_owned())
+}
+
+/// The Rust identifiers the specification's names become, built once per run.
+pub struct Identifiers {
+    /// One per parameter, in offset order.
+    pub parameters: Vec<String>,
+    /// By group name.
+    pub groups: BTreeMap<String, String>,
+    /// By value table identifier.
+    pub tables: BTreeMap<String, String>,
+}
+
+impl Identifiers {
+    /// Turns every parameter, group and value table name into an identifier.
+    ///
+    /// # Errors
+    ///
+    /// As [`identifiers`].
+    pub fn new(spec: &Spec) -> Result<Self, String> {
+        let owned = |map: BTreeMap<&str, String>| {
+            map.into_iter()
+                .map(|(name, ident)| (name.to_owned(), ident))
+                .collect()
+        };
+        Ok(Self {
+            parameters: identifiers(spec.parameters.iter().map(|p| p.name.as_str()), "parameter")?,
+            groups: owned(group_identifiers(spec)?),
+            tables: owned(table_identifiers(spec)?),
+        })
+    }
 }
 
 /// Renders the whole file, unformatted.
-fn render(spec: &Spec) -> Result<String, String> {
+fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     let mut out = String::new();
     out.push_str(HEADER);
     render_counts(spec, &mut out);
-    render_groups(spec, &mut out)?;
-    render_parameters(spec, &mut out)?;
-    render_tables(spec, &mut out)?;
-    render_controllers(spec, &mut out)?;
+    render_groups(idents, &mut out);
+    render_parameters(spec, idents, &mut out)?;
+    render_tables(spec, idents, &mut out)?;
+    render_controllers(spec, idents, &mut out)?;
     Ok(out)
 }
 
@@ -156,11 +193,9 @@ pub const DEFAULT_FIRMWARE: Version = Version {{
     );
 }
 
-fn render_groups(spec: &Spec, out: &mut String) -> Result<(), String> {
-    let mut groups: Vec<&str> = spec.parameters.iter().map(|p| p.group.as_str()).collect();
-    groups.sort_unstable();
-    groups.dedup();
-    let idents = identifiers(groups.iter().copied(), "group")?;
+fn render_groups(idents: &Identifiers, out: &mut String) {
+    let groups: Vec<&str> = idents.groups.keys().map(String::as_str).collect();
+    let idents: Vec<&str> = idents.groups.values().map(String::as_str).collect();
 
     out.push_str(
         "\
@@ -170,6 +205,7 @@ fn render_groups(spec: &Spec, out: &mut String) -> Result<(), String> {
 /// front panel is divided.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = \"serde\", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum Group {
 ",
     );
@@ -179,8 +215,7 @@ pub enum Group {
     out.push_str("}\n\nimpl Group {\n");
     let _ = writeln!(
         out,
-        "    /// Every group, in alphabetical order.\n    pub const ALL: [Self; {}] = [",
-        groups.len()
+        "    /// Every group, in alphabetical order.\n    pub const ALL: &'static [Self] = &[",
     );
     for ident in &idents {
         let _ = writeln!(out, "        Self::{ident},");
@@ -192,14 +227,14 @@ pub enum Group {
         let _ = writeln!(out, "            Self::{ident} => {name:?},");
     }
     out.push_str("        }\n    }\n}\n\n");
-    Ok(())
 }
 
-fn render_parameters(spec: &Spec, out: &mut String) -> Result<(), String> {
-    let names: Vec<&str> = spec.parameters.iter().map(|p| p.name.as_str()).collect();
-    let idents = identifiers(names.iter().copied(), "parameter")?;
-    let groups = group_identifiers(spec)?;
-    let tables = table_identifiers(spec)?;
+fn render_parameters(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
+    let Identifiers {
+        parameters: idents,
+        groups,
+        tables,
+    } = idents;
 
     out.push_str(
         "\
@@ -211,10 +246,11 @@ fn render_parameters(spec: &Spec, out: &mut String) -> Result<(), String> {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = \"serde\", derive(serde::Serialize, serde::Deserialize))]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum ParamId {
 ",
     );
-    for (parameter, ident) in spec.parameters.iter().zip(&idents) {
+    for (parameter, ident) in spec.parameters.iter().zip(idents) {
         let _ = writeln!(
             out,
             "    /// {}.\n    {ident} = {},",
@@ -224,9 +260,9 @@ pub enum ParamId {
     }
     out.push_str("}\n\nimpl ParamId {\n");
     out.push_str(
-        "    /// Every parameter, in offset order.\n    pub const ALL: [Self; PARAMETER_COUNT] = [\n",
+        "    /// Every parameter, in offset order: [`PARAMETER_COUNT`] of them.\n    pub const ALL: &'static [Self] = &[\n",
     );
-    for ident in &idents {
+    for ident in idents {
         let _ = writeln!(out, "        Self::{ident},");
     }
     out.push_str(
@@ -239,7 +275,7 @@ pub enum ParamId {
         match self {
 ",
     );
-    for (parameter, ident) in spec.parameters.iter().zip(&idents) {
+    for (parameter, ident) in spec.parameters.iter().zip(idents) {
         let group = groups
             .get(parameter.group.as_str())
             .ok_or_else(|| format!("parameter {} has an unknown group", parameter.offset))?;
@@ -275,11 +311,9 @@ pub enum ParamId {
     Ok(())
 }
 
-fn render_tables(spec: &Spec, out: &mut String) -> Result<(), String> {
-    let idents = table_identifiers(spec)?;
-    let mut ids: Vec<&str> = spec.tables.iter().map(|t| t.id.as_str()).collect();
-    ids.sort_unstable();
-    ids.dedup();
+fn render_tables(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
+    let idents = &idents.tables;
+    let ids: Vec<&str> = idents.keys().map(String::as_str).collect();
 
     out.push_str(
         "\
@@ -290,6 +324,7 @@ fn render_tables(spec: &Spec, out: &mut String) -> Result<(), String> {
 /// [`TableId::table_for`] is what picks between them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = \"serde\", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum TableId {
 ",
     );
@@ -304,8 +339,7 @@ pub enum TableId {
     out.push_str("}\n\nimpl TableId {\n");
     let _ = writeln!(
         out,
-        "    /// Every value table identifier, in alphabetical order.\n    pub const ALL: [Self; {}] = [",
-        ids.len()
+        "    /// Every value table identifier, in alphabetical order.\n    pub const ALL: &'static [Self] = &[",
     );
     for &id in &ids {
         let _ = writeln!(out, "        Self::{},", idents[id]);
@@ -351,36 +385,48 @@ pub enum TableId {
 /// Renders the body of one `table_for` arm: a static, or a chain choosing
 /// between the versions of a renumbered table, newest first.
 fn table_arm(spec: &Spec, id: &str) -> Result<String, String> {
-    let mut versions: Vec<&ValueTable> = spec.tables.iter().filter(|t| t.id == id).collect();
-    versions.sort_by_key(|table| {
-        let (major, minor) = version_parts(table.firmware.as_deref().unwrap_or("0.0"));
-        core::cmp::Reverse((major, minor))
-    });
+    let versions = spec.versions_of(id);
     let (last, rest) = versions
         .split_last()
         .ok_or_else(|| format!("enums.toml: no table for {id}"))?;
 
     let mut arm = String::new();
     for table in rest {
-        let range = table
-            .firmware
-            .as_deref()
-            .ok_or_else(|| format!("enums.toml: table {id} has an unversioned duplicate"))?;
-        let (major, minor) = version_parts(range);
-        let test = if range.ends_with('+') {
-            format!("firmware.at_least({major}, {minor})")
-        } else {
-            format!("firmware.is({major}, {minor})")
-        };
-        let _ = write!(arm, "if {test} {{ &{} }} else ", static_name(spec, table));
+        let _ = write!(
+            arm,
+            "if {} {{ &{} }} else ",
+            firmware_test(table)?,
+            static_name(spec, table)
+        );
     }
     let _ = write!(arm, "{{ &{} }}", static_name(spec, last));
     Ok(arm)
 }
 
-fn render_controllers(spec: &Spec, out: &mut String) -> Result<(), String> {
-    let names: Vec<&str> = spec.parameters.iter().map(|p| p.name.as_str()).collect();
-    let idents = identifiers(names.iter().copied(), "parameter")?;
+/// Renders the test that picks one version of a renumbered table: `firmware`
+/// is at least the version a `1.1+` range starts at, or is exactly a `1.0`.
+///
+/// # Errors
+///
+/// Returns a message when the table names no firmware, since a table without
+/// a range has nothing to test.
+pub fn firmware_test(table: &ValueTable) -> Result<String, String> {
+    let range = table.firmware.as_deref().ok_or_else(|| {
+        format!(
+            "enums.toml: table {} has an unversioned duplicate",
+            table.id
+        )
+    })?;
+    let (major, minor) = version_parts(range);
+    Ok(if range.ends_with('+') {
+        format!("firmware.at_least({major}, {minor})")
+    } else {
+        format!("firmware.is({major}, {minor})")
+    })
+}
+
+fn render_controllers(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
+    let idents = &idents.parameters;
 
     out.push_str(
         "\
@@ -456,8 +502,10 @@ pub fn table_identifiers(spec: &Spec) -> Result<BTreeMap<&str, String>, String> 
 
 /// Turns each name into a Rust identifier, rejecting anything unusable.
 ///
-/// Two names that collide would compile into one variant and silently lose a
-/// parameter, so a collision is an error rather than a suffix.
+/// # Errors
+///
+/// Returns a message when a name makes no identifier, or when two names make
+/// the same one, which would compile into one variant.
 pub fn identifiers<'a>(
     names: impl Iterator<Item = &'a str>,
     what: &str,
@@ -484,11 +532,12 @@ fn cased<'a>(
     case: impl Fn(&str) -> String,
 ) -> Result<Vec<String>, String> {
     let idents: Vec<String> = names.map(case).collect();
+    let mut seen: BTreeSet<&str> = BTreeSet::new();
     for (index, ident) in idents.iter().enumerate() {
         if ident.is_empty() || ident.starts_with(|c: char| c.is_ascii_digit()) {
             return Err(format!("{what} {index} makes no identifier: {ident:?}"));
         }
-        if idents.iter().skip(index + 1).any(|other| other == ident) {
+        if !seen.insert(ident) {
             return Err(format!("two {what} names both make the identifier {ident}"));
         }
     }
@@ -663,14 +712,6 @@ fn camel_case(word: &str) -> bool {
         && rest.contains(|c: char| c.is_ascii_lowercase())
 }
 
-/// Splits a version or version range, `"1.1"` or `"1.1+"`, into its two numbers.
-pub fn version_parts(version: &str) -> (u32, u32) {
-    let mut parts = version.trim_end_matches('+').split('.');
-    let major = parts.next().and_then(|p| p.parse().ok()).unwrap_or(0);
-    let minor = parts.next().and_then(|p| p.parse().ok()).unwrap_or(0);
-    (major, minor)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -682,13 +723,11 @@ mod tests {
     /// disagrees with its own specification.
     #[test]
     fn generated_code_is_current() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .unwrap_or(Path::new("."));
-        match run(root, true) {
-            Ok(Outcome::Current) => {}
-            Ok(Outcome::Stale) => panic!(
-                "{CODE_PATH} is out of date with spec/. Run `cargo xtask codegen` and commit the result."
+        match generate(crate::spec::shared(), &crate::root(), true) {
+            Ok(stale) if stale.is_empty() => {}
+            Ok(stale) => panic!(
+                "{} out of date with spec/. Run `cargo xtask codegen` and commit the result.",
+                stale.join(" and ")
             ),
             Err(message) => panic!("{message}"),
         }
@@ -746,11 +785,5 @@ mod tests {
     fn colliding_names_are_an_error_not_a_lost_parameter() {
         let names = ["Arp On/Off", "Arp On Off"];
         assert!(identifiers(names.into_iter(), "parameter").is_err());
-    }
-
-    #[test]
-    fn firmware_ranges_split_into_numbers() {
-        assert_eq!(version_parts("1.1+"), (1, 1));
-        assert_eq!(version_parts("1.0"), (1, 0));
     }
 }

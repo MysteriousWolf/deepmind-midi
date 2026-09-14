@@ -10,10 +10,11 @@
 //! use deepmind_midi::program::{Program, ProgramName};
 //! use deepmind_midi::syx::{self, File, Writer};
 //!
-//! let mut program = Program::new(ProtocolVersion::V6)?;
+//! let mut program = Program::new(ProtocolVersion::V6);
 //! program.set_name(ProgramName::new("Bass Sweep")?);
 //!
-//! // Write. The buffer is the host's; `MAX_BANK_LEN` sizes the biggest one.
+//! // Write. The buffer is the host's: `MAX_PROGRAM_FRAME_LEN` sizes one
+//! // program, `MAX_BANK_LEN` a whole bank.
 //! let mut bytes = [0; syx::MAX_PROGRAM_FRAME_LEN];
 //! let mut writer = Writer::new(&mut bytes, DeviceId::Broadcast);
 //! writer.push_program(Bank::A, ProgramNumber::FIRST, &program)?;

@@ -10,7 +10,7 @@
 /// ```
 /// use deepmind_midi::device::Known;
 ///
-/// let sent: Known<u8> = Known::Assumed { value: 64, sent_at: 1_000 };
+/// let sent: Known<u8> = Known::Assumed { value: 64, at: 1_000 };
 /// assert_eq!(sent.value(), Some(&64));
 /// assert!(!sent.is_confirmed());
 /// ```
@@ -30,7 +30,7 @@ pub enum Known<T> {
         /// The value as the host believes it to be.
         value: T,
         /// Host clock when it went out, in milliseconds.
-        sent_at: u64,
+        at: u64,
     },
     /// Read back from the synthesizer, which is the only thing that confirms it.
     Confirmed {
@@ -68,8 +68,7 @@ impl<T> Known<T> {
     pub const fn timestamp(&self) -> Option<u64> {
         match *self {
             Self::Unknown => None,
-            Self::Assumed { sent_at, .. } => Some(sent_at),
-            Self::Confirmed { at, .. } => Some(at),
+            Self::Assumed { at, .. } | Self::Confirmed { at, .. } => Some(at),
         }
     }
 
@@ -91,15 +90,24 @@ impl<T> Known<T> {
         matches!(self, Self::Confirmed { .. })
     }
 
+    /// Returns the value for changing in place, keeping the claim around it.
+    ///
+    /// The claim is unchanged, which is right for a correction the host makes
+    /// to its own copy and wrong for anything the synthesizer said.
+    #[must_use]
+    pub const fn value_mut(&mut self) -> Option<&mut T> {
+        match self {
+            Self::Unknown => None,
+            Self::Assumed { value, .. } | Self::Confirmed { value, .. } => Some(value),
+        }
+    }
+
     /// Borrows the value while keeping the claim around it.
     #[must_use]
     pub const fn as_ref(&self) -> Known<&T> {
         match self {
             Self::Unknown => Known::Unknown,
-            Self::Assumed { value, sent_at } => Known::Assumed {
-                value,
-                sent_at: *sent_at,
-            },
+            Self::Assumed { value, at } => Known::Assumed { value, at: *at },
             Self::Confirmed { value, at } => Known::Confirmed { value, at: *at },
         }
     }
@@ -109,9 +117,9 @@ impl<T> Known<T> {
     pub fn map<U, F: FnOnce(T) -> U>(self, f: F) -> Known<U> {
         match self {
             Self::Unknown => Known::Unknown,
-            Self::Assumed { value, sent_at } => Known::Assumed {
+            Self::Assumed { value, at } => Known::Assumed {
                 value: f(value),
-                sent_at,
+                at,
             },
             Self::Confirmed { value, at } => Known::Confirmed {
                 value: f(value),
@@ -135,10 +143,7 @@ mod tests {
 
     #[test]
     fn a_claim_carries_its_clock_reading() {
-        let assumed = Known::Assumed {
-            value: 7u8,
-            sent_at: 12,
-        };
+        let assumed = Known::Assumed { value: 7u8, at: 12 };
         let confirmed = Known::Confirmed { value: 7u8, at: 34 };
 
         assert_eq!(assumed.timestamp(), Some(12));
@@ -157,11 +162,21 @@ mod tests {
 
     #[test]
     fn borrowing_keeps_the_claim() {
-        let held = Known::Assumed {
+        let mut held = Known::Assumed {
             value: [1u8, 2, 3],
-            sent_at: 9,
+            at: 9,
         };
         assert_eq!(held.as_ref().value(), Some(&&[1, 2, 3]));
         assert_eq!(held.as_ref().timestamp(), Some(9));
+        if let Some(value) = held.value_mut() {
+            value[0] = 4;
+        }
+        assert_eq!(
+            held,
+            Known::Assumed {
+                value: [4, 2, 3],
+                at: 9
+            }
+        );
     }
 }

@@ -22,7 +22,6 @@ use crate::error::{Error, Result};
 /// # Ok::<(), deepmind_midi::Error>(())
 /// ```
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProgramName {
     bytes: [u8; ProgramName::MAX_CHARS],
     len: u8,
@@ -106,6 +105,48 @@ impl ProgramName {
     #[must_use]
     pub const fn is_empty(&self) -> bool {
         self.len == 0
+    }
+}
+
+/// Serializes as the string it displays as, so `"Bass Sweep"` is the whole of
+/// it in any format.
+#[cfg(feature = "serde")]
+#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
+impl serde::Serialize for ProgramName {
+    fn serialize<S: serde::Serializer>(
+        &self,
+        serializer: S,
+    ) -> core::result::Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+/// Deserializes from a string, through [`ProgramName::new`], so the length
+/// and character rules hold for a name that came out of a file too.
+#[cfg(feature = "serde")]
+#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
+impl<'de> serde::Deserialize<'de> for ProgramName {
+    fn deserialize<D: serde::Deserializer<'de>>(
+        deserializer: D,
+    ) -> core::result::Result<Self, D::Error> {
+        struct Visitor;
+
+        impl serde::de::Visitor<'_> for Visitor {
+            type Value = ProgramName;
+
+            fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                f.write_str("a program name of up to sixteen printable ASCII characters")
+            }
+
+            fn visit_str<E: serde::de::Error>(
+                self,
+                text: &str,
+            ) -> core::result::Result<Self::Value, E> {
+                ProgramName::new(text).map_err(E::custom)
+            }
+        }
+
+        deserializer.deserialize_str(Visitor)
     }
 }
 

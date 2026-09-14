@@ -9,14 +9,12 @@
 //! the same guarantee for the fixture itself, so regenerating it is a visible
 //! edit rather than a silent one.
 //!
-//! The factory preset packs are the other source, and they are not committed:
-//! redistribution rights on Behringer sound banks are unclear and a library
-//! repository is the wrong place to find out. Point `DEEPMIND_PACKS` at a
-//! directory of `.syx` files and [`factory_packs_read_back_unchanged`] reads
-//! every one of them; without it the test skips.
+//! The factory preset packs are the other source. They are not committed (the
+//! README says why), so [`factory_packs_read_back_unchanged`] is ignored until
+//! `DEEPMIND_PACKS` names a directory of them and it is asked for by name:
 //!
 //! ```sh
-//! DEEPMIND_PACKS=~/Downloads/deepmind-presets cargo test -p deepmind-midi --test packs
+//! DEEPMIND_PACKS=~/Downloads/deepmind-presets cargo test -p deepmind-midi --test packs -- --include-ignored
 //! UPDATE_FIXTURES=1 cargo test -p deepmind-midi --test packs   # rewrite the fixture
 //! ```
 
@@ -34,13 +32,17 @@ use std::path::{Path, PathBuf};
 use deepmind_midi::ids::{Bank, DeviceId, ProgramNumber, ProtocolVersion};
 use deepmind_midi::program::{Program, ProgramName};
 use deepmind_midi::sysex::{Frame, Message};
-use deepmind_midi::syx::{File, MAX_BANK_LEN, Writer};
+use deepmind_midi::syx::File;
+
+mod common;
+
+use common::{Rng, write_pack};
 
 /// FNV-1a of the committed fixture.
 ///
 /// A literal rather than a computation, so rebuilding the fixture has to be
 /// agreed to in a diff. Print the new one with `UPDATE_FIXTURES=1`.
-const FIXTURE_HASH: u64 = 0x6ae3_fe5d_c623_7c60;
+const FIXTURE_HASH: u64 = 0x8daa_e3d6_ad71_c8bc;
 
 /// Programs the synthetic pack stores in bank A, under comms protocol version 6.
 const V6_PROGRAMS: u8 = 4;
@@ -54,17 +56,7 @@ fn fixture_path() -> PathBuf {
 
 /// Deterministic bytes, the same on every platform and every run.
 fn filled(version: ProtocolVersion, seed: u64, name: &str) -> Program {
-    let mut state = seed;
-    let len = version.program_data_len().expect("a version with a length");
-    let bytes: Vec<u8> = (0..len)
-        .map(|_| {
-            state = state
-                .wrapping_mul(6_364_136_223_846_793_005)
-                .wrapping_add(1_442_695_040_888_963_407);
-            u8::try_from(state >> 56).unwrap_or(0)
-        })
-        .collect();
-
+    let bytes = Rng::new(seed).bytes(version.program_data_len());
     let mut program = Program::from_bytes(version, &bytes).expect("bytes of the right length");
     program.set_name(ProgramName::new(name).expect("a name the display can show"));
     program
@@ -78,44 +70,39 @@ fn filled(version: ProtocolVersion, seed: u64, name: &str) -> Program {
 /// table lists, and a pack the library cannot carry through unchanged is a bug
 /// whether or not every byte is one the manual names.
 fn synthetic_pack() -> Vec<u8> {
-    let mut bytes = vec![0; MAX_BANK_LEN];
-    let mut writer = Writer::new(&mut bytes, DeviceId::Broadcast);
-
-    for index in 0..V6_PROGRAMS {
-        let program = filled(
-            ProtocolVersion::V6,
-            u64::from(index) + 1,
-            &format!("Synthetic {}", index + 1),
-        );
+    write_pack(DeviceId::Broadcast, |writer| {
+        for index in 0..V6_PROGRAMS {
+            let program = filled(
+                ProtocolVersion::V6,
+                u64::from(index) + 1,
+                &format!("Synthetic {}", index + 1),
+            );
+            writer
+                .push_program(
+                    Bank::A,
+                    ProgramNumber::new(index).expect("a program in range"),
+                    &program,
+                )
+                .expect("room for a program");
+        }
+        for index in 0..V7_PROGRAMS {
+            let program = filled(
+                ProtocolVersion::V7,
+                u64::from(index) + 100,
+                &format!("Reserved {}", index + 1),
+            );
+            writer
+                .push_program(
+                    Bank::new(1).expect("bank B"),
+                    ProgramNumber::new(index).expect("a program in range"),
+                    &program,
+                )
+                .expect("room for a program");
+        }
         writer
-            .push_program(
-                Bank::A,
-                ProgramNumber::new(index).expect("a program in range"),
-                &program,
-            )
-            .expect("room for a program");
-    }
-    for index in 0..V7_PROGRAMS {
-        let program = filled(
-            ProtocolVersion::V7,
-            u64::from(index) + 100,
-            &format!("Reserved {}", index + 1),
-        );
-        writer
-            .push_program(
-                Bank::new(1).expect("bank B"),
-                ProgramNumber::new(index).expect("a program in range"),
-                &program,
-            )
-            .expect("room for a program");
-    }
-    writer
-        .push_edit_buffer(&filled(ProtocolVersion::V6, 999, "Edit Buffer"))
-        .expect("room for the edit buffer");
-
-    let written = writer.finish();
-    bytes.truncate(written);
-    bytes
+            .push_edit_buffer(&filled(ProtocolVersion::V6, 999, "Edit Buffer"))
+            .expect("room for the edit buffer");
+    })
 }
 
 /// FNV-1a, 64-bit. Eight lines beats a dependency for a fixture checksum.
@@ -210,11 +197,10 @@ fn the_fixture_carries_the_programs_it_was_built_from() {
 }
 
 #[test]
+#[ignore = "set DEEPMIND_PACKS to a directory of factory .syx packs and run with --include-ignored"]
 fn factory_packs_read_back_unchanged() {
-    let Some(dir) = std::env::var_os("DEEPMIND_PACKS") else {
-        eprintln!("skipped: set DEEPMIND_PACKS to a directory of .syx files to run this");
-        return;
-    };
+    let dir = std::env::var_os("DEEPMIND_PACKS")
+        .expect("DEEPMIND_PACKS is not set; point it at a directory of factory .syx packs");
 
     let mut files = 0;
     let mut programs = 0;

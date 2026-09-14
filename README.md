@@ -1,12 +1,14 @@
 <p align="center">
-  <img src="docs/banner.svg" alt="deepmind-midi" width="800">
+  <img src="https://raw.githubusercontent.com/MysteriousWolf/deepmind-midi/main/docs/banner.svg" alt="deepmind-midi" width="800">
 </p>
 
 <p align="center">
+  <a href="https://crates.io/crates/deepmind-midi"><img src="https://img.shields.io/crates/v/deepmind-midi" alt="crates.io"></a>
+  <a href="https://docs.rs/deepmind-midi"><img src="https://img.shields.io/docsrs/deepmind-midi" alt="docs.rs"></a>
   <a href="https://github.com/MysteriousWolf/deepmind-midi/actions/workflows/ci.yml"><img src="https://github.com/MysteriousWolf/deepmind-midi/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/rust-1.85%2B-orange" alt="Rust 1.85+">
   <img src="https://img.shields.io/badge/no__std-yes-blue" alt="no_std">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-green" alt="License: Apache-2.0"></a>
+  <a href="https://github.com/MysteriousWolf/deepmind-midi/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-green" alt="License: Apache-2.0"></a>
 </p>
 
 Rust library for the Behringer DeepMind MIDI protocol. Sans-IO, `no_std`,
@@ -69,12 +71,12 @@ has not replied yet, which is how a host's timeout path gets tested.
 
 | | |
 |---|---|
-| [Protocol](docs/midi-spec.md) | Signal path, SysEx, NRPN, all 242 parameters, the CC map, value tables |
-| [Effects](docs/effects.md) | All 35 algorithms: a drawing of each panel and what its twelve slots do |
-| [Architecture](docs/architecture.md) | Design, layering, testing, releases, status |
-| [`spec/`](spec/) | The same protocol as TOML. Source of truth for the docs and the code |
-| [NOTICE](NOTICE) | Where the descriptions and panel colours come from |
-| `cargo doc --open` | API reference |
+| [Protocol](https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/midi-spec.md) | Signal path, SysEx, NRPN, all 242 parameters, the CC map, value tables |
+| [Effects](https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/effects.md) | All 35 algorithms: a drawing of each panel and what its twelve slots do |
+| [Architecture](https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/architecture.md) | Design, layering, testing, releases, status |
+| [`spec/`](https://github.com/MysteriousWolf/deepmind-midi/tree/main/spec) | The same protocol as TOML. Source of truth for the docs and the code |
+| [NOTICE](https://github.com/MysteriousWolf/deepmind-midi/blob/main/NOTICE) | Where the descriptions and panel colours come from |
+| [docs.rs](https://docs.rs/deepmind-midi) | API reference, or `cargo doc --open` |
 
 ## Development
 
@@ -99,14 +101,18 @@ Fuzzing needs nightly and `cargo-fuzz`:
 
 ```sh
 cargo install cargo-fuzz
-cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict   # or decoder, file, program
+cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict   # or decoder, file, program, device
 ```
 
 The factory preset packs are not in the repository. The tests that read them
-skip unless `DEEPMIND_PACKS` points at your own copy.
+are ignored unless `DEEPMIND_PACKS` points at your own copy:
+
+```sh
+DEEPMIND_PACKS=~/deepmind/packs cargo test -p deepmind-midi --test packs -- --include-ignored
+```
 
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](https://github.com/MysteriousWolf/deepmind-midi/blob/main/LICENSE).
 
 Not affiliated with or endorsed by Behringer or Music Tribe.

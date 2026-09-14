@@ -80,6 +80,20 @@ impl Interface {
     }
 }
 
+impl TryFrom<u8> for Interface {
+    type Error = Error;
+
+    fn try_from(byte: u8) -> Result<Self> {
+        Self::from_byte(byte)
+    }
+}
+
+impl From<Interface> for u8 {
+    fn from(value: Interface) -> Self {
+        value.to_byte()
+    }
+}
+
 impl fmt::Display for Interface {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(match self {
@@ -95,7 +109,7 @@ impl fmt::Display for Interface {
 /// Bulk payloads stay packed. Unpacking needs somewhere to put 242 or 2048
 /// bytes, which a `no_std` host has to choose for itself, so
 /// [`packed::unpack_into`] is a separate step the caller drives.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum Message<'a> {
     /// Announces a control application on the interface it arrives over.
@@ -348,7 +362,7 @@ impl<'a> Message<'a> {
                 program,
                 packed,
             } => {
-                prefix = [version.0, bank.index(), program.get(), 0, 0];
+                prefix = [version.get(), bank.index(), program.get(), 0, 0];
                 (3, packed)
             }
             Self::EditBufferDumpResponse { version, packed }
@@ -356,7 +370,7 @@ impl<'a> Message<'a> {
             | Self::CalibrationDataDumpResponse { version, packed }
             | Self::ChordMemoryDumpResponse { version, packed }
             | Self::PolyChordMemoryDumpResponse { version, packed } => {
-                prefix = [version.0, 0, 0, 0, 0];
+                prefix = [version.get(), 0, 0, 0, 0];
                 (1, packed)
             }
             Self::BankProgramNamesDumpResponse {
@@ -369,7 +383,7 @@ impl<'a> Message<'a> {
                 bank,
                 packed,
             } => {
-                prefix = [version.0, bank.index(), 0, 0, 0];
+                prefix = [version.get(), bank.index(), 0, 0, 0];
                 (2, packed)
             }
             Self::UserPatternDumpResponse {
@@ -378,10 +392,10 @@ impl<'a> Message<'a> {
                 packed,
             } => {
                 if let Some(pattern) = pattern {
-                    prefix = [version.0, pattern.get(), 0, 0, 0];
+                    prefix = [version.get(), pattern.get(), 0, 0, 0];
                     (2, packed)
                 } else {
-                    prefix = [version.0, 0, 0, 0, 0];
+                    prefix = [version.get(), 0, 0, 0, 0];
                     (1, packed)
                 }
             }
@@ -506,11 +520,11 @@ impl<'a> Message<'a> {
         let wrong = wrong_length(command, found);
         Ok(match command {
             Command::ProgramDumpResponse => {
-                let (version, rest) = split_version(payload).ok_or_else(|| wrong(3))?;
+                let (version, rest) = split_version(payload).ok_or_else(|| wrong(3))??;
                 let [bank, program, ref packed @ ..] = *rest else {
                     return Err(wrong(3));
                 };
-                check_run(packed, version.program_data_len(), 3, found, command)?;
+                check_run(packed, Some(version.program_data_len()), 3, found, command)?;
                 Self::ProgramDumpResponse {
                     version,
                     bank: Bank::new(bank)?,
@@ -519,32 +533,33 @@ impl<'a> Message<'a> {
                 }
             }
             Command::EditBufferDumpResponse => {
-                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))?;
-                check_run(packed, version.program_data_len(), 1, found, command)?;
+                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))??;
+                check_run(packed, Some(version.program_data_len()), 1, found, command)?;
                 Self::EditBufferDumpResponse { version, packed }
             }
             Command::GlobalParameterDumpResponse => {
-                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))?;
+                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))??;
                 check_run(packed, Some(GLOBAL_DATA_LEN), 1, found, command)?;
                 Self::GlobalParameterDumpResponse { version, packed }
             }
             Command::CalibrationDataDumpResponse => {
-                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))?;
+                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))??;
+                check_run(packed, None, 1, found, command)?;
                 Self::CalibrationDataDumpResponse { version, packed }
             }
             Command::ChordMemoryDumpResponse => {
-                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))?;
+                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))??;
                 check_run(packed, Some(CHORD_MEMORY_LEN), 1, found, command)?;
                 Self::ChordMemoryDumpResponse { version, packed }
             }
             Command::PolyChordMemoryDumpResponse => {
-                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))?;
+                let (version, packed) = split_version(payload).ok_or_else(|| wrong(1))??;
                 check_run(packed, Some(POLY_CHORD_MEMORY_LEN), 1, found, command)?;
                 Self::PolyChordMemoryDumpResponse { version, packed }
             }
             Command::BankProgramNamesDumpResponse => {
                 let (version, bank, packed) =
-                    split_version_and_bank(payload).ok_or_else(|| wrong(2))?;
+                    split_version_and_bank(payload).ok_or_else(|| wrong(2))??;
                 check_run(packed, Some(BANK_NAMES_LEN), 2, found, command)?;
                 Self::BankProgramNamesDumpResponse {
                     version,
@@ -554,7 +569,7 @@ impl<'a> Message<'a> {
             }
             Command::SingleProgramNameDumpResponse => {
                 let (version, bank, packed) =
-                    split_version_and_bank(payload).ok_or_else(|| wrong(2))?;
+                    split_version_and_bank(payload).ok_or_else(|| wrong(2))??;
                 check_run(packed, Some(PROGRAM_NAME_LEN), 2, found, command)?;
                 Self::SingleProgramNameDumpResponse {
                     version,
@@ -563,7 +578,7 @@ impl<'a> Message<'a> {
                 }
             }
             Command::UserPatternDumpResponse => {
-                let (version, rest) = split_version(payload).ok_or_else(|| wrong(1))?;
+                let (version, rest) = split_version(payload).ok_or_else(|| wrong(1))??;
                 let (pattern, packed) = split_pattern(rest, PATTERN_DATA_LEN)
                     .ok_or_else(|| wrong(1 + packed::packed_len(PATTERN_DATA_LEN)))?;
                 Self::UserPatternDumpResponse {
@@ -592,16 +607,19 @@ fn wrong_length(command: Command, found: usize) -> impl Fn(usize) -> Error {
 }
 
 /// Splits the comms protocol version byte off the front of a payload.
-fn split_version(payload: &[u8]) -> Option<(ProtocolVersion, &[u8])> {
+///
+/// `None` for an empty payload, which is a length error for the caller to
+/// name, and [`Error::UnsupportedProtocolVersion`] for a version this build
+/// does not know the dump layout of.
+fn split_version(payload: &[u8]) -> Option<Result<(ProtocolVersion, &[u8])>> {
     let (version, rest) = payload.split_first()?;
-    Some((ProtocolVersion(*version), rest))
+    Some(ProtocolVersion::new(*version).map(|version| (version, rest)))
 }
 
 /// Splits the version and bank bytes off the front of a payload.
-fn split_version_and_bank(payload: &[u8]) -> Option<(ProtocolVersion, u8, &[u8])> {
-    let (version, rest) = split_version(payload)?;
-    let (bank, packed) = rest.split_first()?;
-    Some((version, *bank, packed))
+fn split_version_and_bank(payload: &[u8]) -> Option<Result<(ProtocolVersion, u8, &[u8])>> {
+    let (bank, packed) = payload.get(1..)?.split_first()?;
+    Some(split_version(payload)?.map(|(version, _)| (version, *bank, packed)))
 }
 
 /// Tells the two user pattern dump responses apart by length.
@@ -631,8 +649,8 @@ fn holds(packed: &[u8], raw_len: usize) -> bool {
 ///
 /// A run is accepted when it can hold that many bytes and is no more than one
 /// short group longer, which covers a last group padded out to eight bytes and
-/// one sent short. `None` skips the check, for the one message whose unpacked
-/// length the manual does not give.
+/// one sent short. `None` only asks that the run unpacks at all, for the one
+/// message whose unpacked length the manual does not give.
 fn check_run(
     packed: &[u8],
     raw_len: Option<usize>,
@@ -641,7 +659,7 @@ fn check_run(
     command: Command,
 ) -> Result<()> {
     let Some(raw_len) = raw_len else {
-        return Ok(());
+        return packed::unpacked_len(packed.len()).map(|_| ());
     };
     if holds(packed, raw_len) {
         return Ok(());
@@ -697,6 +715,7 @@ impl<'a> Frame<'a> {
     /// # Errors
     ///
     /// Returns [`Error::Unframed`] when the `F0` or the `F7` is missing,
+    /// [`Error::NotSevenBit`] when a byte between them has its high bit set,
     /// [`Error::ShortFrame`] when there is no room for a header,
     /// [`Error::Foreign`] for another manufacturer's or model's frame,
     /// [`Error::UnknownCommand`] for an undocumented command, and
@@ -706,6 +725,11 @@ impl<'a> Frame<'a> {
         let (last, body) = rest.split_last().ok_or(Error::Unframed)?;
         if *first != SYSEX_START || *last != SYSEX_END {
             return Err(Error::Unframed);
+        }
+        // A port never delivers one, since a status byte ends a frame; a file
+        // or a caller can, and a frame holding one is not a frame.
+        if let Some(byte) = body.iter().find(|byte| **byte >= 0x80) {
+            return Err(Error::NotSevenBit(*byte));
         }
         let [a, b, c, model, device, command, payload @ ..] = body else {
             return Err(Error::ShortFrame(bytes.len()));
@@ -735,7 +759,10 @@ impl<'a> Frame<'a> {
     /// # Errors
     ///
     /// Returns [`Error::BufferTooSmall`] when `out` is shorter than
-    /// [`encoded_len`](Self::encoded_len).
+    /// [`encoded_len`](Self::encoded_len), and [`Error::NotSevenBit`] when the
+    /// message holds a byte that cannot travel inside a frame: a channel or a
+    /// reserved byte of 128 or more, or a packed run that was not packed. Nothing
+    /// is written in either case.
     pub fn encode_into(&self, out: &mut [u8]) -> Result<usize> {
         let needed = self.encoded_len();
         let available = out.len();
@@ -743,6 +770,10 @@ impl<'a> Frame<'a> {
             .get_mut(..needed)
             .ok_or(Error::BufferTooSmall { needed, available })?;
         let (prefix, prefix_len, packed) = self.message.parts();
+        let prefix = prefix.get(..prefix_len).unwrap_or_default();
+        if let Some(byte) = prefix.iter().chain(packed).find(|byte| **byte >= 0x80) {
+            return Err(Error::NotSevenBit(*byte));
+        }
         let header = [
             SYSEX_START,
             MANUFACTURER_ID[0],
@@ -752,13 +783,14 @@ impl<'a> Frame<'a> {
             self.device.to_byte(),
             self.message.command().to_byte(),
         ];
-        let bytes = header
-            .into_iter()
-            .chain(prefix.into_iter().take(prefix_len))
-            .chain(packed.iter().copied())
-            .chain(core::iter::once(SYSEX_END));
-        for (slot, byte) in out.iter_mut().zip(bytes) {
-            *slot = byte;
+        let (head, rest) = out.split_at_mut(header.len().min(out.len()));
+        head.copy_from_slice(header.get(..head.len()).unwrap_or_default());
+        let (front, rest) = rest.split_at_mut(prefix.len().min(rest.len()));
+        front.copy_from_slice(prefix.get(..front.len()).unwrap_or_default());
+        let (body, tail) = rest.split_at_mut(packed.len().min(rest.len()));
+        body.copy_from_slice(packed.get(..body.len()).unwrap_or_default());
+        if let Some(end) = tail.first_mut() {
+            *end = SYSEX_END;
         }
         Ok(needed)
     }
@@ -924,6 +956,60 @@ mod tests {
         }
     }
 
+    /// A byte with its high bit set would end the frame early on the wire, so
+    /// a message holding one is refused rather than written.
+    #[test]
+    fn a_message_that_cannot_travel_inside_a_frame_is_refused() {
+        let mut out = [0; 512];
+        let bad_channel = Frame::new(
+            DeviceId::Unit(0),
+            Message::ControlAppNotifyResponse {
+                rx_channel: 0x90,
+                tx_channel: 0,
+                interface: Interface::Midi,
+                bank: Bank::A,
+                program: ProgramNumber::FIRST,
+            },
+        );
+        assert_eq!(
+            bad_channel.encode_into(&mut out),
+            Err(Error::NotSevenBit(0x90))
+        );
+        assert!(out.iter().all(|byte| *byte == 0), "nothing is written");
+
+        let unpacked = [0xFF; 280];
+        let bad_run = Frame::new(
+            DeviceId::Unit(0),
+            Message::EditBufferDumpResponse {
+                version: ProtocolVersion::V6,
+                packed: &unpacked,
+            },
+        );
+        assert_eq!(bad_run.encode_into(&mut out), Err(Error::NotSevenBit(0xFF)));
+    }
+
+    /// The one dump with no documented length still has to unpack.
+    #[test]
+    fn a_calibration_dump_that_cannot_unpack_is_refused() {
+        let mut bytes = alloc::vec![0xF0, 0x00, 0x20, 0x32, 0x20, 0x00, 0x12, 0x07];
+        bytes.extend_from_slice(&[0; 9]);
+        bytes.push(0xF7);
+        assert_eq!(Frame::parse(&bytes), Err(Error::PackedRunLength(9)));
+    }
+
+    /// A dump stamped with a version this build has no layout for is refused
+    /// where it is parsed, since nothing downstream could read it.
+    #[test]
+    fn an_unknown_protocol_version_is_refused_at_the_frame() {
+        let mut bytes = alloc::vec![0xF0, 0x00, 0x20, 0x32, 0x20, 0x00, 0x04, 0x09];
+        bytes.extend_from_slice(&[0; 280]);
+        bytes.push(0xF7);
+        assert_eq!(
+            Frame::parse(&bytes),
+            Err(Error::UnsupportedProtocolVersion(9))
+        );
+    }
+
     #[test]
     fn every_command_the_table_knows_is_reachable_from_a_message() {
         let runs = runs();
@@ -932,7 +1018,7 @@ mod tests {
             seen.push(message.command());
         }
         for command in Command::ALL {
-            assert!(seen.contains(&command), "{command} has no message");
+            assert!(seen.contains(command), "{command} has no message");
         }
     }
 

@@ -11,8 +11,7 @@
 //! kinds are left as raw bytes, with the label as the way to read them:
 //!
 //! - **Numbers.** The three clock divider tables list `1/2`, `3/8`, `1/16`. Those
-//!   are divisions of a bar, not names, and `Div1Over2` would be a worse way of
-//!   writing `1/2` than `1/2` is.
+//!   are divisions of a bar, not names.
 //! - **Runs.** `SPREAD-1` stands for `SPREAD-1` through `SPREAD-254` and
 //!   `Preset-1` for a bank of patterns. The specification marks those tables
 //!   partial and lists only the first of each run, so an enum of what is listed
@@ -25,7 +24,7 @@
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
 
-use crate::codegen::{doc, pascal, snake_identifiers, table_identifiers, version_parts};
+use crate::codegen::{Identifiers, doc, firmware_test, pascal, snake_identifiers};
 use crate::spec::{Spec, ValueTable};
 
 /// Path of the generated program types, relative to the repository root.
@@ -46,11 +45,11 @@ const NAME_PREFIX: &str = "Program Name Char";
 /// Returns a message when a name in the specification does not make a usable
 /// Rust identifier, or when the program name is not one contiguous run of
 /// parameters.
-pub fn render(spec: &Spec) -> Result<String, String> {
+pub fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     let mut out = String::from(HEADER);
     render_name_field(spec, &mut out)?;
-    render_values(spec, &mut out)?;
-    render_accessors(spec, &mut out)?;
+    render_values(spec, idents, &mut out)?;
+    render_accessors(spec, idents, &mut out)?;
     Ok(out)
 }
 
@@ -114,24 +113,20 @@ pub const NAME_LEN: usize = {};
 
 /// Renders one Rust enum per value table whose entries are a closed set of
 /// names.
-fn render_values(spec: &Spec, out: &mut String) -> Result<(), String> {
-    let table_idents = table_identifiers(spec)?;
+fn render_values(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
     for id in typed_tables(spec) {
-        let mut versions: Vec<&ValueTable> = spec.tables.iter().filter(|t| t.id == id).collect();
-        versions.sort_by_key(|table| {
-            let (major, minor) = version_parts(table.firmware.as_deref().unwrap_or("0.0"));
-            std::cmp::Reverse((major, minor))
-        });
+        let versions = spec.versions_of(id);
         let (newest, older) = versions
             .split_first()
             .ok_or_else(|| format!("enums.toml: no table for {id}"))?;
         let ident = pascal(id);
-        let table = table_idents
+        let table = idents
+            .tables
             .get(id)
             .ok_or_else(|| format!("enums.toml: no identifier for {id}"))?;
         let variants = variant_identifiers(newest, id)?;
 
-        render_value_enum(spec, newest, &ident, &variants, out);
+        render_value_enum(newest, !older.is_empty(), &ident, &variants, out);
         render_value_impl(&ident, table, newest, older, &variants, out)?;
     }
     Ok(())
@@ -140,13 +135,12 @@ fn render_values(spec: &Spec, out: &mut String) -> Result<(), String> {
 /// Renders the enum itself: one variant per entry of the newest firmware's
 /// table.
 fn render_value_enum(
-    spec: &Spec,
     newest: &ValueTable,
+    renumbered: bool,
     ident: &str,
     variants: &[String],
     out: &mut String,
 ) {
-    let renumbered = spec.tables.iter().filter(|t| t.id == newest.id).count() > 1;
     let _ = writeln!(out, "/// {}.\n///", doc(&newest.name));
     if renumbered {
         let _ = writeln!(
@@ -175,6 +169,7 @@ fn render_value_enum(
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = \"serde\", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum {ident} {{"
     );
     for (entry, variant) in newest.entries.iter().zip(variants) {
@@ -210,8 +205,7 @@ fn render_value_header(ident: &str, table: &str, variants: &[String], out: &mut 
     pub const TABLE: TableId = TableId::{table};
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; {}] = [",
-        variants.len()
+    pub const ALL: &'static [Self] = &[",
     );
     for variant in variants {
         let _ = writeln!(out, "        Self::{variant},");
@@ -425,29 +419,14 @@ fn render_firmware_chain(
     out: &mut String,
     body: impl Fn(&ValueTable, &mut String) -> Result<(), String>,
 ) -> Result<(), String> {
-    let range = newest
-        .firmware
-        .as_deref()
-        .ok_or_else(|| format!("enums.toml: table {} has an unversioned copy", newest.id))?;
-    let (major, minor) = version_parts(range);
-    let test = if range.ends_with('+') {
-        format!("firmware.at_least({major}, {minor})")
-    } else {
-        format!("firmware.is({major}, {minor})")
-    };
-    let _ = writeln!(out, "        if {test} {{");
+    let _ = writeln!(out, "        if {} {{", firmware_test(newest)?);
     body(newest, out)?;
     out.push_str("        } else {\n");
     let (last, rest) = older
         .split_last()
         .ok_or_else(|| format!("enums.toml: table {} has one version", newest.id))?;
     for table in rest {
-        let range = table
-            .firmware
-            .as_deref()
-            .ok_or_else(|| format!("enums.toml: table {} has an unversioned copy", table.id))?;
-        let (major, minor) = version_parts(range);
-        let _ = writeln!(out, "        if firmware.at_least({major}, {minor}) {{");
+        let _ = writeln!(out, "        if {} {{", firmware_test(table)?);
         body(table, out)?;
         out.push_str("        } else {\n");
     }
@@ -460,15 +439,16 @@ fn render_firmware_chain(
 
 /// Renders the typed accessors, one pair per parameter that is not part of the
 /// program's name.
-fn render_accessors(spec: &Spec, out: &mut String) -> Result<(), String> {
+fn render_accessors(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
     let typed = typed_tables(spec);
-    let named: Vec<&crate::spec::Parameter> = spec
+    let named: Vec<(&crate::spec::Parameter, &str)> = spec
         .parameters
         .iter()
-        .filter(|parameter| !parameter.name.starts_with(NAME_PREFIX))
+        .zip(&idents.parameters)
+        .filter(|(parameter, _)| !parameter.name.starts_with(NAME_PREFIX))
+        .map(|(parameter, ident)| (parameter, ident.as_str()))
         .collect();
-    let methods = snake_identifiers(named.iter().map(|p| p.name.as_str()), "parameter")?;
-    let idents = crate::codegen::identifiers(named.iter().map(|p| p.name.as_str()), "parameter")?;
+    let methods = snake_identifiers(named.iter().map(|(p, _)| p.name.as_str()), "parameter")?;
 
     out.push_str(
         "\
@@ -483,7 +463,7 @@ fn render_accessors(spec: &Spec, out: &mut String) -> Result<(), String> {
 impl Program {
 ",
     );
-    for ((parameter, method), ident) in named.iter().zip(&methods).zip(&idents) {
+    for ((parameter, ident), method) in named.iter().zip(&methods) {
         let table = parameter
             .value_table
             .as_deref()

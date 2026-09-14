@@ -33,6 +33,7 @@ pub const NAME_LEN: usize = 17;
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum ArpMode {
     /// Up.
     Up,
@@ -63,7 +64,7 @@ impl ArpMode {
     pub const TABLE: TableId = TableId::ArpMode;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 11] = [
+    pub const ALL: &'static [Self] = &[
         Self::Up,
         Self::Down,
         Self::UpAndDown,
@@ -168,6 +169,7 @@ impl fmt::Display for ArpMode {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum EnvelopeTrigger {
     /// Key.
     Key,
@@ -186,7 +188,7 @@ impl EnvelopeTrigger {
     pub const TABLE: TableId = TableId::EnvelopeTrigger;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 5] = [
+    pub const ALL: &'static [Self] = &[
         Self::Key,
         Self::Lfo1,
         Self::Lfo2,
@@ -273,6 +275,7 @@ impl fmt::Display for EnvelopeTrigger {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum FxMode {
     /// Insert.
     Insert,
@@ -287,7 +290,7 @@ impl FxMode {
     pub const TABLE: TableId = TableId::FxMode;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 3] = [Self::Insert, Self::Send, Self::Bypass];
+    pub const ALL: &'static [Self] = &[Self::Insert, Self::Send, Self::Bypass];
 
     /// Returns the value this byte selects on [`DEFAULT_FIRMWARE`].
     ///
@@ -364,6 +367,7 @@ impl fmt::Display for FxMode {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum FxRouting {
     /// Serial 1-2-3-4.
     Serial1234,
@@ -392,7 +396,7 @@ impl FxRouting {
     pub const TABLE: TableId = TableId::FxRouting;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 10] = [
+    pub const ALL: &'static [Self] = &[
         Self::Serial1234,
         Self::Parallel12Serial34,
         Self::Parallel12Parallel34,
@@ -498,6 +502,7 @@ impl fmt::Display for FxRouting {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum FxType {
     /// `TC-DeepVRB`.
     TcDeepVrb,
@@ -576,7 +581,7 @@ impl FxType {
     pub const TABLE: TableId = TableId::FxType;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 35] = [
+    pub const ALL: &'static [Self] = &[
         Self::TcDeepVrb,
         Self::AmbVerb,
         Self::RoomRev,
@@ -869,6 +874,7 @@ impl fmt::Display for FxType {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum KeyAssignMode {
     /// Mono.
     Mono,
@@ -885,7 +891,7 @@ impl KeyAssignMode {
     pub const TABLE: TableId = TableId::KeyAssignMode;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 4] = [Self::Mono, Self::ReTrigger, Self::Legato, Self::OneShot];
+    pub const ALL: &'static [Self] = &[Self::Mono, Self::ReTrigger, Self::Legato, Self::OneShot];
 
     /// Returns the value this byte selects on [`DEFAULT_FIRMWARE`].
     ///
@@ -964,6 +970,7 @@ impl fmt::Display for KeyAssignMode {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum LfoShape {
     /// Sine.
     Sine,
@@ -986,7 +993,7 @@ impl LfoShape {
     pub const TABLE: TableId = TableId::LfoShape;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 7] = [
+    pub const ALL: &'static [Self] = &[
         Self::Sine,
         Self::Triangle,
         Self::Square,
@@ -1083,6 +1090,7 @@ impl fmt::Display for LfoShape {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum ModDestination {
     /// Off.
     Off,
@@ -1357,7 +1365,7 @@ impl ModDestination {
     pub const TABLE: TableId = TableId::ModDestination;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 133] = [
+    pub const ALL: &'static [Self] = &[
         Self::Off,
         Self::Lfo1Rate,
         Self::Lfo1Delay,
@@ -2240,6 +2248,7 @@ impl fmt::Display for ModDestination {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum ModSource {
     /// Off.
     Off,
@@ -2298,7 +2307,7 @@ impl ModSource {
     pub const TABLE: TableId = TableId::ModSource;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 25] = [
+    pub const ALL: &'static [Self] = &[
         Self::Off,
         Self::PitchBend,
         Self::ModWheel,
@@ -2530,6 +2539,7 @@ impl fmt::Display for ModSource {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum Osc1PitchModMode {
     /// OSC 1 + 2.
     Osc12,
@@ -2542,7 +2552,7 @@ impl Osc1PitchModMode {
     pub const TABLE: TableId = TableId::Osc1PitchModMode;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 2] = [Self::Osc12, Self::Osc1Only];
+    pub const ALL: &'static [Self] = &[Self::Osc12, Self::Osc1Only];
 
     /// Returns the value this byte selects on [`DEFAULT_FIRMWARE`].
     ///
@@ -2617,6 +2627,7 @@ impl fmt::Display for Osc1PitchModMode {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum OscRange {
     /// 16'.
     SixteenFoot,
@@ -2631,7 +2642,7 @@ impl OscRange {
     pub const TABLE: TableId = TableId::OscRange;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 3] = [Self::SixteenFoot, Self::EightFoot, Self::FourFoot];
+    pub const ALL: &'static [Self] = &[Self::SixteenFoot, Self::EightFoot, Self::FourFoot];
 
     /// Returns the value this byte selects on [`DEFAULT_FIRMWARE`].
     ///
@@ -2708,6 +2719,7 @@ impl fmt::Display for OscRange {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum PitchModSource {
     /// LFO 1.
     Lfo1,
@@ -2730,7 +2742,7 @@ impl PitchModSource {
     pub const TABLE: TableId = TableId::PitchModSource;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 7] = [
+    pub const ALL: &'static [Self] = &[
         Self::Lfo1,
         Self::Lfo2,
         Self::VcaEnv,
@@ -2823,6 +2835,7 @@ impl fmt::Display for PitchModSource {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum PolyphonyMode {
     /// Poly.
     Poly,
@@ -2857,7 +2870,7 @@ impl PolyphonyMode {
     pub const TABLE: TableId = TableId::PolyphonyMode;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 13] = [
+    pub const ALL: &'static [Self] = &[
         Self::Poly,
         Self::Unison2,
         Self::Unison3,
@@ -2968,6 +2981,7 @@ impl fmt::Display for PolyphonyMode {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum PortamentoMode {
     /// Normal.
     Normal,
@@ -3004,7 +3018,7 @@ impl PortamentoMode {
     pub const TABLE: TableId = TableId::PortamentoMode;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 14] = [
+    pub const ALL: &'static [Self] = &[
         Self::Normal,
         Self::Fingered,
         Self::FixedRate,
@@ -3118,6 +3132,7 @@ impl fmt::Display for PortamentoMode {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum ProgramCategory {
     /// None.
     None,
@@ -3160,7 +3175,7 @@ impl ProgramCategory {
     pub const TABLE: TableId = TableId::ProgramCategory;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 17] = [
+    pub const ALL: &'static [Self] = &[
         Self::None,
         Self::Bass,
         Self::Pad,
@@ -3283,6 +3298,7 @@ impl fmt::Display for ProgramCategory {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum PwmSource {
     /// Manual.
     Manual,
@@ -3303,7 +3319,7 @@ impl PwmSource {
     pub const TABLE: TableId = TableId::PwmSource;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 6] = [
+    pub const ALL: &'static [Self] = &[
         Self::Manual,
         Self::Lfo1,
         Self::Lfo2,
@@ -3393,6 +3409,7 @@ impl fmt::Display for PwmSource {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum SequencerSync {
     /// Loop on.
     LoopOn,
@@ -3407,7 +3424,7 @@ impl SequencerSync {
     pub const TABLE: TableId = TableId::SequencerSync;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 3] = [Self::LoopOn, Self::KeySyncOn, Self::LoopAndKeySyncOn];
+    pub const ALL: &'static [Self] = &[Self::LoopOn, Self::KeySyncOn, Self::LoopAndKeySyncOn];
 
     /// Returns the value this byte selects on [`DEFAULT_FIRMWARE`].
     ///
@@ -3484,6 +3501,7 @@ impl fmt::Display for SequencerSync {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum ToneModSource {
     /// Manual.
     Manual,
@@ -3504,7 +3522,7 @@ impl ToneModSource {
     pub const TABLE: TableId = TableId::ToneModSource;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 6] = [
+    pub const ALL: &'static [Self] = &[
         Self::Manual,
         Self::Lfo1,
         Self::Lfo2,
@@ -3594,6 +3612,7 @@ impl fmt::Display for ToneModSource {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum VcfEnvelopePolarity {
     /// Negative.
     Negative,
@@ -3606,7 +3625,7 @@ impl VcfEnvelopePolarity {
     pub const TABLE: TableId = TableId::VcfEnvelopePolarity;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 2] = [Self::Negative, Self::Positive];
+    pub const ALL: &'static [Self] = &[Self::Negative, Self::Positive];
 
     /// Returns the value this byte selects on [`DEFAULT_FIRMWARE`].
     ///
@@ -3681,6 +3700,7 @@ impl fmt::Display for VcfEnvelopePolarity {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum VcfLfoSelect {
     /// LFO 1.
     Lfo1,
@@ -3693,7 +3713,7 @@ impl VcfLfoSelect {
     pub const TABLE: TableId = TableId::VcfLfoSelect;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 2] = [Self::Lfo1, Self::Lfo2];
+    pub const ALL: &'static [Self] = &[Self::Lfo1, Self::Lfo2];
 
     /// Returns the value this byte selects on [`DEFAULT_FIRMWARE`].
     ///
@@ -3768,6 +3788,7 @@ impl fmt::Display for VcfLfoSelect {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum VcfPoleMode {
     /// 4 Pole.
     FourPole,
@@ -3780,7 +3801,7 @@ impl VcfPoleMode {
     pub const TABLE: TableId = TableId::VcfPoleMode;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 2] = [Self::FourPole, Self::TwoPole];
+    pub const ALL: &'static [Self] = &[Self::FourPole, Self::TwoPole];
 
     /// Returns the value this byte selects on [`DEFAULT_FIRMWARE`].
     ///
@@ -3855,6 +3876,7 @@ impl fmt::Display for VcfPoleMode {
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum VoicePriority {
     /// Lowest.
     Lowest,
@@ -3869,7 +3891,7 @@ impl VoicePriority {
     pub const TABLE: TableId = TableId::VoicePriority;
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; 3] = [Self::Lowest, Self::Highest, Self::Last];
+    pub const ALL: &'static [Self] = &[Self::Lowest, Self::Highest, Self::Last];
 
     /// Returns the value this byte selects on [`DEFAULT_FIRMWARE`].
     ///

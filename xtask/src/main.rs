@@ -21,6 +21,7 @@ mod codegen;
 mod diagrams;
 mod docs;
 mod fx;
+mod output;
 mod program;
 mod spec;
 
@@ -38,8 +39,14 @@ fn main() -> ExitCode {
             usage();
             return ExitCode::SUCCESS;
         }
-        "docs" => docs_command(flags.iter().any(|f| f == "--check")),
-        "codegen" => codegen_command(flags.iter().any(|f| f == "--check")),
+        "docs" | "codegen" => check_flag(command, flags).and_then(|check| {
+            let run = if command == "docs" {
+                docs::run
+            } else {
+                codegen::run
+            };
+            report(command, &run(&root(), check)?, check)
+        }),
         other => Err(format!("unknown command: {other}")),
     };
 
@@ -53,7 +60,7 @@ fn main() -> ExitCode {
 }
 
 fn usage() {
-    println!("usage: cargo xtask <command>");
+    println!("usage: cargo xtask <command> [--check]");
     println!();
     println!("commands:");
     println!("  docs [--check]     regenerate docs/midi-spec.md, docs/effects.md and");
@@ -64,48 +71,51 @@ fn usage() {
     println!("  help               show this message");
 }
 
+/// Returns whether `--check` was given, and rejects any other flag.
+fn check_flag(command: &str, flags: &[String]) -> Result<bool, String> {
+    let mut check = false;
+    for flag in flags {
+        if flag == "--check" {
+            check = true;
+        } else {
+            return Err(format!(
+                "unknown flag for {command}: {flag}. The only flag is --check"
+            ));
+        }
+    }
+    Ok(check)
+}
+
+/// Prints what a run found: nothing stale, or the files it rewrote or would.
+///
+/// A stale file in check mode is an error, so that CI fails on it.
+fn report(command: &str, stale: &[String], check: bool) -> Result<(), String> {
+    let what = match command {
+        "docs" => format!(
+            "{}, {} and docs/diagrams/",
+            docs::DOC_PATH,
+            docs::EFFECTS_PATH
+        ),
+        _ => codegen::CODE_PATHS.join(" and "),
+    };
+    if stale.is_empty() {
+        println!("{what} are up to date");
+        return Ok(());
+    }
+    let listed = stale.join("\n  ");
+    if check {
+        return Err(format!(
+            "out of date with spec/:\n  {listed}\nRun `cargo xtask {command}` and commit the result."
+        ));
+    }
+    println!("regenerated from spec/:\n  {listed}");
+    Ok(())
+}
+
 /// Returns the repository root, which is the parent of this crate's directory.
-fn root() -> PathBuf {
+pub(crate) fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .unwrap_or(Path::new("."))
         .to_path_buf()
-}
-
-fn codegen_command(check: bool) -> Result<(), String> {
-    let paths = codegen::CODE_PATHS.join(" and ");
-    match codegen::run(&root(), check)? {
-        docs::Outcome::Current => {
-            println!("{paths} are up to date");
-            Ok(())
-        }
-        docs::Outcome::Stale if check => Err(format!(
-            "{paths} are out of date with spec/. Run `cargo xtask codegen` and commit the result."
-        )),
-        docs::Outcome::Stale => {
-            println!("regenerated {paths} from spec/");
-            Ok(())
-        }
-    }
-}
-
-fn docs_command(check: bool) -> Result<(), String> {
-    match docs::run(&root(), check)? {
-        docs::Outcome::Current => {
-            println!(
-                "{} and {} are up to date",
-                docs::DOC_PATH,
-                docs::EFFECTS_PATH
-            );
-            Ok(())
-        }
-        docs::Outcome::Stale if check => Err(
-            "docs/ is out of date with spec/. Run `cargo xtask docs` and commit the result."
-                .to_owned(),
-        ),
-        docs::Outcome::Stale => {
-            println!("regenerated docs/ from spec/");
-            Ok(())
-        }
-    }
 }

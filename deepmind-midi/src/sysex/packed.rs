@@ -21,9 +21,8 @@
 //!
 //! The sixth is the program dump, where the manual prints 278 packed bytes for
 //! 242 raw. That is neither rule: padded gives 280 and short gives 277. Nothing
-//! here reproduces 278, and [`unpack_into`] accepts all three, since a decoder
-//! that insisted on one would reject hardware over a figure that cannot be
-//! right as printed. See the specification's open questions.
+//! here reproduces 278, and [`unpack_into`] accepts all three, so a dump of
+//! any of those lengths decodes. See the specification's open questions.
 //!
 //! Padding also means a packed run does not state its raw length: 280 packed
 //! bytes hold 245, which is a comms protocol version 7 program and also a

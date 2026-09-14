@@ -13,7 +13,7 @@
 //! use deepmind_midi::sim::Synth;
 //!
 //! // A unit with a sound in its edit buffer.
-//! let mut sound = Program::new(ProtocolVersion::V7)?;
+//! let mut sound = Program::new(ProtocolVersion::V7);
 //! sound.set_name(ProgramName::new("Bass Sweep")?);
 //! let mut synth: Synth = Synth::new(DeviceId::Unit(0), sound);
 //!
@@ -94,6 +94,8 @@
 //! [`Heard::Request`] reports both the command and whether an answer was queued,
 //! so a test can tell "asked and ignored" from "asked and answered".
 
+use core::fmt;
+
 use crate::error::{Error, Result};
 use crate::ids::{Bank, DeviceId, ProgramNumber, Slot};
 use crate::nrpn::{Change, Nrpn};
@@ -129,6 +131,14 @@ pub const MAX_REPLY_LEN: usize = larger(syx::MAX_PROGRAM_FRAME_LEN, inquiry::REP
 pub trait Library {
     /// Returns the program stored in `slot`.
     fn program(&self, slot: Slot) -> Option<Program>;
+
+    /// Returns whether `slot` holds a program.
+    ///
+    /// Asked before a reply is queued. The default decodes the program to find
+    /// out; a library that can answer from an index does.
+    fn contains(&self, slot: Slot) -> bool {
+        self.program(slot).is_some()
+    }
 }
 
 /// A unit with nothing in its memory.
@@ -148,6 +158,10 @@ impl<L: Library + ?Sized> Library for &L {
     fn program(&self, slot: Slot) -> Option<Program> {
         (**self).program(slot)
     }
+
+    fn contains(&self, slot: Slot) -> bool {
+        (**self).contains(slot)
+    }
 }
 
 /// A preset pack is a unit's memory: the slots the file names are the slots the
@@ -164,10 +178,23 @@ impl Library for syx::File<'_> {
             .find(|entry| entry.slot == Some(slot))
             .map(|entry| entry.program)
     }
+
+    /// Reads the frame headers and unpacks nothing.
+    fn contains(&self, slot: Slot) -> bool {
+        self.frames()
+            .filter_map(core::result::Result::ok)
+            .any(|frame| {
+                matches!(
+                    frame.message,
+                    Message::ProgramDumpResponse { bank, program, .. }
+                        if Slot::new(bank, program) == slot
+                )
+            })
+    }
 }
 
 /// What a [`Synth`] made of what arrived.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum Heard {
     /// A device inquiry arrived and was answered.
@@ -218,6 +245,28 @@ pub enum Heard {
     },
     /// Observations were dropped because the queue was full, and how many.
     Lost(u16),
+}
+
+impl fmt::Display for Heard {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Inquiry => f.write_str("device inquiry, answered"),
+            Self::Request { command, answered } => {
+                let outcome = if *answered { "answered" } else { "unanswered" };
+                write!(f, "{command}, {outcome}")
+            }
+            Self::Parameter {
+                parameter, value, ..
+            } => write!(f, "{parameter} = {value}"),
+            Self::Channel { channel, message } => write!(f, "channel {channel}: {message}"),
+            Self::Unexpected(command) => write!(f, "unexpected {command}"),
+            Self::Failed(error) => write!(f, "unreadable frame: {error}"),
+            Self::Foreign { manufacturer, .. } => {
+                write!(f, "frame from manufacturer {manufacturer:02X?}")
+            }
+            Self::Lost(count) => write!(f, "{count} observations dropped"),
+        }
+    }
 }
 
 /// One reply, held as what to send rather than as the bytes of it.
@@ -389,6 +438,12 @@ impl<L: Library, const RX: usize, const TX: usize, const EV: usize> Synth<L, RX,
     #[must_use]
     pub const fn queued(&self) -> usize {
         self.tx.len()
+    }
+
+    /// Returns how many more replies the outbound queue has room for.
+    #[must_use]
+    pub const fn room(&self) -> usize {
+        self.tx.remaining()
     }
 
     /// Drops everything queued and everything half-decoded, as a power cycle
@@ -723,14 +778,14 @@ impl<L: Library, const TX: usize, const EV: usize> Inbound<'_, L, TX, EV> {
                 // A slot the library does not hold is not an answer this unit
                 // can give, and saying so here is more useful than queuing a
                 // reply that writes nothing.
-                self.library.program(slot).is_some() && self.reply(Reply::Program(slot))
+                self.library.contains(slot) && self.reply(Reply::Program(slot))
             }
             Message::SingleProgramNameDumpRequest { bank, program } => {
                 let slot = Slot {
                     bank,
                     number: program,
                 };
-                self.library.program(slot).is_some() && self.reply(Reply::ProgramName(slot))
+                self.library.contains(slot) && self.reply(Reply::ProgramName(slot))
             }
             Message::ProgramBankDumpRequest { bank, first, last } => {
                 first.get() <= last.get()
@@ -838,7 +893,7 @@ mod tests {
     }
 
     fn named(name: &str) -> Program {
-        let mut program = Program::new(ProtocolVersion::V7).expect("a known version");
+        let mut program = Program::new(ProtocolVersion::V7);
         program.set_name(ProgramName::new(name).expect("a legal name"));
         program
     }

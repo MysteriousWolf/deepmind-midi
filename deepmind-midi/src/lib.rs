@@ -20,8 +20,8 @@
 //! | [`program`]   | A program: the 242 bytes, typed accessors, names, value types      |
 //! | [`syx`]       | `.syx` files: the programs a preset pack carries, and building one |
 //! | [`device`]    | The state machine: what the synthesizer holds, and what to send    |
-//! | [`transport`] | The blocking adapter over a port and a clock (`transport`)         |
-//! | [`sim`]       | The other end of the conversation, for tests (`sim`)               |
+//! | `transport`   | The blocking adapter over a port and a clock (feature `transport`) |
+//! | `sim`         | The other end of the conversation, for tests (feature `sim`)       |
 //!
 //! Each layer depends only on those above it: [`wire`] does not know what a
 //! `DeepMind` is, and [`sysex`] does not know where its bytes came from.
@@ -42,12 +42,17 @@
 //! });
 //! ```
 //!
-//! See `docs/architecture.md` for the design and `docs/midi-spec.md` for the
+//! See [`docs/architecture.md`] for the design and [`docs/midi-spec.md`] for the
 //! protocol itself.
+//!
+//! [`docs/architecture.md`]: https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/architecture.md
+//! [`docs/midi-spec.md`]: https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/midi-spec.md
 //!
 //! # Feature flags
 //!
-//! - `std` (default): `std::error::Error` impls and owned collection helpers.
+//! - `std` (default): implies `alloc`, and adds [`transport::StdClock`] when
+//!   `transport` is on. The error types implement [`core::error::Error`] with
+//!   or without it.
 //! - `alloc`: APIs that allocate, such as bank decoding and `.syx` handling.
 //! - `serde`: `Serialize`/`Deserialize` derives on the public data types.
 //! - `transport`: the blocking adapter, which is the one part of this crate that
@@ -56,6 +61,12 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
+#![doc(
+    html_logo_url = "https://raw.githubusercontent.com/MysteriousWolf/deepmind-midi/main/docs/logo.svg"
+)]
+#![doc(
+    html_favicon_url = "https://raw.githubusercontent.com/MysteriousWolf/deepmind-midi/main/docs/logo.svg"
+)]
 
 #[cfg(feature = "alloc")]
 extern crate alloc;

@@ -80,6 +80,20 @@ impl Channel {
     }
 }
 
+impl TryFrom<u8> for Channel {
+    type Error = Error;
+
+    fn try_from(byte: u8) -> Result<Self> {
+        Self::new(byte)
+    }
+}
+
+impl From<Channel> for u8 {
+    fn from(value: Channel) -> Self {
+        value.index()
+    }
+}
+
 impl fmt::Display for Channel {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.number())
@@ -139,6 +153,22 @@ pub enum ChannelMessage {
         /// Bend position, `0..=16383`, centred on [`ChannelMessage::BEND_CENTRE`].
         value: u16,
     },
+}
+
+impl fmt::Display for ChannelMessage {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NoteOff { key, velocity } => write!(f, "note off {key} velocity {velocity}"),
+            Self::NoteOn { key, velocity } => write!(f, "note on {key} velocity {velocity}"),
+            Self::PolyKeyPressure { key, pressure } => {
+                write!(f, "key pressure {key} {pressure}")
+            }
+            Self::ControlChange { controller, value } => write!(f, "CC {controller} = {value}"),
+            Self::ProgramChange { program } => write!(f, "program change {program}"),
+            Self::ChannelPressure { pressure } => write!(f, "channel pressure {pressure}"),
+            Self::PitchBend { value } => write!(f, "pitch bend {value}"),
+        }
+    }
 }
 
 impl ChannelMessage {

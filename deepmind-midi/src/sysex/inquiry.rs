@@ -93,7 +93,9 @@ impl fmt::Display for Version {
 }
 
 /// What a unit answers a device inquiry with.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub struct Identity {
     /// Device ID the unit answered on, which is also its global MIDI channel.
     pub device: DeviceId,
@@ -272,7 +274,7 @@ pub fn reply_into(identity: &Identity, out: &mut [u8]) -> Result<usize> {
 /// `DeepMind` 6 from a 12XD, so there is nothing to return but the list. A host
 /// that needs to know asks the user.
 #[must_use]
-pub const fn models() -> [Model; 6] {
+pub const fn models() -> &'static [Model] {
     Model::ALL
 }
 
