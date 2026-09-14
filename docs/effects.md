@@ -9,8 +9,8 @@ on which of the 35 algorithms the engine is running. `FX 1 Param 3` is Size on a
 room reverb and Acceleration on a rotary speaker. This document is the table that
 makes those 48 bytes readable, one algorithm at a time.
 
-For the protocol around them - how to address a parameter, how the four engines
-are wired to each other, what `FX Type` and `FX Routing` hold - see
+For the protocol around them (how to address a parameter, how the four engines
+are wired to each other, what `FX Type` and `FX Routing` hold) see
 [the MIDI specification](midi-spec.md).
 
 ## Contents
@@ -31,11 +31,11 @@ cannot be said about that curve.
 
 ## Which parameters respond to modulation
 
-The `Mod` column needs care. All 48 slots are addressable from the modulation
-matrix as `Fx 1 Param 1` through `Fx 4 Param 12`, whatever algorithm is loaded,
-so a blank does not mean unreachable. It means the manual does not mark the
-parameter as responding, and the pattern holds up: of the parameters that select
-between options rather than sweep a range, almost all are blank, as are the
+All 48 slots are addressable from the modulation matrix as `Fx 1 Param 1`
+through `Fx 4 Param 12`, whatever algorithm is loaded, so a blank in the `Mod`
+column does not mean unreachable. It means the manual does not mark the
+parameter as responding. The pattern is consistent: parameters that select
+between options rather than sweep a range are almost all blank, as are
 structural ones such as reverb size and pre-delay.
 
 ## Reading a panel
@@ -46,16 +46,16 @@ effect's editor panel, which gives the control and the colours.
 
 The positions are a grid, measured from all 35 screenshots, which agree on it:
 six controls to a row, in slot order, wrapping onto a second row, left aligned.
-The controls are what the panel beside it uses - 29 effects are knobs, five are
-vertical faders on a cream surface, and the Vintage Room Reverb is numeric
-displays. The colours are sampled from the same picture. All of it lives in
-[`spec/layout.toml`](../spec/layout.toml), which records how each was taken.
+The controls are what the panel beside each screenshot uses: 29 effects are
+knobs, five are vertical faders on a cream surface, and the Vintage Room Reverb
+is numeric displays. The colours are sampled from the same picture. All of it
+lives in [`spec/layout.toml`](../spec/layout.toml), which records how each was
+taken.
 
 Each drawing is filed and linked under the `FX Type` value and the manual's full
-name, so `31-moog-type-filter` is the Mood Filter. The number is not decoration:
-the manual's effects table gives types 32 and 33 the same full name, Dual Pitch
-Shifter, and only their short names - `DualPitch` and `Vintage Pitch` - tell
-them apart.
+name, so `31-moog-type-filter` is the Mood Filter. The number is needed: the
+manual gives types 32 and 33 the same full name, Dual Pitch Shifter, and only
+their short names, `DualPitch` and `Vintage Pitch`, tell them apart.
 
 The drawings say what is on the page, not what a patch sounds like:
 
@@ -69,12 +69,11 @@ The drawings say what is on the page, not what a patch sounds like:
 | Text above | The short name, exactly as the synthesizer's display shows it |
 | Text below | The same parameter written out, expanded by this project |
 
-Every handle sits at the middle of its travel, and that means nothing. The
-specification holds no default value for an effect parameter, so there is no
-position to draw; the middle is the one choice that carries no information,
-since it is the same for every slot on every page. Leaving the handle off
-entirely was tried first and read badly - a fader without a cap is a line with
-ticks beside it.
+Every handle sits at the middle of its travel, which carries no information.
+The specification holds no default value for an effect parameter, so there is
+no position to draw, and the middle is the same for every slot on every page.
+Leaving the handle off was tried first and read badly: a fader without a cap is
+a line with ticks beside it.
 
 <!-- generated:grid -->
 

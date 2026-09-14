@@ -1,6 +1,6 @@
 //! `SysEx` frames, parsed from arbitrary bytes.
 //!
-//! The interesting property is not that parsing survives - it is that anything
+//! The property that matters is not that parsing survives but that anything
 //! which parses re-encodes to the bytes it came from. A parser that accepted a
 //! frame and reported a payload nobody sent would pass a panic-freedom check
 //! and still hand a host the wrong program.

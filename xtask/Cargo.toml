@@ -1,6 +1,6 @@
 [package]
 name = "xtask"
-description = "Repository automation: documentation generation from the spec files and release version bumps"
+description = "Generates the documentation and the library's parameter tables from the spec files"
 publish = false
 version.workspace = true
 edition.workspace = true

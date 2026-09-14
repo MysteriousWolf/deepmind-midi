@@ -150,10 +150,10 @@ impl FusedIterator for Frames<'_> {}
 /// Every program in a file, in the order it holds them.
 ///
 /// Both dumps that carry a program are taken: one stored in a bank, and the edit
-/// buffer. A frame carrying something else - the globals, a pattern, a bank of
-/// names - is skipped, since a pack is entitled to hold those and a host asking
-/// for programs is not asking about them. Anything that fails to parse is
-/// yielded as the error it failed with, per [`Frames`].
+/// buffer. A frame carrying something else (the globals, a pattern, a bank of
+/// names) is skipped: a pack may hold those, and a host asking for programs is
+/// not asking about them. Anything that fails to parse is yielded as the error
+/// it failed with, per [`Frames`].
 #[derive(Debug, Clone)]
 pub struct Programs<'a> {
     frames: Frames<'a>,

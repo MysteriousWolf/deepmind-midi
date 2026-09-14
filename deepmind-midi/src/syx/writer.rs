@@ -39,11 +39,10 @@ pub fn edit_buffer_frame_len(program: &Program) -> usize {
 
 /// Writes a `.syx` file into a buffer the caller owns.
 ///
-/// A file is its frames and nothing else - no header, no index, no trailer - so
+/// A file is its frames and nothing else (no header, no index, no trailer), so
 /// writing one is writing frames in order. The buffer is the caller's because
-/// only the caller knows where forty kilobytes can go;
-/// [`MAX_BANK_LEN`] is what a whole bank needs and
-/// [`program_frame_len`] what one program does.
+/// only the caller knows where forty kilobytes can go; [`MAX_BANK_LEN`] is what
+/// a whole bank needs and [`program_frame_len`] what one program does.
 ///
 /// ```
 /// use deepmind_midi::ids::{Bank, DeviceId, ProgramNumber, ProtocolVersion};

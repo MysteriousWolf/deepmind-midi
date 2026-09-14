@@ -36,18 +36,17 @@
 //!
 //! **It is not a `DeepMind`, and it cannot find out that the manual is wrong.**
 //! It answers what `spec/messages.toml` says a unit answers, encoded by the same
-//! code the library decodes with, so a round trip through it proves that this
-//! library agrees with itself and nothing about the instrument. The
-//! specification is reverse-engineered from a manual that is wrong in at least
-//! one printed figure, and no amount of simulation closes that.
+//! code the library decodes with, so a round trip through it proves only that
+//! this library agrees with itself.
 //!
 //! What it does find is a host that drives the protocol wrongly: one that reads
-//! a dump it never asked for, that mistakes a stored program for the edit
-//! buffer, that never drains its queue, or that assumes an answer arrives before
-//! the next request goes out. Those are the bugs a host writes, and they are
-//! reachable without hardware.
+//! a dump it never asked for, mistakes a stored program for the edit buffer,
+//! never drains its queue, or assumes an answer arrives before the next request
+//! goes out. Those bugs are reachable without hardware.
 //!
-//! # The loop, which is the one [`Device`](crate::device::Device) writes
+//! # The loop
+//!
+//! The same one [`Device`](crate::device::Device) writes:
 //!
 //! ```text
 //! synth.feed(&bytes_from_the_host);                // inbound, any chunking
@@ -55,24 +54,21 @@
 //! while let Some(heard) = synth.poll_heard() {}    // what it made of it
 //! ```
 //!
-//! No clock. A real unit takes a few tens of milliseconds to answer and this one
-//! answers as soon as it is drained, which means the test owns the latency: not
-//! draining is a synthesizer that has not replied yet, and that is how a host's
-//! timeout path gets exercised. See [`Synth::drain_tx`].
+//! No clock. This unit answers as soon as it is drained, so the test owns the
+//! latency: not draining is a synthesizer that has not replied yet, which is how
+//! a host's timeout path gets exercised. See [`Synth::drain_tx`].
 //!
 //! # Stored programs come from a [`Library`]
 //!
-//! A bank is 128 programs and eight banks are two hundred kilobytes, which is
-//! not something to hold inline on the target this crate is `no_std` for. So a
-//! [`Synth`] holds its edit buffer and nothing else, and stored programs come
-//! from whatever the caller supplies: [`Empty`] for a unit whose memory is not
-//! part of the test, or a [`syx::File`], which makes a preset
-//! pack into the contents of a simulated unit.
+//! Eight banks are two hundred kilobytes, too much to hold inline on the target
+//! this crate is `no_std` for. So a [`Synth`] holds its edit buffer and nothing
+//! else, and stored programs come from whatever the caller supplies: [`Empty`]
+//! for a unit whose memory is not part of the test, or a [`syx::File`], which
+//! makes a preset pack the contents of a simulated unit.
 //!
 //! A slot the library does not hold is not answered. A real unit always has
-//! something in every slot, so that is a shape a `DeepMind` cannot take - but
-//! the alternative is inventing a program, and a request that goes unanswered is
-//! the more useful thing to be able to test anyway.
+//! something in every slot, but an unanswered request is more useful to test
+//! than an invented program.
 //!
 //! # What it answers
 //!

@@ -12,19 +12,18 @@
 //!
 //! # How long is a packed run
 //!
-//! Two answers are possible for a length that is not a multiple of seven: pad
-//! the last group out to eight bytes, or send only the bytes it needs. The
-//! manual's own figures settle it. Five of the six lengths it tabulates - the
-//! globals, pattern, bank names, single name and chord memory dumps - are
-//! exactly `ceil(raw / 7) * 8`, the padded form, and none of them matches the
-//! short form. So [`pack_into`] pads, and [`packed_len`] describes what it
-//! writes.
+//! A length that is not a multiple of seven leaves a choice: pad the last group
+//! out to eight bytes, or send only the bytes it needs. The manual's figures
+//! settle it. Five of the six lengths it tabulates (the globals, pattern, bank
+//! names, single name and chord memory dumps) are exactly `ceil(raw / 7) * 8`,
+//! the padded form, and none matches the short form. So [`pack_into`] pads, and
+//! [`packed_len`] describes what it writes.
 //!
 //! The sixth is the program dump, where the manual prints 278 packed bytes for
 //! 242 raw. That is neither rule: padded gives 280 and short gives 277. Nothing
 //! here reproduces 278, and [`unpack_into`] accepts all three, since a decoder
-//! that insisted on one of them would reject hardware over a figure that cannot
-//! be right as printed. See the specification's open questions.
+//! that insisted on one would reject hardware over a figure that cannot be
+//! right as printed. See the specification's open questions.
 //!
 //! Padding also means a packed run does not state its raw length: 280 packed
 //! bytes hold 245, which is a comms protocol version 7 program and also a

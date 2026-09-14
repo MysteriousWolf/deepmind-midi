@@ -27,32 +27,29 @@
 //! # Ok::<(), deepmind_midi::Error>(())
 //! ```
 //!
-//! # No IO, here as everywhere
+//! # No IO
 //!
 //! Opening the file is the host's job. This module starts from bytes and ends at
-//! bytes, which is also what makes it work on a file that never touched a disk:
-//! a pack downloaded into memory, one assembled from a device, one under test.
+//! bytes, so it also works on a file that never touched a disk: a pack
+//! downloaded into memory, one assembled from a device, one under test.
 //!
 //! # Reading is lenient about the file, strict about the frame
 //!
 //! Files in the wild are padded, concatenated and appended to, so bytes between
-//! frames are walked past rather than refused. What is inside an `F0` is another
-//! matter: a frame that does not parse is yielded as the error it failed with,
-//! and the walk goes on. A file is untrusted input, and one bad frame is not a
-//! reason to lose the 127 good ones.
+//! frames are skipped. A frame that does not parse is yielded as the error it
+//! failed with, and the walk goes on: one bad frame is no reason to lose the
+//! other 127.
 //!
-//! [`Programs`] skips frames carrying something other than a program - the
-//! globals, a pattern, a bank of names - because a pack is entitled to hold
-//! those and a host asking for programs is not asking about them. Reach them
-//! through [`Frames`], which hands back everything the file holds.
+//! [`Programs`] skips frames carrying something other than a program (the
+//! globals, a pattern, a bank of names). Reach those through [`Frames`], which
+//! hands back everything the file holds.
 //!
 //! # Writing does not reproduce every file byte for byte
 //!
-//! A program that goes in comes out unchanged, and a file that goes in does not
-//! always. The reason is the one open question in the packed codec: the manual
-//! prints 278 packed bytes for a 242-byte program where padding gives 280, and
-//! [`packed`](crate::sysex::packed) pads. A file written by something that
-//! packs the other way reads back to identical programs and rewrites to a
+//! A program that goes in comes out unchanged; a file does not always. The
+//! manual prints 278 packed bytes for a 242-byte program where padding gives
+//! 280, and [`packed`](crate::sysex::packed) pads. A file written by something
+//! that packs the other way reads back to identical programs and rewrites to a
 //! different length. The programs are the file's content; the padding is not.
 //!
 //! # What a file does not say
@@ -60,9 +57,8 @@
 //! Which firmware wrote it. A dump carries the comms protocol version, which
 //! decides how many bytes the program occupies, and nothing carries the firmware
 //! version, which decides what three of the value tables mean. A host that knows
-//! the firmware another way passes it to the accessors that take one; a host
-//! that does not gets the current tables. See
-//! [`param`](crate::param#firmware) for the mechanism.
+//! the firmware another way passes it to the accessors that take one; otherwise
+//! it gets the current tables. See [`param`](crate::param#firmware).
 
 mod reader;
 mod writer;

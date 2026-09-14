@@ -1,15 +1,15 @@
 //! Generates the library's parameter tables from `spec/`.
 //!
-//! The library cannot read TOML at runtime - it runs on targets with no
-//! filesystem and no allocator - so the specification is rendered into Rust and
-//! checked in. `cargo xtask codegen` writes it; `cargo xtask codegen --check`
-//! and the `generated_code_is_current` test fail when the checked-in file has
-//! fallen behind `spec/`, the same safety net the documentation has.
+//! The library runs on targets with no filesystem and no allocator, so it cannot
+//! read TOML at runtime; the specification is rendered into Rust and checked
+//! in. `cargo xtask codegen` writes it; `cargo xtask codegen --check` and the
+//! `generated_code_is_current` test fail when the checked-in file has fallen
+//! behind `spec/`, the same safety net the documentation has.
 //!
-//! Only data is generated. The shapes that data fills, and everything that acts
+//! Only data is generated. The types that data fills, and everything that acts
 //! on it, are hand-written in `deepmind-midi/src/param/mod.rs` and
 //! `deepmind-midi/src/program/mod.rs`, so reviewing a specification change means
-//! reading a table rather than reading logic.
+//! reading a table rather than logic.
 
 use std::collections::BTreeMap;
 use std::fmt::Write as _;

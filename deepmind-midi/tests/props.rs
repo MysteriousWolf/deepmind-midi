@@ -7,14 +7,12 @@
 //!
 //! The generator is a sixty-four bit xorshift seeded from a constant, so a run
 //! is the same run on every machine and a failure is reproducible from the seed
-//! printed with it. That is deliberate: `proptest` would shrink a failing case
-//! for us, and it would also put a dependency, a lockfile entry and a minimum
-//! toolchain of its own into a crate that currently has none of those. The
-//! shrinking is worth less here than the zero dependencies, because these
-//! inputs are byte strings, and a byte string that fails prints in full.
+//! printed with it. `proptest` would shrink a failing case, but it would also
+//! add a dependency and a minimum toolchain to a crate that has neither, and
+//! these inputs are byte strings that print in full when they fail.
 //!
-//! What this file does not do is search adversarially. [`fuzz/`](../../fuzz) is
-//! where that lives; these tests are the part of it that runs on every commit.
+//! This file does not search adversarially. [`fuzz/`](../../fuzz) does; these
+//! tests are the part of it that runs on every commit.
 
 #![cfg(all(feature = "std", feature = "alloc"))]
 #![expect(

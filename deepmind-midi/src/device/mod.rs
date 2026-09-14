@@ -59,49 +59,44 @@
 //! while let Some(event) = device.poll_event() {} // results
 //! ```
 //!
-//! No IO, no threads, no blocking and no clock of its own. A fake clock and a
-//! byte vector reproduce any timing bug exactly, which is the point: the
-//! hardware-dependent tests are the ones that rot.
+//! No IO, no threads, no blocking and no clock of its own, so a fake clock and
+//! a byte vector reproduce any timing bug exactly.
 //!
 //! # Nothing is sent until it is drained
 //!
-//! Queuing is not sending. [`request_edit_buffer`](Device::request_edit_buffer)
-//! and its neighbours put an item in the outbound queue and return; the bytes
-//! exist when [`drain_tx`](Device::drain_tx) hands them to the host, and the
-//! timeout on a request starts then rather than when it was queued. A host that
-//! never drains never times out, which is the truthful answer for a request
-//! that never went anywhere.
+//! [`request_edit_buffer`](Device::request_edit_buffer) and its neighbours put
+//! an item in the outbound queue and return. The bytes exist when
+//! [`drain_tx`](Device::drain_tx) hands them to the host, and a request's
+//! timeout starts then rather than when it was queued. A host that never drains
+//! never times out.
 //!
-//! The queue holds items, not bytes: a request is a few bytes and a whole-program
-//! edit is 242 of them, so the cost is what is waiting rather than the worst case
-//! of what might be.
+//! The queue holds items, not bytes: a request is a few bytes and a
+//! whole-program edit is 242 of them, so the cost is what is waiting rather
+//! than the worst case of what might be.
 //!
 //! # State is a set of claims
 //!
-//! [`Known`] is what the synthesizer is believed to hold and how that belief was
-//! come by. The synthesizer answers no per-parameter reads, so there are exactly
+//! [`Known`] is what the synthesizer is believed to hold and how that belief
+//! was reached. The synthesizer answers no per-parameter reads, so there are
 //! two ways to believe something about it: it said so, or the host told it so
 //! and nothing has contradicted that. [`Device::program`] says which.
 //!
-//! An edit makes the tracked program [`Known::Assumed`]. After sending edits, an
-//! edit buffer dump is the only thing that turns it back into
-//! [`Known::Confirmed`], and this layer never asks for one on its own: whether a
-//! resync is worth its latency is the host's call, not the library's.
+//! An edit makes the tracked program [`Known::Assumed`]. Only an edit buffer
+//! dump turns it back into [`Known::Confirmed`], and this layer never asks for
+//! one on its own: whether a resync is worth its latency is the host's call.
 //!
 //! # What arrives from the synthesizer
 //!
-//! Turning a knob on the front panel sends the parameter out, so inbound traffic
-//! changes the tracked program as well as outbound traffic does. An NRPN carries
-//! the parameter's whole value and the tracked program stays confirmed; a
-//! control change carries seven bits of it, which for most parameters is less
-//! than the value has, so applying one leaves the program assumed. Either way
-//! [`Event::Parameter`] reports it.
+//! Turning a knob on the front panel sends the parameter out, so inbound
+//! traffic changes the tracked program too. An NRPN carries the parameter's
+//! whole value and the tracked program stays confirmed; a control change
+//! carries seven bits of it, less than most parameters have, so applying one
+//! leaves the program assumed. Either way [`Event::Parameter`] reports it.
 //!
 //! Real-time bytes are dropped rather than queued. A running MIDI clock is
 //! twenty-four messages a beat, none of which says anything about what the
-//! synthesizer holds, and queuing them would starve the queue of the events that
-//! do. A host that wants everything on the port drives [`Decoder`] itself, which
-//! is what it is for.
+//! synthesizer holds, and queuing them would starve the queue of the events
+//! that do. A host that wants everything on the port drives [`Decoder`] itself.
 //!
 //! # Sizing
 //!
@@ -516,7 +511,7 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
     /// # Errors
     ///
     /// Returns [`Error::ProgramNotKnown`] when no program is tracked yet, since
-    /// there is then nothing to diff against - ask for the edit buffer, or seed
+    /// there is then nothing to diff against. Ask for the edit buffer, or seed
     /// one with [`assume_program`](Device::assume_program).
     ///
     /// Returns [`Error::ValueOutOfRange`] when the closure left a parameter

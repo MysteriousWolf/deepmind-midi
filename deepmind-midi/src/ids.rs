@@ -288,7 +288,7 @@ impl fmt::Display for ProgramNumber {
 
 /// One of the 1024 places a program is stored: a bank and a number in it.
 ///
-/// The two travel together everywhere a stored program does - a dump names both,
+/// The two travel together everywhere a stored program does: a dump names both,
 /// a `.syx` file says both, and the front panel shows them as one label.
 ///
 /// ```

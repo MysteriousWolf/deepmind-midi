@@ -7,15 +7,15 @@
 //! cargo xtask codegen --check    verify them, without writing
 //! ```
 //!
-//! `spec/` is the single source of truth for the protocol. It renders two ways:
-//! into documentation for a person, and into Rust tables for the library, which
+//! `spec/` is the source of truth for the protocol. It renders two ways: into
+//! documentation for a person, and into Rust tables for the library, which
 //! cannot read TOML on the targets it runs on. Both renderings are checked in,
 //! and both have a `--check` mode and a test that fails when the checked-in copy
 //! has fallen behind.
 //!
-//! Everything else this repository needs is a shell one-liner and lives where it
-//! runs: the version guard in `.github/workflows/ci.yml`, the release in
-//! `.github/workflows/release.yml`.
+//! Everything else the repository automates is a shell one-liner and lives
+//! where it runs: the version guard in `.github/workflows/ci.yml`, the release
+//! in `.github/workflows/release.yml`.
 
 mod codegen;
 mod diagrams;
@@ -56,12 +56,12 @@ fn usage() {
     println!("usage: cargo xtask <command>");
     println!();
     println!("commands:");
-    println!("  docs [--check]  regenerate docs/midi-spec.md, docs/effects.md and");
-    println!("                  docs/diagrams/ from spec/, or report whether they are");
-    println!("                  current without writing");
-    println!("  codegen [--check]  regenerate the library's generated sources from spec/,");
-    println!("                  or report whether they are current without writing");
-    println!("  help            show this message");
+    println!("  docs [--check]     regenerate docs/midi-spec.md, docs/effects.md and");
+    println!("                     docs/diagrams/ from spec/, or report whether they");
+    println!("                     are current without writing");
+    println!("  codegen [--check]  regenerate the library's generated sources from");
+    println!("                     spec/, or report whether they are current");
+    println!("  help               show this message");
 }
 
 /// Returns the repository root, which is the parent of this crate's directory.
