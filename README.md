@@ -12,8 +12,8 @@ DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 
 **Status: early.** The protocol is reverse-engineered, verified and written
 down. The code layers are landing one at a time: MIDI decoding, SysEx, the
-parameter table, programs, `.syx` files and the device state machine are in; the
-blocking transport adapter and the CLI are not. Enough to drive a synthesizer
+parameter table, programs, `.syx` files, the device state machine and the
+blocking transport adapter are in; the CLI is not. Enough to drive a synthesizer
 from a host that owns the port, and not yet run against one.
 
 ## Documentation

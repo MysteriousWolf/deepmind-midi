@@ -6,7 +6,7 @@
 /// the host's to see: [`push`](Queue::push) reports whether the item was taken,
 /// and the caller decides what saying no means.
 #[derive(Debug)]
-pub(super) struct Queue<T, const N: usize> {
+pub(crate) struct Queue<T, const N: usize> {
     slots: [Option<T>; N],
     head: usize,
     len: usize,
@@ -14,7 +14,7 @@ pub(super) struct Queue<T, const N: usize> {
 
 impl<T, const N: usize> Queue<T, N> {
     /// Builds an empty queue.
-    pub(super) const fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         Self {
             slots: [const { None }; N],
             head: 0,
@@ -23,17 +23,17 @@ impl<T, const N: usize> Queue<T, N> {
     }
 
     /// Returns how many items are waiting.
-    pub(super) const fn len(&self) -> usize {
+    pub(crate) const fn len(&self) -> usize {
         self.len
     }
 
     /// Returns how many more items fit.
-    pub(super) const fn remaining(&self) -> usize {
+    pub(crate) const fn remaining(&self) -> usize {
         N - self.len
     }
 
     /// Adds an item, returning whether there was room for it.
-    pub(super) fn push(&mut self, item: T) -> bool {
+    pub(crate) fn push(&mut self, item: T) -> bool {
         if self.len >= N {
             return false;
         }
@@ -49,7 +49,7 @@ impl<T, const N: usize> Queue<T, N> {
     }
 
     /// Takes the oldest item.
-    pub(super) fn pop(&mut self) -> Option<T> {
+    pub(crate) fn pop(&mut self) -> Option<T> {
         if self.len == 0 {
             return None;
         }
@@ -60,7 +60,7 @@ impl<T, const N: usize> Queue<T, N> {
     }
 
     /// Copies the oldest item without taking it.
-    pub(super) fn peek(&self) -> Option<T>
+    pub(crate) fn peek(&self) -> Option<T>
     where
         T: Copy,
     {
@@ -71,7 +71,7 @@ impl<T, const N: usize> Queue<T, N> {
     }
 
     /// Drops everything waiting.
-    pub(super) fn clear(&mut self) {
+    pub(crate) fn clear(&mut self) {
         while self.pop().is_some() {}
     }
 }

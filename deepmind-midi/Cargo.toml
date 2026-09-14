@@ -19,6 +19,9 @@ std = ["alloc"]
 alloc = []
 ## Derives `Serialize`/`Deserialize` on the public data types.
 serde = ["dep:serde"]
+## Enables the blocking adapter: a port trait, a clock trait and the loop between
+## them. Needs neither `std` nor an allocator.
+transport = []
 
 [dependencies]
 serde = { version = "1", optional = true, default-features = false, features = ["derive"] }

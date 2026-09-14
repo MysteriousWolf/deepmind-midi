@@ -125,22 +125,31 @@ Why:
   facade hides that rather than solving it.
 
 `drain_tx` takes a closure, which covers most of what a callback API would,
-without making `Device` generic over its IO. For hosts that want less
-boilerplate, a `transport` feature adds a trait and a driver loop:
+without making `Device` generic over its IO. For hosts that would rather not
+write the loop, the `transport` feature adds two traits and the loop between
+them:
 
 ```rust
-pub trait Transport {
-    fn recv(&mut self, buf: &mut [u8]) -> io::Result<usize>;
-    fn send(&mut self, bytes: &[u8]) -> io::Result<()>;
-    fn now_ms(&self) -> u64;
+pub trait Port {
+    type Error;
+    fn send(&mut self, bytes: &[u8]) -> Result<(), Self::Error>;
+    fn receive(&mut self, into: &mut [u8]) -> Result<usize, Self::Error>;
 }
 
-device.run_blocking(&mut port, |event| { /* ... */ })?;
+pub trait Clock {
+    fn now_ms(&mut self) -> u64;
+    fn sleep_ms(&mut self, milliseconds: u64);
+}
+
+let mut synth: Transport<_, _> = Transport::new(device, port, StdClock::new());
+let program = synth.edit_buffer()?;                       // ask, and wait
+synth.edit(|program| program.set_lfo1_rate(64))?;         // change, and send
 ```
 
-A trait and a loop, no executor and no channels. An async host writes its own
-loop against the core in about thirty lines and keeps control of cancellation
-and backpressure.
+No executor and no channels. An async host writes its own loop against the core
+in about thirty lines and keeps control of cancellation and backpressure, which
+is what [The transport is a policy](#the-transport-is-a-policy-not-a-protocol)
+is about.
 
 ## Layers
 
@@ -154,6 +163,7 @@ param     the parameter table: IDs, NRPN numbers, ranges, enums, formatting
 program   Program: the dump's bytes, typed accessors, names, value types
 device    the sans-IO state machine: requests, timeouts, known state, events
 syx       .syx files and preset packs
+transport the blocking adapter: the port and clock traits, and the loop
 ```
 
 Each layer depends only on those above it. `wire` does not know what a DeepMind
@@ -488,6 +498,44 @@ two orders of magnitude between a desktop host and a microcontroller. An event
 that does not fit is dropped and counted, and the count arrives as `Event::Lost`
 once the queue has room again. Nothing is dropped quietly.
 
+## The transport is a policy, not a protocol
+
+Everything above this line describes a synthesizer. Blocking does not: it is a
+decision about what a host does while it waits, and hosts disagree. So the
+adapter that blocks is one module behind one feature flag, and it is the only
+part of this library that knows what IO is.
+
+It knows as little as two traits can say. `Port` sends bytes and reads whatever
+has arrived without blocking; `Clock` says what time it is and waits. Port
+enumeration, virtual ports, connection state, reconnection - all of it stays on
+the host's side, because a library that opened ports would need an opinion about
+all of it. Neither trait needs `std` or an allocator; `StdClock` is the only
+thing in the module that wants `std`, and a host without it writes its own clock
+in six lines.
+
+What is left is the loop: read, feed, tick, send. `pump` is one pass of it, and
+a host that wants its own loop uses that and nothing else in the module.
+
+**Waiting ends three ways**, and two of them are the same fact. The answer
+arrives; or the device raises the timeout for the request; or nothing has arrived
+for longer than that timeout allows, which is the backstop for a request the
+device is not timing. The last two are both a timeout error, because that is what
+they are. Nothing is retried - a bank half-read is not a thing to ask for again,
+and only the host knows whether anything else is.
+
+**Progress is an event, not traffic.** A bank is one request and 128 answers, and
+each answer is progress, so a transfer that takes a minute never times out while
+it is still arriving. A port streaming clock bytes at a silent synthesizer is not
+progress and does not hold the wait open. That distinction is why the timeout can
+be measured against a transfer at all rather than only against a single message.
+
+**Events a wait was not waiting for are kept.** A blocking call has to look at
+every event to find the one it wants, so the ones it does not want go into a
+queue of the transport's own and come back out of `poll_event` in order. Turning
+a knob while a host reads a bank does not lose the knob. That second queue is the
+adapter's one real cost - `EV` more events held inline - and an event that does
+not fit is counted and arrives as `Event::Lost`, the same as in the layer below.
+
 ## Two kinds of version
 
 Independent, and both matter.
@@ -570,23 +618,21 @@ built-in token; any failure there leaves the generated notes alone.
 | 5 | `program`: the `Program` struct, its value types and typed accessors |
 | 6 | `syx`: `.syx` files and preset packs |
 | 7 | `device`: the state machine, events, timeouts, provenance, `edit` |
-| 8 | `transport`: the blocking adapter |
+| 8 | `transport`: the blocking adapter, its port and clock traits |
 | 9 | `deepmind-cli` |
 
-Steps 1 to 7 have landed.
+Steps 1 to 8 have landed.
 
-### Next: the transport
+### Next: the command-line host
 
-`transport`: the blocking adapter, which is a trait and a driver loop over the
-state machine that is now there. It is the one part of this library that knows
-what IO is, and it stays behind a feature flag for that reason - an async host
-writes its own loop against the core in about thirty lines and keeps control of
-cancellation and backpressure, which is the arrangement [Sans-IO](#sans-io)
-argues for.
+`deepmind-cli`: a midir host that dumps banks, imports packs and monitors
+traffic. It is the first thing here that opens a port, and it exists to prove the
+library is pleasant to use against real hardware - which is a thing only real
+hardware can say. The `transport` feature is what it will be written against, and
+writing it is how that feature finds out whether it was designed right.
 
-After it, `deepmind-cli`: a midir host that dumps banks, imports packs and
-monitors traffic. It exists to prove the library is pleasant to use against real
-hardware, which is a thing only real hardware can say.
+Nothing in this library has been run against a synthesizer yet. That, rather than
+any missing layer, is the gap between where this is and where it is useful.
 
 ### Not yet possible: the globals and the sequencer
 

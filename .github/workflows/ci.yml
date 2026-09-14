@@ -74,6 +74,11 @@ jobs:
       - name: serde without std
         run: cargo build -p deepmind-midi --no-default-features --features alloc,serde
 
+      # The blocking adapter needs neither std nor an allocator, and the only way
+      # that stays true is to keep building it without them.
+      - name: transport without std
+        run: cargo build -p deepmind-midi --no-default-features --features transport
+
   msrv:
     name: minimum supported Rust version
     runs-on: ubuntu-latest
