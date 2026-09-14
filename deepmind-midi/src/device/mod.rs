@@ -139,10 +139,8 @@ use request::Outbound;
 
 use crate::error::{Error, Result};
 use crate::ids::{Bank, DeviceId, ProgramNumber, Slot};
-use crate::param::{
-    Controller, DATA_ENTRY_LSB, DATA_ENTRY_MSB, DEFAULT_FIRMWARE, NRPN_NUMBER_LSB, NRPN_NUMBER_MSB,
-    ParamId,
-};
+use crate::nrpn::{Change, Nrpn};
+use crate::param::{DEFAULT_FIRMWARE, ParamId};
 use crate::program::Program;
 use crate::queue::Queue;
 use crate::sysex::inquiry::{self, Version};
@@ -177,27 +175,6 @@ pub const MAX_PENDING: usize = 8;
 struct Pending {
     request: Request,
     sent_at: u64,
-}
-
-/// The inbound NRPN registers, which the synthesizer keeps too.
-///
-/// A parameter is selected by a pair of controllers and then written by another
-/// pair, and the selection stays in force, so a knob sweep is one selection and
-/// a run of values.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-struct Nrpn {
-    number_msb: Option<u8>,
-    number_lsb: Option<u8>,
-    data_msb: Option<u8>,
-}
-
-impl Nrpn {
-    /// Returns the parameter currently selected, where one is and it names one.
-    fn parameter(self) -> Option<ParamId> {
-        let (msb, lsb) = (self.number_msb?, self.number_lsb?);
-        let number = (u16::from(msb) << 7) | u16::from(lsb);
-        ParamId::from_offset(u8::try_from(number).ok()?).ok()
-    }
 }
 
 /// One synthesizer, tracked.
@@ -244,11 +221,7 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
             pending: [const { None }; MAX_PENDING],
             program: Known::Unknown,
             identity: Known::Unknown,
-            nrpn: Nrpn {
-                number_msb: None,
-                number_lsb: None,
-                data_msb: None,
-            },
+            nrpn: Nrpn::new(),
         }
     }
 
@@ -760,49 +733,18 @@ impl<const EV: usize> Inbound<'_, EV> {
 
     /// Takes one control change, returning whether it was a parameter edit.
     fn control_change(&mut self, controller: u8, value: u8) -> bool {
-        match controller {
-            NRPN_NUMBER_MSB => {
-                self.nrpn.number_msb = Some(value);
-                self.nrpn.data_msb = None;
+        match self.nrpn.control_change(controller, value) {
+            Change::Ignored => false,
+            Change::Pending => true,
+            Change::Parameter {
+                parameter,
+                value,
+                exact,
+            } => {
+                self.parameter(parameter, value, exact);
                 true
             }
-            NRPN_NUMBER_LSB => {
-                self.nrpn.number_lsb = Some(value);
-                self.nrpn.data_msb = None;
-                true
-            }
-            // Held until its other half arrives: the value is fourteen bits and
-            // this is the top seven of them.
-            DATA_ENTRY_MSB => {
-                self.nrpn.data_msb = Some(value);
-                true
-            }
-            DATA_ENTRY_LSB => {
-                self.data_entry(value);
-                true
-            }
-            _ => match Controller::for_cc(controller).and_then(|control| control.parameter) {
-                Some(parameter) => {
-                    // Seven bits of a value that usually has eight, so what it
-                    // says is close rather than exact.
-                    self.parameter(parameter, parameter.from_cc_value(value), false);
-                    true
-                }
-                None => false,
-            },
         }
-    }
-
-    /// Applies a data entry LSB against the selected parameter.
-    fn data_entry(&mut self, lsb: u8) {
-        let Some(parameter) = self.nrpn.parameter() else {
-            return;
-        };
-        let msb = self.nrpn.data_msb.take().unwrap_or(0);
-        let value = (u16::from(msb) << 7) | u16::from(lsb);
-        // The selection stays in force, so a knob sweep is one selection and a
-        // run of values.
-        self.parameter(parameter, value, true);
     }
 
     /// Records that a parameter now holds `value`.
@@ -887,6 +829,7 @@ impl<const EV: usize> Inbound<'_, EV> {
 mod tests {
     use super::*;
     use crate::ids::ProtocolVersion;
+    use crate::param::{DATA_ENTRY_LSB, DATA_ENTRY_MSB, NRPN_NUMBER_LSB, NRPN_NUMBER_MSB};
     use crate::program::ProgramName;
     use crate::sysex::{Command, inquiry};
 
