@@ -2,7 +2,8 @@
   <title>deepmind-midi</title>
   <!--
     A dark panel between wooden end cheeks, as on the unit, and a MIDI DIN
-    socket with the horizontal lines of the DeepMind wordmark inside it.
+    socket whose bezel is sliced by the horizontal lines of the DeepMind
+    wordmark. The slices stop short of the bottom, so the bezel stays closed.
   -->
   <defs>
     <clipPath id="case"><rect width="128" height="128" rx="24"/></clipPath>
@@ -10,45 +11,80 @@
       <rect x="0" width="13" height="128"/>
       <rect x="115" width="13" height="128"/>
     </clipPath>
-    <clipPath id="inside"><circle cx="64" cy="64" r="33"/></clipPath>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a9552c"/>
+      <stop offset="1" stop-color="#8a3f1f"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#282c36"/>
+      <stop offset="1" stop-color="#15181e"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4f5f8"/>
+      <stop offset="0.5" stop-color="#c9cdd6"/>
+      <stop offset="1" stop-color="#8e939f"/>
+    </linearGradient>
+    <radialGradient id="recess" cx="0.5" cy="0.45" r="0.6">
+      <stop offset="0" stop-color="#3b404b"/>
+      <stop offset="1" stop-color="#1c2027"/>
+    </radialGradient>
+    <mask id="cuts">
+      <rect width="128" height="128" fill="#fff"/>
+      <rect x="0" y="71" width="128" height="1.4" fill="#000"/>
+      <rect x="0" y="77" width="128" height="1.9" fill="#000"/>
+      <rect x="0" y="83.5" width="128" height="2.4" fill="#000"/>
+      <rect x="0" y="90.5" width="128" height="2.9" fill="#000"/>
+    </mask>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.6" flood-color="#000" flood-opacity="0.55"/>
+    </filter>
   </defs>
+
   <g clip-path="url(#case)">
-    <rect width="128" height="128" fill="#9b4a25"/>
+    <rect width="128" height="128" fill="url(#wood)"/>
     <!-- Wood grain: a few lines running the length of each cheek. -->
     <g clip-path="url(#cheeks)" fill="none" stroke-linecap="round">
-      <g stroke="#7a3719" stroke-width="1.1" opacity="0.7">
+      <g stroke="#6f3116" stroke-width="1.1" opacity="0.7">
         <path d="M 3 -4 C 2 30 5 60 3.5 90 S 3 120 4 132"/>
         <path d="M 8.5 -4 C 9.5 25 7 55 8.5 85 S 9.5 115 8 132"/>
         <path d="M 118.5 -4 C 117.5 30 120.5 60 119 90 S 118.5 120 119.5 132"/>
         <path d="M 124 -4 C 125 25 122.5 55 124 85 S 125 115 123.5 132"/>
       </g>
-      <g stroke="#b85c30" stroke-width="0.8" opacity="0.6">
+      <g stroke="#c26436" stroke-width="0.8" opacity="0.55">
         <path d="M 5.8 -4 C 5 35 7 65 5.8 95 S 5.2 120 6 132"/>
         <path d="M 11 -4 C 11.5 40 10 70 11 100 S 11.5 125 10.8 132"/>
         <path d="M 121.4 -4 C 120.6 35 122.6 65 121.4 95 S 120.8 120 121.6 132"/>
         <path d="M 116.5 -4 C 117 40 115.5 70 116.5 100 S 117 125 116.3 132"/>
       </g>
     </g>
-    <rect x="13" width="102" height="128" fill="#1e2128"/>
-    <!-- The panel's rolled edges. -->
-    <rect x="13" width="1.2" height="128" fill="#000" opacity="0.45"/>
-    <rect x="113.8" width="1.2" height="128" fill="#000" opacity="0.45"/>
-    <rect x="14.2" width="0.8" height="128" fill="#3a3f4b"/>
-    <rect x="113" width="0.8" height="128" fill="#3a3f4b"/>
+    <!-- The panel, with a seam and a lip where it meets the wood. -->
+    <rect x="13" width="102" height="128" fill="url(#panel)"/>
+    <rect x="13" width="1.4" height="128" fill="#000" opacity="0.5"/>
+    <rect x="113.6" width="1.4" height="128" fill="#000" opacity="0.5"/>
+    <rect x="14.4" width="0.8" height="128" fill="#454b58"/>
+    <rect x="112.8" width="0.8" height="128" fill="#454b58"/>
   </g>
-  <!-- A hollow DIN socket, with the wordmark's lines across its lower half. -->
-  <circle cx="64" cy="64" r="38" fill="none" stroke="#d9dce3" stroke-width="6"/>
-  <g fill="#d9dce3">
-    <circle cx="64" cy="40" r="4.2"/>
-    <circle cx="47" cy="47" r="4.2"/>
-    <circle cx="81" cy="47" r="4.2"/>
-    <circle cx="40" cy="64" r="4.2"/>
-    <circle cx="88" cy="64" r="4.2"/>
+
+  <!-- The socket: a dark recess behind a metal bezel. -->
+  <circle cx="64" cy="64" r="36" fill="url(#recess)"/>
+  <circle cx="64" cy="64" r="35" fill="none" stroke="#000" stroke-width="2.5" opacity="0.55"/>
+  <g filter="url(#drop)">
+    <circle cx="64" cy="64" r="38" fill="none" stroke="url(#metal)" stroke-width="6" mask="url(#cuts)"/>
   </g>
-  <g clip-path="url(#inside)" fill="#d9dce3">
-    <rect x="0" y="74.5" width="128" height="1.5"/>
-    <rect x="0" y="80.5" width="128" height="2"/>
-    <rect x="0" y="86.5" width="128" height="2.5"/>
-    <rect x="0" y="92.5" width="128" height="3"/>
+  <circle cx="64" cy="64" r="41" fill="none" stroke="#000" stroke-width="0.8" opacity="0.5" mask="url(#cuts)"/>
+  <!-- Pin holes: dark, with a lit lower edge. -->
+  <g>
+    <circle cx="64" cy="40" r="4.4" fill="#06070a"/>
+    <circle cx="47" cy="47" r="4.4" fill="#06070a"/>
+    <circle cx="81" cy="47" r="4.4" fill="#06070a"/>
+    <circle cx="40" cy="64" r="4.4" fill="#06070a"/>
+    <circle cx="88" cy="64" r="4.4" fill="#06070a"/>
+    <g fill="none" stroke="#9ba0ab" stroke-width="0.9" stroke-linecap="round">
+      <path d="M 60.4 42.4 A 4.4 4.4 0 0 0 67.6 42.4"/>
+      <path d="M 43.4 49.4 A 4.4 4.4 0 0 0 50.6 49.4"/>
+      <path d="M 77.4 49.4 A 4.4 4.4 0 0 0 84.6 49.4"/>
+      <path d="M 36.4 66.4 A 4.4 4.4 0 0 0 43.6 66.4"/>
+      <path d="M 84.4 66.4 A 4.4 4.4 0 0 0 91.6 66.4"/>
+    </g>
   </g>
 </svg>
