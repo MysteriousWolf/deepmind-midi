@@ -2,7 +2,7 @@
   <title>deepmind-midi</title>
   <!--
     A dark panel between wooden end cheeks, as on the unit, and a MIDI DIN
-    socket cut through by the horizontal lines the DeepMind wordmark uses.
+    socket with the horizontal lines of the DeepMind wordmark inside it.
   -->
   <defs>
     <clipPath id="case"><rect width="128" height="128" rx="24"/></clipPath>
@@ -10,13 +10,7 @@
       <rect x="0" width="13" height="128"/>
       <rect x="115" width="13" height="128"/>
     </clipPath>
-    <mask id="cuts">
-      <rect width="128" height="128" fill="#fff"/>
-      <rect x="0" y="72" width="128" height="1.6" fill="#000"/>
-      <rect x="0" y="79" width="128" height="2.2" fill="#000"/>
-      <rect x="0" y="86.5" width="128" height="2.8" fill="#000"/>
-      <rect x="0" y="94.5" width="128" height="3.4" fill="#000"/>
-    </mask>
+    <clipPath id="inside"><circle cx="64" cy="64" r="33"/></clipPath>
   </defs>
   <g clip-path="url(#case)">
     <rect width="128" height="128" fill="#9b4a25"/>
@@ -42,15 +36,19 @@
     <rect x="14.2" width="0.8" height="128" fill="#3a3f4b"/>
     <rect x="113" width="0.8" height="128" fill="#3a3f4b"/>
   </g>
-  <!-- The socket face, with the pin holes, sliced by the wordmark's lines. -->
-  <g mask="url(#cuts)">
-    <circle cx="64" cy="64" r="38" fill="#d9dce3"/>
-    <g fill="#1e2128">
-      <circle cx="64" cy="40" r="4.2"/>
-      <circle cx="47" cy="47" r="4.2"/>
-      <circle cx="81" cy="47" r="4.2"/>
-      <circle cx="40" cy="64" r="4.2"/>
-      <circle cx="88" cy="64" r="4.2"/>
-    </g>
+  <!-- A hollow DIN socket, with the wordmark's lines across its lower half. -->
+  <circle cx="64" cy="64" r="38" fill="none" stroke="#d9dce3" stroke-width="6"/>
+  <g fill="#d9dce3">
+    <circle cx="64" cy="40" r="4.2"/>
+    <circle cx="47" cy="47" r="4.2"/>
+    <circle cx="81" cy="47" r="4.2"/>
+    <circle cx="40" cy="64" r="4.2"/>
+    <circle cx="88" cy="64" r="4.2"/>
+  </g>
+  <g clip-path="url(#inside)" fill="#d9dce3">
+    <rect x="0" y="74.5" width="128" height="1.5"/>
+    <rect x="0" y="80.5" width="128" height="2"/>
+    <rect x="0" y="86.5" width="128" height="2.5"/>
+    <rect x="0" y="92.5" width="128" height="3"/>
   </g>
 </svg>
