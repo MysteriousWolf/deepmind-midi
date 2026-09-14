@@ -21,6 +21,7 @@
 //! | [`syx`]   | `.syx` files: the programs a preset pack carries, and building one |
 //! | [`device`] | The state machine: what the synthesizer holds, and what to send |
 //! | [`transport`] | The blocking adapter over a port and a clock (`transport`) |
+//! | [`sim`]   | The other end of the conversation, for tests (`sim`)         |
 //!
 //! Each layer depends only on those above it: [`wire`] does not know what a
 //! `DeepMind` is, and [`sysex`] does not know where its bytes came from.
@@ -51,6 +52,7 @@
 //! - `serde`: `Serialize`/`Deserialize` derives on the public data types.
 //! - `transport`: the blocking adapter, which is the one part of this crate that
 //!   knows what IO is. Needs neither `std` nor an allocator.
+//! - `sim`: a synthesizer to talk to, for testing a host without one plugged in.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
@@ -61,9 +63,13 @@ extern crate alloc;
 pub mod device;
 pub mod error;
 pub mod ids;
+mod nrpn;
 pub mod param;
 pub mod program;
 mod queue;
+#[cfg(feature = "sim")]
+#[cfg_attr(docsrs, doc(cfg(feature = "sim")))]
+pub mod sim;
 pub mod sysex;
 pub mod syx;
 #[cfg(feature = "transport")]

@@ -86,6 +86,8 @@ pub enum Error {
     SysExInterrupted,
     /// An interface byte was neither MIDI (0), USB (1) nor Wi-Fi (2).
     InvalidInterface(u8),
+    /// A universal `SysEx` frame was not a device inquiry request.
+    NotAnInquiryRequest,
     /// A universal `SysEx` frame was not a `DeepMind` device inquiry response.
     NotAnInquiryResponse,
     /// An edit was made before any program was known, so nothing said what
@@ -195,6 +197,7 @@ impl fmt::Display for Error {
                 f,
                 "invalid interface {byte}, expected 0 (MIDI), 1 (USB) or 2 (Wi-Fi)"
             ),
+            Self::NotAnInquiryRequest => f.write_str("not a device inquiry request"),
             Self::NotAnInquiryResponse => f.write_str("not a DeepMind device inquiry response"),
             Self::ProgramNotKnown => f.write_str("no program known yet, nothing to edit"),
             Self::QueueFull { needed, available } => {

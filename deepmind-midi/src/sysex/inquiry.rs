@@ -141,6 +141,43 @@ pub fn request_into(device: DeviceId, out: &mut [u8]) -> Result<usize> {
     Ok(REQUEST_LEN)
 }
 
+/// Reads an identity request, returning the device it addresses.
+///
+/// The counterpart of [`request_into`], here for the same reason
+/// [`reply_into`] is: something answering an inquiry has to notice one first. A
+/// host has no reason to read one.
+///
+/// The request is a universal message and says nothing about a `DeepMind`, so
+/// what comes back is the address it carries and nothing more.
+/// [`DeviceId::Broadcast`] addresses every unit on the port.
+///
+/// # Errors
+///
+/// Returns [`Error::Unframed`] when the `F0` or the `F7` is missing, and
+/// [`Error::NotAnInquiryRequest`] when the frame is some other universal
+/// message. A device ID byte of `0x10` through `0x7E` addresses no unit and is
+/// [`Error::InvalidDeviceId`].
+///
+/// ```
+/// use deepmind_midi::ids::DeviceId;
+/// use deepmind_midi::sysex::inquiry;
+///
+/// let asked = inquiry::parse_request(&[0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7])?;
+/// assert_eq!(asked, DeviceId::Broadcast);
+/// # Ok::<(), deepmind_midi::Error>(())
+/// ```
+pub fn parse_request(bytes: &[u8]) -> Result<DeviceId> {
+    let (first, rest) = bytes.split_first().ok_or(Error::Unframed)?;
+    let (last, body) = rest.split_last().ok_or(Error::Unframed)?;
+    if *first != SYSEX_START || *last != SYSEX_END {
+        return Err(Error::Unframed);
+    }
+    let &[NON_REALTIME, device, GENERAL_INFORMATION, IDENTITY_REQUEST] = body else {
+        return Err(Error::NotAnInquiryRequest);
+    };
+    DeviceId::from_byte(device)
+}
+
 /// Reads an identity reply.
 ///
 /// # Errors
@@ -253,6 +290,48 @@ mod tests {
             firmware: Version { major: 1, minor: 1 },
             voice: Version { major: 1, minor: 0 },
         }
+    }
+
+    #[test]
+    fn a_request_round_trips() {
+        for device in [DeviceId::Unit(0), DeviceId::Unit(15), DeviceId::Broadcast] {
+            let mut bytes = [0u8; REQUEST_LEN];
+            let len = request_into(device, &mut bytes).expect("the buffer fits");
+            assert_eq!(len, REQUEST_LEN);
+            assert_eq!(parse_request(&bytes), Ok(device));
+        }
+    }
+
+    #[test]
+    fn a_reply_is_not_a_request() {
+        let mut bytes = [0u8; REPLY_LEN];
+        reply_into(&identity(), &mut bytes).expect("the buffer fits");
+        assert_eq!(parse_request(&bytes), Err(Error::NotAnInquiryRequest));
+    }
+
+    /// The `DeepMind` frame is not a universal one, so it fails on its second
+    /// byte rather than its length.
+    #[test]
+    fn a_deepmind_frame_is_not_a_request() {
+        let bytes = [0xF0, 0x00, 0x20, 0x32, 0x20, 0x00, 0x03, 0xF7];
+        assert_eq!(parse_request(&bytes), Err(Error::NotAnInquiryRequest));
+    }
+
+    #[test]
+    fn a_request_has_to_be_framed() {
+        assert_eq!(parse_request(&[]), Err(Error::Unframed));
+        assert_eq!(
+            parse_request(&[0xF0, 0x7E, 0x7F, 0x06, 0x01]),
+            Err(Error::Unframed)
+        );
+    }
+
+    #[test]
+    fn a_request_addressing_no_unit_is_refused() {
+        assert_eq!(
+            parse_request(&[0xF0, 0x7E, 0x10, 0x06, 0x01, 0xF7]),
+            Err(Error::InvalidDeviceId(0x10))
+        );
     }
 
     #[test]

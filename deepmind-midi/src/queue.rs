@@ -70,6 +70,19 @@ impl<T, const N: usize> Queue<T, N> {
         self.slots.get(self.head).copied().flatten()
     }
 
+    /// Borrows the oldest item, so one that is being sent a piece at a time can
+    /// record how far it got.
+    ///
+    /// A bank run is the only reply shaped that way, so this is dead weight in a
+    /// build without the simulated synthesizer.
+    #[cfg(feature = "sim")]
+    pub(crate) fn peek_mut(&mut self) -> Option<&mut T> {
+        if self.len == 0 {
+            return None;
+        }
+        self.slots.get_mut(self.head).and_then(Option::as_mut)
+    }
+
     /// Drops everything waiting.
     pub(crate) fn clear(&mut self) {
         while self.pop().is_some() {}
