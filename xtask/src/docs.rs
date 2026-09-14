@@ -284,7 +284,7 @@ fn render_structure(spec: &Spec, all: &[diagrams::Diagram]) -> Result<String, St
     out.push_str(
         "Three identical envelopes: VCA, VCF and mod. Each has the four \
          stages plus a curve control per stage, which bends the segment \
-         between linear and exponential.\n\n",
+         from linear towards exponential in either direction.\n\n",
     );
     let _ = writeln!(out, "{}", embed("envelope")?);
     out.push_str(

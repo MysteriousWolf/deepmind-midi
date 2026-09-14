@@ -206,17 +206,19 @@ const ENVELOPE_PLOT: EnvelopePlot = EnvelopePlot {
 const AXIS: &str = "#555";
 const FAINT: &str = "#aaa";
 const LINEAR: &str = "#1f6fb2";
-const EXPONENTIAL: &str = "#c8401f";
+const FAST: &str = "#c8401f";
+const SLOW: &str = "#2a8f5a";
 
-/// The four envelope stages, drawn at two curve settings.
+/// The four envelope stages, drawn at three curve settings.
 ///
 /// Level against time. The key goes down at the start of the attack and comes
 /// up at the end of the sustain. The linear curve is straight segments; the
-/// exponential one rises and falls fast, then flattens.
+/// exponential ones bend the same segments each way, one starting fast and
+/// flattening out, the other starting slow and finishing fast.
 fn envelope() -> String {
     let mut out = String::from(
         "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 152\" width=\"640\" \
-         height=\"304\" role=\"img\" aria-label=\"One envelope at two curve settings\" \
+         height=\"304\" role=\"img\" aria-label=\"One envelope at three curve settings\" \
          font-family=\"ui-sans-serif, system-ui, sans-serif\" font-size=\"7\">\n\
          <title>Envelope stages</title>\n\
          <rect width=\"320\" height=\"152\" rx=\"3\" fill=\"#fafafa\"/>\n",
@@ -304,8 +306,8 @@ fn envelope_stages(out: &mut String, p: &EnvelopePlot) {
     );
 }
 
-/// The linear envelope as straight segments and the exponential one as
-/// curves that start steep and flatten out.
+/// The linear envelope as straight segments, and the two exponential ones as
+/// the same segments bent each way.
 fn envelope_curves(out: &mut String, p: &EnvelopePlot) {
     let EnvelopePlot {
         left,
@@ -321,34 +323,50 @@ fn envelope_curves(out: &mut String, p: &EnvelopePlot) {
          {right},{base}\" fill=\"none\" stroke=\"{LINEAR}\" stroke-width=\"1.6\" \
          stroke-linejoin=\"round\"/>"
     );
-    let _ = writeln!(
-        out,
-        "<path d=\"M {left} {base} Q {:.1} {:.1} {attack} {top} \
-         Q {:.1} {:.1} {decay} {sustain} L {hold} {sustain} \
-         Q {:.1} {:.1} {right} {base}\" fill=\"none\" stroke=\"{EXPONENTIAL}\" \
-         stroke-width=\"1.6\" stroke-linejoin=\"round\"/>",
-        left + (attack - left) * 0.18,
-        top + (base - top) * 0.05,
-        attack + (decay - attack) * 0.14,
-        sustain - (sustain - top) * 0.06,
-        hold + (right - hold) * 0.14,
-        base - (base - sustain) * 0.06,
-    );
+    // Each moving segment is a quadratic curve. The control point sits near
+    // one end of the segment: near the start for a fast start, near the end
+    // for a slow one. `along` is how far along the segment it sits, `across`
+    // how far through the segment's rise or fall.
+    let bend = |from: (f32, f32), to: (f32, f32), along: f32, across: f32| {
+        (
+            from.0 + (to.0 - from.0) * along,
+            from.1 + (to.1 - from.1) * across,
+        )
+    };
+    let start = (left, base);
+    let peak = (attack, top);
+    let settled = (decay, sustain);
+    let released = (hold, sustain);
+    let end = (right, base);
+    for (colour, along, across) in [(FAST, 0.16, 0.95), (SLOW, 0.84, 0.05)] {
+        let a = bend(start, peak, along, across);
+        let d = bend(peak, settled, along, across);
+        let r = bend(released, end, along, across);
+        let _ = writeln!(
+            out,
+            "<path d=\"M {left} {base} Q {:.1} {:.1} {attack} {top} \
+             Q {:.1} {:.1} {decay} {sustain} L {hold} {sustain} \
+             Q {:.1} {:.1} {right} {base}\" fill=\"none\" stroke=\"{colour}\" \
+             stroke-width=\"1.6\" stroke-linejoin=\"round\"/>",
+            a.0, a.1, d.0, d.1, r.0, r.1,
+        );
+    }
 }
 
 fn envelope_legend(out: &mut String, p: &EnvelopePlot) {
     for (row, colour, label) in [
-        (0.0, LINEAR, "linear curve"),
-        (10.0, EXPONENTIAL, "exponential curve"),
+        (0.0, LINEAR, "linear"),
+        (10.0, FAST, "exponential, fast start"),
+        (20.0, SLOW, "exponential, slow start"),
     ] {
         let y = p.top + 6.0 + row;
         let _ = writeln!(
             out,
             "<line x1=\"{}\" y1=\"{y}\" x2=\"{}\" y2=\"{y}\" stroke=\"{colour}\" stroke-width=\"1.6\"/>\n\
              <text x=\"{}\" y=\"{}\" fill=\"{AXIS}\">{label}</text>",
-            p.right - 70.0,
-            p.right - 58.0,
-            p.right - 54.0,
+            p.right - 88.0,
+            p.right - 76.0,
+            p.right - 72.0,
             y + 2.5,
         );
     }

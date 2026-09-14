@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="deepmind-midi">
+  <title>deepmind-midi</title>
+  <!-- A five-pin DIN socket, with an envelope where the cable would go. -->
+  <rect width="128" height="128" rx="28" fill="#1b1f2a"/>
+  <circle cx="64" cy="64" r="44" fill="none" stroke="#e8eaf0" stroke-width="5"/>
+  <g fill="#e8eaf0">
+    <circle cx="64" cy="38" r="5"/>
+    <circle cx="45.6" cy="45.6" r="5"/>
+    <circle cx="82.4" cy="45.6" r="5"/>
+    <circle cx="38" cy="64" r="5"/>
+    <circle cx="90" cy="64" r="5"/>
+  </g>
+  <polyline points="42,92 52,72 60,84 74,84 86,92" fill="none" stroke="#f0a533" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

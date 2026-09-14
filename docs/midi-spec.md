@@ -88,7 +88,7 @@ Each bus occupies three consecutive offsets: source, destination, depth. Bus 1 i
 
 ### Envelopes
 
-Three identical envelopes: VCA, VCF and mod. Each has the four stages plus a curve control per stage, which bends the segment between linear and exponential.
+Three identical envelopes: VCA, VCF and mod. Each has the four stages plus a curve control per stage, which bends the segment from linear towards exponential in either direction.
 
 <img src="diagrams/envelope.svg" alt="Envelopes" width="640">
 
