@@ -203,11 +203,17 @@ const ENVELOPE_PLOT: EnvelopePlot = EnvelopePlot {
     ends: [94.0, 154.0, 234.0],
 };
 
-const AXIS: &str = "#555";
-const FAINT: &str = "#aaa";
-const LINEAR: &str = "#1f6fb2";
-const FAST: &str = "#c8401f";
-const SLOW: &str = "#2a8f5a";
+/// Colours that read on both backgrounds, and the two backgrounds.
+///
+/// Dark is the default; the light set applies when the viewer's system asks
+/// for it. Text, axes and rules are classes so one stylesheet switches them.
+const ENVELOPE_STYLE: &str = "\
+    .bg{fill:#1b1f2a}.axis{stroke:#c9cdd6}.faint{stroke:#5a6070}.ink{fill:#c9cdd6}\n    \
+    @media (prefers-color-scheme: light){\
+    .bg{fill:#fafafa}.axis{stroke:#555}.faint{stroke:#aaa}.ink{fill:#555}}";
+const LINEAR: &str = "#4a90d9";
+const FAST: &str = "#e0563a";
+const SLOW: &str = "#3fae73";
 
 /// The four envelope stages, drawn at three curve settings.
 ///
@@ -216,12 +222,13 @@ const SLOW: &str = "#2a8f5a";
 /// exponential ones bend the same segments each way, one starting fast and
 /// flattening out, the other starting slow and finishing fast.
 fn envelope() -> String {
-    let mut out = String::from(
+    let mut out = format!(
         "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 152\" width=\"640\" \
          height=\"304\" role=\"img\" aria-label=\"One envelope at three curve settings\" \
          font-family=\"ui-sans-serif, system-ui, sans-serif\" font-size=\"7\">\n\
          <title>Envelope stages</title>\n\
-         <rect width=\"320\" height=\"152\" rx=\"3\" fill=\"#fafafa\"/>\n",
+         <style>\n    {ENVELOPE_STYLE}\n</style>\n\
+         <rect class=\"bg\" width=\"320\" height=\"152\" rx=\"3\"/>\n",
     );
     envelope_axes(&mut out, &ENVELOPE_PLOT);
     envelope_stages(&mut out, &ENVELOPE_PLOT);
@@ -242,12 +249,12 @@ fn envelope_axes(out: &mut String, p: &EnvelopePlot) {
     } = *p;
     let _ = writeln!(
         out,
-        "<line x1=\"{left}\" y1=\"{top}\" x2=\"{left}\" y2=\"{base}\" stroke=\"{AXIS}\" stroke-width=\"0.8\"/>\n\
-         <line x1=\"{left}\" y1=\"{base}\" x2=\"{right}\" y2=\"{base}\" stroke=\"{AXIS}\" stroke-width=\"0.8\"/>\n\
-         <text x=\"{}\" y=\"{}\" text-anchor=\"end\" fill=\"{AXIS}\">255</text>\n\
-         <text x=\"{}\" y=\"{}\" text-anchor=\"end\" fill=\"{AXIS}\">0</text>\n\
-         <text x=\"{left}\" y=\"{}\" text-anchor=\"middle\" fill=\"{AXIS}\" font-size=\"6.5\">level</text>\n\
-         <text x=\"{right}\" y=\"{}\" text-anchor=\"end\" fill=\"{AXIS}\" font-size=\"6.5\">time</text>",
+        "<line class=\"axis\" x1=\"{left}\" y1=\"{top}\" x2=\"{left}\" y2=\"{base}\" stroke-width=\"0.8\"/>\n\
+         <line class=\"axis\" x1=\"{left}\" y1=\"{base}\" x2=\"{right}\" y2=\"{base}\" stroke-width=\"0.8\"/>\n\
+         <text class=\"ink\" x=\"{}\" y=\"{}\" text-anchor=\"end\">255</text>\n\
+         <text class=\"ink\" x=\"{}\" y=\"{}\" text-anchor=\"end\">0</text>\n\
+         <text class=\"ink\" x=\"{left}\" y=\"{}\" text-anchor=\"middle\" font-size=\"6.5\">level</text>\n\
+         <text class=\"ink\" x=\"{right}\" y=\"{}\" text-anchor=\"end\" font-size=\"6.5\">time</text>",
         left - 3.0,
         top + 2.5,
         left - 3.0,
@@ -258,8 +265,8 @@ fn envelope_axes(out: &mut String, p: &EnvelopePlot) {
     for (x, label, anchor) in [(left, "key down", "start"), (p.ends[2], "key up", "middle")] {
         let _ = writeln!(
             out,
-            "<path d=\"M {:.1} {} L {:.1} {} L {x} {}\" fill=\"{AXIS}\"/>\n\
-             <text x=\"{x}\" y=\"{}\" text-anchor=\"{anchor}\" fill=\"{AXIS}\" font-size=\"6.5\">{label}</text>",
+            "<path class=\"ink\" d=\"M {:.1} {} L {:.1} {} L {x} {}\"/>\n\
+             <text class=\"ink\" x=\"{x}\" y=\"{}\" text-anchor=\"{anchor}\" font-size=\"6.5\">{label}</text>",
             x - 2.5,
             base + 17.0,
             x + 2.5,
@@ -282,9 +289,9 @@ fn envelope_stages(out: &mut String, p: &EnvelopePlot) {
     ] {
         let _ = writeln!(
             out,
-            "<line x1=\"{x}\" y1=\"{}\" x2=\"{x}\" y2=\"{}\" stroke=\"{FAINT}\" \
+            "<line class=\"faint\" x1=\"{x}\" y1=\"{}\" x2=\"{x}\" y2=\"{}\" \
              stroke-width=\"0.5\" stroke-dasharray=\"2 2\"/>\n\
-             <text x=\"{:.1}\" y=\"{}\" text-anchor=\"middle\" fill=\"{AXIS}\">{label}</text>",
+             <text class=\"ink\" x=\"{:.1}\" y=\"{}\" text-anchor=\"middle\">{label}</text>",
             p.top,
             p.base,
             f32::midpoint(start, x),
@@ -294,9 +301,9 @@ fn envelope_stages(out: &mut String, p: &EnvelopePlot) {
     }
     let _ = writeln!(
         out,
-        "<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" stroke=\"{FAINT}\" stroke-width=\"0.5\" \
+        "<line class=\"faint\" x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" stroke-width=\"0.5\" \
          stroke-dasharray=\"1 2\"/>\n\
-         <text x=\"{}\" y=\"{}\" fill=\"{AXIS}\" font-size=\"6.5\">sustain level</text>",
+         <text class=\"ink\" x=\"{}\" y=\"{}\" font-size=\"6.5\">sustain level</text>",
         p.left,
         p.sustain,
         p.ends[2],
@@ -363,7 +370,7 @@ fn envelope_legend(out: &mut String, p: &EnvelopePlot) {
         let _ = writeln!(
             out,
             "<line x1=\"{}\" y1=\"{y}\" x2=\"{}\" y2=\"{y}\" stroke=\"{colour}\" stroke-width=\"1.6\"/>\n\
-             <text x=\"{}\" y=\"{}\" fill=\"{AXIS}\">{label}</text>",
+             <text class=\"ink\" x=\"{}\" y=\"{}\">{label}</text>",
             p.right - 88.0,
             p.right - 76.0,
             p.right - 72.0,
