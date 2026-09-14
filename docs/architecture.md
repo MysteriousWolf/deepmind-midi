@@ -632,12 +632,23 @@ the tree wrong between releases and would need write access to the default
 branch. This way the tree always states what it will release next and the
 release job only reads.
 
-Releasing is one click. The workflow verifies the build, reads the version,
-refuses if that tag exists, then tags, releases and publishes. Notes come from
-GitHub's generator, categorised by label through `.github/release.yml`, with
-an optional opening paragraph from a small model on GitHub Models; any failure
-there leaves the generated notes alone. `CARGO_REGISTRY_TOKEN` is optional and
-a missing one warns rather than fails.
+Releasing is one click. The workflow verifies the build and a `cargo publish
+--dry-run`, reads the version, refuses if that tag exists, then tags, releases
+and publishes. Notes come from GitHub's generator, categorised by label through
+`.github/release.yml`, with an optional opening paragraph from a small model on
+GitHub Models; any failure there leaves the generated notes alone.
+
+crates.io is reached through trusted publishing when the crate has a trusted
+publisher configured, and through the `CARGO_REGISTRY_TOKEN` repository secret
+otherwise. crates.io only offers trusted publishing for a crate that already
+exists, so the first release needs the secret. When publishing is requested
+and neither credential is there, the run fails before it tags, so a version is
+never released on GitHub without reaching crates.io.
+
+Once published, `docs.rs` builds the API reference with every feature on, as
+`[package.metadata.docs.rs]` asks. The README on crates.io uses absolute links
+because its renderer resolves relative ones against the package directory,
+`deepmind-midi/`, not the repository root.
 
 ## Status
 

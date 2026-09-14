@@ -4,6 +4,7 @@ description = "Sans-IO protocol library for Behringer DeepMind synthesizers: Sys
 categories = ["encoding", "no-std", "parser-implementations"]
 keywords = ["midi", "sysex", "synthesizer", "deepmind", "behringer"]
 readme = "../README.md"
+documentation = "https://docs.rs/deepmind-midi"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

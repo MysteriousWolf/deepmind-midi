@@ -42,8 +42,11 @@
 //! });
 //! ```
 //!
-//! See `docs/architecture.md` for the design and `docs/midi-spec.md` for the
+//! See [`docs/architecture.md`] for the design and [`docs/midi-spec.md`] for the
 //! protocol itself.
+//!
+//! [`docs/architecture.md`]: https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/architecture.md
+//! [`docs/midi-spec.md`]: https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/midi-spec.md
 //!
 //! # Feature flags
 //!
@@ -56,6 +59,12 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
+#![doc(
+    html_logo_url = "https://raw.githubusercontent.com/MysteriousWolf/deepmind-midi/main/docs/logo.svg"
+)]
+#![doc(
+    html_favicon_url = "https://raw.githubusercontent.com/MysteriousWolf/deepmind-midi/main/docs/logo.svg"
+)]
 
 #[cfg(feature = "alloc")]
 extern crate alloc;

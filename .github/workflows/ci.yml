@@ -40,6 +40,11 @@ jobs:
       - name: Generated parameter tables are current
         run: cargo xtask codegen --check
 
+      # What the release workflow will publish: packages the crate, builds it
+      # from the package and checks the registry metadata, without uploading.
+      - name: Publishable
+        run: cargo publish --package deepmind-midi --dry-run
+
       # The first change merged after a release has to move the version.
       # A repository with no release tags yet passes: nothing to be behind.
       - name: Version is ahead of the last release
