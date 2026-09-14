@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="deepmind-midi">
   <title>deepmind-midi</title>
   <!--
-    A dark panel between wooden end cheeks, as on the unit. A MIDI DIN socket
-    with the horizontal cuts the DeepMind wordmark uses, and an envelope.
+    A dark panel between wooden end cheeks, as on the unit, and a MIDI DIN
+    socket cut through by the horizontal lines the DeepMind wordmark uses.
   -->
   <defs>
     <clipPath id="case"><rect width="128" height="128" rx="24"/></clipPath>
@@ -12,11 +12,10 @@
     </clipPath>
     <mask id="cuts">
       <rect width="128" height="128" fill="#fff"/>
-      <rect x="0" y="52" width="128" height="1.4" fill="#000"/>
-      <rect x="0" y="57.5" width="128" height="2" fill="#000"/>
-      <rect x="0" y="63.5" width="128" height="2.6" fill="#000"/>
-      <rect x="0" y="70" width="128" height="3.2" fill="#000"/>
-      <rect x="0" y="77" width="128" height="4" fill="#000"/>
+      <rect x="0" y="72" width="128" height="1.6" fill="#000"/>
+      <rect x="0" y="79" width="128" height="2.2" fill="#000"/>
+      <rect x="0" y="86.5" width="128" height="2.8" fill="#000"/>
+      <rect x="0" y="94.5" width="128" height="3.4" fill="#000"/>
     </mask>
   </defs>
   <g clip-path="url(#case)">
@@ -43,13 +42,15 @@
     <rect x="14.2" width="0.8" height="128" fill="#3a3f4b"/>
     <rect x="113" width="0.8" height="128" fill="#3a3f4b"/>
   </g>
-  <circle cx="64" cy="50" r="28" fill="none" stroke="#d9dce3" stroke-width="5" mask="url(#cuts)"/>
-  <g fill="#d9dce3">
-    <circle cx="64" cy="32" r="3.4"/>
-    <circle cx="51.3" cy="37.3" r="3.4"/>
-    <circle cx="76.7" cy="37.3" r="3.4"/>
-    <circle cx="46" cy="50" r="3.4"/>
-    <circle cx="82" cy="50" r="3.4"/>
+  <!-- The socket face, with the pin holes, sliced by the wordmark's lines. -->
+  <g mask="url(#cuts)">
+    <circle cx="64" cy="64" r="38" fill="#d9dce3"/>
+    <g fill="#1e2128">
+      <circle cx="64" cy="40" r="4.2"/>
+      <circle cx="47" cy="47" r="4.2"/>
+      <circle cx="81" cy="47" r="4.2"/>
+      <circle cx="40" cy="64" r="4.2"/>
+      <circle cx="88" cy="64" r="4.2"/>
+    </g>
   </g>
-  <polyline points="24,116 38,94 54,104 74,104 104,116" fill="none" stroke="#9fd8cf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
