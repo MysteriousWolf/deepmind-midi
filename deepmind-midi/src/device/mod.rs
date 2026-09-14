@@ -24,7 +24,7 @@
 //! assert_eq!(asked, [0xF0, 0x00, 0x20, 0x32, 0x20, 0x00, 0x03, 0xF7]);
 //!
 //! // What comes back, in whatever chunks the port delivers it.
-//! let mut program = Program::new(ProtocolVersion::V6)?;
+//! let mut program = Program::new(ProtocolVersion::V6);
 //! program.set_name(ProgramName::new("Bass Sweep")?);
 //! let mut packed = [0; Program::PACKED_MAX_LEN];
 //! let packed_len = program.pack_into(&mut packed)?;
@@ -864,7 +864,7 @@ mod tests {
     }
 
     fn program(name: &str) -> Program {
-        let mut program = Program::new(ProtocolVersion::V6).expect("a version the build knows");
+        let mut program = Program::new(ProtocolVersion::V6);
         program.set_name(ProgramName::new(name).expect("a name the display can write"));
         program
     }

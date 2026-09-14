@@ -106,7 +106,7 @@ impl Port for Deaf {
 }
 
 fn named(name: &str) -> Program {
-    let mut program = Program::new(ProtocolVersion::V7).expect("a known version");
+    let mut program = Program::new(ProtocolVersion::V7);
     program.set_name(ProgramName::new(name).expect("a legal name"));
     program
 }

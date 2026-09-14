@@ -81,7 +81,7 @@ pub enum Command {
 
 impl Command {
     /// Every documented command, ordered by command byte.
-    pub const ALL: [Self; 22] = [
+    pub const ALL: &'static [Self] = &[
         Self::ControlAppNotifyRequest,
         Self::ProgramDumpRequest,
         Self::ProgramDumpResponse,
@@ -217,6 +217,20 @@ impl Command {
     }
 }
 
+impl TryFrom<u8> for Command {
+    type Error = Error;
+
+    fn try_from(byte: u8) -> Result<Self> {
+        Self::from_byte(byte)
+    }
+}
+
+impl From<Command> for u8 {
+    fn from(value: Command) -> Self {
+        value.to_byte()
+    }
+}
+
 impl fmt::Display for Command {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.name())
@@ -229,7 +243,7 @@ mod tests {
 
     #[test]
     fn every_command_round_trips_through_its_byte() {
-        for command in Command::ALL {
+        for command in Command::ALL.iter().copied() {
             assert_eq!(Command::from_byte(command.to_byte()), Ok(command));
         }
     }
@@ -237,7 +251,7 @@ mod tests {
     #[test]
     fn the_table_is_ordered_by_command_byte_and_has_no_duplicates() {
         let mut previous = None;
-        for command in Command::ALL {
+        for command in Command::ALL.iter().copied() {
             if let Some(previous) = previous {
                 assert!(command.to_byte() > previous, "{command} is out of order");
             }
@@ -254,7 +268,7 @@ mod tests {
 
     #[test]
     fn a_response_comes_from_the_device_and_a_request_goes_to_it() {
-        for command in Command::ALL {
+        for command in Command::ALL.iter().copied() {
             let expected = if command.name().ends_with("Response") {
                 Direction::FromDevice
             } else {

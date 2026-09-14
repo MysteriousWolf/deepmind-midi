@@ -55,7 +55,7 @@ fn fixture_path() -> PathBuf {
 /// Deterministic bytes, the same on every platform and every run.
 fn filled(version: ProtocolVersion, seed: u64, name: &str) -> Program {
     let mut state = seed;
-    let len = version.program_data_len().expect("a version with a length");
+    let len = version.program_data_len();
     let bytes: Vec<u8> = (0..len)
         .map(|_| {
             state = state

@@ -21,7 +21,7 @@ fuzz_target!(|data: &[u8]| {
 
         assert_eq!(
             program.version().program_data_len(),
-            Some(program.as_bytes().len())
+            program.as_bytes().len()
         );
 
         // Reading every parameter, which is what a host does with a dump.

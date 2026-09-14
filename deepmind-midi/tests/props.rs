@@ -614,7 +614,7 @@ fn every_request_survives_a_frame() {
 
 /// Returns a program filled with bytes from `rng`, every value in range.
 fn random_program(rng: &mut Rng, version: ProtocolVersion) -> Program {
-    let len = version.program_data_len().expect("a version with a length");
+    let len = version.program_data_len();
     let mut program = Program::from_bytes(version, &vec![0; len]).expect("a zeroed program");
     for parameter in ParamId::ALL {
         program.set_clamped(parameter, rng.byte());
@@ -631,7 +631,7 @@ fn a_program_is_the_bytes_it_was_built_from() {
         } else {
             ProtocolVersion::V7
         };
-        let len = version.program_data_len().expect("a version with a length");
+        let len = version.program_data_len();
         let bytes = rng.bytes(len);
 
         let program = Program::from_bytes(version, &bytes).expect("the documented length");
@@ -653,7 +653,7 @@ fn a_wrong_length_is_refused_rather_than_padded() {
         let len = rng.below(400);
         let bytes = rng.bytes(len);
         for version in [ProtocolVersion::V6, ProtocolVersion::V7] {
-            let expected = version.program_data_len() == Some(len);
+            let expected = version.program_data_len() == len;
             assert_eq!(
                 Program::from_bytes(version, &bytes).is_ok(),
                 expected,
@@ -702,7 +702,7 @@ fn the_diff_is_exactly_what_it_takes_to_become_the_target() {
 fn clamping_always_lands_on_a_value_the_parameter_accepts() {
     let mut rng = Rng::new(0x7072_6F67_0004);
     for _ in 0..CASES {
-        let mut program = Program::new(ProtocolVersion::V7).expect("a default program");
+        let mut program = Program::new(ProtocolVersion::V7);
         for _ in 0..8 {
             let parameter = ParamId::ALL[rng.below(PARAMETER_COUNT)];
             let wanted = rng.byte();
@@ -733,7 +733,7 @@ fn a_name_survives_the_field_it_is_stored_in() {
             .collect();
         let name = ProgramName::new(&text).expect("printable ASCII within sixteen characters");
 
-        let mut program = Program::new(ProtocolVersion::V7).expect("a default program");
+        let mut program = Program::new(ProtocolVersion::V7);
         program.set_name(name);
         assert_eq!(program.name(), name, "name did not survive: {text:?}");
         assert_eq!(program.name().as_str(), text);

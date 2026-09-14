@@ -34,7 +34,7 @@ fuzz_target!(|data: &[u8]| {
             // A program that came out of a file has to be a program: its bytes
             // are its declared length, and they pack back to what was read.
             let expected = entry.program.version().program_data_len();
-            assert_eq!(expected, Some(entry.program.as_bytes().len()));
+            assert_eq!(expected, entry.program.as_bytes().len());
         }
     }
 });

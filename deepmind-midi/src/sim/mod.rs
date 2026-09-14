@@ -13,7 +13,7 @@
 //! use deepmind_midi::sim::Synth;
 //!
 //! // A unit with a sound in its edit buffer.
-//! let mut sound = Program::new(ProtocolVersion::V7)?;
+//! let mut sound = Program::new(ProtocolVersion::V7);
 //! sound.set_name(ProgramName::new("Bass Sweep")?);
 //! let mut synth: Synth = Synth::new(DeviceId::Unit(0), sound);
 //!
@@ -838,7 +838,7 @@ mod tests {
     }
 
     fn named(name: &str) -> Program {
-        let mut program = Program::new(ProtocolVersion::V7).expect("a known version");
+        let mut program = Program::new(ProtocolVersion::V7);
         program.set_name(ProgramName::new(name).expect("a legal name"));
         program
     }

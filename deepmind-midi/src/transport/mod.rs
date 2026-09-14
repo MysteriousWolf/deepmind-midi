@@ -33,7 +33,7 @@
 //! }
 //!
 //! // The dump that port will hand over.
-//! let mut sound = Program::new(ProtocolVersion::V6)?;
+//! let mut sound = Program::new(ProtocolVersion::V6);
 //! sound.set_name(ProgramName::new("Bass Sweep")?);
 //! let mut packed = [0; Program::PACKED_MAX_LEN];
 //! let packed_len = sound.pack_into(&mut packed)?;
@@ -700,7 +700,7 @@ mod tests {
     }
 
     fn program(name: &str) -> Program {
-        let mut program = Program::new(ProtocolVersion::V6).expect("a version the build knows");
+        let mut program = Program::new(ProtocolVersion::V6);
         program.set_name(ProgramName::new(name).expect("a name the display can write"));
         program
     }

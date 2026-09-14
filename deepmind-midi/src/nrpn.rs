@@ -92,9 +92,10 @@ impl Nrpn {
         let Some(parameter) = self.parameter() else {
             return Change::Pending;
         };
-        let msb = self.data_msb.take().unwrap_or(0);
-        // The selection stays in force, so a sweep is one selection and a run of
-        // values.
+        // Both the selection and the top half stay in force, as MIDI data entry
+        // has them: a sweep is one selection, one top half and a run of bottom
+        // halves. Reselecting is what clears the held half.
+        let msb = self.data_msb.unwrap_or(0);
         Change::Parameter {
             parameter,
             value: (u16::from(msb) << 7) | u16::from(lsb),
@@ -154,6 +155,24 @@ mod tests {
                 Change::Parameter {
                     parameter: ParamId::Lfo1Rate,
                     value: u16::from(value),
+                    exact: true,
+                }
+            );
+        }
+    }
+
+    #[test]
+    fn a_data_entry_msb_stays_in_force_for_a_run_of_lsbs() {
+        let mut nrpn = Nrpn::default();
+        edit(&mut nrpn, ParamId::Lfo1Rate, 0);
+
+        assert_eq!(nrpn.control_change(DATA_ENTRY_MSB, 1), Change::Pending);
+        for lsb in [0, 5, 10] {
+            assert_eq!(
+                nrpn.control_change(DATA_ENTRY_LSB, lsb),
+                Change::Parameter {
+                    parameter: ParamId::Lfo1Rate,
+                    value: 128 + u16::from(lsb),
                     exact: true,
                 }
             );

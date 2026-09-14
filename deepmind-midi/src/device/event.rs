@@ -98,7 +98,7 @@ impl fmt::Display for Event {
             Self::Program { slot, program } => write!(f, "{slot}: {}", program.name()),
             Self::Identity(identity) => write!(f, "firmware {}", identity.firmware),
             Self::Parameter { parameter, value } => write!(f, "{parameter} = {value}"),
-            Self::Channel { channel, message } => write!(f, "channel {channel}: {message:?}"),
+            Self::Channel { channel, message } => write!(f, "channel {channel}: {message}"),
             Self::Timeout(request) => write!(f, "no answer to the {request}"),
             Self::Unhandled(command) => write!(f, "untracked {command}"),
             Self::Failed(error) => write!(f, "unreadable frame: {error}"),

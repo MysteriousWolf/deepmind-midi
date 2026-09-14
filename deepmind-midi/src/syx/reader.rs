@@ -32,7 +32,7 @@ pub struct Entry {
 /// use deepmind_midi::syx::{self, File};
 ///
 /// // Whatever the host read off disk. Built here so the example stands alone.
-/// let mut program = Program::new(ProtocolVersion::V6)?;
+/// let mut program = Program::new(ProtocolVersion::V6);
 /// program.set_name(ProgramName::new("Bass Sweep")?);
 ///
 /// let mut bytes = [0; syx::MAX_PROGRAM_FRAME_LEN];
@@ -80,11 +80,14 @@ impl<'a> File<'a> {
 
 /// Every `SysEx` frame in a file, borrowed where it lies.
 ///
-/// A frame runs from an `F0` to the next `F7`, which is exact: a payload is
-/// seven-bit data, so neither byte can occur inside one. Bytes between frames
-/// are skipped rather than refused, since a file is free to pad. An `F0` with no
-/// `F7` after it yields [`Error::Unframed`] and ends the walk, and
-/// [`Frames::offset`] says where it started.
+/// A frame runs from an `F0` to the next `F7`: a payload is seven-bit data, so
+/// neither byte can occur inside one. Bytes between frames are skipped rather
+/// than refused, since a file is free to pad. An `F0` followed by another `F0`
+/// before any `F7` is a frame the file never closed; it yields
+/// [`Error::Unframed`] and the walk goes on from the second `F0`, so a
+/// truncated dump does not take the one after it down with it. An `F0` with no
+/// `F7` anywhere after it yields the same error and ends the walk.
+/// [`Frames::offset`] says where the bad frame started either way.
 ///
 /// The item is a `Result` because a file is untrusted input: a frame another
 /// device wrote, or one with a payload its command does not take, is one bad
@@ -134,12 +137,22 @@ impl<'a> Iterator for Frames<'a> {
         let frame = self.bytes.get(start..)?;
         self.offset = start;
 
-        let Some(end) = frame.iter().position(|byte| *byte == SYSEX_END) else {
+        let Some(end) = frame
+            .iter()
+            .skip(1)
+            .position(|byte| *byte == SYSEX_END || *byte == SYSEX_START)
+            .map(|index| index.saturating_add(1))
+        else {
             // An F0 the file never closes. There is nothing after it to walk.
             self.done = true;
             self.pos = self.bytes.len();
             return Some(Err(Error::Unframed));
         };
+        if frame.get(end) == Some(&SYSEX_START) {
+            // A frame cut short by the next one, which is kept.
+            self.pos = start.saturating_add(end);
+            return Some(Err(Error::Unframed));
+        }
         self.pos = start.saturating_add(end).saturating_add(1);
         Some(Frame::parse(frame.get(..=end)?))
     }
@@ -217,7 +230,7 @@ mod tests {
     use crate::syx::{MAX_PROGRAM_FRAME_LEN, Writer, bank_to_vec, program_frame_len};
 
     fn named(name: &str) -> Program {
-        let mut program = Program::new(ProtocolVersion::V6).expect("version 6 is supported");
+        let mut program = Program::new(ProtocolVersion::V6);
         program.set_name(ProgramName::new(name).expect("a name the display can show"));
         program
     }
@@ -329,6 +342,25 @@ mod tests {
             .expect("it parses");
         assert_eq!(entry.slot, None);
         assert_eq!(entry.program, program);
+    }
+
+    /// A dump cut off by the next one is one bad frame; the next one is kept.
+    #[test]
+    fn a_truncated_frame_does_not_take_the_one_after_it() {
+        let whole = pack(&[named("One")]);
+        let mut bytes = whole.get(..100).expect("a frame is longer").to_vec();
+        bytes.extend_from_slice(&whole);
+
+        let mut programs = File::new(&bytes).programs();
+        assert_eq!(programs.next(), Some(Err(Error::Unframed)));
+        assert_eq!(programs.offset(), 0);
+        let entry = programs
+            .next()
+            .expect("the whole frame")
+            .expect("it parses");
+        assert_eq!(entry.program.name().as_str(), "One");
+        assert_eq!(programs.offset(), 100);
+        assert_eq!(programs.next(), None);
     }
 
     /// A file another device wrote is one bad frame, not the end of the walk.

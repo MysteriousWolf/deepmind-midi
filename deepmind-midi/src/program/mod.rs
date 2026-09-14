@@ -9,7 +9,7 @@
 //! use deepmind_midi::param::ParamId;
 //! use deepmind_midi::program::{LfoShape, Program, ProgramName};
 //!
-//! let mut program = Program::new(ProtocolVersion::V6)?;
+//! let mut program = Program::new(ProtocolVersion::V6);
 //! program.set_name(ProgramName::new("Bass Sweep")?);
 //! program.set_lfo1_shape(LfoShape::Triangle);
 //! program.set_vcf_frequency(200);
@@ -50,7 +50,7 @@
 //! use deepmind_midi::program::Program;
 //! use deepmind_midi::sysex::{Frame, Message};
 //!
-//! let program = Program::new(ProtocolVersion::V6)?;
+//! let program = Program::new(ProtocolVersion::V6);
 //!
 //! let mut packed = [0; Program::PACKED_MAX_LEN];
 //! let len = program.pack_into(&mut packed)?;
@@ -70,7 +70,8 @@
 //!
 //! # Serde
 //!
-//! [`ProgramName`] and the value types serialize under the `serde` feature.
+//! [`Program`], [`ProgramName`] and the value types serialize under the `serde`
+//! feature: a program as its version and its bytes, a name as a string.
 //! [`Program`] does not: it is a byte string with a version, and
 //! [`Program::as_bytes`] with [`Program::from_bytes`] is that byte string, in
 //! the form the synthesizer itself uses. A host that wants a program inside a
@@ -78,6 +79,8 @@
 
 mod generated;
 mod name;
+#[cfg(feature = "serde")]
+mod serde;
 
 // The generated module is this module's other half: it holds a type per value
 // table and a pair of accessors per parameter, both of which are this module's
@@ -92,7 +95,7 @@ use core::fmt;
 use crate::error::{Error, Result};
 use crate::ids::{PROGRAMS_PER_BANK, ProgramNumber, ProtocolVersion};
 use crate::param::{PARAMETER_COUNT, ParamId};
-use crate::sysex::{Message, PROGRAM_NAME_LEN, packed};
+use crate::sysex::{Command, Message, PROGRAM_NAME_LEN, packed};
 
 /// One program: a sound, as the synthesizer stores and sends it.
 ///
@@ -108,10 +111,7 @@ impl Program {
     ///
     /// A comms protocol version 7 program; a version 6 program is three bytes
     /// shorter and those three bytes are the reserved ones.
-    pub const MAX_LEN: usize = match ProtocolVersion::V7.program_data_len() {
-        Some(len) => len,
-        None => PARAMETER_COUNT,
-    };
+    pub const MAX_LEN: usize = ProtocolVersion::V7.program_data_len();
 
     /// Bytes [`Program::pack_into`] needs at most.
     pub const PACKED_MAX_LEN: usize = packed::packed_len(Self::MAX_LEN);
@@ -122,14 +122,8 @@ impl Program {
     /// a factory sound this specification does not record. It is a program that
     /// every parameter accepts, which is what building one from nothing needs.
     ///
-    /// # Errors
-    ///
-    /// Returns [`Error::UnsupportedProtocolVersion`] for a version this build
-    /// does not know the length of.
-    pub fn new(version: ProtocolVersion) -> Result<Self> {
-        version
-            .program_data_len()
-            .ok_or(Error::UnsupportedProtocolVersion(version.0))?;
+    #[must_use]
+    pub fn new(version: ProtocolVersion) -> Self {
         let mut program = Self {
             version,
             data: [0; Self::MAX_LEN],
@@ -138,25 +132,21 @@ impl Program {
             let min = u8::try_from(parameter.min()).unwrap_or(0);
             program.set_clamped(parameter, min);
         }
-        Ok(program)
+        program
     }
 
     /// Reads a program from the bytes of an unpacked dump.
     ///
     /// Nothing is checked beyond the length. A value outside what its parameter
-    /// accepts is kept and reported by [`Program::invalid`]: the synthesizer is
-    /// the authority on what it holds, and a decoder that refuses a dump over
-    /// one byte is a decoder nobody can use.
+    /// accepts is kept and reported by [`Program::invalid`], since the
+    /// synthesizer is the authority on what it holds.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::UnsupportedProtocolVersion`] for an unknown version and
-    /// [`Error::ProgramLength`] when `bytes` is not as long as that version's
-    /// program.
+    /// Returns [`Error::ProgramLength`] when `bytes` is not as long as that
+    /// version's program.
     pub fn from_bytes(version: ProtocolVersion, bytes: &[u8]) -> Result<Self> {
-        let expected = version
-            .program_data_len()
-            .ok_or(Error::UnsupportedProtocolVersion(version.0))?;
+        let expected = version.program_data_len();
         if bytes.len() != expected {
             return Err(Error::ProgramLength {
                 expected,
@@ -172,27 +162,29 @@ impl Program {
 
     /// Reads a program from the packed payload of a dump.
     ///
-    /// A packed run is padded to a multiple of eight bytes, so it can carry more
-    /// than the program needs; the version says how much of it is the program
-    /// and the rest is dropped.
+    /// A packed run is padded to a multiple of eight bytes, so it can carry up
+    /// to six bytes more than the program needs; the version says how much of
+    /// it is the program and the rest is dropped. That is the same rule
+    /// [`Frame::parse`](crate::sysex::Frame::parse) applies to a program dump,
+    /// so a frame that parses is a program that decodes.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::UnsupportedProtocolVersion`] for an unknown version,
-    /// [`Error::PackedRunLength`] for a run that cannot be unpacked,
-    /// [`Error::BufferTooSmall`] for one longer than any program, and
-    /// [`Error::ProgramLength`] for one shorter than this version's program.
+    /// Returns [`Error::PackedRunLength`] for a run that cannot be unpacked and
+    /// [`Error::ProgramLength`] for one that unpacks to fewer bytes than this
+    /// version's program, or to a whole group more.
     pub fn from_packed(version: ProtocolVersion, packed: &[u8]) -> Result<Self> {
-        let expected = version
-            .program_data_len()
-            .ok_or(Error::UnsupportedProtocolVersion(version.0))?;
-        let mut data = [0; Self::MAX_LEN];
-        let found = packed::unpack_into(packed, &mut data)?;
-        if found < expected {
+        let expected = version.program_data_len();
+        let found = packed::unpacked_len(packed.len())?;
+        if found < expected || found >= expected + packed::RAW_GROUP {
             return Err(Error::ProgramLength { expected, found });
         }
-        for slot in data.iter_mut().skip(expected) {
-            *slot = 0;
+        // Room for the padding of a last group, which is dropped.
+        let mut scratch = [0; Self::MAX_LEN + packed::RAW_GROUP - 1];
+        packed::unpack_into(packed, &mut scratch)?;
+        let mut data = [0; Self::MAX_LEN];
+        for (slot, byte) in data.iter_mut().zip(scratch).take(expected) {
+            *slot = byte;
         }
         Ok(Self { version, data })
     }
@@ -313,7 +305,7 @@ impl Program {
     /// use deepmind_midi::param::ParamId;
     /// use deepmind_midi::program::Program;
     ///
-    /// let before = Program::new(ProtocolVersion::V6)?;
+    /// let before = Program::new(ProtocolVersion::V6);
     /// let mut after = before.clone();
     /// after.set_lfo1_rate(64);
     ///
@@ -387,11 +379,12 @@ impl Program {
     ///
     /// The one parameter that does not start at zero: the manual gives it as 80
     /// to 176 for -48 to +48, so the value it carries is its distance from the
-    /// middle of that range.
+    /// middle of that range. A byte outside 80 to 176, which
+    /// [`invalid`](Program::invalid) reports, is clamped to the nearer end.
     #[must_use]
     pub fn transpose(&self) -> i8 {
         let raw = i16::from(self.get(ParamId::ProgramTranspose));
-        i8::try_from(raw - i16::from(transpose_centre())).unwrap_or(0)
+        i8::try_from((raw - i16::from(transpose_centre())).clamp(-48, 48)).unwrap_or(0)
     }
 
     /// Sets the program's transposition in semitones.
@@ -407,7 +400,7 @@ impl Program {
 
     /// Returns the length of this program's dump.
     fn data_len(&self) -> usize {
-        self.version.program_data_len().unwrap_or(PARAMETER_COUNT)
+        self.version.program_data_len()
     }
 
     /// Writes one byte, at an offset the parameter table guarantees is inside
@@ -477,11 +470,12 @@ impl<'a> BankNames<'a> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::ProgramLength`] when `unpacked` is not [`BankNames::LEN`]
-    /// bytes.
+    /// Returns [`Error::PayloadLength`] when `unpacked` is not [`BankNames::LEN`]
+    /// bytes, naming the bank program names dump as the command.
     pub fn new(unpacked: &'a [u8]) -> Result<Self> {
         if unpacked.len() != Self::LEN {
-            return Err(Error::ProgramLength {
+            return Err(Error::PayloadLength {
+                command: Command::BankProgramNamesDumpResponse.to_byte(),
                 expected: Self::LEN,
                 found: unpacked.len(),
             });
@@ -522,7 +516,7 @@ mod tests {
     const FIRMWARE_1_0: Version = Version { major: 1, minor: 0 };
 
     fn program() -> Program {
-        Program::new(ProtocolVersion::V6).expect("version 6 is supported")
+        Program::new(ProtocolVersion::V6)
     }
 
     #[test]
@@ -597,10 +591,52 @@ mod tests {
                 found: 240,
             })
         );
+    }
+
+    /// A run that unpacks to more than the program is the padding of a last
+    /// group, up to six bytes; a whole group more is not a program.
+    #[test]
+    fn a_packed_run_may_carry_the_padding_of_its_last_group_and_no_more() {
+        let program = program();
+        let mut packed = [0; Program::PACKED_MAX_LEN + packed::PACKED_GROUP];
+        let len = program.pack_into(&mut packed).expect("room to pack");
+        // 242 bytes pack to 280, which unpack to 245: three bytes of padding.
+        assert_eq!(len, 280);
         assert_eq!(
-            Program::from_bytes(ProtocolVersion(99), &[0; 242]),
-            Err(Error::UnsupportedProtocolVersion(99))
+            Program::from_packed(ProtocolVersion::V6, packed.get(..len).expect("in range")),
+            Ok(program.clone())
         );
+        // One more group, unpacking to 252, is more than the padding.
+        assert_eq!(
+            Program::from_packed(
+                ProtocolVersion::V6,
+                packed.get(..len + packed::PACKED_GROUP).expect("in range")
+            ),
+            Err(Error::ProgramLength {
+                expected: 242,
+                found: 252,
+            })
+        );
+        // Two bytes short of a group is still short of the program.
+        assert_eq!(
+            Program::from_packed(
+                ProtocolVersion::V6,
+                packed.get(..len - packed::PACKED_GROUP).expect("in range")
+            ),
+            Err(Error::ProgramLength {
+                expected: 242,
+                found: 238,
+            })
+        );
+    }
+
+    #[test]
+    fn transpose_is_clamped_to_the_range_the_manual_gives() {
+        let mut program = program();
+        program.set_clamped(ParamId::ProgramTranspose, 0);
+        assert_eq!(program.transpose(), -48);
+        program.set_clamped(ParamId::ProgramTranspose, 255);
+        assert_eq!(program.transpose(), 48);
     }
 
     #[test]
@@ -803,7 +839,8 @@ mod tests {
         assert_eq!(names.iter().count(), 128);
         assert_eq!(
             BankNames::new(&[0; 16]),
-            Err(Error::ProgramLength {
+            Err(Error::PayloadLength {
+                command: Command::BankProgramNamesDumpResponse.to_byte(),
                 expected: BankNames::LEN,
                 found: 16,
             })
