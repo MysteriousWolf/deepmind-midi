@@ -3,7 +3,8 @@
   <!--
     A dark panel between wooden end cheeks, as on the unit, and a MIDI DIN
     socket whose bezel is sliced by the horizontal lines of the DeepMind
-    wordmark. The slices stop short of the bottom, so the bezel stays closed.
+    wordmark over its lower two thirds. The slices stop short of the bottom,
+    so the bezel stays closed.
   -->
   <defs>
     <clipPath id="case"><rect width="128" height="128" rx="24"/></clipPath>
@@ -30,10 +31,13 @@
     </radialGradient>
     <mask id="cuts">
       <rect width="128" height="128" fill="#fff"/>
-      <rect x="0" y="71" width="128" height="1.4" fill="#000"/>
-      <rect x="0" y="77" width="128" height="1.9" fill="#000"/>
-      <rect x="0" y="83.5" width="128" height="2.4" fill="#000"/>
-      <rect x="0" y="90.5" width="128" height="2.9" fill="#000"/>
+      <rect x="0" y="52" width="128" height="1" fill="#000"/>
+      <rect x="0" y="58.5" width="128" height="1.3" fill="#000"/>
+      <rect x="0" y="65" width="128" height="1.6" fill="#000"/>
+      <rect x="0" y="71.5" width="128" height="2" fill="#000"/>
+      <rect x="0" y="78" width="128" height="2.4" fill="#000"/>
+      <rect x="0" y="84.5" width="128" height="2.8" fill="#000"/>
+      <rect x="0" y="91" width="128" height="3.2" fill="#000"/>
     </mask>
     <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
       <feDropShadow dx="0" dy="1.5" stdDeviation="1.6" flood-color="#000" flood-opacity="0.55"/>
@@ -72,19 +76,19 @@
     <circle cx="64" cy="64" r="38" fill="none" stroke="url(#metal)" stroke-width="6" mask="url(#cuts)"/>
   </g>
   <circle cx="64" cy="64" r="41" fill="none" stroke="#000" stroke-width="0.8" opacity="0.5" mask="url(#cuts)"/>
-  <!-- Pin holes: dark, with a lit lower edge. -->
-  <g>
-    <circle cx="64" cy="40" r="4.4" fill="#06070a"/>
-    <circle cx="47" cy="47" r="4.4" fill="#06070a"/>
-    <circle cx="81" cy="47" r="4.4" fill="#06070a"/>
-    <circle cx="40" cy="64" r="4.4" fill="#06070a"/>
-    <circle cx="88" cy="64" r="4.4" fill="#06070a"/>
-    <g fill="none" stroke="#9ba0ab" stroke-width="0.9" stroke-linecap="round">
-      <path d="M 60.4 42.4 A 4.4 4.4 0 0 0 67.6 42.4"/>
-      <path d="M 43.4 49.4 A 4.4 4.4 0 0 0 50.6 49.4"/>
-      <path d="M 77.4 49.4 A 4.4 4.4 0 0 0 84.6 49.4"/>
-      <path d="M 36.4 66.4 A 4.4 4.4 0 0 0 43.6 66.4"/>
-      <path d="M 84.4 66.4 A 4.4 4.4 0 0 0 91.6 66.4"/>
-    </g>
+  <!-- Pins: metal contact sleeves, each with a dark bore. -->
+  <g stroke="#000" stroke-width="0.6" stroke-opacity="0.5">
+    <circle cx="64" cy="40" r="4.8" fill="url(#metal)"/>
+    <circle cx="47" cy="47" r="4.8" fill="url(#metal)"/>
+    <circle cx="81" cy="47" r="4.8" fill="url(#metal)"/>
+    <circle cx="40" cy="64" r="4.8" fill="url(#metal)"/>
+    <circle cx="88" cy="64" r="4.8" fill="url(#metal)"/>
+  </g>
+  <g fill="#06070a">
+    <circle cx="64" cy="40" r="2.4"/>
+    <circle cx="47" cy="47" r="2.4"/>
+    <circle cx="81" cy="47" r="2.4"/>
+    <circle cx="40" cy="64" r="2.4"/>
+    <circle cx="88" cy="64" r="2.4"/>
   </g>
 </svg>
