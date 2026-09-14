@@ -29,21 +29,19 @@
 //!
 //! What a host needs in order to act: the name the synthesizer shows, the
 //! section of the panel it belongs to, the range it accepts, and the named
-//! values it decodes into. That is [`Parameter`], and [`ParamId::info`] is the
-//! way to it.
+//! values it decodes into. That is [`Parameter`], reached through
+//! [`ParamId::info`].
 //!
-//! What it does not carry is the manual's prose. Notes, displayed ranges and the
-//! places this specification departs from the printed table are documentation,
-//! not behaviour; they live in `docs/midi-spec.md`, addressed by the same
-//! offsets. Keeping them out of the binary matters on the targets this crate is
-//! meant to run on. Value-table entries carry their names for the same reason:
-//! a name is what a display shows, a description is what a manual says.
+//! It does not carry the manual's prose. Notes, displayed ranges and the places
+//! this specification departs from the printed table live in
+//! `docs/midi-spec.md`, addressed by the same offsets, which keeps them out of
+//! the binary on the targets this crate is meant for. Value-table entries carry
+//! names and not descriptions for the same reason.
 //!
 //! Nor does it carry conversions from a raw value to the number the synthesizer
 //! displays. The manual publishes the two ends of a range and almost never the
-//! curve between them, and a plausible wrong frequency in front of a musician is
-//! worse than an honest raw one. Those arrive per parameter as they are
-//! measured; see the scaling section of `docs/midi-spec.md`.
+//! curve between them. Conversions arrive per parameter as they are measured;
+//! see the scaling section of `docs/midi-spec.md`.
 //!
 //! # Firmware
 //!
@@ -353,8 +351,8 @@ impl ParamId {
     ///
     /// The manual's rule is the value over its maximum, in 127ths. Here it is
     /// the value over its *range*, which is the same arithmetic for every
-    /// parameter that starts at zero - all 90 that have a controller - and the
-    /// only reading that means anything for the one that does not.
+    /// parameter that starts at zero (all 90 that have a controller) and the
+    /// only reading that means anything for one that does not.
     ///
     /// Lossy for a parameter whose range runs past 127, which is most of them.
     #[must_use]

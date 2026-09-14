@@ -609,8 +609,8 @@ fn split_version_and_bank(payload: &[u8]) -> Option<(ProtocolVersion, u8, &[u8])
 /// The stored form names its slot, the edit buffer form does not, and the
 /// command byte is the same. Whichever reading leaves a packed run that can hold
 /// `raw_len` bytes is the right one. The edit buffer reading is tried first, so
-/// a length both readings accept - which needs the synthesizer to send a short
-/// last group rather than a padded one - is taken as the edit buffer.
+/// a length both readings accept (which needs the synthesizer to send a short
+/// last group rather than a padded one) is taken as the edit buffer.
 fn split_pattern(payload: &[u8], raw_len: usize) -> Option<(Option<u8>, &[u8])> {
     if holds(payload, raw_len) {
         return Some((None, payload));

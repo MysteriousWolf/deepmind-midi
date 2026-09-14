@@ -189,7 +189,7 @@ mod tests {
         assert_eq!(ProgramName::from_field(b"\0").as_str(), "");
     }
 
-    /// Not something hardware sends - the name parameters stop at 127 - but a
+    /// Hardware never sends this, since the name parameters stop at 127, but a
     /// file is not hardware.
     #[test]
     fn a_byte_with_no_glyph_becomes_a_question_mark() {

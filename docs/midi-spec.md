@@ -70,7 +70,7 @@ flowchart LR
     MOD -.-> FX
 ```
 
-Offsets 40 and 52, the high pass frequency and the bass boost, appear twice on purpose. The front panel groups them with the VCF and this specification follows the panel, but the block diagram in section 6 of the manual places both after the VCA, where they act on the mixed voices rather than on one. The analog path is the route that skips the FX block; which of the two paths carry signal is the [`FX Mode`](#fx-routing) parameter's job.
+Offsets 40 and 52, the high pass frequency and the bass boost, appear twice on purpose. The front panel groups them with the VCF and this specification follows the panel, but the block diagram in section 6 of the manual places both after the VCA, where they act on the mixed voices rather than on one. The analog path skips the FX block; the [`FX Mode`](#fx-routing) parameter decides which paths carry signal.
 
 ### Modulation matrix
 
@@ -88,16 +88,9 @@ Each bus occupies three consecutive offsets: source, destination, depth. Bus 1 i
 
 ### Envelopes
 
-Three identical envelopes: VCA, VCF and mod. Each has the four familiar stages plus a curve control per stage, which bends the segment between linear and exponential.
+Three identical envelopes: VCA, VCF and mod. Each has the four stages plus a curve control per stage, which bends the segment between linear and exponential.
 
-```mermaid
-xychart-beta
-    title "One envelope, at two attack and decay curve settings"
-    x-axis "time, key released after the sustain stage" 0 --> 15
-    y-axis "level" 0 --> 255
-    line "linear" [0, 85, 170, 255, 215, 185, 160, 160, 160, 160, 160, 120, 80, 40, 0, 0]
-    line "exponential" [0, 160, 215, 255, 190, 170, 160, 160, 160, 160, 160, 75, 35, 15, 0, 0]
-```
+<img src="diagrams/envelope.svg" alt="Envelopes" width="640">
 
 | Stage | VCA | VCF | Mod |
 |---|---|---|---|
@@ -169,10 +162,9 @@ So this library pads when it writes and accepts either when it reads, because a
 parser that insisted on one of them would turn a figure that cannot be right
 into a rejected dump.
 
-Padding has a consequence worth stating: a packed run does not carry its own raw
-length. 280 packed bytes hold 245, which is a version 7 program and also a
-version 6 program with three bytes to spare. The comms protocol version byte is
-what says which, which is the same reason
+One consequence: a packed run does not carry its own raw length. 280 packed
+bytes hold 245, which is a version 7 program and also a version 6 program with
+three bytes to spare. The comms protocol version byte says which, so
 [the two versions](#protocol-version-6-versus-7) cannot be told apart by length.
 
 ## SysEx messages
@@ -322,7 +314,7 @@ B0 26 <lsb>   data entry LSB
 
 With running status this collapses to `B0 63 aa 62 bb 06 cc 26 dd`.
 
-Three behaviours worth designing around:
+Three behaviours to design around:
 
 - The data entry MSB is optional for switches and for any parameter whose range
   fits in 0-127.
@@ -841,19 +833,18 @@ firmware one, read with a device inquiry.
 
 Firmware 1.1 renumbered three value tables rather than only appending to them,
 so the same stored value means different things depending on which version
-wrote it. It is not a small overlap: 17 of the 23 modulation sources and 120 of
-the 130 modulation destinations changed meaning. Only the FX type list is close
-to a pure extension, and even there value 33 moved from Rotary Speaker to
-Vintage Pitch.
+wrote it. 17 of the 23 modulation sources and 120 of the 130 modulation
+destinations changed meaning. Only the FX type list is close to a pure
+extension, and even there value 33 moved from Rotary Speaker to Vintage Pitch.
 
-Tables below carry the firmware they describe; where a version is not named, the
+Tables below carry the firmware they describe; where no version is named, the
 table has never changed. Firmware 1.1 is assumed unless a caller says otherwise,
 so reading this document straight through describes current hardware.
 
-One caveat worth knowing. A dump carries the comms protocol version, not the
-firmware version, so a `.syx` file on its own does not say which firmware wrote
-it. The firmware 1.0 tables are usable only when a host knows the version
-another way, which in practice means it asked the device.
+A dump carries the comms protocol version, not the firmware version, so a `.syx`
+file on its own does not say which firmware wrote it. The firmware 1.0 tables
+are usable only when a host knows the version another way, in practice by
+asking the device.
 
 <!-- generated:firmware -->
 
@@ -1765,10 +1756,10 @@ algorithm the engine is running, so `FX 1 Param 3` is Size on a room reverb and
 something else on a phaser.
 
 All 371 of them, with a drawing of each algorithm's page, are in
-[Effects](effects.md). They are a document of their own because they are a
-different kind of fact: the rest of this file is the protocol, which is fixed,
-while the effect tables are what the synthesizer does with 48 of its bytes once
-an algorithm is loaded.
+[Effects](effects.md). They are a separate document because they are a
+different kind of fact: this file is the protocol, which is fixed, while the
+effect tables are what the synthesizer does with 48 of its bytes once an
+algorithm is loaded.
 
 ## Corrections to the manual
 
@@ -1836,36 +1827,32 @@ Seven things the manual does not settle. Each needs a hardware session.
 ## Scaling raw values to displayed values
 
 Every parameter is one byte on the wire and every displayed range has two known
-ends, so the only missing piece is the shape in between. Neither of the two
-obvious guesses is safe.
+ends, so the missing piece is the shape in between. Neither obvious guess is
+safe.
 
 Logarithmic does not fit most of them. Of the 329 effect parameters with a
-numeric range, 201 either start at zero or cross it, which no logarithmic curve
-can do.
+numeric range, 201 start at zero or cross it, which no logarithmic curve can do.
 
-Linear does not follow from that, and the manual supplies its own counterexample.
-OSC 1 Pitch Mod Depth runs from 0.00 cents to 36.0 semitones, starts at zero, and
-section 8.3.1 says outright that the fader "has a non-linear response which gives
-more resolution at smaller settings". So a range that starts at zero rules out
-logarithmic and says nothing else.
+Linear does not follow from that. OSC 1 Pitch Mod Depth runs from 0.00 cents to
+36.0 semitones, starts at zero, and section 8.3.1 says the fader "has a
+non-linear response which gives more resolution at smaller settings". A range
+that starts at zero rules out logarithmic and says nothing else.
 
-### What the manual can be made to give up
+### What the manual's figures show
 
 Two kinds of figure carry more than the prose does.
 
 The first is the response graph section 8.3.1 prints for the OSC 1 Pitch Mod
-fader. It is a drawing rather than a table, but it is a drawing of a specific
-shape: two straight segments meeting at a breakpoint about 40% of the way along
+fader: two straight segments meeting at a breakpoint about 40% of the way along
 the fader, shallow below and steep above, reaching the full 36 semitones at the
-top of the travel. Not a smooth curve, and not one curve.
+top of the travel.
 
-The second is the PROG screen, and it is the useful one. Section 7.1.7 calls the
-number at the top of its left-hand strip the CURRENT PARAMETER MIDI VALUE and
-says it is "a simple value (0-255)", which is the value on the wire. Section
-7.1.9 says the line along the bottom of the same screen carries "a more accurate
-value of the parameter being adjusted" and its units. The manual screenshots that
-screen beside nearly every fader it describes, so each one is a raw value printed
-next to what the synthesizer makes of it.
+The second is the PROG screen. Section 7.1.7 calls the number at the top of its
+left-hand strip the CURRENT PARAMETER MIDI VALUE and says it is "a simple value
+(0-255)", which is the value on the wire. Section 7.1.9 says the line along the
+bottom of the same screen carries "a more accurate value of the parameter being
+adjusted" and its units. The manual prints that screen beside nearly every fader
+it describes, so each screenshot is a raw value next to its displayed value.
 
 <!-- generated:measurements -->
 
@@ -1912,29 +1899,28 @@ straight line between the parameter's two stated ends, to the digit the screen
 prints: `50.0 + 118/255 x 49.0` is 72.675 against a displayed 72.6, `153/255 x
 100` is 60.0 against 60.0, `34/255 x 50` is 6.667 against 6.6.
 
-**Frequencies are exponential, and this is not a close call.** VCF Frequency at
-raw 98 displays 500.0 Hz. An exponential sweep between its stated 50 Hz and
-20000 Hz gives 500.0005 Hz there; a straight line gives 7717 Hz. The high pass
-behaves the same way, showing 98.0 Hz at raw 88 where an exponential sweep
-between 20 Hz and 2000 Hz gives 97.99 and a straight line gives 703. LFO 1 Rate
-is exponential in frequency rather than in the period it displays: 17.0 s at raw
-12, where an exponential sweep predicts 17.04 s and a linear one predicts 0.32 s.
-One interior reading cannot prove a curve, but it can kill one, and it has.
+**Frequencies are exponential.** VCF Frequency at raw 98 displays 500.0 Hz. An
+exponential sweep between its stated 50 Hz and 20000 Hz gives 500.0005 Hz there;
+a straight line gives 7717 Hz. The high pass shows 98.0 Hz at raw 88, where an
+exponential sweep between 20 Hz and 2000 Hz gives 97.99 and a straight line
+gives 703. LFO 1 Rate is exponential in frequency rather than in the period it
+displays: 17.0 s at raw 12, where an exponential sweep predicts 17.04 s and a
+linear one predicts 0.32 s. One interior reading cannot prove a curve, but it
+can rule one out.
 
 **The pitch mod fader is the piecewise one the graph draws.** Its two readings
 fall on a line of 0.2357 semitones per raw step. That line reaches 36.09
 semitones at raw 255, where the display maximum is 36.0, and crosses zero at raw
-102. Reading the breakpoint off the graph instead gives raw 104. A drawing and a
-pair of displayed numbers are independent evidence and they land within two raw
-steps of each other, which pins the steep upper segment. Both oscillators share
-the response: offsets 21 and 29 show the same 7.8 semitones at the same raw 135.
+102. Reading the breakpoint off the graph gives raw 104. Two independent sources
+land within two raw steps of each other, which pins the steep upper segment.
+Both oscillators share the response: offsets 21 and 29 show the same 7.8
+semitones at the same raw 135.
 
-**Two faders match nothing simple, and the manual does not warn about either.**
-OSC 2 Pitch shows -7.0 cents at raw 121, six and a half steps below centre, on a
-fader the manual gives a range of plus or minus 12 semitones; linear would show
--61 cents, so that fader must be far finer near its centre than at its ends. VCA
-Level shows 2.50 dB at raw 181 where linear between -12.0 dB and +6.0 dB gives
-0.78 dB.
+**Two faders match nothing simple.** OSC 2 Pitch shows -7.0 cents at raw 121,
+six and a half steps below centre, on a fader with a stated range of plus or
+minus 12 semitones; linear would show -61 cents, so that fader is far finer near
+its centre than at its ends. VCA Level shows 2.50 dB at raw 181 where linear
+between -12.0 dB and +6.0 dB gives 0.78 dB.
 
 **Two readings fill gaps the manual leaves.** The parameter table carries no
 displayed range for the envelope times; the screenshots give VCA release 32.0 s
@@ -1944,29 +1930,25 @@ a plain 0 to 100% would give.
 
 ### What that means for the rest
 
-It generalises as method, not as numbers. Every reading above is of a program
-parameter. They cover none of the 329 effect ranges, because the manual prints
-no PROG screen and no response graph for any effect parameter: the FX pages show
-displayed values only, with no raw value anywhere on screen.
+The method generalises; the numbers do not. Every reading above is of a program
+parameter. None covers the 329 effect ranges, because the manual prints no PROG
+screen and no response graph for any effect parameter.
 
-They also stop short of a conversion even where they are strongest. A single
-interior point fixes a curve only if you already know its family, and the two
-faders that match nothing simple are the reminder of what assuming the family
-costs. So nothing here is wired into a conversion. `raw()` always works; `hz()`
-waits.
+They also stop short of a conversion. A single interior point fixes a curve only
+if the family is already known, and the two faders that match nothing simple
+show what assuming the family costs. So nothing here is wired into a conversion:
+`raw()` always works; `hz()` waits.
 
-The remaining procedure is mechanical once the wire layer exists: send an NRPN
-edit for a known raw value, read the value the synthesizer displays, repeat
-across the range, and fit. It has to be done per parameter, because the manual
-describes bespoke fader responses rather than one house curve, and because the
-readings above show at least four different shapes already. The rows in
-`spec/measurements.toml` are what that pass should reproduce before anyone trusts
-the rest of its output.
+The remaining procedure is mechanical: send an NRPN edit for a known raw value,
+read the value the synthesizer displays, repeat across the range, and fit. It
+has to be done per parameter, because the manual describes bespoke fader
+responses rather than one house curve, and the readings above already show four
+different shapes. The rows in `spec/measurements.toml` are what that pass should
+reproduce before its other output is trusted.
 
-Until then this specification records the two ends, the readings, and no curve,
-and a host should show raw values rather than invent displayed ones. Inventing
-them would put plausible, wrong numbers in front of a musician, which is worse
-than showing a number that is honestly raw.
+Until then this specification records the two ends, the readings, and no curve.
+A host should show raw values rather than invent displayed ones: a plausible
+wrong number in front of a musician is worse than an honest raw one.
 
 ## Cross-verification
 
@@ -1979,14 +1961,13 @@ The controller map is a third source and corroborates the firmware 1.1 reading:
 it puts the 3D axes on CC 115, 116 and 117, matching the modulation source list
 in the newer manual rather than the CC 114-116 of the older one.
 
-The firmware 1.1 modulation tables are confirmed by a count the manual states in
-its own words. Section 2.7 says "Modulation Sources (24)" and "Modulation
-Destinations (132)", which is exactly what `enums.toml` holds once the `Off`
-entry is set aside. That is worth having because those lists were transcribed
-name by name and a dropped line would otherwise be invisible.
+The firmware 1.1 modulation tables are confirmed by a count the manual states.
+Section 2.7 says "Modulation Sources (24)" and "Modulation Destinations (132)",
+which is what `enums.toml` holds once the `Off` entry is set aside. Those lists
+were transcribed name by name, and a dropped line would otherwise be invisible.
 
-The same manual contradicts itself twice, both times in a summary rather than a
-reference section, and both stale rather than wrong:
+The manual contradicts itself twice, both times in a summary section, and both
+times stale rather than wrong:
 
 - The mod matrix diagram on page 19 says 22 sources and 130 destinations and
   multiplies them out to 22,880 possible modulations. Those are the firmware 1.0

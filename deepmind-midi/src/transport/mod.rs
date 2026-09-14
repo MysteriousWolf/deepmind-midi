@@ -63,21 +63,20 @@
 //!
 //! # Why this is opt-in
 //!
-//! Because blocking is a policy, not a protocol. An async host wants its own
-//! cancellation and its own backpressure, and it gets both by writing the four
-//! calls in [`device`](crate::device) into its own loop - which is about thirty
-//! lines and is the arrangement the sans-IO design is for. This module is for
-//! the hosts that would write the same thirty lines: a command-line tool, a test
-//! harness, a thread that owns the port.
+//! Blocking is a policy, not a protocol. An async host wants its own
+//! cancellation and backpressure, and gets both by writing the four calls in
+//! [`device`](crate::device) into its own loop, about thirty lines. This module
+//! is for hosts that would write the same thirty lines: a command-line tool, a
+//! test harness, a thread that owns the port.
 //!
 //! It needs neither `std` nor an allocator. [`StdClock`] is the only thing here
-//! that wants `std`, and a host without it supplies its own [`Clock`].
+//! that wants `std`; a host without it supplies its own [`Clock`].
 //!
 //! # The loop
 //!
-//! [`pump`](Transport::pump) is one pass of it: read what has arrived, feed it
-//! in, advance the clock, and send whatever the device queued. A host that wants
-//! its own loop calls that and [`poll_event`](Transport::poll_event) and nothing
+//! [`pump`](Transport::pump) is one pass: read what has arrived, feed it in,
+//! advance the clock, send whatever the device queued. A host that wants its
+//! own loop calls that and [`poll_event`](Transport::poll_event) and nothing
 //! else here.
 //!
 //! ```
@@ -113,22 +112,20 @@
 //!
 //! Progress is an event, not traffic. A bank transfer is one request and 128
 //! answers, and each answer is progress, so a long transfer never times out
-//! while it is still arriving - which is what [`Request::Bank`] already
-//! promises. A port streaming clock bytes at a silent synthesizer is not
-//! progress, and does not hold the wait open.
+//! while it is still arriving, as [`Request::Bank`] promises. A port streaming
+//! clock bytes at a silent synthesizer is not progress and does not hold the
+//! wait open.
 //!
 //! # Events a wait was not waiting for
 //!
-//! A blocking call has to look at every event to find the one it wants, so the
-//! ones it does not want have to go somewhere. They go into a queue of this
-//! module's own, `EV` deep like the device's, and come back out of
-//! [`poll_event`](Transport::poll_event) in the order they happened. Turning a
-//! knob while a host reads a bank does not lose the knob.
+//! A blocking call has to look at every event to find the one it wants. The
+//! others go into a queue of this module's own, `EV` deep like the device's,
+//! and come back out of [`poll_event`](Transport::poll_event) in order. Turning
+//! a knob while a host reads a bank does not lose the knob.
 //!
-//! That queue is the transport's one real cost: a second `EV` events held
-//! inline. An event that does not fit is counted and arrives as
-//! [`Event::Lost`], the same as in [`device`](crate::device). Nothing is dropped
-//! quietly.
+//! That queue is the transport's one cost: a second `EV` events held inline. An
+//! event that does not fit is counted and arrives as [`Event::Lost`], the same
+//! as in [`device`](crate::device).
 
 mod clock;
 mod error;
@@ -399,7 +396,7 @@ where
         })
     }
 
-    /// Asks for the edit buffer - the program as it currently sounds - and waits
+    /// Asks for the edit buffer, the program as it currently sounds, and waits
     /// for the dump.
     ///
     /// The answer is also what [`Device::program`] confirms afterwards, so a
@@ -462,7 +459,7 @@ where
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Timeout`] when a dump does not arrive in time - the run
+    /// Returns [`Error::Timeout`] when a dump does not arrive in time. The run
     /// is abandoned where it stopped, and the dumps already handed over stay
     /// handed over. Returns [`Error::Port`] when the port fails, and
     /// [`Error::Protocol`] when `last` is before `first` or the outbound queue
@@ -501,7 +498,7 @@ where
     ///
     /// Returns [`Error::Protocol`] when no program is known yet, when the
     /// closure left a parameter out of range, or when the change needs more room
-    /// than the outbound queue has - nothing is queued in any of those cases.
+    /// than the outbound queue has. Nothing is queued in any of those cases.
     /// Returns [`Error::Port`] when the port fails partway, which leaves the
     /// rest of the edit queued for the next [`flush`](Transport::flush).
     pub fn edit<F>(&mut self, edit: F) -> Result<usize, Error<P::Error>>
@@ -521,8 +518,8 @@ where
     /// wrong thing.
     ///
     /// Ends on the answer, on the device raising the timeout for the request, or
-    /// on a silence longer than the device allows - the last being the backstop
-    /// for a request the device is not timing, which happens past
+    /// on a silence longer than the device allows. The last is the backstop for
+    /// a request the device is not timing, which happens past
     /// [`MAX_PENDING`](crate::device::MAX_PENDING) concurrent ones.
     fn answer<T, F>(&mut self, request: Request, mut extract: F) -> Result<T, Error<P::Error>>
     where
@@ -596,8 +593,8 @@ mod tests {
     /// A port a test scripts.
     ///
     /// It remembers everything sent through it, and hands back what was queued
-    /// for it - but only once a request has actually gone out, so the order a
-    /// test sees is the order a synthesizer would produce.
+    /// for it only once a request has actually gone out, so the order a test
+    /// sees is the order a synthesizer would produce.
     struct Port {
         sent: [u8; SCRIPT],
         sent_len: usize,

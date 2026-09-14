@@ -3,9 +3,9 @@
 /// A MIDI connection the driver loop can read from and write to.
 ///
 /// Two methods, because two is what driving the state machine takes. Everything
-/// a real backend also has - port enumeration, virtual ports, connection state,
-/// reconnection - stays on the host's side of this trait, where it belongs: a
-/// library that opened ports would have to have an opinion about all of it.
+/// else a real backend has (port enumeration, virtual ports, connection state,
+/// reconnection) stays on the host's side of this trait, since a library that
+/// opened ports would need an opinion about all of it.
 ///
 /// # Implementing it
 ///
@@ -50,8 +50,8 @@
 ///
 /// The buffer a [`Transport`](super::Transport) offers is as long as the
 /// decoder's frame buffer, so the longest frame the library can read fits in one
-/// call and the `partial` above never holds anything in practice. It is still
-/// worth writing: the contract is "as much as fits", not "all or nothing".
+/// call and the `partial` above never holds anything in practice. Keep it
+/// anyway: the contract is "as much as fits", not "all or nothing".
 pub trait Port {
     /// What the connection fails with.
     type Error;

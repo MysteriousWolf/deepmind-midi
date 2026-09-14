@@ -3,8 +3,7 @@
 ## Goal
 
 The host program owns the MIDI connection. This library owns everything else:
-framing, parameter semantics, device state, preset files. That split is the one
-constraint everything else follows from.
+framing, parameter semantics, device state, preset files.
 
 ```
 DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
@@ -14,14 +13,13 @@ DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 
 ## The API a host uses
 
-Nothing in a host program looks up an offset or a controller number. One object
-holds the synthesizer; changing it is changing the synthesizer.
+A host never looks up an offset or a controller number. One object holds the
+synthesizer; changing it is changing the synthesizer.
 
 ```rust
 let mut device: Device = Device::new(DeviceId::Unit(0));
 
-// Read. Named the way the synthesizer's own display names it, and carrying
-// where the answer came from.
+// Read. Named as the synthesizer's display names it, with provenance.
 if let Some(program) = device.program().value() {
     println!("{}", program.name());         // Bass Sweep
     let shape = program.lfo1_shape();       // Some(LfoShape::Triangle)
@@ -36,10 +34,9 @@ device.edit(|p| {
 ```
 
 `edit` diffs the program against what the synthesizer is believed to hold and
-queues NRPN messages for exactly the offsets that changed - `Program::changes`
-is that diff, and `drain_tx` is what hands it to the port. Two edits to the same
-parameter in one closure send one message, and an edit that puts a parameter
-back where it was sends none.
+queues one NRPN message per changed offset. `Program::changes` is the diff and
+`drain_tx` hands the messages to the port. Two edits to one parameter in one
+closure send one message; an edit that restores the old value sends none.
 
 A parameter with a value table reads as its table, and a switch as a `bool`:
 
@@ -49,60 +46,52 @@ program.lfo1_shape()              // Some(LfoShape::Triangle)
 program.lfo1_key_sync()           // false
 ```
 
-What is not there is a conversion from the raw value to the number the
-synthesizer displays, for the reason [Raw values stay raw until
-measured](#raw-values-stay-raw-until-measured) gives. `program.vcf_frequency()`
-is a byte, not a frequency, until the curve behind that byte is known.
+There is no conversion from a raw value to the number the synthesizer displays.
+`program.vcf_frequency()` is a byte, not a frequency, until the curve behind
+that byte has been measured. See [Raw values stay raw](#raw-values-stay-raw).
 
 The accessors and the value types are generated from `spec/`, so the offset map
-exists in one place and no host code repeats it.
+exists in one place.
 
 ## A program is its bytes
 
-A `Program` holds the dump it arrived as: 242 bytes, or 245 under comms protocol
-version 7. Reading a parameter is a lookup and writing one is a byte, so a dump
-that goes in comes out byte for byte, and the tests say so over every byte
-pattern.
+A `Program` holds the dump as it arrived: 242 bytes, or 245 under comms
+protocol version 7. Reading a parameter is a lookup and writing one is a byte,
+so a dump that goes in comes out byte for byte.
 
-The alternative - a struct of 242 decoded fields - loses on all three counts
-that matter here. A value no table lists could not be held, and hardware is
-entitled to send one. The reserved bytes of a version 7 dump would have to be
-carried alongside anyway. And three value tables were renumbered by firmware, so
-a decoded field would have to pick a firmware at decode time, when nothing in a
-stored program says which firmware wrote it.
+A struct of 242 decoded fields would lose three things:
 
-So decoding is a view over the bytes rather than a copy of them. A typed
-accessor answers `Option` where the byte is not a value its table names; the byte
-is still there, and `Program::get` returns it. `Program::invalid` lists the
-parameters holding something they do not accept, rather than a decoder refusing
-the dump over one byte.
+- A value no table lists could not be held, and hardware may send one.
+- The reserved bytes of a version 7 dump would need carrying separately.
+- Three value tables were renumbered by firmware, and nothing in a stored
+  program says which firmware wrote it, so a decoded field would have to guess.
+
+So decoding is a view over the bytes. A typed accessor returns `None` when the
+byte is not one its table names; `Program::get` still returns the byte, and
+`Program::invalid` lists the parameters holding values they do not accept.
 
 ## Which value tables become a type
 
 A value table becomes a Rust enum when its entries are a closed set of names:
-`LfoShape::Triangle`, `ModSource::Lfo2`, `FxType::RotarySpkr`. Twenty-two of the
-twenty-seven are.
+`LfoShape::Triangle`, `ModSource::Lfo2`, `FxType::RotarySpkr`. 22 of the 27
+tables are.
 
-The other five stay raw bytes with a label, because a type would be a worse way
-of writing what they hold:
+The other five stay raw bytes with a label:
 
-- The three clock divider tables list `1/2`, `3/8`, `1/16`. Those are divisions
-  of a bar, not names, and `Div1Over2` says less than `1/2` does.
-- `LFO Mono Mode` and `Arpeggiator Pattern` list the first of a run - `SPREAD-1`
-  stands for `SPREAD-1` through `SPREAD-254` - so an enum of what is listed would
-  answer `None` for almost every value the synthesizer sends.
+- The three clock divider tables list `1/2`, `3/8`, `1/16`. Those are numbers,
+  and `Div1Over2` says less than `1/2`.
+- `LFO Mono Mode` and `Arpeggiator Pattern` list only the first of a run
+  (`SPREAD-1` stands for `SPREAD-1` through `SPREAD-254`), so an enum of what is
+  listed would return `None` for almost every value the synthesizer sends.
 
-Which of the two a table is, is read off the table rather than declared in it.
-`spec/` describes the synthesizer; how that lands in Rust is the generator's
-business, and putting the rule in the generator keeps the specification about the
-hardware.
+The generator reads which kind a table is off the table itself. `spec/`
+describes the synthesizer; how that lands in Rust is the generator's decision.
 
-For the three tables firmware renumbered, a variant is what the value *means* and
-`raw_for` is the byte it travels as on a given firmware. `ModSource::Expression`
-is 6 on firmware 1.1 and does not exist on 1.0; `ModSource::Lfo1` is 7 on 1.1 and
-6 on 1.0. The join between the two firmware tables is the entry's name, which is
-also why `NoteOff Vel` and `Note Off Vel` are one variant: firmware respelled the
-name of a value it kept.
+For the three tables firmware renumbered, a variant is what the value means
+and `raw_for` is the byte it travels as on a given firmware.
+`ModSource::Expression` is 6 on firmware 1.1 and absent on 1.0;
+`ModSource::Lfo1` is 7 on 1.1 and 6 on 1.0. The two firmware tables are joined
+by entry name, which is why `NoteOff Vel` and `Note Off Vel` are one variant.
 
 ## Sans-IO
 
@@ -115,19 +104,36 @@ device.drain_tx(|bytes| port.send(bytes))?;       // outbound
 while let Some(event) = device.poll_event() { }   // results
 ```
 
+```mermaid
+sequenceDiagram
+    participant H as host
+    participant D as Device
+    participant P as port
+    participant S as DeepMind
+    H->>D: request_edit_buffer()
+    Note over D: queued, not yet sent
+    H->>D: drain_tx(send)
+    D->>P: F0 .. 03 F7
+    Note over D: outstanding, timeout starts
+    P->>S: bytes
+    S->>P: edit buffer dump
+    H->>D: feed(bytes)
+    Note over D: program is Confirmed
+    H->>D: poll_event()
+    D-->>H: Event::EditBuffer(program)
+```
+
 Why:
 
-- **Testable.** A fake clock and a byte vector reproduce any timing bug exactly.
-  Hardware-dependent tests are the ones that rot.
+- **Testable.** A fake clock and a byte vector reproduce any timing bug.
 - **Portable.** No `std::time`, no executor. Works under `no_std`, in a JACK
   callback, in a tokio task, in WASM.
-- **Honest.** MIDI transports vary wildly in latency and chunking. An async
-  facade hides that rather than solving it.
+- **Honest.** MIDI transports differ in latency and chunking. An async facade
+  would hide that rather than solve it.
 
-`drain_tx` takes a closure, which covers most of what a callback API would,
-without making `Device` generic over its IO. For hosts that would rather not
-write the loop, the `transport` feature adds two traits and the loop between
-them:
+`drain_tx` takes a closure, so `Device` is not generic over its IO. For hosts
+that would rather not write the loop, the `transport` feature adds two traits
+and the loop between them:
 
 ```rust
 pub trait Port {
@@ -146,10 +152,9 @@ let program = synth.edit_buffer()?;                       // ask, and wait
 synth.edit(|program| program.set_lfo1_rate(64))?;         // change, and send
 ```
 
-No executor and no channels. An async host writes its own loop against the core
-in about thirty lines and keeps control of cancellation and backpressure, which
-is what [The transport is a policy](#the-transport-is-a-policy-not-a-protocol)
-is about.
+An async host writes its own loop against the core in about thirty lines and
+keeps control of cancellation and backpressure. See [The transport is a
+policy](#the-transport-is-a-policy).
 
 ## Layers
 
@@ -173,12 +178,12 @@ is; `param` does not know what a message is.
 ## One table, three consumers
 
 A parameter's NRPN number is its byte offset in a program dump. That one fact
-collapses NRPN edits, dump parsing and dump building into a single table.
+lets NRPN edits, dump parsing and dump building share a single table.
 
 | File | Contents |
 |---|---|
 | `spec/parameters.toml` | 242 program parameters |
-| `spec/enums.toml` | 28 value tables, including 132 modulation destinations |
+| `spec/enums.toml` | 27 value tables (30 with the firmware 1.0 variants), including 132 modulation destinations |
 | `spec/controllers.toml` | 112 MIDI controllers, 90 mapped to a parameter |
 | `spec/messages.toml` | 22 SysEx messages |
 | `spec/globals.toml` | 25 device-wide settings |
@@ -190,253 +195,199 @@ collapses NRPN edits, dump parsing and dump building into a single table.
 | `spec/measurements.toml` | 29 raw values with what the synthesizer displayed |
 | `spec/firmware.toml` | firmware versions that change the protocol |
 
-`cargo xtask docs` renders the tables and Mermaid diagrams in
-[`midi-spec.md`](midi-spec.md), the algorithms in [`effects.md`](effects.md), the
-diagram sources in `docs/diagrams/*.mmd`, and a panel drawing per effect in
-`docs/diagrams/fx/*.svg`. The Mermaid diagrams are embedded inline as well, from
-the same strings, so nothing needs a build step to read.
+Three things are generated from these files:
 
-`cargo xtask codegen` renders the parameter table itself into
-`deepmind-midi/src/param/generated.rs`: the 242 parameters as an enum whose
-discriminant is the NRPN number, their groups and ranges, the value tables with
-the firmware each belongs to, and the controller map. It renders the program
-layer into `deepmind-midi/src/program/generated.rs`: the value tables as Rust
-types, and the 225 parameters that are not the program's name as a getter and a
-setter each. The library cannot read TOML on a target with no filesystem and no
-allocator, so the specification is compiled in rather than parsed.
+| Command | Output |
+|---|---|
+| `cargo xtask docs` | Tables and diagrams in [`midi-spec.md`](midi-spec.md), the algorithms in [`effects.md`](effects.md), `docs/diagrams/*.mmd`, `docs/diagrams/envelope.svg`, and a panel drawing per effect in `docs/diagrams/fx/*.svg` |
+| `cargo xtask codegen` | `deepmind-midi/src/param/generated.rs`: the 242 parameters as an enum whose discriminant is the NRPN number, their groups and ranges, the value tables with the firmware each belongs to, and the controller map |
+| `cargo xtask codegen` | `deepmind-midi/src/program/generated.rs`: one Rust type per value table, and a getter and setter for each of the 225 parameters that are not the program's name |
 
-Only data is generated. The types it fills and everything that acts on them are
-hand-written beside it, so a specification change arrives in review as a changed
-table rather than as changed logic, and a behaviour change cannot hide in a
-regenerated file.
+The library is compiled for targets with no filesystem and no allocator, so
+the specification is compiled in rather than parsed at runtime.
 
-The same files generate the program layer: one Rust type per value table and one
-pair of accessors per parameter, in
-`deepmind-midi/src/program/generated.rs`. A correction gets made once.
+Only data is generated. The types it fills and the code that acts on them are
+hand-written, so a specification change arrives in review as a changed table,
+not changed logic.
 
-### Keeping generated output honest
+### Keeping generated output current
 
-The failure mode is silent, so it is caught twice:
-
-- `generated_documentation_is_current` compares the checked-in document against a
-  fresh render, so a stale checkout fails `cargo test`.
-- `generated_code_is_current` does the same for the library's parameter tables,
-  so a spec file edited without regenerating fails the build rather than
-  shipping a library that disagrees with its own specification.
+- `generated_documentation_is_current` and `generated_code_is_current` compare
+  the checked-in files against a fresh render, so a stale checkout fails
+  `cargo test`.
 - `cargo xtask docs --check` and `cargo xtask codegen --check` do the same
-  without writing, and name the command to run. CI runs both for the clearer
-  error.
+  without writing and name the command to run. CI runs both.
 
-CI does not regenerate and commit. Auto-committing to contributor branches is
-worse than a failure that says what to run.
+CI does not regenerate and commit. A failure that says what to run is better
+than auto-commits to contributor branches.
 
-The loader validates before rendering: offsets must cover 0..=241 exactly, every
-referenced value table must exist, an enumerated parameter's maximum must match
-its table, no controller number may repeat, and no two controllers may claim the
-same parameter. Not theoretical. The enum check caught the parameter table
-carrying firmware 1.0 ranges while the value tables carried firmware 1.1 lists.
+### Validation
 
-Beyond that, correctness comes from disagreeing sources. The parameter table was
-built from the manual, then checked against a MIDI Designer layout that had no
-part in building it. All 35 of its named NRPN controls agree, including the three
-offsets where this specification departs from the manual's printed names.
+`Spec::load` checks the files before rendering anything: offsets must cover
+0..=241 exactly, every referenced value table must exist, an enumerated
+parameter's maximum must match its table, no controller number may repeat, no
+two controllers may claim the same parameter, every value table id must
+resolve to exactly one table per firmware version, every routing graph must be
+connected and its feedback flag must match the graph, and the slot count
+measured off each FX page must match `effects.toml`.
+
+These checks have caught real errors: the parameter table carrying firmware
+1.0 ranges against firmware 1.1 value tables, and a twelfth slot on
+`MoodFilter` that the text extraction had merged into the eleventh row.
+
+The parameter table was also checked against a MIDI Designer layout that had
+no part in building it. All 35 of its named NRPN controls agree, including the
+three offsets where this specification departs from the manual's printed names.
 
 ## Decoding borrows, it does not copy
 
 A bank program names dump is 2354 bytes on the wire. Handing a host an owned
-copy of that would put an allocator on the path of every message, which is the
-one thing a `no_std` library cannot do, so nothing on the way in is copied.
+copy would put an allocator on the path of every message, which a `no_std`
+library cannot do.
 
 The decoder owns one buffer and reassembles frames into it. `Event::SysEx`
-borrows that buffer and lives until the next byte is fed in, which is long
-enough to parse and not long enough to hold. `Frame::parse` then borrows again:
-a `Message` carries its bulk payload as a `&[u8]`, still packed. Unpacking is a
-separate call, into a buffer the caller owns, because only the caller knows
-where 245 bytes can go.
+borrows that buffer until the next byte is fed in. `Frame::parse` borrows
+again: a `Message` carries its bulk payload as a `&[u8]`, still packed.
+Unpacking is a separate call into a buffer the caller owns.
 
-The buffer size is a const parameter defaulting to the longest documented frame.
-A host that only sends NRPN edits and reads the edit buffer can say
-`Decoder<300>` and save two kilobytes of stack; one that talks to something else
-on the same port can say more. A frame that does not fit is dropped with one
-error rather than truncated into something that would parse.
+The buffer size is a const parameter defaulting to the longest documented
+frame. A host that only sends NRPN edits and reads the edit buffer can use
+`Decoder<300>` and save two kilobytes of stack. A frame that does not fit is
+dropped with one error rather than truncated into something that would parse.
 
-The decoder reports what arrived rather than tidying it. A note-on with velocity
-zero stays a note-on, since the wire distinguishes them and some devices mean
-the difference. Running status, real-time bytes inside a `SysEx` frame and a
-status byte that ends one early are all handled, because they are what a MIDI
-port actually delivers and a library that only worked on clean input would put
-that work in every host.
+The decoder reports what arrived rather than tidying it. A note-on with
+velocity zero stays a note-on. Running status, real-time bytes inside a
+`SysEx` frame and a status byte that ends a frame early are all handled,
+because MIDI ports deliver all of them.
 
 ## A file is a run of frames
 
-A `.syx` file has no header, no index and no trailer. A preset pack is 128
-program dumps end to end and a single patch is one dump, so reading a file is
-reading frames and `syx` is the layer that walks them.
+A `.syx` file has no header, index or trailer. A preset pack is 128 program
+dumps end to end; a single patch is one dump. `syx` walks the frames.
 
-It walks the bytes directly rather than feeding them through `Decoder`. The
-decoder exists to reassemble frames that arrive a few bytes at a time over a
-port; a file is already whole, and walking it in place means a program dump is
+It walks the bytes directly rather than through `Decoder`, so a program is
 borrowed from the file rather than copied into a buffer first. A payload is
 seven-bit data, so an `F0` and the next `F7` delimit a frame exactly.
 
 Files in the wild are padded, concatenated and appended to, so bytes outside a
-frame are walked past. What is inside one is another matter: a frame that does
-not parse is handed back as the error it failed with and the walk goes on, since
-one bad frame is not a reason to lose the 127 good ones. That is why the
-iterators yield a `Result` per item rather than refusing the file.
+frame are skipped. A frame that does not parse is yielded as its error and the
+walk goes on, since one bad frame is no reason to lose the other 127. That is
+why the iterators yield a `Result` per item.
 
-Writing does not promise to reproduce a file byte for byte, and says so. The
-manual prints 278 packed bytes for a 242-byte program where padding gives 280
-and truncating gives 277; this library pads, for the reason the packed codec
-gives. A file written the other way reads back to identical programs and rewrites
-to a different length. The programs are what a pack is; the padding is not, and
-the golden test checks the programs always and the bytes where the two agree.
+Writing does not promise to reproduce a file byte for byte. The manual prints
+278 packed bytes for a 242-byte program, where padding gives 280 and
+truncating gives 277; this library pads. A file packed the other way reads
+back to identical programs and rewrites to a different length. The golden test
+checks the programs always and the bytes where the two agree.
 
-## Firmware is a dimension, not a footnote
+## Firmware is a lookup key
 
 Firmware 1.1 renumbered three value tables rather than only appending to them.
-A program stored on 1.0 using modulation source 23 means something else read
-back on 1.1. That is not a note for a human, it is a lookup key:
+17 of the 23 modulation sources and 120 of the 130 destinations changed
+meaning, so a 1.0 program read with 1.1 tables is mislabelled almost
+everywhere. Only the FX type list is close to a pure extension.
 
 ```rust
 spec.table_for("mod_source", "1.0")    // 23 entries
 spec.table_for("mod_source", "1.1")    // 25 entries
 ```
 
-This is not a footnote-sized difference. 17 of the 23 modulation sources and 120
-of the 130 modulation destinations changed meaning between the two versions, so
-reading a 1.0 program with 1.1 tables mislabels almost everything. Only the FX
-type list is nearly a pure extension.
+A table declares the versions it covers: `"1.0"` for that one, `"1.1+"` for
+that one and later, nothing for a table that has never changed. The newest
+version is the default. Loading fails unless every table id resolves to
+exactly one table for every listed version.
 
-A table declares the versions it covers: `"1.0"` for exactly that one, `"1.1+"`
-for that one and later, and nothing at all for a table that has never changed.
-The newest version is the default, so a caller who never mentions firmware gets
-current hardware.
+A dump carries the comms protocol version, not the firmware version, so
+nothing in a `.syx` file says which firmware wrote it. The older tables are
+only reachable when the host knows the version another way, in practice by
+asking the device.
 
-What the mechanism cannot do: a dump carries the comms protocol version, not the
-firmware version, so nothing in a `.syx` file says which firmware wrote it. The
-older tables are only reachable when the host knows the version another way.
-Loading fails unless every table identifier resolves to exactly one table for
-every listed version. A gap makes a table unreachable; an overlap makes the
-answer depend on file order, which is how this sort of thing goes wrong
-quietly.
-
-Comms protocol version is a separate axis and stays separate: it decides how
-many bytes a dump carries, not what a value means.
+Comms protocol version is a separate axis: it decides how many bytes a dump
+carries, not what a value means.
 
 ## Presentation is separate from protocol
 
-Three files, because three different questions have three different sources.
+Three files, because three questions have three sources.
 
-`spec/effects.toml` says what a parameter is: its name as the manual writes it,
-its range, its unit, whether the engine acts on modulation reaching it.
+- `spec/effects.toml`: what a parameter is. Name as the manual writes it,
+  range, unit, whether the engine acts on modulation reaching it.
+- `spec/panels.toml`: what kind of control it is (continuous, switch,
+  selector), its full name, and which slots belong together. Derived from
+  `effects.toml` by this project.
+- `spec/layout.toml`: where the control goes, what it looks like, what colour
+  it is. Measured from the manual's figures.
 
-`spec/panels.toml` says what kind of control it is - continuous, switch or
-selector - what it is called in full, and which slots belong together, such as
-the two sides of the compressor or the two channels of the pitch shifter. All of
-that is derived from `effects.toml` by this project, and the file says so.
+The grid came from the 35 FX-page screenshots in section 9.3: six columns at a
+20-pixel pitch, two rows, filled in slot order. The control and the colours
+came from the effect's own editor panel printed beside each screenshot: 29 are
+knobs, five are vertical faders, one is a set of numeric displays. Four
+colours per panel are sampled by position: case, surface, the moving part, and
+the one saturated colour a label or LED uses.
 
-`spec/layout.toml` says where the control goes, what it is, and what colour it
-is. All of that is measured from the manual's figures, and the file says how.
+The two figures disagree about shape. The FX page draws every slot as a circle
+because a 128x64 display has room for one shape; the panel draws what the
+effect actually is. A host that wants to look like the synthesizer reads
+`grid.shape`; one that wants to look like the effect reads `control`. Both
+are in the file, labelled with their source.
 
-The grid came from filling and labelling the ink in the 35 FX-page screenshots
-of section 9.3 and reading off the circle centres: six columns at a 20-pixel
-pitch, two rows, filled in slot order, a short row stopping rather than
-spreading. The control and the colours came from the effect's own editor panel,
-printed beside each screenshot: 29 are knobs, five are vertical faders, one is a
-set of numeric displays, and four colours per panel are sampled by where they
-sit - the case, the surface, the part a finger moves, and the one saturated
-colour a label or an LED uses. Nothing there is a house style or a guess.
+Derived and measured stay in separate files because a derived field can be
+argued with and a measured one can only be re-measured.
 
-The two figures disagree about one thing, and the disagreement is the point. The
-FX page draws every slot as a circle because a 128x64 display has room for one
-shape. The panel draws what the effect actually is. A host that wants to look
-like the synthesizer reads `grid.shape`; one that wants to look like the effect
-reads `control` on the layout. Both are in the file, each labelled with where it
-came from.
+The manual publishes no geometry beyond the grid: no sizes except the circles,
+no fonts. `layout.toml` carries none either.
 
-Splitting derived from measured is not bookkeeping. A derived field can be
-argued with; a measured one can only be re-measured. Keeping them in separate
-files means a host can tell which is which without reading prose.
-
-The measurement earns its keep beyond drawing. It counts controls, and
-`Spec::load` checks that count against `effects.toml`. That check found a
-twelfth slot on `MoodFilter` that the text extraction had swallowed into the
-eleventh row's description: the screenshot draws twelve circles and the table
-had eleven. One algorithm out of 35 was wrong, and now the other 34 are
-confirmed by something that had no part in building them.
-
-What the manual still does not publish is geometry beyond that grid - no sizes
-for anything but the circles, no fonts, no arrangement other than the one the
-synthesizer itself uses. So `layout.toml` carries none, and a host is free to lay
-the slots out its own way knowing what the hardware does.
-
-## Routing is a graph, not a name
+## Routing is a graph
 
 Ten fixed wirings of the four FX engines, chosen by one parameter. The manual
-names them, and the names alone are not enough to act on: `Level` is defined as
-the output level of effects "configured in parallel, or any effects which are the
-last effect before reaching the output stage", so a host cannot label that control
-without knowing where the current routing puts the slot.
+names them, and a name is not enough to act on: `Level` is defined as the
+output level of effects "configured in parallel, or any effects which are the
+last effect before reaching the output stage", so a host cannot label that
+control without knowing where the routing puts the slot.
 
-`spec/routing.toml` carries all ten as edge lists, transcribed from the diagrams
-in section 7.2.2. Loading checks each graph rather than trusting the
-transcription: every slot has to be reachable from the FX block's input and have
-a path to its output, and a topology's declared feedback flag has to match whether
-its graph actually contains a loop. Ten small printed diagrams read by eye is
-exactly the input that wants checking by machine.
+`spec/routing.toml` carries all ten as edge lists, transcribed from the
+diagrams in section 7.2.2. Loading checks each graph: every slot must be
+reachable from the input and reach the output, and a declared feedback flag
+must match whether the graph contains a loop.
 
 ## Strings are reachable by key
 
 Every user-visible string in `spec/` is addressed by a stable path: a parameter
-by its offset, an effect slot by its type and slot number, a value table entry
-by its table and value. Nothing addresses a string by the string.
+by offset, an effect slot by type and slot number, a value table entry by table
+and value. Nothing addresses a string by the string.
 
-That is all translation needs from the data model, and it is already true. A
-translation would be an overlay file keyed the same way, merged over the English
-at load. Until someone actually wants one, English lives in the spec files and
-there is no second mechanism to keep in sync. The point is that adding one later
-is not a refactor.
+That is all a translation would need: an overlay file keyed the same way,
+merged at load. None exists yet, and adding one later is not a refactor.
+Ranges are stored as two ends and a unit rather than as `"0.1 to 6.0 s"` for
+the same reason.
 
-What would not survive translation is anything that parses a display string.
-Ranges are stored as their two ends and a unit, not as `"0.1 to 6.0 s"`, for
-that reason among others.
+## Raw values stay raw
 
-## Raw values stay raw until measured
+A parameter is one byte on the wire. The manual gives the displayed value at
+each end of its range and almost never the curve between. The curve cannot be
+inferred: 201 of the 329 effect ranges start at or cross zero, which rules out
+a logarithmic fit, and the manual documents a fader that starts at zero and is
+explicitly non-linear.
 
-A parameter is one byte on the wire, and the manual gives the displayed value at
-each end of its range but almost never the curve between. That curve cannot be
-inferred: 201 of the 329 effect ranges start at or cross zero, which rules out a
-logarithmic fit, and the manual documents a fader that starts at zero and is
-still explicitly non-linear.
+The manual's PROG screenshots print a raw MIDI value next to the displayed
+value, which makes each one a measurement. `spec/measurements.toml` holds the
+29 the manual contains; [the specification](midi-spec.md#scaling-raw-values-to-displayed-values)
+works through them. Most faders are linear. The three frequency parameters are
+exponential: VCF Frequency reads 500.0 Hz where an exponential sweep predicts
+500.0005 and a straight line predicts 7717. Two faders match neither.
 
-Almost never, rather than never, because the manual's figures give up more than
-its prose does. Its PROG screenshots print a parameter's raw MIDI value next to
-the value the synthesizer displays for it, which makes each one a measurement.
-`spec/measurements.toml` collects the 29 of them the manual contains, and
-[the specification](midi-spec.md#scaling-raw-values-to-displayed-values) works
-through what they say. Most faders are linear. The three frequency parameters are
-exponential, and not marginally: VCF Frequency reads 500.0 Hz where an
-exponential sweep predicts 500.0005 and a straight line predicts 7717. Two faders
-match neither, and the manual warns about neither.
+None of that is wired into a conversion, and none of it covers the 329 effect
+ranges, for which the manual prints no screenshot. A single interior reading
+fixes a curve only when the family is already known, and two faders show what
+assuming the family costs.
 
-None of that is a conversion, and none of it touches the 329 effect ranges, for
-which the manual prints no screenshot and no graph. A single interior reading
-fixes a curve only if the family is already known, and the two faders that match
-nothing are what assuming the family costs.
+So `Frequency::hz()` will exist only for parameters whose curve has been
+measured; `raw()` always works. A plausible wrong number in front of a
+musician is worse than an honest raw one.
 
-So `Frequency::hz()` will exist only for parameters whose curve has been measured,
-and `raw()` always works. A conversion that has not been measured is absent rather
-than approximated: a plausible wrong number in front of a musician is worse than
-an honest raw one, and it would be believed. A partially measured curve is absent
-too, since a conversion that is right above the breakpoint and wrong below it is
-the same trap wearing a better disguise.
-
-## State is a set of claims, not a cache
+## State is a set of claims
 
 The synthesizer answers no per-parameter reads. Dumps can be requested; edits
-can be sent and presumed to have landed. Plain values would conflate the two, so
-every tracked value records where it came from:
+can be sent and presumed to have landed. Every tracked value records which:
 
 ```rust
 pub enum Known<T> {
@@ -446,118 +397,119 @@ pub enum Known<T> {
 }
 ```
 
-The host decides whether to trust an assumed value or re-request the edit buffer
-first. After sending edits, an edit buffer dump is the only way to resync, and
-the library never polls on its own.
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> Unknown
+    Unknown --> Assumed: assume_program()
+    Unknown --> Confirmed: edit buffer dump
+    Assumed --> Confirmed: edit buffer dump
+    Confirmed --> Assumed: edit() sent
+    Confirmed --> Assumed: CC from the panel (7 bits)
+    Confirmed --> Confirmed: NRPN from the panel (whole value)
+    Assumed --> Assumed: edit() sent, or any panel edit
+    Confirmed --> Unknown: reset()
+    Assumed --> Unknown: reset()
+```
 
-Inbound traffic makes the same distinction, because a synthesizer whose knob has
-been turned says so. An NRPN carries the parameter's whole value, so applying one
-leaves the tracked program confirmed. A control change carries seven bits of a
-value that usually has eight, so applying one leaves it assumed. The difference
-is not pedantry: a host that redraws a fader from an assumed value and one that
-writes it back to the synthesizer are doing different things with the same
-number.
+The host decides whether to trust an assumed value or request the edit buffer
+first. The library never polls on its own.
+
+Inbound traffic makes the same distinction. An NRPN carries the parameter's
+whole value, so applying one leaves the tracked program confirmed. A control
+change carries seven bits of a value that usually has eight, so applying one
+leaves it assumed. A host that redraws a fader from an assumed value and one
+that writes it back to the synthesizer are doing different things with the
+same number.
 
 ## The device tracks the sound, and reports the rest
 
 `Device` holds two things: the edit buffer and what a device inquiry answered.
-Everything else a frame can carry is reported by command and not decoded, which
-is a boundary drawn by what is knowable and what fits.
+Everything else a frame can carry is reported by command and not decoded.
 
-Nothing is knowable about the globals, the patterns or the chord memories - the
-manual gives those dumps a length and no offsets, as [Not yet
-possible](#not-yet-possible-the-globals-and-the-sequencer) says. A bank of
-program names is knowable and is two kilobytes, which is more than an event
-queue with no allocator should carry for the hosts that never ask for one.
+The globals, patterns and chord memories cannot be decoded: the manual gives
+those dumps a length and no offsets (see [Not yet
+possible](#not-yet-possible-the-globals-and-the-sequencer)). A bank of program
+names can be decoded but is two kilobytes, more than an allocator-free event
+queue should carry for hosts that never ask for one.
 
-A stored program is neither: it decodes, and it is not the sound the synthesizer
-is making, so it arrives as an event and leaves the tracked program alone. That
-is also why a program-bearing event carries the program by value rather than
-pointing at the tracked copy. A bank transfer overwrites that copy 128 times, and
-an event meaning "look at the current one" would be worth nothing by the time
-anyone looked.
+A stored program is neither. It decodes, but it is not the sound the
+synthesizer is making, so it arrives as an event and leaves the tracked
+program alone. That is also why a program-bearing event carries the program by
+value: a bank transfer overwrites the tracked copy 128 times, and an event
+that said "look at the current one" would be stale before anyone looked.
 
 Real-time bytes are dropped rather than queued. A running MIDI clock is
 twenty-four messages a beat, none of which says anything about what the
-synthesizer holds, and queuing them would starve the queue of the events that do.
-A host that wants everything on the port drives `Decoder` itself, which is the
-layer for it.
+synthesizer holds. A host that wants everything on the port drives `Decoder`
+itself.
 
 ### Queuing is not sending
 
 `request_edit_buffer` and its neighbours put an item in the outbound queue and
-return. The bytes exist when `drain_tx` hands them to the host, and that is when
-the request becomes outstanding and its timeout starts. A host that never drains
-never times out, which is the truthful answer for a request that never went
-anywhere.
+return. The bytes exist when `drain_tx` hands them to the host, and that is
+when the request becomes outstanding and its timeout starts. A host that never
+drains never times out.
 
-The queue holds items rather than bytes, so a request costs a handful of bytes
-and a whole-program edit costs 242 of them rather than the 2,904 bytes they
-encode to. Both queues and the decoder's frame buffer are const parameters with
-defaults, for the reason the decoder's already is: the right numbers differ by
-two orders of magnitude between a desktop host and a microcontroller. An event
-that does not fit is dropped and counted, and the count arrives as `Event::Lost`
-once the queue has room again. Nothing is dropped quietly.
+The queue holds items rather than bytes, so a request costs a few bytes and a
+whole-program edit costs 242 rather than the 2,904 bytes they encode to. Both
+queues and the decoder's frame buffer are const parameters with defaults,
+because the right sizes differ by two orders of magnitude between a desktop
+host and a microcontroller. An event that does not fit is dropped and counted,
+and the count arrives as `Event::Lost` once the queue has room again.
 
-## The transport is a policy, not a protocol
+## The transport is a policy
 
-Everything above this line describes a synthesizer. Blocking does not: it is a
-decision about what a host does while it waits, and hosts disagree. So the
-adapter that blocks is one module behind one feature flag, and it is the only
-part of this library that knows what IO is.
+Everything above describes a synthesizer. Blocking does not: it is a decision
+about what a host does while it waits, and hosts disagree. So the adapter that
+blocks is one module behind one feature flag, and the only part of the library
+that knows what IO is.
 
-It knows as little as two traits can say. `Port` sends bytes and reads whatever
-has arrived without blocking; `Clock` says what time it is and waits. Port
-enumeration, virtual ports, connection state, reconnection - all of it stays on
-the host's side, because a library that opened ports would need an opinion about
-all of it. Neither trait needs `std` or an allocator; `StdClock` is the only
-thing in the module that wants `std`, and a host without it writes its own clock
-in six lines.
+It knows as little as two traits can say. `Port` sends bytes and reads what
+has arrived without blocking; `Clock` tells the time and waits. Port
+enumeration, virtual ports, connection state and reconnection stay on the
+host's side. Neither trait needs `std` or an allocator; `StdClock` is the only
+thing in the module that wants `std`.
 
-What is left is the loop: read, feed, tick, send. `pump` is one pass of it, and
-a host that wants its own loop uses that and nothing else in the module.
+The loop is read, feed, tick, send. `pump` is one pass of it, and a host that
+wants its own loop uses that and nothing else in the module.
 
-**Waiting ends three ways**, and two of them are the same fact. The answer
-arrives; or the device raises the timeout for the request; or nothing has arrived
-for longer than that timeout allows, which is the backstop for a request the
-device is not timing. The last two are both a timeout error, because that is what
-they are. Nothing is retried - a bank half-read is not a thing to ask for again,
-and only the host knows whether anything else is.
+**Waiting ends three ways.** The answer arrives; the device raises the timeout
+for the request; or nothing has arrived for longer than the timeout allows,
+which is the backstop for a request the device is not timing. The last two are
+both a timeout error. Nothing is retried: a bank half-read is not a thing to
+ask for again, and only the host knows whether anything else is.
 
-**Progress is an event, not traffic.** A bank is one request and 128 answers, and
-each answer is progress, so a transfer that takes a minute never times out while
-it is still arriving. A port streaming clock bytes at a silent synthesizer is not
-progress and does not hold the wait open. That distinction is why the timeout can
-be measured against a transfer at all rather than only against a single message.
+**Progress is an event, not traffic.** A bank is one request and 128 answers,
+and each answer is progress, so a transfer that takes a minute never times out
+while it is still arriving. A port streaming clock bytes at a silent
+synthesizer is not progress.
 
 **Events a wait was not waiting for are kept.** A blocking call has to look at
-every event to find the one it wants, so the ones it does not want go into a
-queue of the transport's own and come back out of `poll_event` in order. Turning
-a knob while a host reads a bank does not lose the knob. That second queue is the
-adapter's one real cost - `EV` more events held inline - and an event that does
-not fit is counted and arrives as `Event::Lost`, the same as in the layer below.
+every event to find the one it wants. The others go into a queue of the
+transport's own and come back out of `poll_event` in order, so turning a knob
+while a host reads a bank does not lose the knob. That second queue is the
+adapter's one cost: `EV` more events held inline, with overflow counted as
+`Event::Lost` the same as in the layer below.
 
 ## The other end of the conversation
 
 `device` is the host's end. `sim`, behind a feature of that name, is the
 synthesizer's: `Synth` answers requests, applies the edits it is sent, and
-reports what it heard. It writes the same four-call loop `Device` does, and it
-has no clock, because the test already owns one - not draining a `Synth` is a
-synthesizer that has not replied yet, which is the only way a host's timeout path
-gets exercised without waiting on a real port.
+reports what it heard. It writes the same four-call loop `Device` does and has
+no clock, because the test owns one. Not draining a `Synth` is a synthesizer
+that has not replied yet, which is how a host's timeout path is exercised
+without a real port.
 
-**It cannot find out that the manual is wrong.** Both ends are generated from the
-same `spec/`, so a round trip through it says this library agrees with itself.
-That limit is the same one [What is left is hardware](#what-is-left-is-hardware)
-describes, and nothing in software moves it.
+**It cannot find out that the manual is wrong.** Both ends are generated from
+the same `spec/`, so a round trip through it proves that this library agrees
+with itself. See [What is left is hardware](#what-is-left-is-hardware).
 
 What it does reach is the seam between the layers, which no single-layer test
-sees: an answer that resolves the wrong outstanding request, a dump that lands in
-the wrong place, a bank run that stops one short, a timeout that fires when the
-answer did arrive. And it reaches the same seam in somebody else's host, which is
-the reason it is a feature of the published crate rather than a test helper: a
-host cannot be tested against a `DeepMind` that is not plugged in, and the
-alternative is hand-assembling reply frames in every test.
+sees: an answer that resolves the wrong outstanding request, a dump that lands
+in the wrong place, a bank run that stops one short, a timeout that fires when
+the answer did arrive. It reaches the same seam in somebody else's host, which
+is why it is a feature of the published crate rather than a test helper.
 
 A `Synth` holds its edit buffer and nothing else. Stored programs come from a
 `Library`, which `syx::File` implements, so a preset pack is the contents of a
@@ -569,30 +521,24 @@ let mut synth: Synth<syx::File<'_>> =
     Synth::with_library(DeviceId::Unit(0), edit_buffer, pack);
 ```
 
-Eight banks of programs are two hundred kilobytes, which is not something to hold
-inline on the target this crate is `no_std` for, and a slot the library does not
-hold goes unanswered rather than being invented. A real unit always has something
-in every slot, so that shape is not one a `DeepMind` takes - but a request that
-goes unanswered is the more useful thing to be able to test, and the alternative
-is making up a program.
+Eight banks are two hundred kilobytes, too much to hold inline on the target
+this crate is `no_std` for. A slot the library does not hold goes unanswered
+rather than invented. A real unit always has something in every slot, but an
+unanswered request is the more useful thing to be able to test.
 
-It answers every request `Device` can send. The globals, the patterns, the chord
-memories and the calibration data are heard and not answered, for the same reason
-they are opaque everywhere else here: the manual gives those payloads a length
-and never says what is in them. `Heard::Request` carries whether an answer was
-queued, so a test can tell the two apart.
+It answers every request `Device` can send. The globals, patterns, chord
+memories and calibration data are heard and not answered, because the manual
+never says what those payloads contain. `Heard::Request` carries whether an
+answer was queued, so a test can tell the two apart.
 
 ## Two kinds of version
 
-Independent, and both matter.
-
-**Comms protocol version**, stamped into every dump. Version 6 (documented) and
-version 7 (shipping firmware) carry 242 and 245 bytes of program data. Offsets
-0-241 are identical; 242-244 are reserved and preserved on round-trip.
+**Comms protocol version**, stamped into every dump. Version 6 (documented)
+and version 7 (shipping firmware) carry 242 and 245 bytes of program data.
+Offsets 0-241 are identical; 242-244 are reserved and preserved on round-trip.
 
 **Firmware version**, read via device inquiry. Firmware 1.1 added modulation
-sources and destinations and an FX algorithm, renumbering three value tables. A
-program written on 1.1 using modulation source 23 means something else on 1.0.
+sources and destinations and an FX algorithm, renumbering three value tables.
 
 The library reads firmware versions. It does not write firmware: updates are a
 vendor SysEx file streamed over an undocumented bootloader protocol, and
@@ -603,58 +549,55 @@ blind-relaying that bricks synthesizers.
 ```
 spec/            the machine-readable specification
 deepmind-midi/   the library
-xtask/           generates the documentation from spec/
+xtask/           generates the documentation and the generated sources from spec/
 fuzz/            the fuzz targets, a workspace of their own
 ```
 
-One library crate. A workspace split buys version churn and nothing else at this
-size. Features cover the axes that matter: `std` (default), `alloc`, `serde`,
-`transport`, `sim`.
+One library crate. A workspace split would buy version churn and nothing else
+at this size. Features: `std` (default), `alloc`, `serde`, `transport`, `sim`.
 
-`fuzz/` is outside the workspace because `cargo fuzz` builds it on nightly with
-sanitizer instrumentation, and the library's own build must not inherit that.
+`fuzz/` is outside the workspace because `cargo fuzz` builds it on nightly
+with sanitizer instrumentation, and the library's own build must not inherit
+that.
 
 **There is no host program here, and there will not be one.** A command-line
-tool would need a MIDI backend, and a MIDI backend is the one thing this library
-has spent every design decision refusing to have an opinion about: which crate,
-which platform, how ports are enumerated, what happens on a disconnect. Adding
-one would put that opinion into the repository's lockfile, its CI runners and
-its minimum toolchain, in service of a binary that nothing here can run - it
-needs a synthesizer on the other end, which no test machine has. A host belongs
-in the host's repository. What this one owes it is the wiring, and
+tool would need a MIDI backend, and a MIDI backend is the one thing this
+library refuses to have an opinion about: which crate, which platform, how
+ports are enumerated, what happens on disconnect. Adding one would put that
+opinion into the lockfile, the CI runners and the minimum toolchain, for a
+binary that needs a synthesizer on the other end to do anything. A host
+belongs in the host's repository. What this one owes it is the wiring:
 [Sans-IO](#sans-io) and [The transport is a
-policy](#the-transport-is-a-policy-not-a-protocol) are where that is written
-down.
+policy](#the-transport-is-a-policy).
 
 ## Testing
 
-Three kinds, because a MIDI port is untrusted input and the library's central
-claim is that it never panics on one. A claim about all inputs cannot be checked
-by enumerating some.
+A MIDI port is untrusted input, and the library's central claim is that it
+never panics on one. A claim about all inputs cannot be checked by enumerating
+some, so there are five kinds of test:
 
 - **Unit tests** beside the code, for the cases somebody reasoned about.
 - **Randomised invariant tests** in `tests/props.rs`, run on every commit. Two
-  thousand cases per property, from a seeded xorshift, so a run is the same run
-  on every machine. The invariants are round-trip on every codec, chunking
-  invariance in the decoder, and termination in both file walks.
+  thousand cases per property from a seeded xorshift, so a run is the same
+  run on every machine. The invariants: round-trip on every codec, chunking
+  invariance in the decoder, termination in both file walks.
 - **Fuzzing** in `fuzz/`, four targets: the decoder, the `SysEx` frame parser,
-  the `.syx` reader and the program decoder. Each one asserts more than the
-  absence of a panic - a frame that parses has to re-encode to the bytes it came
-  from, since a parser that accepted a frame and reported a payload nobody sent
+  the `.syx` reader and the program decoder. Each asserts more than the absence
+  of a panic: a frame that parses must re-encode to the bytes it came from,
+  since a parser that accepted a frame and reported a payload nobody sent
   would survive a panic-freedom check and still hand a host the wrong program.
 - **Golden tests** against the factory preset packs.
 - **Conversation tests** in `tests/conversation.rs`, which drive `Device` and
-  `Transport` against a `sim::Synth` rather than against bytes somebody wrote
-  down. They are the only tests that cross the seam between layers, and the only
-  ones where neither end is told what the other is about to do.
+  `Transport` against a `sim::Synth`. They are the only tests that cross the
+  seam between layers.
 
 **A generator that stops reaching the parser is a test that stopped testing.**
-Bytes shaped by guesswork are rejected at the manufacturer ID and never reach
-the code that decides what a payload means, so the randomised tests mutate
-frames this library wrote rather than inventing them, and each one asserts that
-enough of its mutants still parse. The same problem in the fuzzer is what
-`fuzz/deepmind.dict` is for: the header as a token. Without it the `frame`
-target reaches 42 coverage points in twenty seconds and with it 434.
+Random bytes are rejected at the manufacturer ID and never reach the code that
+decides what a payload means, so the randomised tests mutate frames this
+library wrote and assert that enough mutants still parse. `fuzz/deepmind.dict`
+does the same job for the fuzzer by giving it the header as a token: without
+it the `frame` target reaches 42 coverage points in twenty seconds, with it
+434.
 
 Fuzzing needs nightly and `cargo-fuzz`:
 
@@ -663,19 +606,16 @@ cargo install cargo-fuzz
 cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict
 ```
 
-CI runs each target for a minute, which is a regression check rather than a
-campaign. A campaign is hours against a kept corpus, and the corpus is not
-committed: it is derived, it grows without bound, and regenerating it is one
-command.
+CI runs each target for a minute as a regression check. A real campaign is
+hours against a kept corpus, and the corpus is not committed: it is derived,
+grows without bound, and regenerating it is one command.
 
-The packs are not committed. Redistribution rights on Behringer sound banks are
-unclear and a library repository is the wrong place to find out. The tests read a
-path from `DEEPMIND_PACKS` and skip when it is unset; the repository holds a
-small synthetic fixture and its checksum. The fixture is what this library
-writes, frozen: a change in the encoder arrives in review as a changed fixture
-rather than as a file the next release cannot read. `UPDATE_FIXTURES=1` rewrites
-it and prints the checksum to paste in, so agreeing to the change is an edit
-somebody makes.
+The factory packs are not committed either. Redistribution rights on Behringer
+sound banks are unclear. The tests read a path from `DEEPMIND_PACKS` and skip
+when it is unset; the repository holds a small synthetic fixture and its
+checksum. The fixture is what this library writes, frozen: a change in the
+encoder arrives in review as a changed fixture. `UPDATE_FIXTURES=1` rewrites
+it and prints the checksum to paste in.
 
 ## Versioning and releases
 
@@ -683,84 +623,52 @@ somebody makes.
 `YY.RELEASE.PATCH`: `26.1.0` is the first release of 2026, `26.1.1` its first
 patch, `26.2.0` the second release of the year.
 
-A human owns it, editing one line by hand. CI fails when the version is not
-ahead of the newest release tag, so the first pull request merged after a
-release has to move it. That check is eight lines of shell in the workflow,
-where anyone reading the workflow can see it.
+A human edits that one line. CI fails when the version is not ahead of the
+newest release tag, so the first pull request merged after a release has to
+move it. That check is eight lines of shell in the workflow.
 
 Having the release workflow bump and commit instead would make the version in
-the tree a lie between releases, and would need write access to the default
+the tree wrong between releases and would need write access to the default
 branch. This way the tree always states what it will release next and the
 release job only reads.
 
 Releasing is one click. The workflow verifies the build, reads the version,
-refuses to proceed if that tag exists, then tags, releases and publishes. Notes
-come from GitHub's generator, categorised by label through `.github/release.yml`,
-with an optional opening paragraph from a small model on GitHub Models using the
-built-in token; any failure there leaves the generated notes alone.
-`CARGO_REGISTRY_TOKEN` is optional and a missing one warns rather than fails.
+refuses if that tag exists, then tags, releases and publishes. Notes come from
+GitHub's generator, categorised by label through `.github/release.yml`, with
+an optional opening paragraph from a small model on GitHub Models; any failure
+there leaves the generated notes alone. `CARGO_REGISTRY_TOKEN` is optional and
+a missing one warns rather than fails.
 
-## Roadmap
+## Status
 
-| Step | Contents |
-|---|---|
-| 1 | Workspace, CI, lint policy, the specification, generation and release tooling |
-| 2 | `spec/effects.toml`: per-effect parameter names, presentation, FX routing |
-| 3 | `wire` and `sysex`: framing, packed MS-bit codec, typed messages |
-| 4 | `param`: code generated from `spec/`, typed values |
-| 5 | `program`: the `Program` struct, its value types and typed accessors |
-| 6 | `syx`: `.syx` files and preset packs |
-| 7 | `device`: the state machine, events, timeouts, provenance, `edit` |
-| 8 | `transport`: the blocking adapter, its port and clock traits |
-| 9 | Randomised invariant tests and the fuzz targets |
-| 10 | `sim`: the synthesizer's end of the conversation, and the tests that cross it |
-
-All ten have landed. Every layer the manual documents is written, and the claim
-that none of them panics on a hostile port is checked rather than asserted.
-
-Step 10 is what was left once the protocol was written down and checked: the
-other end of it. It does not close the gap below, and the
-[section on it](#the-other-end-of-the-conversation) is explicit that it cannot.
-What it closes is a smaller one - a host had no synthesizer to develop against,
-and the tests here had no way to exercise two layers at once.
-
-Step 9 was `deepmind-cli` until step 8 was written. What that step turned up is
-that the blocking adapter had already answered the question the CLI was there to
-ask: whether a host can drive this library without reaching for an offset. It
-can, in a dozen lines, and those lines are in the `transport` docs. What a CLI
-would have added on top is a MIDI backend and an argument parser, which are a
-host's problems and not this one's. [Crate layout](#crate-layout) is where that
-is written down.
+Every layer the manual documents is written: `wire`, `sysex`, `param`,
+`program`, `syx`, `device`, `transport` and `sim`, with the randomised tests
+and fuzz targets behind the no-panic claim.
 
 ### What is left is hardware
 
 Nothing here has been run against a synthesizer. The specification is
-reverse-engineered from a manual that is wrong in at least one printed figure -
-see the packed length of a program dump - and a round-trip test proves only that
-this library agrees with itself.
+reverse-engineered from a manual that is wrong in at least one printed figure
+(the packed length of a program dump), and a round-trip test proves only that
+this library agrees with itself. "Verified" in this repository means verified
+against the document, not the instrument. That needs a DeepMind, a MIDI cable
+and an afternoon.
 
-That is not a layer somebody can write. It wants a DeepMind, a MIDI cable and an
-afternoon, and until then "verified" in this repository means verified against
-the document, not against the instrument. `sim` is the closest software gets and
-it is not close: it is this specification talking to itself.
-
-One thing the manual does not document is worth naming here, because its absence
-is easy to read as an oversight. Every dump in `spec/messages.toml` is
-`from_device`. Nothing describes a message that writes a program *into* a
-synthesizer, so there is no way to send a preset pack back to the instrument it
-came off, and this library does not invent one. Most synthesizers accept their
-own dump format back; whether this one does, and what it does with the bank and
-program bytes when it is not answering a request, is a question for a cable.
+One absence is deliberate, not an oversight. Every dump in
+`spec/messages.toml` is `from_device`. The manual describes no message that
+writes a program into a synthesizer, so there is no way to send a preset pack
+back to the instrument, and this library does not invent one. Most
+synthesizers accept their own dump format back; whether this one does is a
+question for a cable.
 
 ### Not yet possible: the globals and the sequencer
 
-`Global`, `Pattern` and the chord memories stay opaque payloads for now, and not
-for want of a layer to put them in. The manual lists the 25 device-wide settings
-but never says where in the 45-byte dump each one sits, and it gives the pattern
-and chord dumps a length and nothing else. Naming those bytes needs hardware, not
-another reading of the manual; `spec/globals.toml` records what is known and
-marks the offsets as unknown rather than guessing at them.
+`Global`, `Pattern` and the chord memories stay opaque payloads. The manual
+lists the 25 device-wide settings but never says where in the 45-byte dump
+each one sits, and it gives the pattern and chord dumps a length and nothing
+else. Naming those bytes needs hardware. `spec/globals.toml` records what is
+known and marks the offsets as unknown.
 
-The one dump besides the program that is documented well enough to decode is the
-bank program names, which is 128 names of sixteen bytes and is where `BankNames`
+The one dump besides the program that is documented well enough to decode is
+the bank program names: 128 names of sixteen bytes, which is where `BankNames`
 comes from.

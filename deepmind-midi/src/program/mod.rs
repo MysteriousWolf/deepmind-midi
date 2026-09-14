@@ -23,10 +23,9 @@
 //! # The bytes are what is stored
 //!
 //! A program is its dump, not a decoded copy of one. Reading is a lookup and
-//! writing is a byte, so a dump that goes in comes out unchanged - including the
-//! reserved bytes a comms protocol version 7 dump carries, and including a value
-//! no table lists, which hardware is entitled to send and a library is not
-//! entitled to lose.
+//! writing is a byte, so a dump that goes in comes out unchanged, including the
+//! reserved bytes a comms protocol version 7 dump carries and any value no
+//! table lists, which hardware may send and a library must not lose.
 //!
 //! That is also why the typed accessors answer `Option` for a parameter with a
 //! value table. `None` means the byte is not one the table names; the byte is

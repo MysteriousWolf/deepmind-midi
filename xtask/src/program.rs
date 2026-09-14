@@ -597,8 +597,8 @@ fn variant_identifiers(table: &ValueTable, id: &str) -> Result<Vec<String>, Stri
 /// Returns the variant one entry of one firmware's table belongs to.
 ///
 /// The join is the name, since the value is what firmware changed. Spelling
-/// changed with it - `NoteOff Vel` became `Note Off Vel` - so the join is the
-/// name as an identifier, which is what both of those spell.
+/// changed with it (`NoteOff Vel` became `Note Off Vel`), so the join is the
+/// name as an identifier, which both of those spell the same way.
 fn variant_for<'a>(
     name: &str,
     table: &ValueTable,

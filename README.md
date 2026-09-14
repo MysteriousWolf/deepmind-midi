@@ -10,22 +10,20 @@ and a tracked view of the synthesizer.
 DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 ```
 
-**Status: early.** The protocol is reverse-engineered, verified against the
-manual and written down. Every layer is in: MIDI decoding, SysEx, the parameter
-table, programs, `.syx` files, the device state machine and the blocking
-transport adapter. Enough to drive a synthesizer from a host that owns the port,
-and not yet run against one - which is the gap that matters, and the one thing
-no amount of code here closes.
+**Status: early.** The protocol is reverse-engineered from the manual and
+written down as [`spec/`](spec/). Every layer is implemented: MIDI decoding,
+SysEx, the parameter table, programs, `.syx` files, the device state machine,
+the blocking transport adapter and a simulated synthesizer. None of it has been
+run against real hardware yet, and that is the gap that matters.
 
 There is no command-line tool and there will not be one. A host needs a MIDI
-backend, and refusing to have an opinion about which is the point of the
-library.
+backend, and the library deliberately has no opinion about which.
 
 ## Testing a host without a synthesizer
 
-The `sim` feature is the other end of the conversation: something that answers
-requests, applies the edits it is sent and says what it heard, so a host can be
-driven through a whole exchange with nothing plugged in.
+The `sim` feature is the other end of the conversation: it answers requests,
+applies the edits it is sent and reports what it heard, so a host can be driven
+through a whole exchange with nothing plugged in.
 
 ```rust
 let mut synth: Synth = Synth::new(DeviceId::Unit(0), sound);
@@ -39,13 +37,13 @@ assert!(matches!(host.poll_event(), Some(Event::EditBuffer(_))));
 ```
 
 Stored programs come from a `Library`, which `syx::File` implements, so a preset
-pack is the contents of a simulated unit. It has no clock: not draining it is a
-synthesizer that has not replied yet, which is how a host's timeout path gets
-tested.
+pack can stand in for a unit's memory. The simulator has no clock: not draining
+it is a synthesizer that has not replied yet, which is how a host's timeout path
+gets tested.
 
-It is built from the same specification as the rest of this crate, so it will
-never find out that the manual is wrong. What it finds is a host that drives the
-protocol wrongly, which is a different and more common bug.
+It is built from the same specification as the rest of the crate, so it cannot
+find out that the manual is wrong. What it finds is a host that drives the
+protocol wrongly, which is the more common bug.
 
 ## Documentation
 
@@ -53,7 +51,7 @@ protocol wrongly, which is a different and more common bug.
 |---|---|
 | [Protocol](docs/midi-spec.md) | Signal path, SysEx, NRPN, all 242 parameters, the CC map, value tables |
 | [Effects](docs/effects.md) | All 35 algorithms: a drawing of each panel and what its twelve slots do |
-| [Architecture](docs/architecture.md) | Design, layering, roadmap |
+| [Architecture](docs/architecture.md) | Design, layering, status |
 | [`spec/`](spec/) | The same protocol as TOML. Source of truth for the docs and the code |
 | [NOTICE](NOTICE) | Where the descriptions and panel colours come from |
 | `cargo doc --open` | API reference |
@@ -75,8 +73,8 @@ cargo fmt --all --check
 cargo +1.85.0 check --workspace --all-features   # the MSRV, which CI also checks
 ```
 
-A current toolchain accepts things 1.85 does not, so the last line is worth
-running before pushing.
+A current toolchain accepts things 1.85 does not, so run the last line before
+pushing.
 
 Fuzzing needs nightly and `cargo-fuzz`, and lives in its own workspace under
 `fuzz/`:
@@ -86,8 +84,8 @@ cargo install cargo-fuzz
 cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict   # or decoder, file, program
 ```
 
-The dictionary is worth the flag: without it the mutator spends its time
-guessing at a five-byte SysEx header instead of at payloads.
+Use the dictionary. Without it the mutator spends its time guessing at a
+five-byte SysEx header instead of at payloads.
 
 The factory preset packs are not in the repository, so the tests that read them
 skip unless you point them at your own copy:
@@ -113,7 +111,7 @@ Editing a spec file without regenerating fails `cargo test`.
 Versions are `YY.RELEASE.PATCH`: `26.1.0` is the first release of 2026, `26.1.1`
 its first patch, `26.2.0` the second release of the year.
 
-Edit `version` in `Cargo.toml`, in a pull request. CI fails any pull request
+Edit `version` in `Cargo.toml` in a pull request. CI fails any pull request
 whose version is not ahead of the newest release tag, so the first one merged
 after a release has to move it. Then run the Release workflow from the Actions
 tab; it tags and publishes what `Cargo.toml` holds.

@@ -10,18 +10,18 @@
 //!
 //! # Layout
 //!
-//! | Module    | Responsibility                                               |
-//! |-----------|--------------------------------------------------------------|
-//! | [`ids`]   | Addressing primitives: device ID, model, bank, program number |
-//! | [`error`] | Crate-wide error type                                        |
-//! | [`wire`]  | MIDI bytes: running status, channel messages, `SysEx` reassembly |
-//! | [`sysex`] | `DeepMind` framing, the packed MS-bit codec, typed messages   |
-//! | [`param`] | The 242 program parameters: names, ranges, value tables, NRPN |
-//! | [`program`] | A program: the 242 bytes, typed accessors, names, value types |
-//! | [`syx`]   | `.syx` files: the programs a preset pack carries, and building one |
-//! | [`device`] | The state machine: what the synthesizer holds, and what to send |
-//! | [`transport`] | The blocking adapter over a port and a clock (`transport`) |
-//! | [`sim`]   | The other end of the conversation, for tests (`sim`)         |
+//! | Module        | Responsibility                                                     |
+//! |---------------|--------------------------------------------------------------------|
+//! | [`ids`]       | Addressing primitives: device ID, model, bank, program number      |
+//! | [`error`]     | Crate-wide error type                                              |
+//! | [`wire`]      | MIDI bytes: running status, channel messages, `SysEx` reassembly   |
+//! | [`sysex`]     | `DeepMind` framing, the packed MS-bit codec, typed messages        |
+//! | [`param`]     | The 242 program parameters: names, ranges, value tables, NRPN      |
+//! | [`program`]   | A program: the 242 bytes, typed accessors, names, value types      |
+//! | [`syx`]       | `.syx` files: the programs a preset pack carries, and building one |
+//! | [`device`]    | The state machine: what the synthesizer holds, and what to send    |
+//! | [`transport`] | The blocking adapter over a port and a clock (`transport`)         |
+//! | [`sim`]       | The other end of the conversation, for tests (`sim`)               |
 //!
 //! Each layer depends only on those above it: [`wire`] does not know what a
 //! `DeepMind` is, and [`sysex`] does not know where its bytes came from.

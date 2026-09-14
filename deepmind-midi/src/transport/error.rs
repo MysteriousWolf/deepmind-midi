@@ -37,14 +37,14 @@ pub enum Error<E> {
     /// The request stopped being outstanding without ever being answered.
     ///
     /// What a host sees when something else reached the same device in the
-    /// meantime - a [`reset`](crate::device::Device::reset) between pumps, or a
+    /// meantime: a [`reset`](crate::device::Device::reset) between pumps, or a
     /// second identical request whose answer cleared this one. Not reachable by
     /// a host that drives one transport from one place.
     Dropped(Request),
     /// The limit given to [`wait_for`](super::Transport::wait_for) passed.
     ///
-    /// The synthesizer has not been declared late - the device timeout is what
-    /// says that. This is only the host's own patience running out.
+    /// The synthesizer has not been declared late; the device timeout is what
+    /// says that. This is only the host's own limit running out.
     Elapsed,
 }
 
