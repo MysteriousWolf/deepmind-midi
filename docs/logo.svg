@@ -70,9 +70,11 @@
     <rect x="112.8" width="0.8" height="128" fill="#454b58"/>
   </g>
 
-  <!-- The socket: a dark recess behind a metal bezel. -->
+  <!-- The socket: a recess behind a metal bezel, shaded like the pin holes. -->
   <circle cx="64" cy="64" r="36" fill="url(#recess)"/>
-  <circle cx="64" cy="64" r="35" fill="none" stroke="#000" stroke-width="2.5" opacity="0.55"/>
+  <circle cx="64" cy="64" r="34.5" fill="none" stroke="#0b0d11" stroke-width="2.6"/>
+  <path d="M 31.5 76 A 34 34 0 0 1 96.5 76" fill="none" stroke="#000" stroke-width="2.2" opacity="0.5"/>
+  <path d="M 33 76 A 34 34 0 0 0 95 76" fill="none" stroke="#7d838f" stroke-width="0.9" opacity="0.8"/>
   <g filter="url(#drop)">
     <circle cx="64" cy="64" r="38" fill="none" stroke="url(#metal)" stroke-width="6" mask="url(#cuts)"/>
   </g>
