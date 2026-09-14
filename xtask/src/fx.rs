@@ -11,7 +11,7 @@
 
 use std::fmt::Write as _;
 
-use crate::spec::{Layout, LayoutRow, Spec};
+use crate::spec::{Effect, Grid, Layout, LayoutRow, Panel, Spec};
 
 /// Directory holding the drawings, relative to the repository root.
 pub const DIR: &str = "docs/diagrams/fx";
@@ -33,15 +33,11 @@ const GAP: f32 = 3.0;
 /// Longest sweep an arc track covers, in degrees either side of straight up.
 const SWEEP: f32 = 135.0;
 
-/// Why every control is drawn at the middle of its travel.
+/// Where every control is drawn: at the middle of its travel.
 ///
 /// The specification holds no default value for an effect parameter, so there
-/// is no position to draw. Leaving the handle off entirely was tried first and
-/// read badly: a fader without a cap is a line with ticks beside it, and the
-/// five fader panels came out looking like ladders. A handle at the middle is
-/// the one position that claims nothing, since it is the same for every slot on
-/// every page and so carries no information at all. The legend in
-/// `docs/effects.md` says so.
+/// is no position to draw. The middle is the same for every slot on every
+/// page, so it carries no information; the legend in `docs/effects.md` says so.
 const HANDLE: &str = "middle of travel, which carries no meaning";
 
 /// One effect's drawing.
@@ -413,20 +409,22 @@ fn display(cx: f32, cy: f32, radius: f32, colours: &Palette) -> String {
     )
 }
 
+/// Everything one effect's page is drawn from, looked up once per page.
+struct Page<'a> {
+    grid: &'a Grid,
+    layout: &'a Layout,
+    effect: &'a Effect,
+    panel: Option<&'a Panel>,
+    colours: Palette,
+}
+
 /// Draws one row of controls, honouring what the row says about alignment.
 ///
 /// The measured grid is left aligned, so every row in `layout.toml` simply
-/// stops where it runs out of slots. The other alignments are here because a
-/// host with a panel of a different width may want one.
-fn draw_row(
-    out: &mut String,
-    spec: &Spec,
-    layout: &Layout,
-    colours: &Palette,
-    row: &LayoutRow,
-    top: f32,
-) -> Result<(), String> {
-    let grid = &spec.grid;
+/// stops where it runs out of slots. The other alignments are here for a host
+/// with a panel of a different width.
+fn draw_row(out: &mut String, page: &Page, row: &LayoutRow, top: f32) -> Result<(), String> {
+    let grid = page.grid;
     let free = grid.display_width - 2.0 * grid.first_x - units(row.slots.len()) * grid.column_pitch
         + grid.column_pitch;
     let shift = match row.align.as_str() {
@@ -441,39 +439,28 @@ fn draw_row(
     };
     for (column, slot) in row.slots.iter().enumerate() {
         let cx = grid.first_x + shift + units(column) * pitch;
-        draw_slot(out, spec, layout, colours, *slot, cx, top)?;
+        draw_slot(out, page, *slot, cx, top)?;
     }
     Ok(())
 }
 
 /// Draws one slot: its short name, its control, and its name in full.
-fn draw_slot(
-    out: &mut String,
-    spec: &Spec,
-    layout: &Layout,
-    colours: &Palette,
-    slot: u8,
-    cx: f32,
-    top: f32,
-) -> Result<(), String> {
-    let grid = &spec.grid;
+fn draw_slot(out: &mut String, page: &Page, slot: u8, cx: f32, top: f32) -> Result<(), String> {
+    let Page {
+        grid,
+        layout,
+        effect,
+        panel,
+        colours,
+    } = page;
     let radius = grid.control_diameter / 2.0;
     let cy = top + REF + GAP + radius;
-    let effect = spec
-        .effects
-        .iter()
-        .find(|e| e.r#type == layout.r#type)
-        .ok_or_else(|| format!("no effect for layout {}", layout.name))?;
     let parameter = effect
         .parameters
         .iter()
         .find(|p| p.slot == slot)
         .ok_or_else(|| format!("{} has no slot {slot}", layout.name))?;
-    let presentation = spec
-        .panels
-        .iter()
-        .find(|p| p.r#type == layout.r#type)
-        .and_then(|p| p.slots.iter().find(|s| s.slot == slot));
+    let presentation = panel.and_then(|p| p.slots.iter().find(|s| s.slot == slot));
 
     let _ = write!(
         out,
@@ -545,7 +532,14 @@ fn draw(spec: &Spec, layout: &Layout) -> Result<String, String> {
         .ok_or_else(|| format!("no effect for layout {}", layout.name))?;
     let panel = spec.panels.iter().find(|p| p.r#type == layout.r#type);
     let grid = &spec.grid;
-    let colours = Palette::resolve(layout);
+    let page = Page {
+        grid,
+        layout,
+        effect,
+        panel,
+        colours: Palette::resolve(layout),
+    };
+    let colours = &page.colours;
 
     // Every row is as tall as the longest title on the page needs, so the
     // circles stay on one grid however long the words are.
@@ -596,7 +590,7 @@ fn draw(spec: &Spec, layout: &Layout) -> Result<String, String> {
 
     for (index, row) in layout.rows.iter().enumerate() {
         let top = HEADER + units(index) * row_height;
-        draw_row(&mut out, spec, layout, &colours, row, top)?;
+        draw_row(&mut out, &page, row, top)?;
     }
 
     out.push_str("\n</svg>\n");

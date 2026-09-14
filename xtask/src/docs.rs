@@ -16,6 +16,7 @@
 use std::fmt::Write as _;
 use std::path::Path;
 
+use crate::output::Output;
 use crate::spec::Spec;
 use crate::{diagrams, fx};
 
@@ -25,167 +26,81 @@ pub const DOC_PATH: &str = "docs/midi-spec.md";
 /// Path of the effects document, relative to the repository root.
 pub const EFFECTS_PATH: &str = "docs/effects.md";
 
-/// Outcome of a generation run.
-#[derive(Debug, PartialEq, Eq)]
-pub enum Outcome {
-    /// The file on disk already matched.
-    Current,
-    /// The file differed. It was rewritten unless the run was a check.
-    Stale,
-}
-
-/// Renders the marked regions and compares them against the file on disk.
-///
-/// Writes the result unless `check` is set.
+/// Loads the spec, then renders the documentation as [`generate`].
 ///
 /// # Errors
 ///
-/// Returns a message when the spec cannot be loaded, the document is missing,
-/// a marker pair is missing or malformed, or the file cannot be written.
-pub fn run(root: &Path, check: bool) -> Result<Outcome, String> {
-    let spec = Spec::load(root)?;
-    let diagrams = diagrams::all(&spec)?;
-    let drawings = fx::all(&spec)?;
-    let mut stale = write_diagram_sources(root, &diagrams, check)?;
-    stale |= write_drawings(root, &drawings, check)?;
+/// As [`generate`], or a message when the spec cannot be loaded.
+pub fn run(root: &Path, check: bool) -> Result<Vec<String>, String> {
+    generate(&Spec::load(root)?, root, check)
+}
+
+/// Renders the marked regions and the diagrams, and compares them against the
+/// files on disk.
+///
+/// Writes each file that differs unless `check` is set, and returns the paths,
+/// relative to the root, of the files that differed: the two documents, the
+/// diagram sources under `docs/diagrams/`, and the effect drawings under
+/// `docs/diagrams/fx/`. A diagram or drawing left behind by something renamed
+/// is removed, and counts as a stale path too.
+///
+/// # Errors
+///
+/// Returns a message when a document is missing, a marker pair is missing or
+/// malformed, or a file cannot be written.
+pub fn generate(spec: &Spec, root: &Path, check: bool) -> Result<Vec<String>, String> {
+    let diagrams = diagrams::all(spec)?;
+    let drawings = fx::all(spec)?;
+
+    let mut output = Output::new(root, check);
+    let sources: Vec<(String, String)> = diagrams
+        .iter()
+        .map(|d| (d.file_name(), d.file_contents()))
+        .collect();
+    output.sync_dir(diagrams::DIR, &sources, &["mmd", "svg"])?;
+    let panels: Vec<(String, &str)> = drawings
+        .iter()
+        .map(|d| (format!("{}.svg", d.id), d.source.as_str()))
+        .collect();
+    output.sync_dir(fx::DIR, &panels, &["svg"])?;
 
     for (path, sections) in [
         (
             DOC_PATH,
             vec![
-                ("structure", render_structure(&spec, &diagrams)?),
-                ("messages", render_messages(&spec)),
-                ("parameters", render_parameters(&spec)),
-                ("firmware", render_firmware(&spec)),
-                ("mapping", render_mapping(&spec)),
-                ("value-tables", render_value_tables(&spec)),
-                ("globals", render_globals(&spec)),
-                ("controllers", render_controllers(&spec)),
-                ("routing", render_routing(&spec)),
-                ("measurements", render_measurements(&spec)),
-                ("corrections", render_corrections(&spec)),
+                ("structure", render_structure(spec, &diagrams)?),
+                ("messages", render_messages(spec)),
+                ("parameters", render_parameters(spec)),
+                ("firmware", render_firmware(spec)),
+                ("mapping", render_mapping(spec)),
+                ("value-tables", render_value_tables(spec)),
+                ("globals", render_globals(spec)),
+                ("controllers", render_controllers(spec)),
+                ("routing", render_routing(spec)),
+                ("measurements", render_measurements(spec)),
+                ("corrections", render_corrections(spec)),
             ],
         ),
         (
             EFFECTS_PATH,
             vec![
-                ("grid", render_grid(&spec)),
-                ("effect-index", render_effect_index(&spec)),
-                ("effects", render_effects(&spec, &drawings)),
-                ("effect-corrections", render_effect_corrections(&spec)),
+                ("grid", render_grid(spec)),
+                ("effect-index", render_effect_index(spec)),
+                ("effects", render_effects(spec, &drawings)),
+                ("effect-corrections", render_effect_corrections(spec)),
             ],
         ),
     ] {
         let file = root.join(path);
-        let current =
+        let mut document =
             std::fs::read_to_string(&file).map_err(|e| format!("{}: {e}", file.display()))?;
-        let mut updated = current.clone();
         for (marker, body) in sections {
-            updated = splice(path, &updated, marker, &body)?;
+            document = splice(path, &document, marker, &body)?;
         }
-        if updated != current {
-            stale = true;
-            if !check {
-                std::fs::write(&file, updated).map_err(|e| format!("{}: {e}", file.display()))?;
-            }
-        }
+        output.write(path, &document)?;
     }
 
-    Ok(if stale {
-        Outcome::Stale
-    } else {
-        Outcome::Current
-    })
-}
-
-/// Writes each effect drawing to `docs/diagrams/fx/<id>.svg`, or reports staleness.
-///
-/// Returns whether any file differed from what is on disk.
-fn write_drawings(root: &Path, all: &[fx::Drawing], check: bool) -> Result<bool, String> {
-    let dir = root.join(fx::DIR);
-    if !check {
-        std::fs::create_dir_all(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
-    }
-    let mut stale = false;
-    for drawing in all {
-        let path = dir.join(format!("{}.svg", drawing.id));
-        if std::fs::read_to_string(&path).is_ok_and(|found| found == drawing.source) {
-            continue;
-        }
-        stale = true;
-        if !check {
-            std::fs::write(&path, &drawing.source)
-                .map_err(|e| format!("{}: {e}", path.display()))?;
-        }
-    }
-
-    // A drawing whose effect was renamed leaves its old file behind, and a
-    // stale panel in the directory is worse than no panel.
-    let wanted: Vec<String> = all.iter().map(|d| format!("{}.svg", d.id)).collect();
-    if let Ok(entries) = std::fs::read_dir(&dir) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.extension().is_none_or(|e| e != "svg") {
-                continue;
-            }
-            let name = entry.file_name().to_string_lossy().into_owned();
-            if wanted.contains(&name) {
-                continue;
-            }
-            stale = true;
-            if !check {
-                std::fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-            }
-        }
-    }
-    Ok(stale)
-}
-
-/// Writes each diagram to `docs/diagrams/<id>.<ext>`, or reports staleness.
-///
-/// Returns whether any file differed from what is on disk. A diagram source
-/// left behind by a renamed or re-kinded diagram is removed.
-fn write_diagram_sources(
-    root: &Path,
-    all: &[diagrams::Diagram],
-    check: bool,
-) -> Result<bool, String> {
-    let dir = root.join(diagrams::DIR);
-    if !check {
-        std::fs::create_dir_all(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
-    }
-
-    let mut stale = false;
-    for diagram in all {
-        let path = dir.join(diagram.file_name());
-        let wanted = diagram.file_contents();
-        if std::fs::read_to_string(&path).is_ok_and(|found| found == wanted) {
-            continue;
-        }
-        stale = true;
-        if !check {
-            std::fs::write(&path, &wanted).map_err(|e| format!("{}: {e}", path.display()))?;
-        }
-    }
-
-    let wanted: Vec<String> = all.iter().map(diagrams::Diagram::file_name).collect();
-    if let Ok(entries) = std::fs::read_dir(&dir) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if !path.is_file() || path.extension().is_none_or(|e| e != "mmd" && e != "svg") {
-                continue;
-            }
-            let name = entry.file_name().to_string_lossy().into_owned();
-            if wanted.contains(&name) {
-                continue;
-            }
-            stale = true;
-            if !check {
-                std::fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-            }
-        }
-    }
-    Ok(stale)
+    Ok(output.stale())
 }
 
 /// Replaces the text between `<!-- generated:NAME -->` and `<!-- /generated:NAME -->`.
@@ -222,7 +137,8 @@ fn cell(text: &str) -> String {
 ///
 /// # Errors
 ///
-/// Returns a message when a diagram is missing from the generated set.
+/// Returns a message when a diagram is missing from the generated set, or when
+/// a parameter group the prose describes is missing a parameter it names.
 fn render_structure(spec: &Spec, all: &[diagrams::Diagram]) -> Result<String, String> {
     let diagram = |id: &str| -> Result<&diagrams::Diagram, String> {
         all.iter()
@@ -263,21 +179,28 @@ fn render_structure(spec: &Spec, all: &[diagrams::Diagram]) -> Result<String, St
     out.push_str("Eight independent busses, each a source, a destination and a signed depth.\n\n");
     let _ = writeln!(out, "{}", embed("modulation-matrix")?);
 
-    let mut busses = spec
+    // The first bus is the group's first three offsets and the last bus its
+    // last three.
+    let busses: Vec<u16> = spec
         .parameters
         .iter()
         .filter(|p| p.group == "Mod Matrix")
-        .map(|p| p.offset);
-    let first = busses.next().unwrap_or(0);
+        .map(|p| p.offset)
+        .collect();
+    let (Some(first), Some(last)) = (busses.first_chunk::<3>(), busses.last_chunk::<3>()) else {
+        return Err("no parameters in group Mod Matrix".to_owned());
+    };
     let _ = writeln!(
         out,
         "Each bus occupies three consecutive offsets: source, destination, depth. \
-         Bus 1 is {first}, {}, {}, and bus 8 is {}, {}, {}.\n",
-        first + 1,
-        first + 2,
-        first + 21,
-        first + 22,
-        first + 23
+         Bus 1 is {}, {}, {}, and bus {} is {}, {}, {}.\n",
+        first[0],
+        first[1],
+        first[2],
+        busses.len() / 3,
+        last[0],
+        last[1],
+        last[2],
     );
 
     let _ = writeln!(out, "### {}\n", diagram("envelope")?.title);
@@ -287,17 +210,35 @@ fn render_structure(spec: &Spec, all: &[diagrams::Diagram]) -> Result<String, St
          from linear towards exponential in either direction.\n\n",
     );
     let _ = writeln!(out, "{}", embed("envelope")?);
-    out.push_str(
-        "| Stage | VCA | VCF | Mod |\n|---|---|---|---|\n\
-                  | Attack time | 53 | 62 | 71 |\n\
-                  | Decay time | 54 | 63 | 72 |\n\
-                  | Sustain level | 55 | 64 | 73 |\n\
-                  | Release time | 56 | 65 | 74 |\n\
-                  | Attack curve | 58 | 67 | 76 |\n\
-                  | Decay curve | 59 | 68 | 77 |\n\
-                  | Sustain curve | 60 | 69 | 78 |\n\
-                  | Release curve | 61 | 70 | 79 |\n",
-    );
+    out.push_str("| Stage | VCA | VCF | Mod |\n|---|---|---|---|\n");
+    // Each envelope's group names its parameters `<group> <stage>`, so a stage
+    // is found by the end of the name.
+    let stage = |group: &str, stage: &str| -> Result<u16, String> {
+        spec.parameters
+            .iter()
+            .filter(|p| p.group == group)
+            .find(|p| p.name.to_lowercase().ends_with(&stage.to_lowercase()))
+            .map(|p| p.offset)
+            .ok_or_else(|| format!("no {stage} parameter in group {group}"))
+    };
+    for name in [
+        "Attack time",
+        "Decay time",
+        "Sustain level",
+        "Release time",
+        "Attack curve",
+        "Decay curve",
+        "Sustain curve",
+        "Release curve",
+    ] {
+        let _ = writeln!(
+            out,
+            "| {name} | {} | {} | {} |",
+            stage("VCA Envelope", name)?,
+            stage("VCF Envelope", name)?,
+            stage("Mod Envelope", name)?,
+        );
+    }
 
     Ok(out)
 }
@@ -954,13 +895,11 @@ mod tests {
     /// Fails when a generated Markdown table has a row whose column count differs
     /// from its header.
     ///
-    /// Adding a column to a row and forgetting the header renders as a broken table
-    /// rather than an error, so it is worth checking rather than eyeballing.
+    /// A row with one more column than its header renders as a broken table
+    /// rather than an error.
     #[test]
     fn generated_tables_have_consistent_columns() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .unwrap_or(Path::new("."));
+        let root = crate::root();
         let columns = |line: &str| line.trim().trim_matches('|').split('|').count();
         for path in [DOC_PATH, EFFECTS_PATH] {
             let document = std::fs::read_to_string(root.join(path)).expect("document is readable");
@@ -1003,13 +942,11 @@ mod tests {
     /// a spec file without regenerating turns `cargo test` red.
     #[test]
     fn generated_documentation_is_current() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .unwrap_or(Path::new("."));
-        match run(root, true) {
-            Ok(Outcome::Current) => {}
-            Ok(Outcome::Stale) => panic!(
-                "{DOC_PATH} is out of date with spec/. Run `cargo xtask docs` and commit the result."
+        match generate(crate::spec::shared(), &crate::root(), true) {
+            Ok(stale) if stale.is_empty() => {}
+            Ok(stale) => panic!(
+                "out of date with spec/: {}. Run `cargo xtask docs` and commit the result.",
+                stale.join(", ")
             ),
             Err(message) => panic!("{message}"),
         }
