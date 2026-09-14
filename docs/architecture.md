@@ -392,7 +392,7 @@ can be sent and presumed to have landed. Every tracked value records which:
 ```rust
 pub enum Known<T> {
     Unknown,
-    Assumed { value: T, sent_at: u64 },   // sent, not confirmed
+    Assumed { value: T, at: u64 },        // sent, not confirmed
     Confirmed { value: T, at: u64 },      // came back in a dump
 }
 ```

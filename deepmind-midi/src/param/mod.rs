@@ -421,7 +421,8 @@ impl Group {
     /// Allocates nothing: it is a filter over [`ParamId::ALL`].
     pub fn parameters(self) -> impl Iterator<Item = ParamId> {
         ParamId::ALL
-            .into_iter()
+            .iter()
+            .copied()
             .filter(move |parameter| parameter.group() == self)
     }
 }
@@ -548,7 +549,7 @@ mod tests {
 
     #[test]
     fn every_offset_names_exactly_one_parameter() {
-        for (index, parameter) in ParamId::ALL.into_iter().enumerate() {
+        for (index, parameter) in ParamId::ALL.iter().copied().enumerate() {
             let offset = u8::try_from(index).expect("242 offsets fit in a byte");
             assert_eq!(parameter.offset(), offset);
             assert_eq!(ParamId::from_offset(offset), Ok(parameter));
@@ -573,7 +574,7 @@ mod tests {
     #[test]
     fn every_parameter_belongs_to_exactly_one_group() {
         let counted: usize = Group::ALL
-            .into_iter()
+            .iter()
             .map(|group| group.parameters().count())
             .sum();
         assert_eq!(counted, PARAMETER_COUNT);
@@ -667,7 +668,7 @@ mod tests {
     /// leave a host with a value it can address and cannot display.
     #[test]
     fn a_complete_value_table_names_every_value_its_parameter_accepts() {
-        for parameter in ParamId::ALL {
+        for parameter in ParamId::ALL.iter().copied() {
             let Kind::Enumerated(id) = parameter.kind() else {
                 continue;
             };
@@ -730,7 +731,7 @@ mod tests {
     /// NRPN can address. The two ends have to land exactly even so.
     #[test]
     fn a_control_change_reaches_the_ends_of_the_range_it_scales() {
-        for parameter in ParamId::ALL {
+        for parameter in ParamId::ALL.iter().copied() {
             assert_eq!(parameter.to_cc_value(parameter.min()), 0, "{parameter}");
             assert_eq!(parameter.to_cc_value(parameter.max()), 127, "{parameter}");
             assert_eq!(parameter.from_cc_value(0), parameter.min(), "{parameter}");

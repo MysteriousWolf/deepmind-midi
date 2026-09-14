@@ -128,7 +128,7 @@ impl Program {
             version,
             data: [0; Self::MAX_LEN],
         };
-        for parameter in ParamId::ALL {
+        for parameter in ParamId::ALL.iter().copied() {
             let min = u8::try_from(parameter.min()).unwrap_or(0);
             program.set_clamped(parameter, min);
         }
@@ -291,7 +291,8 @@ impl Program {
     /// Returns every parameter and the value it holds, in offset order.
     pub fn values(&self) -> impl Iterator<Item = (ParamId, u8)> + '_ {
         ParamId::ALL
-            .into_iter()
+            .iter()
+            .copied()
             .map(move |parameter| (parameter, self.get(parameter)))
     }
 
@@ -314,7 +315,7 @@ impl Program {
     /// # Ok::<(), deepmind_midi::Error>(())
     /// ```
     pub fn changes<'a>(&'a self, target: &'a Self) -> impl Iterator<Item = (ParamId, u8)> + 'a {
-        ParamId::ALL.into_iter().filter_map(move |parameter| {
+        ParamId::ALL.iter().copied().filter_map(move |parameter| {
             let value = target.get(parameter);
             (self.get(parameter) != value).then_some((parameter, value))
         })
@@ -570,7 +571,7 @@ mod tests {
     #[test]
     fn clamping_lands_inside_every_parameters_range() {
         let mut program = program();
-        for parameter in ParamId::ALL {
+        for parameter in ParamId::ALL.iter().copied() {
             for value in 0..=u8::MAX {
                 let stored = program.set_clamped(parameter, value);
                 assert_eq!(program.get(parameter), stored);
@@ -715,19 +716,19 @@ mod tests {
 
     #[test]
     fn every_value_of_every_table_survives_the_round_trip() {
-        for source in ModSource::ALL {
+        for source in ModSource::ALL.iter().copied() {
             assert_eq!(ModSource::from_raw(source.raw()), Some(source));
         }
-        for destination in ModDestination::ALL {
+        for destination in ModDestination::ALL.iter().copied() {
             assert_eq!(
                 ModDestination::from_raw(destination.raw()),
                 Some(destination)
             );
         }
-        for effect in FxType::ALL {
+        for effect in FxType::ALL.iter().copied() {
             assert_eq!(FxType::from_raw(effect.raw()), Some(effect));
         }
-        for shape in LfoShape::ALL {
+        for shape in LfoShape::ALL.iter().copied() {
             assert_eq!(LfoShape::from_raw(shape.raw()), Some(shape));
             assert_eq!(
                 Some(shape.name()),

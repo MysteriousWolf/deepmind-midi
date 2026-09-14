@@ -25,7 +25,7 @@ fuzz_target!(|data: &[u8]| {
         );
 
         // Reading every parameter, which is what a host does with a dump.
-        for parameter in ParamId::ALL {
+        for parameter in ParamId::ALL.iter().copied() {
             let value = program.get(parameter);
             let _ = parameter.label(u16::from(value));
         }

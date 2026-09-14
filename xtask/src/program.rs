@@ -175,6 +175,7 @@ fn render_value_enum(
 /// in the program either way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = \"serde\", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum {ident} {{"
     );
     for (entry, variant) in newest.entries.iter().zip(variants) {
@@ -210,8 +211,7 @@ fn render_value_header(ident: &str, table: &str, variants: &[String], out: &mut 
     pub const TABLE: TableId = TableId::{table};
 
     /// Every value, in the order the newest firmware numbers them.
-    pub const ALL: [Self; {}] = [",
-        variants.len()
+    pub const ALL: &'static [Self] = &[",
     );
     for variant in variants {
         let _ = writeln!(out, "        Self::{variant},");

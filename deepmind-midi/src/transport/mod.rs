@@ -215,6 +215,7 @@ where
     ///     Transport::new(Device::new(DeviceId::Unit(0)), port, clock);
     /// # let _ = (synth, small);
     /// ```
+    #[must_use]
     pub const fn new(device: Device<RX, TX, EV>, port: P, clock: C) -> Self {
         Self {
             device,
@@ -229,7 +230,9 @@ where
 
     /// Sets how long a quiet loop waits before reading the port again.
     ///
-    /// [`DEFAULT_POLL_MS`] otherwise. Zero spins.
+    /// [`DEFAULT_POLL_MS`] otherwise. Zero spins, and with a clock that only
+    /// moves in [`sleep_ms`](Clock::sleep_ms) it never moves at all, so a test
+    /// clock wants at least one.
     #[must_use]
     pub const fn with_poll_interval(mut self, milliseconds: u64) -> Self {
         self.interval = milliseconds;
@@ -237,6 +240,7 @@ where
     }
 
     /// Returns the device being driven, which is what holds the tracked state.
+    #[must_use]
     pub const fn device(&self) -> &Device<RX, TX, EV> {
         &self.device
     }
@@ -256,6 +260,7 @@ where
 
     /// Gives back the three pieces, so a host can put the port down and keep
     /// what was learned through it.
+    #[must_use]
     pub fn into_parts(self) -> (Device<RX, TX, EV>, P, C) {
         (self.device, self.port, self.clock)
     }
@@ -315,7 +320,7 @@ where
     /// Drives the loop until `ready` picks something out of the events, or
     /// `limit_ms` passes.
     ///
-    /// The escape hatch for waiting on something this module has no method for -
+    /// The escape hatch for waiting on something this module has no method for:
     /// a front-panel edit, a dump a host asked for through
     /// [`device_mut`](Transport::device_mut), a particular parameter landing.
     /// Events `ready` passes over are set aside for
@@ -391,8 +396,8 @@ where
     pub fn identity(&mut self) -> Result<Identity, Error<P::Error>> {
         self.device.request_identity()?;
         self.answer(Request::Identity, |event| match event {
-            Event::Identity(identity) => Some(*identity),
-            _ => None,
+            Event::Identity(identity) => Offer::Answer(identity),
+            other => Offer::Other(other),
         })
     }
 
@@ -409,8 +414,8 @@ where
     pub fn edit_buffer(&mut self) -> Result<Program, Error<P::Error>> {
         self.device.request_edit_buffer()?;
         self.answer(Request::EditBuffer, |event| match event {
-            Event::EditBuffer(program) => Some(program.clone()),
-            _ => None,
+            Event::EditBuffer(program) => Offer::Answer(program),
+            other => Offer::Other(other),
         })
     }
 
@@ -426,8 +431,8 @@ where
     pub fn program(&mut self, slot: Slot) -> Result<Program, Error<P::Error>> {
         self.device.request_program(slot)?;
         self.answer(Request::Program(slot), |event| match event {
-            Event::Program { slot: at, program } if *at == slot => Some(program.clone()),
-            _ => None,
+            Event::Program { slot: at, program } if at == slot => Offer::Answer(program),
+            other => Offer::Other(other),
         })
     }
 
@@ -436,8 +441,10 @@ where
     ///
     /// One request, one answer per program. The dumps are handed over by
     /// reference and not collected, because 128 of them is thirty kilobytes and
-    /// most hosts are writing each one somewhere as it lands. Returns how many
-    /// arrived, which is the length of the run when nothing went wrong.
+    /// most hosts are writing each one somewhere as it lands; nor are they set
+    /// aside for [`poll_event`](Transport::poll_event), since `on_program` is
+    /// where they went. Returns how many arrived, which is the length of the run
+    /// when nothing went wrong.
     ///
     /// Every dump is progress, so a slow transfer does not time out while it is
     /// still arriving; a gap longer than [`Device::timeout`] does.
@@ -477,12 +484,18 @@ where
         self.device.request_bank(bank, first, last)?;
         let mut read = 0usize;
         self.answer(Request::Bank { bank, first, last }, |event| match event {
-            Event::Program { slot, program } if slot.bank == bank => {
-                on_program(*slot, program);
+            Event::Program { slot, program }
+                if slot.bank == bank && (first.get()..=last.get()).contains(&slot.number.get()) =>
+            {
+                on_program(slot, &program);
                 read += 1;
-                (slot.number.get() == last.get()).then_some(())
+                if slot.number.get() == last.get() {
+                    Offer::Answer(())
+                } else {
+                    Offer::Progress
+                }
             }
-            _ => None,
+            other => Offer::Other(other),
         })?;
         Ok(read)
     }
@@ -517,31 +530,45 @@ where
     /// timeout starts. Waiting before the bytes went out would be measuring the
     /// wrong thing.
     ///
+    /// `extract` is offered each event and says what it was: the answer,
+    /// progress it consumed, or none of its business, in which case it gives
+    /// the event back to be set aside for [`poll_event`](Transport::poll_event).
+    ///
     /// Ends on the answer, on the device raising the timeout for the request, or
     /// on a silence longer than the device allows. The last is the backstop for
     /// a request the device is not timing, which happens past
-    /// [`MAX_PENDING`](crate::device::MAX_PENDING) concurrent ones.
+    /// [`MAX_PENDING`](crate::device::MAX_PENDING) concurrent ones. Silence is
+    /// the absence of `SysEx` traffic and of progress: notes and knob turns
+    /// arriving from the panel say the synthesizer is on, not that it is
+    /// answering.
     fn answer<T, F>(&mut self, request: Request, mut extract: F) -> Result<T, Error<P::Error>>
     where
-        F: FnMut(&Event) -> Option<T>,
+        F: FnMut(Event) -> Offer<T>,
     {
         let grace = self.device.timeout().saturating_add(self.interval);
         let mut quiet_since = self.clock.now_ms();
         loop {
             let read = self.pump()?;
             let mut seen = false;
+            let mut progress = false;
             while let Some(event) = self.device.poll_event() {
                 seen = true;
-                if let Some(value) = extract(&event) {
-                    return Ok(value);
-                }
+                progress |= is_sysex_traffic(&event);
+                let event = match extract(event) {
+                    Offer::Answer(value) => return Ok(value),
+                    Offer::Progress => {
+                        progress = true;
+                        continue;
+                    }
+                    Offer::Other(event) => event,
+                };
                 if event == Event::Timeout(request) {
                     return Err(Error::Timeout(request));
                 }
                 self.hold(event);
             }
             let now = self.clock.now_ms();
-            if seen {
+            if progress {
                 quiet_since = now;
             } else if now.saturating_sub(quiet_since) > grace {
                 return Err(Error::Timeout(request));
@@ -561,6 +588,34 @@ where
     }
 }
 
+/// What a wait made of an event it was offered.
+#[expect(
+    clippy::large_enum_variant,
+    reason = "the event is given back rather than copied, and lives only as long as one match"
+)]
+enum Offer<T> {
+    /// The answer, which ends the wait.
+    Answer(T),
+    /// Part of the answer, consumed; the wait goes on.
+    Progress,
+    /// Not the wait's business, given back to be set aside.
+    Other(Event),
+}
+
+/// Returns whether the event came out of a `SysEx` frame, which is the
+/// synthesizer talking to the host rather than the panel being played.
+const fn is_sysex_traffic(event: &Event) -> bool {
+    matches!(
+        event,
+        Event::EditBuffer(_)
+            | Event::Program { .. }
+            | Event::Identity(_)
+            | Event::Unhandled(_)
+            | Event::Failed(_)
+            | Event::Foreign { .. }
+    )
+}
+
 #[cfg(test)]
 #[expect(
     clippy::expect_used,
@@ -569,7 +624,7 @@ where
 )]
 mod tests {
     use super::*;
-    use crate::device::DEFAULT_TIMEOUT_MS;
+    use crate::device::{DEFAULT_TIMEOUT_MS, MAX_PENDING};
     use crate::ids::{DeviceId, ProtocolVersion};
     use crate::program::ProgramName;
     use crate::sysex::{Frame, Message, inquiry};
@@ -931,6 +986,56 @@ mod tests {
         );
     }
 
+    /// A dump from outside the run is somebody else's business: it is set
+    /// aside like any other event and does not count towards the run.
+    #[test]
+    fn a_dump_outside_the_run_is_held_rather_than_counted() {
+        let mut port = Port::new();
+        let mut frames = [[0; FRAME]; 3];
+        let numbers = [0, 5, 1];
+        for (number, out) in numbers.into_iter().zip(frames.iter_mut()) {
+            port.queue(program_dump(out, slot(number), &program("Bank Sound")));
+        }
+
+        let mut synth = transport(port);
+        let read = synth
+            .bank(
+                Bank::A,
+                ProgramNumber::new(0).expect("a program in range"),
+                ProgramNumber::new(1).expect("a program in range"),
+                |at, _| assert!(at.number.get() <= 1, "A6 is not in the run"),
+            )
+            .expect("two dumps");
+        assert_eq!(read, 2);
+        assert!(
+            matches!(synth.poll_event(), Some(Event::Program { slot, .. }) if slot == self::slot(5)),
+            "the stray dump comes back out afterwards"
+        );
+        assert_eq!(synth.poll_event(), None, "the run's own dumps do not");
+    }
+
+    /// Notes from the keyboard say the synthesizer is on, not that it is
+    /// answering, so they do not hold a wait open past the timeout.
+    #[test]
+    fn playing_the_keyboard_does_not_hold_a_wait_open() {
+        let mut port = Port::new().in_chunks_of(3);
+        // More notes than the impatient timeout has milliseconds of polls.
+        for _ in 0..200 {
+            port.queue(&[0x90, 0x3C, 0x40]);
+        }
+        let mut synth = impatient(port);
+        // Past MAX_PENDING, so the device is not timing this one and the
+        // backstop is what ends the wait.
+        for _ in 0..MAX_PENDING {
+            synth.device_mut().request_identity().expect("room");
+        }
+        assert_eq!(
+            synth.edit_buffer(),
+            Err(Error::Timeout(Request::EditBuffer)),
+            "notes are not an answer"
+        );
+    }
+
     #[test]
     fn a_bank_that_stops_partway_keeps_what_arrived() {
         let mut port = Port::new();
@@ -1099,7 +1204,7 @@ mod tests {
     fn the_ports_error_travels_through_unchanged() {
         let error: Error<Fault> = Error::Port(Fault);
 
-        assert_eq!(error.port(), Some(Fault));
+        assert_eq!(error.port(), Some(&Fault));
         assert_eq!(error.request(), None);
         assert_eq!(
             Error::<Fault>::Timeout(Request::EditBuffer).request(),

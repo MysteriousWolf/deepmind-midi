@@ -2,7 +2,7 @@
 //!
 //! This is where the layers below meet. Bytes off a port go in, a dump becomes a
 //! confirmed [`Program`], an edit becomes the NRPN messages that carry it, a
-//! request that goes unanswered becomes a [`Event::Timeout`], and bytes for the
+//! request that goes unanswered becomes an [`Event::Timeout`], and bytes for the
 //! port come out. It is also the first layer with a clock, in the sense that the
 //! host supplies one.
 //!
@@ -160,9 +160,8 @@ pub const DEFAULT_TIMEOUT_MS: u64 = 2_000;
 
 /// Requests that can be outstanding at once and still be timed.
 ///
-/// A host waiting on more than this many different answers at the same time is
-/// not really waiting on any of them. Beyond it, requests are still sent; they
-/// are simply not timed.
+/// Beyond it, requests are still sent; they are simply not timed, and never
+/// raise [`Event::Timeout`].
 pub const MAX_PENDING: usize = 8;
 
 /// A request that has gone out and is waiting for its answer.
@@ -230,8 +229,7 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
     /// Sets how long a request waits for its answer, in milliseconds.
     ///
     /// Zero times a request out at the first [`tick`](Device::tick) after it is
-    /// sent, which is a way of turning the mechanism off rather than a way of
-    /// making it strict.
+    /// sent, which is as strict as it gets. `u64::MAX` never times one out.
     #[must_use]
     pub const fn with_timeout(mut self, milliseconds: u64) -> Self {
         self.timeout = milliseconds;
@@ -307,9 +305,9 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
         self.tx.len()
     }
 
-    /// Returns how many more items the outbound queue holds.
+    /// Returns how many more items the outbound queue has room for.
     #[must_use]
-    pub const fn capacity(&self) -> usize {
+    pub const fn room(&self) -> usize {
         self.tx.remaining()
     }
 
@@ -326,7 +324,7 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
         self.pending = [const { None }; MAX_PENDING];
         self.program = Known::Unknown;
         self.identity = Known::Unknown;
-        self.nrpn = Nrpn::default();
+        self.nrpn = Nrpn::new();
     }
 
     /// Seeds the tracked program with one the host already has.
@@ -338,7 +336,7 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
     pub fn assume_program(&mut self, program: Program) {
         self.program = Known::Assumed {
             value: program,
-            sent_at: self.now,
+            at: self.now,
         };
     }
 
@@ -483,7 +481,7 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::ProgramOutOfRange`] when `last` is before `first`, and
+    /// Returns [`Error::EmptyRun`] when `last` is before `first`, and
     /// [`Error::QueueFull`] when the outbound queue has no room.
     pub fn request_bank(
         &mut self,
@@ -492,7 +490,10 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
         last: ProgramNumber,
     ) -> Result<()> {
         if last.get() < first.get() {
-            return Err(Error::ProgramOutOfRange(last.get()));
+            return Err(Error::EmptyRun {
+                first: first.get(),
+                last: last.get(),
+            });
         }
         self.ask(Request::Bank { bank, first, last })
     }
@@ -523,7 +524,7 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
     where
         F: FnOnce(&mut Program),
     {
-        let current = self.program.value().ok_or(Error::ProgramNotKnown)?.clone();
+        let current = self.program.value().ok_or(Error::ProgramNotKnown)?;
         let mut target = current.clone();
         edit(&mut target);
 
@@ -547,7 +548,7 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
         }
         self.program = Known::Assumed {
             value: target,
-            sent_at: self.now,
+            at: self.now,
         };
         Ok(needed)
     }
@@ -749,23 +750,21 @@ impl<const EV: usize> Inbound<'_, EV> {
         let Ok(byte) = u8::try_from(value) else {
             return;
         };
-        let Some(current) = self.program.value() else {
+        let Some(current) = self.program.value_mut() else {
             return;
         };
-        let mut updated = current.clone();
-        if updated.set(parameter, byte).is_err() {
+        if current.set(parameter, byte).is_err() {
             return;
         }
-        *self.program = if exact && self.program.is_confirmed() {
-            Known::Confirmed {
-                value: updated,
-                at: self.now,
+        // The value changed in place; only the claim is rewritten, and the
+        // program moves rather than copies.
+        let now = self.now;
+        *self.program = match core::mem::take(self.program) {
+            Known::Confirmed { value, .. } if exact => Known::Confirmed { value, at: now },
+            Known::Confirmed { value, .. } | Known::Assumed { value, .. } => {
+                Known::Assumed { value, at: now }
             }
-        } else {
-            Known::Assumed {
-                value: updated,
-                sent_at: self.now,
-            }
+            Known::Unknown => Known::Unknown,
         };
     }
 
@@ -783,7 +782,9 @@ impl<const EV: usize> Inbound<'_, EV> {
     /// Notes that the dump for `slot` arrived.
     ///
     /// A bank request is answered one dump at a time, so every dump inside its
-    /// range is progress and only the last one ends it.
+    /// range is progress and only the last one ends it. One dump answers every
+    /// outstanding request it fits, since a program asked for on its own and
+    /// again as part of a run arrives once.
     fn arrived(&mut self, slot: Slot) {
         let now = self.now;
         for entry in self.pending.iter_mut() {
@@ -793,7 +794,6 @@ impl<const EV: usize> Inbound<'_, EV> {
                     ..
                 }) if asked == slot => {
                     *entry = None;
-                    return;
                 }
                 Some(Pending {
                     request: Request::Bank { bank, first, last },
@@ -806,7 +806,6 @@ impl<const EV: usize> Inbound<'_, EV> {
                     } else if let Some(pending) = entry.as_mut() {
                         pending.sent_at = now;
                     }
-                    return;
                 }
                 _ => {}
             }
@@ -1252,6 +1251,25 @@ mod tests {
         assert_eq!(device.outstanding().count(), 0);
     }
 
+    /// A program asked for on its own and again inside a run arrives once, and
+    /// that one dump answers both.
+    #[test]
+    fn one_dump_answers_every_request_it_fits() {
+        let mut device: Device = Device::new(DeviceId::Unit(0)).with_timeout(100);
+        let first = ProgramNumber::new(0).expect("a program in range");
+        let last = ProgramNumber::new(1).expect("a program in range");
+        device.request_program(slot(Bank::A, 1)).expect("room");
+        device.request_bank(Bank::A, first, last).expect("room");
+        drain(&mut device);
+        assert_eq!(device.outstanding().count(), 2);
+
+        let sound = program("Lead");
+        feed_program(&mut device, slot(Bank::A, 0), &sound);
+        assert_eq!(device.outstanding().count(), 2, "progress on the run");
+        feed_program(&mut device, slot(Bank::A, 1), &sound);
+        assert_eq!(device.outstanding().count(), 0, "both were answered");
+    }
+
     #[test]
     fn a_bank_request_before_a_late_program_is_rejected() {
         let mut device: Device = Device::new(DeviceId::Unit(0));
@@ -1259,7 +1277,7 @@ mod tests {
         let last = ProgramNumber::new(2).expect("a program in range");
         assert_eq!(
             device.request_bank(Bank::A, first, last),
-            Err(Error::ProgramOutOfRange(2))
+            Err(Error::EmptyRun { first: 4, last: 2 })
         );
     }
 

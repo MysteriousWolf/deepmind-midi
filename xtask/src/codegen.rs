@@ -170,6 +170,7 @@ fn render_groups(spec: &Spec, out: &mut String) -> Result<(), String> {
 /// front panel is divided.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = \"serde\", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum Group {
 ",
     );
@@ -179,8 +180,7 @@ pub enum Group {
     out.push_str("}\n\nimpl Group {\n");
     let _ = writeln!(
         out,
-        "    /// Every group, in alphabetical order.\n    pub const ALL: [Self; {}] = [",
-        groups.len()
+        "    /// Every group, in alphabetical order.\n    pub const ALL: &'static [Self] = &[",
     );
     for ident in &idents {
         let _ = writeln!(out, "        Self::{ident},");
@@ -211,6 +211,7 @@ fn render_parameters(spec: &Spec, out: &mut String) -> Result<(), String> {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = \"serde\", derive(serde::Serialize, serde::Deserialize))]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum ParamId {
 ",
     );
@@ -224,7 +225,7 @@ pub enum ParamId {
     }
     out.push_str("}\n\nimpl ParamId {\n");
     out.push_str(
-        "    /// Every parameter, in offset order.\n    pub const ALL: [Self; PARAMETER_COUNT] = [\n",
+        "    /// Every parameter, in offset order: [`PARAMETER_COUNT`] of them.\n    pub const ALL: &'static [Self] = &[\n",
     );
     for ident in &idents {
         let _ = writeln!(out, "        Self::{ident},");
@@ -290,6 +291,7 @@ fn render_tables(spec: &Spec, out: &mut String) -> Result<(), String> {
 /// [`TableId::table_for`] is what picks between them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = \"serde\", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum TableId {
 ",
     );
@@ -304,8 +306,7 @@ pub enum TableId {
     out.push_str("}\n\nimpl TableId {\n");
     let _ = writeln!(
         out,
-        "    /// Every value table identifier, in alphabetical order.\n    pub const ALL: [Self; {}] = [",
-        ids.len()
+        "    /// Every value table identifier, in alphabetical order.\n    pub const ALL: &'static [Self] = &[",
     );
     for &id in &ids {
         let _ = writeln!(out, "        Self::{},", idents[id]);

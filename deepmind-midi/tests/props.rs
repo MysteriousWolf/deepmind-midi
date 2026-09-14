@@ -616,7 +616,7 @@ fn every_request_survives_a_frame() {
 fn random_program(rng: &mut Rng, version: ProtocolVersion) -> Program {
     let len = version.program_data_len();
     let mut program = Program::from_bytes(version, &vec![0; len]).expect("a zeroed program");
-    for parameter in ParamId::ALL {
+    for parameter in ParamId::ALL.iter().copied() {
         program.set_clamped(parameter, rng.byte());
     }
     program
@@ -688,7 +688,7 @@ fn the_diff_is_exactly_what_it_takes_to_become_the_target() {
                 .expect("a value from a program");
         }
 
-        for parameter in ParamId::ALL {
+        for parameter in ParamId::ALL.iter().copied() {
             assert_eq!(
                 applied.get(parameter),
                 target.get(parameter),

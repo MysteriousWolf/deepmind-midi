@@ -30,6 +30,7 @@ pub const DEFAULT_FIRMWARE: Version = Version { major: 1, minor: 1 };
 /// front panel is divided.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum Group {
     /// Arpeggiator.
     Arpeggiator,
@@ -63,7 +64,7 @@ pub enum Group {
 
 impl Group {
     /// Every group, in alphabetical order.
-    pub const ALL: [Self; 14] = [
+    pub const ALL: &'static [Self] = &[
         Self::Arpeggiator,
         Self::ControlSequencer,
         Self::Effects,
@@ -110,6 +111,7 @@ impl Group {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum ParamId {
     /// LFO 1 Rate.
     Lfo1Rate = 0,
@@ -598,8 +600,8 @@ pub enum ParamId {
 }
 
 impl ParamId {
-    /// Every parameter, in offset order.
-    pub const ALL: [Self; PARAMETER_COUNT] = [
+    /// Every parameter, in offset order: [`PARAMETER_COUNT`] of them.
+    pub const ALL: &'static [Self] = &[
         Self::Lfo1Rate,
         Self::Lfo1DelayFade,
         Self::Lfo1Shape,
@@ -2553,6 +2555,7 @@ impl ParamId {
 /// [`TableId::table_for`] is what picks between them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub enum TableId {
     /// Arpeggiator Clock Divider.
     ArpClock,
@@ -2612,7 +2615,7 @@ pub enum TableId {
 
 impl TableId {
     /// Every value table identifier, in alphabetical order.
-    pub const ALL: [Self; 27] = [
+    pub const ALL: &'static [Self] = &[
         Self::ArpClock,
         Self::ArpMode,
         Self::ArpPattern,

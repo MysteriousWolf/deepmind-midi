@@ -85,9 +85,9 @@ pub enum Event {
     },
     /// Events were dropped because the queue was full, and how many.
     ///
-    /// Raised once the queue has room again, so the count is what was missed
-    /// between the last event polled and the next one. A host seeing this is
-    /// feeding more between drains than its queue holds.
+    /// Polled once the queue has been emptied, so the count is what was missed
+    /// since the events before it. A host seeing this is feeding more between
+    /// polls than its queue holds.
     Lost(u16),
 }
 
