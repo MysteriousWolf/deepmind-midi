@@ -1,0 +1,51 @@
+# libFuzzer dictionary for the DeepMind SysEx framing.
+#
+# Without it the mutator has to guess a five-byte header before any input
+# reaches the code that decides what a payload means, and it does not. Twenty
+# seconds on the `frame` target, from an empty corpus: 42 coverage points
+# without this file and 434 with it. Half a million executions a second and
+# almost no coverage is the shape of a fuzzer bouncing off a magic number.
+#
+# Tokens are in `deepmind_midi::ids` (MANUFACTURER_ID, Model::MODEL_ID) and
+# `deepmind_midi::sysex::Command`.
+
+# The whole header, which is the token that matters: F0, manufacturer, model.
+header="\xF0\x00\x20\x32\x20"
+# Addressed to unit 0, and to everyone.
+header_unit0="\xF0\x00\x20\x32\x20\x00"
+header_broadcast="\xF0\x00\x20\x32\x20\x7F"
+
+sysex_start="\xF0"
+sysex_end="\xF7"
+manufacturer="\x00\x20\x32"
+model="\x20"
+broadcast="\x7F"
+
+# Commands.
+cmd_control_app_notify_request="\x00"
+cmd_program_dump_request="\x01"
+cmd_program_dump_response="\x02"
+cmd_edit_buffer_dump_request="\x03"
+cmd_edit_buffer_dump_response="\x04"
+cmd_global_dump_request="\x05"
+cmd_global_dump_response="\x06"
+cmd_user_pattern_dump_request="\x07"
+cmd_user_pattern_dump_response="\x08"
+cmd_program_bank_dump_request="\x09"
+cmd_bank_names_dump_request="\x0A"
+cmd_bank_names_dump_response="\x0B"
+cmd_single_name_dump_request="\x0C"
+cmd_single_name_dump_response="\x0D"
+cmd_edit_buffer_pattern_dump_request="\x0E"
+
+# Comms protocol versions, which decide how long a payload should be.
+version_6="\x06"
+version_7="\x07"
+
+# MIDI status bytes the decoder has to keep apart from a payload.
+note_on="\x90"
+control_change="\xB0"
+program_change="\xC0"
+pitch_bend="\xE0"
+clock="\xF8"
+active_sensing="\xFE"

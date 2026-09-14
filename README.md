@@ -10,11 +10,16 @@ and a tracked view of the synthesizer.
 DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 ```
 
-**Status: early.** The protocol is reverse-engineered, verified and written
-down. The code layers are landing one at a time: MIDI decoding, SysEx, the
-parameter table, programs, `.syx` files, the device state machine and the
-blocking transport adapter are in; the CLI is not. Enough to drive a synthesizer
-from a host that owns the port, and not yet run against one.
+**Status: early.** The protocol is reverse-engineered, verified against the
+manual and written down. Every layer is in: MIDI decoding, SysEx, the parameter
+table, programs, `.syx` files, the device state machine and the blocking
+transport adapter. Enough to drive a synthesizer from a host that owns the port,
+and not yet run against one - which is the gap that matters, and the one thing
+no amount of code here closes.
+
+There is no command-line tool and there will not be one. A host needs a MIDI
+backend, and refusing to have an opinion about which is the point of the
+library.
 
 ## Documentation
 
@@ -46,6 +51,17 @@ cargo +1.85.0 check --workspace --all-features   # the MSRV, which CI also check
 
 A current toolchain accepts things 1.85 does not, so the last line is worth
 running before pushing.
+
+Fuzzing needs nightly and `cargo-fuzz`, and lives in its own workspace under
+`fuzz/`:
+
+```sh
+cargo install cargo-fuzz
+cargo +nightly fuzz run frame -- -dict=fuzz/deepmind.dict   # or decoder, file, program
+```
+
+The dictionary is worth the flag: without it the mutator spends its time
+guessing at a five-byte SysEx header instead of at payloads.
 
 The factory preset packs are not in the repository, so the tests that read them
 skip unless you point them at your own copy:

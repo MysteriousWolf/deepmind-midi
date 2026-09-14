@@ -1,5 +1,8 @@
 [workspace]
 members = ["deepmind-midi", "xtask"]
+# `cargo fuzz` builds this one on nightly with sanitizer flags, and the library
+# must not inherit them.
+exclude = ["fuzz"]
 resolver = "3"
 
 [workspace.package]

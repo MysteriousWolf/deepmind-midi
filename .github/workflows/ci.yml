@@ -88,6 +88,57 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo check --workspace --all-features
 
+  fuzz:
+    name: fuzz targets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+            fuzz
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-fuzz
+
+      # A short run on every change. It is not a fuzzing campaign - it is a
+      # check that the targets still build and that nothing obvious regressed,
+      # which is what a pull request can afford. Real campaigns run for hours
+      # against a corpus, locally or on a schedule.
+      #
+      # The explicit --target is not optional. `cargo fuzz` defaults to the
+      # triple its own binary was built for, and the one installed here is
+      # musl-linked, so without this it cross-compiles the targets against a
+      # static libc and the sanitizer refuses: "sanitizer is incompatible with
+      # statically linked libc". Reading the triple off rustc asks the
+      # toolchain that will do the compiling.
+      - name: Fuzz
+        run: |
+          set -euo pipefail
+          host=$(rustc -vV | sed -n 's/^host: //p')
+          echo "building for $host"
+          for target in decoder frame file program; do
+            echo "::group::$target"
+            cargo fuzz run "$target" --target "$host" -- \
+              -max_total_time=60 \
+              -dict=fuzz/deepmind.dict \
+              -print_final_stats=1
+            echo "::endgroup::"
+          done
+        env:
+          # Sanitizers set their own; -D warnings is for the build.
+          RUSTFLAGS: -D warnings
+
+      - name: Upload any crash
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-artifacts
+          path: fuzz/artifacts
+          if-no-files-found: ignore
+
   docs:
     name: rustdoc
     runs-on: ubuntu-latest
