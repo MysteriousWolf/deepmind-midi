@@ -92,9 +92,11 @@ pub use name::ProgramName;
 
 use core::fmt;
 
+use crate::effect::{Algorithm, Engine};
 use crate::error::{Error, Result};
 use crate::ids::{PROGRAMS_PER_BANK, ProgramNumber, ProtocolVersion};
-use crate::param::{PARAMETER_COUNT, ParamId};
+use crate::param::{DEFAULT_FIRMWARE, PARAMETER_COUNT, ParamId};
+use crate::sysex::inquiry::Version;
 use crate::sysex::{Command, Message, PROGRAM_NAME_LEN, packed};
 
 /// One program: a sound, as the synthesizer stores and sends it.
@@ -255,6 +257,47 @@ impl Program {
             .get(usize::from(parameter.offset()))
             .copied()
             .unwrap_or(0)
+    }
+
+    /// Returns the algorithm an effect engine is running, on
+    /// [`DEFAULT_FIRMWARE`](crate::param::DEFAULT_FIRMWARE).
+    ///
+    /// The join between the twelve raw bytes the engine holds and what they
+    /// mean: [`Algorithm::slots`] says what each of them is, and
+    /// [`Engine::slot_parameter`] which byte to read.
+    ///
+    /// `None` when the stored byte names no algorithm, which a program written
+    /// on a firmware this one does not describe can do.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::Engine;
+    /// use deepmind_midi::ids::ProtocolVersion;
+    /// use deepmind_midi::param::ParamId;
+    /// use deepmind_midi::program::Program;
+    ///
+    /// let mut program = Program::new(ProtocolVersion::V7);
+    /// program.set(ParamId::Fx1Type, 2)?;                 // a Room Reverb
+    ///
+    /// let room = program.algorithm(Engine::One).expect("byte 2 names one");
+    /// assert_eq!(room.full_name, "Room Reverb");
+    /// assert_eq!(room.slot(3).map(|slot| slot.title), Some("Size"));
+    /// # Ok::<(), deepmind_midi::Error>(())
+    /// ```
+    #[must_use]
+    pub fn algorithm(&self, engine: Engine) -> Option<&'static Algorithm> {
+        self.algorithm_for(engine, DEFAULT_FIRMWARE)
+    }
+
+    /// Returns the algorithm an effect engine is running, on the firmware a
+    /// device inquiry reported.
+    ///
+    /// Worth reaching for wherever [`ParamId::label_for`] is: firmware 1.1
+    /// inserted an algorithm rather than appending one, so byte 33 is Rotary
+    /// Speaker on 1.0 and Vintage Pitch on 1.1, and every slot of the panel
+    /// follows from which of the two it is.
+    #[must_use]
+    pub fn algorithm_for(&self, engine: Engine, firmware: Version) -> Option<&'static Algorithm> {
+        Algorithm::for_value(self.get(engine.algorithm_parameter()), firmware)
     }
 
     /// Sets one parameter, refusing a value it does not accept.

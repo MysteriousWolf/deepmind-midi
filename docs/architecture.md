@@ -165,6 +165,7 @@ error     one error type; every rejection carries the offending value
 wire      MIDI bytes: message decode, running status, SysEx reassembly
 sysex     DeepMind framing, packed MS-bit codec, typed Message enum
 param     the parameter table: IDs, NRPN numbers, ranges, enums, formatting
+effect    the effect panels: what an engine's twelve bytes are, per algorithm
 program   Program: the dump's bytes, typed accessors, names, value types
 device    the sans-IO state machine: requests, timeouts, known state, events
 syx       .syx files and preset packs

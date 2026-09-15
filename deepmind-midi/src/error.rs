@@ -34,6 +34,8 @@ pub enum Error {
     ChannelOutOfRange(u8),
     /// A parameter offset was 242 or greater, so it names no parameter.
     ParameterOutOfRange(u8),
+    /// An effect engine number was outside the four the synthesizer has.
+    EngineOutOfRange(u8),
     /// A value was outside the range its parameter accepts.
     ValueOutOfRange {
         /// Offset of the parameter the value was meant for.
@@ -145,6 +147,9 @@ impl fmt::Display for Error {
                     f,
                     "parameter offset {offset} out of range, expected 0..=241"
                 )
+            }
+            Self::EngineOutOfRange(engine) => {
+                write!(f, "effect engine {engine} out of range, expected 1..=4")
             }
             Self::ValueOutOfRange {
                 parameter,

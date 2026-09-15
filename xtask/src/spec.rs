@@ -531,7 +531,17 @@ struct Firmwares {
 
 #[derive(Debug, Deserialize)]
 struct Effects {
+    meta: EffectsMeta,
     effect: Vec<Effect>,
+}
+
+/// What every effect engine has in common, whatever it is running.
+#[derive(Debug, Deserialize)]
+pub struct EffectsMeta {
+    /// Program offset of each engine's first parameter slot, in engine order.
+    pub engine_offsets: Vec<u16>,
+    /// Parameter slots one engine holds.
+    pub slots_per_engine: u8,
 }
 
 #[derive(Debug, Deserialize)]
@@ -555,6 +565,8 @@ pub struct Spec {
     pub controllers: Vec<Controller>,
     /// Effect algorithms, ordered by `FX Type` value.
     pub effects: Vec<Effect>,
+    /// What the four effect engines have in common.
+    pub engines: EffectsMeta,
     /// Firmware versions that change the protocol, oldest first.
     pub firmwares: Vec<Firmware>,
     /// Ways of carrying an address and a value over MIDI.
@@ -610,6 +622,7 @@ impl Spec {
             globals: globals.globals,
             controllers: controllers.controller,
             effects: effects.effect,
+            engines: effects.meta,
             firmwares: firmwares.firmware,
             transports: mapping.transport,
             encodings: mapping.encodings,
@@ -674,6 +687,7 @@ impl Spec {
         self.validate_enum_parameters()?;
         self.validate_controllers()?;
         self.validate_effects()?;
+        self.validate_engines()?;
         self.validate_layout()?;
         self.validate_routing()?;
         self.validate_measurements()?;
@@ -925,6 +939,66 @@ impl Spec {
                     "layout.toml: {} places slots {placed:?}, but effects.toml has {} of them",
                     layout.name,
                     effect.parameters.len()
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks that the engine offsets `effects.toml` declares are where the
+    /// parameter table actually puts the slots.
+    ///
+    /// The offsets are written down in two places — as a base per engine here,
+    /// and as 52 named parameters in `parameters.toml` — and a host addressing
+    /// a slot has to be able to trust that they agree. Naming them rather than
+    /// counting from a base is what makes a renamed parameter a build error.
+    fn validate_engines(&self) -> Result<(), String> {
+        let named = |offset: u16, name: &str| -> Result<(), String> {
+            let parameter = self
+                .parameters
+                .iter()
+                .find(|p| p.offset == offset)
+                .ok_or_else(|| format!("effects.toml: no parameter at offset {offset}"))?;
+            if parameter.name == name {
+                return Ok(());
+            }
+            Err(format!(
+                "effects.toml: offset {offset} should be {name:?} and parameters.toml calls it {:?}",
+                parameter.name
+            ))
+        };
+        let slots = u16::from(self.engines.slots_per_engine);
+        if slots == 0 {
+            return Err("effects.toml: an engine holds no slots".to_owned());
+        }
+        for (index, base) in self.engines.engine_offsets.iter().enumerate() {
+            let engine = index + 1;
+            // The type byte sits immediately before the engine's slots, which
+            // is what makes one base enough to describe an engine.
+            let before = base
+                .checked_sub(1)
+                .ok_or_else(|| format!("effects.toml: engine {engine} starts at offset 0"))?;
+            named(before, &format!("FX {engine} Type"))?;
+            for slot in 1..=slots {
+                named(base + slot - 1, &format!("FX {engine} Param {slot}"))?;
+            }
+            if !self
+                .parameters
+                .iter()
+                .any(|p| p.name == format!("FX {engine} Output Gain"))
+            {
+                return Err(format!(
+                    "effects.toml: parameters.toml has no FX {engine} Output Gain"
+                ));
+            }
+        }
+        for effect in &self.effects {
+            if effect.parameters.len() > usize::from(self.engines.slots_per_engine) {
+                return Err(format!(
+                    "effects.toml: {} has {} parameters, an engine holds {}",
+                    effect.name,
+                    effect.parameters.len(),
+                    self.engines.slots_per_engine
                 ));
             }
         }

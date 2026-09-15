@@ -23,7 +23,11 @@ use crate::spec::{Spec, ValueTable, version_parts};
 pub const CODE_PATH: &str = "deepmind-midi/src/param/generated.rs";
 
 /// Every generated source file, in the order they are written.
-pub const CODE_PATHS: [&str; 2] = [CODE_PATH, crate::program::CODE_PATH];
+pub const CODE_PATHS: [&str; 3] = [
+    CODE_PATH,
+    crate::program::CODE_PATH,
+    crate::effect::CODE_PATH,
+];
 
 /// Loads the spec, then renders the generated source files as [`generate`].
 ///
@@ -51,6 +55,10 @@ pub fn generate(spec: &Spec, root: &Path, check: bool) -> Result<Vec<String>, St
         (
             crate::program::CODE_PATH,
             crate::program::render(spec, &idents)?,
+        ),
+        (
+            crate::effect::CODE_PATH,
+            crate::effect::render(spec, &idents)?,
         ),
     ];
 

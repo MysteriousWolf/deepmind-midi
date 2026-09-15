@@ -34,9 +34,9 @@ device.edit(|p| p.set_vcf_frequency(200))?;        // becomes one NRPN message
 ```
 
 **Status: early.** Every layer is implemented and tested against the manual:
-MIDI decoding, SysEx, the 242-parameter table, programs, `.syx` files, the
-device state machine, a blocking transport adapter and a simulated
-synthesizer. None of it has been run against real hardware yet.
+MIDI decoding, SysEx, the 242-parameter table, the 35 effect panels, programs,
+`.syx` files, the device state machine, a blocking transport adapter and a
+simulated synthesizer. None of it has been run against real hardware yet.
 
 There is no command-line tool and there will not be one. A host needs a MIDI
 backend, and the library deliberately has no opinion about which.
@@ -72,7 +72,7 @@ has not replied yet, which is how a host's timeout path gets tested.
 | | |
 |---|---|
 | [Protocol](https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/midi-spec.md) | Signal path, SysEx, NRPN, all 242 parameters, the CC map, value tables |
-| [Effects](https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/effects.md) | All 35 algorithms: a drawing of each panel and what its twelve slots do |
+| [Effects](https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/effects.md) | All 35 algorithms: a drawing of each panel and what its twelve slots do, which the `effect` module also publishes |
 | [Architecture](https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/architecture.md) | Design, layering, testing, releases, status |
 | [`spec/`](https://github.com/MysteriousWolf/deepmind-midi/tree/main/spec) | The same protocol as TOML. Source of truth for the docs and the code |
 | [NOTICE](https://github.com/MysteriousWolf/deepmind-midi/blob/main/NOTICE) | Where the descriptions and panel colours come from |
