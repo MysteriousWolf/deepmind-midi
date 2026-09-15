@@ -27,8 +27,10 @@ use deepmind_midi::ids::{Bank, DeviceId, ProgramNumber, Slot};
 use deepmind_midi::param::ParamId;
 use deepmind_midi::program::Program;
 use deepmind_midi::sim::{Empty, Heard, Library, Synth};
+use deepmind_midi::sysex::Interface;
 use deepmind_midi::syx::File;
 use deepmind_midi::transport::{Clock, Error as TransportError, Port, Transport};
+use deepmind_midi::wire::Channel;
 
 mod common;
 
@@ -139,6 +141,30 @@ fn a_host_reads_the_firmware_the_unit_reports() {
     let mut host = transport(synth);
 
     assert_eq!(host.identity().expect("the unit answers"), expected);
+}
+
+/// The one message that says which program the unit is playing, which a host
+/// otherwise has to guess at from the edit buffer it read.
+#[test]
+fn a_host_reads_the_slot_the_unit_says_is_selected() {
+    let slot = Slot::new(
+        Bank::from_letter('C').expect("C is a bank"),
+        ProgramNumber::new(40).expect("a program in a bank"),
+    );
+    let synth: Synth = Synth::new(DeviceId::Unit(0), named("Bass Sweep"))
+        .with_interface(Interface::Usb)
+        .with_selected(slot);
+    let mut host = transport(synth);
+
+    let answer = host.control_app().expect("the unit answers");
+
+    assert_eq!(answer.slot(), slot);
+    assert_eq!(answer.interface, Interface::Usb);
+    assert_eq!(answer.receive_channel(), Some(Channel::ONE));
+    assert_eq!(answer.transmit_channel(), Some(Channel::ONE));
+    // Reported and not tracked: reading the selection says nothing about the
+    // sound, and the library does not pretend it did.
+    assert!(host.device().program().is_unknown());
 }
 
 /// The loop a librarian writes: read a bank off the unit, one dump at a time.

@@ -17,6 +17,7 @@
 //! | [`wire`]      | MIDI bytes: running status, channel messages, `SysEx` reassembly   |
 //! | [`sysex`]     | `DeepMind` framing, the packed MS-bit codec, typed messages        |
 //! | [`param`]     | The 242 program parameters: names, ranges, value tables, NRPN      |
+//! | [`effect`]    | What an effect engine's twelve bytes are, per algorithm            |
 //! | [`program`]   | A program: the 242 bytes, typed accessors, names, value types      |
 //! | [`syx`]       | `.syx` files: the programs a preset pack carries, and building one |
 //! | [`device`]    | The state machine: what the synthesizer holds, and what to send    |
@@ -72,6 +73,7 @@
 extern crate alloc;
 
 pub mod device;
+pub mod effect;
 pub mod error;
 pub mod ids;
 mod nrpn;
@@ -89,6 +91,7 @@ pub mod transport;
 pub mod wire;
 
 pub use device::{Device, Known};
+pub use effect::{Algorithm, Engine};
 pub use error::{Error, Result};
 pub use ids::{Bank, DeviceId, Model, PatternNumber, ProgramNumber, ProtocolVersion, Slot};
 pub use param::{Group, NrpnEdit, ParamId};

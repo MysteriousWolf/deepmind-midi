@@ -35,7 +35,7 @@
 //!
 //! Three value tables were renumbered by firmware 1.1, and nothing in a stored
 //! program says which firmware wrote it. The generated accessors assume
-//! [`DEFAULT_FIRMWARE`](crate::param::DEFAULT_FIRMWARE); where the host knows
+//! [`DEFAULT_FIRMWARE`]; where the host knows
 //! better, [`ModSource::from_raw_for`] and its neighbours take the version a
 //! device inquiry reported and [`Program::get`] hands them the byte.
 //!
@@ -92,9 +92,11 @@ pub use name::ProgramName;
 
 use core::fmt;
 
+use crate::effect::{Algorithm, Engine};
 use crate::error::{Error, Result};
 use crate::ids::{PROGRAMS_PER_BANK, ProgramNumber, ProtocolVersion};
-use crate::param::{PARAMETER_COUNT, ParamId};
+use crate::param::{DEFAULT_FIRMWARE, PARAMETER_COUNT, ParamId};
+use crate::sysex::inquiry::Version;
 use crate::sysex::{Command, Message, PROGRAM_NAME_LEN, packed};
 
 /// One program: a sound, as the synthesizer stores and sends it.
@@ -255,6 +257,47 @@ impl Program {
             .get(usize::from(parameter.offset()))
             .copied()
             .unwrap_or(0)
+    }
+
+    /// Returns the algorithm an effect engine is running, on
+    /// [`DEFAULT_FIRMWARE`].
+    ///
+    /// The join between the twelve raw bytes the engine holds and what they
+    /// mean: [`Algorithm::slots`] says what each of them is, and
+    /// [`Engine::slot_parameter`] which byte to read.
+    ///
+    /// `None` when the stored byte names no algorithm, which a program written
+    /// on a firmware this one does not describe can do.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::Engine;
+    /// use deepmind_midi::ids::ProtocolVersion;
+    /// use deepmind_midi::param::ParamId;
+    /// use deepmind_midi::program::Program;
+    ///
+    /// let mut program = Program::new(ProtocolVersion::V7);
+    /// program.set(ParamId::Fx1Type, 2)?;                 // a Room Reverb
+    ///
+    /// let room = program.algorithm(Engine::One).expect("byte 2 names one");
+    /// assert_eq!(room.full_name, "Room Reverb");
+    /// assert_eq!(room.slot(3).map(|slot| slot.title), Some("Size"));
+    /// # Ok::<(), deepmind_midi::Error>(())
+    /// ```
+    #[must_use]
+    pub fn algorithm(&self, engine: Engine) -> Option<&'static Algorithm> {
+        self.algorithm_for(engine, DEFAULT_FIRMWARE)
+    }
+
+    /// Returns the algorithm an effect engine is running, on the firmware a
+    /// device inquiry reported.
+    ///
+    /// Worth reaching for wherever [`ParamId::label_for`] is: firmware 1.1
+    /// inserted an algorithm rather than appending one, so byte 33 is Rotary
+    /// Speaker on 1.0 and Vintage Pitch on 1.1, and every slot of the panel
+    /// follows from which of the two it is.
+    #[must_use]
+    pub fn algorithm_for(&self, engine: Engine, firmware: Version) -> Option<&'static Algorithm> {
+        Algorithm::for_value(self.get(engine.algorithm_parameter()), firmware)
     }
 
     /// Sets one parameter, refusing a value it does not accept.
@@ -511,6 +554,7 @@ impl<'a> BankNames<'a> {
 mod tests {
     use super::*;
     use crate::ids::Bank;
+    use crate::param::Group;
     use crate::sysex::inquiry::Version;
 
     /// Firmware 1.0, which numbers three value tables differently.
@@ -518,6 +562,45 @@ mod tests {
 
     fn program() -> Program {
         Program::new(ProtocolVersion::V6)
+    }
+
+    /// Seventeen parameters holding a character each are one word to whoever
+    /// is reading them, and a host has to know which seventeen.
+    #[test]
+    fn the_name_is_the_parameters_at_the_offsets_the_field_occupies() {
+        assert_eq!(NAME_PARAMETERS.len(), NAME_LEN);
+        assert_eq!(
+            NAME_PARAMETERS.first().map(|parameter| parameter.offset()),
+            Some(NAME_OFFSET)
+        );
+        for (index, parameter) in NAME_PARAMETERS.iter().enumerate() {
+            let offset = NAME_OFFSET + u8::try_from(index).expect("seventeen fit in a byte");
+            assert_eq!(parameter.offset(), offset);
+            assert_eq!(parameter.group(), Group::Program);
+        }
+
+        // The seventeenth byte is the terminator and belongs to the field
+        // rather than to the name.
+        assert_eq!(NAME_PARAMETERS.len(), ProgramName::MAX_CHARS + 1);
+    }
+
+    /// A keystroke costs one message to the one character it moved, which is
+    /// what makes drawing the seventeen as one field free.
+    #[test]
+    fn naming_a_program_moves_only_the_characters_that_changed() {
+        let mut program = program();
+        program.set_name(ProgramName::new("Bass").expect("a name the display can write"));
+
+        let mut renamed = program.clone();
+        renamed.set_name(ProgramName::new("Bassy").expect("a name the display can write"));
+
+        let moved: Vec<(ParamId, u8)> = program.changes(&renamed).collect();
+        assert_eq!(moved, [(ParamId::ProgramNameChar5, b'y')]);
+        assert!(
+            moved
+                .iter()
+                .all(|(parameter, _)| NAME_PARAMETERS.contains(parameter))
+        );
     }
 
     #[test]

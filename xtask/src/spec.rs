@@ -55,6 +55,14 @@ pub struct EnumEntry {
     /// Longer explanation, where the manual gives one.
     #[serde(default)]
     pub description: Option<String>,
+    /// Program parameters this value names, by their `parameters.toml` names.
+    ///
+    /// The modulation matrix is what needs it: a destination is an
+    /// abbreviation the display prints, and this is what it moves. Empty is
+    /// both "nothing written yet" and "nothing a program parameter
+    /// addresses", and the two are told apart by the entry's description.
+    #[serde(default)]
+    pub parameters: Vec<String>,
 }
 
 /// A firmware version that changes the protocol.
@@ -523,7 +531,17 @@ struct Firmwares {
 
 #[derive(Debug, Deserialize)]
 struct Effects {
+    meta: EffectsMeta,
     effect: Vec<Effect>,
+}
+
+/// What every effect engine has in common, whatever it is running.
+#[derive(Debug, Deserialize)]
+pub struct EffectsMeta {
+    /// Program offset of each engine's first parameter slot, in engine order.
+    pub engine_offsets: Vec<u16>,
+    /// Parameter slots one engine holds.
+    pub slots_per_engine: u8,
 }
 
 #[derive(Debug, Deserialize)]
@@ -547,6 +565,8 @@ pub struct Spec {
     pub controllers: Vec<Controller>,
     /// Effect algorithms, ordered by `FX Type` value.
     pub effects: Vec<Effect>,
+    /// What the four effect engines have in common.
+    pub engines: EffectsMeta,
     /// Firmware versions that change the protocol, oldest first.
     pub firmwares: Vec<Firmware>,
     /// Ways of carrying an address and a value over MIDI.
@@ -602,6 +622,7 @@ impl Spec {
             globals: globals.globals,
             controllers: controllers.controller,
             effects: effects.effect,
+            engines: effects.meta,
             firmwares: firmwares.firmware,
             transports: mapping.transport,
             encodings: mapping.encodings,
@@ -663,8 +684,10 @@ impl Spec {
     fn validate(&self) -> Result<(), String> {
         self.validate_firmware()?;
         self.validate_parameters()?;
+        self.validate_enum_parameters()?;
         self.validate_controllers()?;
         self.validate_effects()?;
+        self.validate_engines()?;
         self.validate_layout()?;
         self.validate_routing()?;
         self.validate_measurements()?;
@@ -748,6 +771,58 @@ impl Spec {
                     "parameter {} ({}) has max {} but table {id} tops out at {highest}",
                     parameter.offset, parameter.name, parameter.max
                 ));
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Checks the parameters a value table's entries name.
+    ///
+    /// Three things, all of which are how this table stays maintained rather
+    /// than transcribed: every name has to resolve, an entry must not name the
+    /// same parameter twice, and the versions of a renumbered table have to
+    /// agree about what a name moves. The last one is the one that matters:
+    /// the firmware 1.0 destination table is derived from the 1.1 one, so a
+    /// mapping added to one and forgotten in the other is exactly the drift
+    /// nobody would notice.
+    fn validate_enum_parameters(&self) -> Result<(), String> {
+        let named = |name: &str| self.parameters.iter().any(|p| p.name == name);
+        for table in &self.tables {
+            for entry in &table.entries {
+                for (index, name) in entry.parameters.iter().enumerate() {
+                    if !named(name) {
+                        return Err(format!(
+                            "enums.toml: table {} value {} ({}) names unknown parameter {name:?}",
+                            table.id, entry.value, entry.name
+                        ));
+                    }
+                    if entry.parameters[..index].contains(name) {
+                        return Err(format!(
+                            "enums.toml: table {} value {} ({}) names parameter {name:?} twice",
+                            table.id, entry.value, entry.name
+                        ));
+                    }
+                }
+            }
+        }
+
+        for table in &self.tables {
+            for other in self.versions_of(&table.id) {
+                if core::ptr::eq(other, table) {
+                    continue;
+                }
+                for entry in &table.entries {
+                    let Some(twin) = other.entries.iter().find(|e| e.name == entry.name) else {
+                        continue;
+                    };
+                    if twin.parameters != entry.parameters {
+                        return Err(format!(
+                            "enums.toml: {:?} moves different parameters in {} and {}",
+                            entry.name, table.name, other.name
+                        ));
+                    }
+                }
             }
         }
 
@@ -864,6 +939,66 @@ impl Spec {
                     "layout.toml: {} places slots {placed:?}, but effects.toml has {} of them",
                     layout.name,
                     effect.parameters.len()
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks that the engine offsets `effects.toml` declares are where the
+    /// parameter table actually puts the slots.
+    ///
+    /// The offsets are written down in two places — as a base per engine here,
+    /// and as 52 named parameters in `parameters.toml` — and a host addressing
+    /// a slot has to be able to trust that they agree. Naming them rather than
+    /// counting from a base is what makes a renamed parameter a build error.
+    fn validate_engines(&self) -> Result<(), String> {
+        let named = |offset: u16, name: &str| -> Result<(), String> {
+            let parameter = self
+                .parameters
+                .iter()
+                .find(|p| p.offset == offset)
+                .ok_or_else(|| format!("effects.toml: no parameter at offset {offset}"))?;
+            if parameter.name == name {
+                return Ok(());
+            }
+            Err(format!(
+                "effects.toml: offset {offset} should be {name:?} and parameters.toml calls it {:?}",
+                parameter.name
+            ))
+        };
+        let slots = u16::from(self.engines.slots_per_engine);
+        if slots == 0 {
+            return Err("effects.toml: an engine holds no slots".to_owned());
+        }
+        for (index, base) in self.engines.engine_offsets.iter().enumerate() {
+            let engine = index + 1;
+            // The type byte sits immediately before the engine's slots, which
+            // is what makes one base enough to describe an engine.
+            let before = base
+                .checked_sub(1)
+                .ok_or_else(|| format!("effects.toml: engine {engine} starts at offset 0"))?;
+            named(before, &format!("FX {engine} Type"))?;
+            for slot in 1..=slots {
+                named(base + slot - 1, &format!("FX {engine} Param {slot}"))?;
+            }
+            if !self
+                .parameters
+                .iter()
+                .any(|p| p.name == format!("FX {engine} Output Gain"))
+            {
+                return Err(format!(
+                    "effects.toml: parameters.toml has no FX {engine} Output Gain"
+                ));
+            }
+        }
+        for effect in &self.effects {
+            if effect.parameters.len() > usize::from(self.engines.slots_per_engine) {
+                return Err(format!(
+                    "effects.toml: {} has {} parameters, an engine holds {}",
+                    effect.name,
+                    effect.parameters.len(),
+                    self.engines.slots_per_engine
                 ));
             }
         }
@@ -1315,6 +1450,34 @@ mod tests {
     fn firmware_ranges_split_into_numbers() {
         assert_eq!(version_parts("1.1+"), (1, 1));
         assert_eq!(version_parts("1.0"), (1, 0));
+    }
+
+    /// Every modulation destination either names the parameters it moves or
+    /// says why it names none.
+    ///
+    /// The blank and the not-yet-written look the same in the file, and this is
+    /// what keeps them apart: a destination added without a mapping fails here
+    /// rather than reaching a host as a silent empty answer.
+    #[test]
+    fn every_modulation_destination_is_accounted_for() {
+        let spec = spec();
+        let tables: Vec<_> = spec
+            .tables
+            .iter()
+            .filter(|table| table.id == "mod_destination")
+            .collect();
+        assert_eq!(tables.len(), 2, "one destination table per firmware");
+        for table in tables {
+            for entry in &table.entries {
+                assert!(
+                    !entry.parameters.is_empty() || entry.description.is_some(),
+                    "{}: {} ({}) names no parameter and does not say why",
+                    table.name,
+                    entry.value,
+                    entry.name
+                );
+            }
+        }
     }
 
     /// Fails when the library's command table drifts from `spec/messages.toml`.

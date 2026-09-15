@@ -47,7 +47,7 @@ const NAME_PREFIX: &str = "Program Name Char";
 /// parameters.
 pub fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     let mut out = String::from(HEADER);
-    render_name_field(spec, &mut out)?;
+    render_name_field(spec, idents, &mut out)?;
     render_values(spec, idents, &mut out)?;
     render_accessors(spec, idents, &mut out)?;
     Ok(out)
@@ -80,7 +80,7 @@ use crate::sysex::inquiry::Version;
 
 /// Renders where the program's name sits, which the parameter table states by
 /// naming seventeen consecutive bytes after it.
-fn render_name_field(spec: &Spec, out: &mut String) -> Result<(), String> {
+fn render_name_field(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
     let mut offsets: Vec<u16> = spec
         .parameters
         .iter()
@@ -108,6 +108,31 @@ pub const NAME_LEN: usize = {};
 ",
         offsets.len()
     );
+
+    out.push_str(
+        "\
+/// The parameters the program's name is stored in, in the order they print.
+///
+/// The instrument stores a name one character to a parameter, which is the
+/// truth about the wire and a lie about what a person is editing. A host
+/// drawing the parameter table needs to know which of its slots are the name,
+/// so that seventeen faders become the one field the display shows; this is
+/// that answer, and it moves with the field rather than being counted again.
+///
+/// Typing a letter still costs one message to the one parameter it moved:
+/// [`Program::set_name`] writes the field and
+/// [`Program::changes`](super::Program::changes) works out what that cost.
+pub static NAME_PARAMETERS: [ParamId; NAME_LEN] = [
+",
+    );
+    for offset in &offsets {
+        let ident = idents
+            .parameters
+            .get(usize::from(*offset))
+            .ok_or_else(|| format!("parameters.toml: no identifier for offset {offset}"))?;
+        let _ = writeln!(out, "    ParamId::{ident},");
+    }
+    out.push_str("];\n\n");
     Ok(())
 }
 
@@ -616,6 +641,7 @@ mod tests {
                     value: u16::try_from(value).unwrap_or(0),
                     name: (*name).to_owned(),
                     description: None,
+                    parameters: Vec::new(),
                 })
                 .collect(),
         }

@@ -32,6 +32,12 @@
 //! values it decodes into. That is [`Parameter`], reached through
 //! [`ParamId::info`].
 //!
+//! It also carries what one parameter's value says about another, which the
+//! modulation matrix is the whole of: a `Mod n Destination` holds an
+//! abbreviation the display prints, and [`ParamId::targets`] is which parameters
+//! that abbreviation moves. Empty where the destination names something no
+//! program parameter addresses, which the specification says beside the entry.
+//!
 //! It does not carry the manual's prose. Notes, displayed ranges and the places
 //! this specification departs from the printed table live in
 //! `docs/midi-spec.md`, addressed by the same offsets, which keeps them out of
@@ -129,6 +135,20 @@ pub struct ValueEntry {
     pub value: u16,
     /// Name as the synthesizer displays it.
     pub name: &'static str,
+    /// The program parameters this value names, where it names any.
+    ///
+    /// The modulation matrix is what this is for: a destination is an
+    /// abbreviation the display prints, `VCF Freq` or `All Attack`, and this
+    /// is the parameter table's own answer to what the abbreviation moves. A
+    /// slice rather than one parameter because several destinations plainly
+    /// move more than one, and empty where the destination names something no
+    /// program parameter addresses — the pitch a key is playing, the amplitude
+    /// of a voice — which is more honest than a wrong single answer.
+    ///
+    /// Empty for every other table, and for a mapping that has not been
+    /// established. `docs/midi-spec.md` prints the reason beside the
+    /// destinations that have one.
+    pub parameters: &'static [ParamId],
 }
 
 /// A named set of values, as of one firmware version.
@@ -168,6 +188,20 @@ impl ValueTable {
             .iter()
             .find(|entry| entry.value == value)
             .map(|entry| entry.name)
+    }
+
+    /// Returns the program parameters this table's `value` names.
+    ///
+    /// Empty both for a value this table does not list and for one that names
+    /// nothing a program parameter addresses; see
+    /// [`ValueEntry::parameters`] for what the difference is and where it is
+    /// written down.
+    #[must_use]
+    pub fn parameters_of(&self, value: u16) -> &'static [ParamId] {
+        self.entries
+            .iter()
+            .find(|entry| entry.value == value)
+            .map_or(&[], |entry| entry.parameters)
     }
 }
 
@@ -287,6 +321,27 @@ impl ParamId {
         self.info().group
     }
 
+    /// Returns the name without the group's, where the name starts with it.
+    ///
+    /// `VCF Envelope Depth` is `Envelope Depth`, because a panel prints its
+    /// group once as a heading and repeating it in every slot costs the width
+    /// the rest of the name needs. A name that does not start with its group is
+    /// returned whole, which is every parameter of the modulation matrix and of
+    /// the arpeggiator.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// assert_eq!(ParamId::VcfEnvelopeDepth.short_name(), "Envelope Depth");
+    /// assert_eq!(ParamId::Mod1Source.short_name(), "Mod 1 Source");
+    /// ```
+    #[must_use]
+    pub fn short_name(self) -> &'static str {
+        let name = self.name();
+        name.strip_prefix(self.group().name())
+            .map_or(name, |rest| rest.trim_start())
+    }
+
     /// Returns how the raw value is to be read.
     #[must_use]
     pub const fn kind(self) -> Kind {
@@ -356,10 +411,106 @@ impl ParamId {
         }
     }
 
+    /// Returns the named values this parameter accepts, on
+    /// [`DEFAULT_FIRMWARE`].
+    ///
+    /// `None` unless the parameter's table names **every** value it accepts,
+    /// which is the question a host has to answer before drawing a list.
+    /// A table that names some of them would make a control that silently
+    /// dropped the rest: opening the list on an unnamed value and picking the
+    /// nearest name is a control that moves the sound when somebody looks at
+    /// it. Where this answers `None` the raw value is the honest reading.
+    ///
+    /// Also `None` for a switch, whose two values [`label`](ParamId::label)
+    /// names and which a host draws as a light rather than a list.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// let shapes = ParamId::Lfo1Shape.choices().expect("all seven are named");
+    /// assert_eq!(shapes.len(), 7);
+    /// assert_eq!(shapes.first().map(|entry| entry.name), Some("Sine"));
+    ///
+    /// // A table that only writes down the start of a documented run cannot
+    /// // name the rest of it, and says so rather than guessing.
+    /// assert!(ParamId::Lfo1MonoMode.choices().is_none());
+    /// assert!(ParamId::Lfo1Rate.choices().is_none());
+    /// ```
+    #[must_use]
+    pub fn choices(self) -> Option<&'static [ValueEntry]> {
+        self.choices_for(DEFAULT_FIRMWARE)
+    }
+
+    /// Returns the named values this parameter accepts, on the firmware a
+    /// device inquiry reported.
+    ///
+    /// Worth reaching for wherever [`label_for`](ParamId::label_for) is: a list
+    /// drawn from the wrong firmware's table is a list of the wrong names.
+    #[must_use]
+    pub fn choices_for(self, firmware: Version) -> Option<&'static [ValueEntry]> {
+        let Kind::Enumerated(table) = self.kind() else {
+            return None;
+        };
+        let entries = table.table_for(firmware).entries;
+        // The entries are in value order, so the ones this parameter accepts
+        // are one run of them. Counting the run and comparing it with the range
+        // is what says the table covers the range rather than part of it.
+        let first = entries.iter().position(|entry| self.accepts(entry.value))?;
+        let run = entries.get(first..)?;
+        let named = run
+            .iter()
+            .take_while(|entry| self.accepts(entry.value))
+            .count();
+        let span = usize::from(self.max() - self.min()) + 1;
+        if named != span {
+            return None;
+        }
+        run.get(..named)
+    }
+
     /// Returns the controller that drives this parameter, if one does.
     #[must_use]
     pub fn controller(self) -> Option<&'static Controller> {
         Controller::for_parameter(self)
+    }
+
+    /// Returns the program parameters this parameter's `value` names, on
+    /// [`DEFAULT_FIRMWARE`].
+    ///
+    /// The modulation matrix is what has an answer: a `Mod n Destination`
+    /// holding 20 reads `VCF Freq` on the display and moves
+    /// [`ParamId::VcfFrequency`], and a host drawing the matrix beside the
+    /// panels is the caller. Empty for every parameter whose values name no
+    /// other parameter, and for a destination that names something no program
+    /// parameter addresses.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// assert_eq!(
+    ///     ParamId::Mod3Destination.targets(20),
+    ///     &[ParamId::VcfFrequency],
+    /// );
+    /// assert!(ParamId::Mod3Destination.targets(0).is_empty());   // Off
+    /// assert!(ParamId::Lfo1Rate.targets(64).is_empty());         // a sweep
+    /// ```
+    #[must_use]
+    pub fn targets(self, value: u16) -> &'static [ParamId] {
+        self.targets_for(value, DEFAULT_FIRMWARE)
+    }
+
+    /// Returns the program parameters this parameter's `value` names, on the
+    /// firmware a device inquiry reported.
+    ///
+    /// Worth reaching for wherever [`label_for`](ParamId::label_for) is, and
+    /// for the same reason: firmware 1.1 renumbered the destination table, so
+    /// 120 of its 130 entries mean something else on 1.0.
+    #[must_use]
+    pub fn targets_for(self, value: u16, firmware: Version) -> &'static [ParamId] {
+        match self.kind() {
+            Kind::Continuous | Kind::Switch => &[],
+            Kind::Enumerated(table) => table.table_for(firmware).parameters_of(value),
+        }
     }
 
     /// Builds an NRPN edit setting this parameter to `value`.
@@ -693,6 +844,179 @@ mod tests {
         assert_eq!(ParamId::Mod1Source.label_for(6, FIRMWARE_1_0), Some("LFO1"));
         assert_eq!(TableId::ModSource.table_for(FIRMWARE_1_0).entries.len(), 23);
         assert_eq!(TableId::ModSource.table().entries.len(), 25);
+    }
+
+    /// The join the modulation matrix needs: a destination is an abbreviation
+    /// the display prints, and this is what it addresses.
+    #[test]
+    fn a_modulation_destination_names_the_parameters_it_moves() {
+        assert_eq!(ParamId::Mod3Destination.label(20), Some("VCF Freq"));
+        assert_eq!(
+            ParamId::Mod3Destination.targets(20),
+            &[ParamId::VcfFrequency]
+        );
+
+        // Several destinations plainly move more than one, which is why this
+        // is a slice.
+        let attacks = ParamId::Mod1Destination.targets(25);
+        assert_eq!(ParamId::Mod1Destination.label(25), Some("All Attack"));
+        assert_eq!(attacks.len(), 3);
+        assert!(attacks.contains(&ParamId::VcfEnvelopeAttackTime));
+    }
+
+    /// Empty is an answer here, and it means two different things: a
+    /// destination that addresses nothing a program holds, and a parameter
+    /// whose values name no parameter at all.
+    #[test]
+    fn a_destination_that_addresses_nothing_says_so_by_naming_nothing() {
+        assert!(ParamId::Mod1Destination.targets(0).is_empty(), "Off");
+        // Oscillator pitch is played rather than stored.
+        assert_eq!(ParamId::Mod1Destination.label(11), Some("OSC1 Pitch"));
+        assert!(ParamId::Mod1Destination.targets(11).is_empty());
+
+        assert!(ParamId::Lfo1Rate.targets(64).is_empty(), "a sweep");
+        assert!(ParamId::Lfo1KeySync.targets(1).is_empty(), "a switch");
+        assert!(ParamId::Lfo1Shape.targets(3).is_empty(), "a named set");
+    }
+
+    /// The renumbering reaches the join as well as the names: destination 20 is
+    /// the filter cutoff on 1.1 and the filter's LFO depth on 1.0.
+    #[test]
+    fn the_firmware_moves_what_a_destination_addresses() {
+        assert_eq!(
+            ParamId::Mod1Destination.targets(20),
+            &[ParamId::VcfFrequency]
+        );
+        assert_eq!(
+            ParamId::Mod1Destination.targets_for(20, FIRMWARE_1_0),
+            &[ParamId::VcfLfoDepth]
+        );
+        assert_eq!(
+            ParamId::Mod1Destination.targets_for(17, FIRMWARE_1_0),
+            &[ParamId::VcfFrequency]
+        );
+    }
+
+    /// Every FX slot a destination names is an FX slot parameter, which is what
+    /// lets a host label the 48 bytes through the panel tables.
+    #[test]
+    fn every_effect_slot_is_reachable_from_the_matrix() {
+        let table = TableId::ModDestination.table();
+        let slots: Vec<ParamId> = table
+            .entries
+            .iter()
+            .flat_map(|entry| entry.parameters.iter().copied())
+            .filter(|parameter| parameter.group() == Group::Effects)
+            .collect();
+        // Four engines of twelve slots, and the four output gains.
+        assert_eq!(slots.len(), 4 * 12 + 4);
+    }
+
+    /// A destination naming a parameter twice, or naming one that does not
+    /// exist, is caught in the specification rather than here; what this
+    /// checks is that nothing generated a name the table cannot resolve.
+    #[test]
+    fn every_parameter_a_table_names_is_a_parameter() {
+        for id in TableId::ALL {
+            for entry in id.table().entries {
+                for parameter in entry.parameters {
+                    assert_eq!(
+                        ParamId::from_offset(parameter.offset()),
+                        Ok(*parameter),
+                        "{entry:?} in {id}"
+                    );
+                }
+            }
+        }
+    }
+
+    /// The order the panel is in, which a host would otherwise read off the
+    /// offsets itself. `ALL` is alphabetical and is not that order.
+    #[test]
+    fn the_groups_are_listed_twice_in_two_different_orders() {
+        assert_eq!(Group::ORDER.len(), Group::ALL.len());
+        for group in Group::ALL {
+            assert!(Group::ORDER.contains(group), "{group} is not laid out");
+        }
+
+        let starts: Vec<u8> = Group::ORDER
+            .iter()
+            .map(|group| {
+                group
+                    .parameters()
+                    .next()
+                    .expect("a group in the table has a parameter")
+                    .offset()
+            })
+            .collect();
+        let mut sorted = starts.clone();
+        sorted.sort_unstable();
+        assert_eq!(starts, sorted, "the order is not the instrument's own");
+        assert_eq!(Group::ORDER.first(), Some(&Group::Lfo1));
+        assert_eq!(Group::ORDER.last(), Some(&Group::Program));
+    }
+
+    /// A list is only honest where the table names every value the parameter
+    /// accepts; anywhere else the raw number is the reading.
+    #[test]
+    fn a_parameter_offers_a_list_only_when_every_value_has_a_name() {
+        let shapes = ParamId::Lfo1Shape.choices().expect("all seven are named");
+        assert_eq!(shapes.len(), usize::from(ParamId::Lfo1Shape.max()) + 1);
+        assert_eq!(shapes.first().map(|entry| entry.name), Some("Sine"));
+        assert_eq!(
+            shapes.last().map(|entry| entry.name),
+            Some("Sample & Glide")
+        );
+
+        // A table that writes down the start of a documented run names the
+        // first of 254 values and not the rest.
+        assert!(TableId::LfoMonoMode.table().partial);
+        assert!(ParamId::Lfo1MonoMode.choices().is_none());
+
+        assert!(ParamId::Lfo1Rate.choices().is_none(), "a sweep");
+        assert!(ParamId::Lfo1KeySync.choices().is_none(), "a switch");
+    }
+
+    /// Whatever a list offers has a name, which is what makes it safe to draw
+    /// as one: a host picking an entry never picks an unnamed value.
+    #[test]
+    fn every_value_a_list_offers_is_named_and_accepted() {
+        for firmware in [DEFAULT_FIRMWARE, FIRMWARE_1_0] {
+            for parameter in ParamId::ALL.iter().copied() {
+                let Some(choices) = parameter.choices_for(firmware) else {
+                    continue;
+                };
+                for entry in choices {
+                    assert!(parameter.accepts(entry.value), "{parameter}");
+                    assert_eq!(
+                        parameter.label_for(entry.value, firmware),
+                        Some(entry.name),
+                        "{parameter}"
+                    );
+                }
+                for value in parameter.min()..=parameter.max() {
+                    assert!(
+                        choices.iter().any(|entry| entry.value == value),
+                        "{parameter} offers a list that skips {value}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn a_parameter_name_drops_the_group_a_panel_already_prints() {
+        assert_eq!(ParamId::VcfEnvelopeDepth.short_name(), "Envelope Depth");
+        assert_eq!(ParamId::Lfo1Rate.short_name(), "Rate");
+        assert_eq!(ParamId::ProgramNameChar1.short_name(), "Name Char 1");
+        // A name that does not start with its group keeps all of itself.
+        assert_eq!(ParamId::Mod1Source.short_name(), "Mod 1 Source");
+
+        for parameter in ParamId::ALL.iter().copied() {
+            let short = parameter.short_name();
+            assert!(!short.is_empty(), "{parameter} shortens to nothing");
+            assert!(parameter.name().ends_with(short), "{parameter}");
+        }
     }
 
     #[test]

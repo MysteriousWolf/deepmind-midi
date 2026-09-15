@@ -23,7 +23,11 @@ use crate::spec::{Spec, ValueTable, version_parts};
 pub const CODE_PATH: &str = "deepmind-midi/src/param/generated.rs";
 
 /// Every generated source file, in the order they are written.
-pub const CODE_PATHS: [&str; 2] = [CODE_PATH, crate::program::CODE_PATH];
+pub const CODE_PATHS: [&str; 3] = [
+    CODE_PATH,
+    crate::program::CODE_PATH,
+    crate::effect::CODE_PATH,
+];
 
 /// Loads the spec, then renders the generated source files as [`generate`].
 ///
@@ -51,6 +55,10 @@ pub fn generate(spec: &Spec, root: &Path, check: bool) -> Result<Vec<String>, St
         (
             crate::program::CODE_PATH,
             crate::program::render(spec, &idents)?,
+        ),
+        (
+            crate::effect::CODE_PATH,
+            crate::effect::render(spec, &idents)?,
         ),
     ];
 
@@ -142,7 +150,7 @@ fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     let mut out = String::new();
     out.push_str(HEADER);
     render_counts(spec, &mut out);
-    render_groups(idents, &mut out);
+    render_groups(spec, idents, &mut out);
     render_parameters(spec, idents, &mut out)?;
     render_tables(spec, idents, &mut out)?;
     render_controllers(spec, idents, &mut out)?;
@@ -193,8 +201,17 @@ pub const DEFAULT_FIRMWARE: Version = Version {{
     );
 }
 
-fn render_groups(idents: &Identifiers, out: &mut String) {
+fn render_groups(spec: &Spec, idents: &Identifiers, out: &mut String) {
     let groups: Vec<&str> = idents.groups.keys().map(String::as_str).collect();
+    // The order the groups first appear in the parameter table, which is the
+    // order the instrument lays its panel out. Read off the offsets rather than
+    // written down, so a group a later parameter table adds lands in its place.
+    let mut laid_out: Vec<&str> = Vec::with_capacity(groups.len());
+    for parameter in &spec.parameters {
+        if !laid_out.contains(&parameter.group.as_str()) {
+            laid_out.push(parameter.group.as_str());
+        }
+    }
     let idents: Vec<&str> = idents.groups.values().map(String::as_str).collect();
 
     out.push_str(
@@ -218,6 +235,28 @@ pub enum Group {
         "    /// Every group, in alphabetical order.\n    pub const ALL: &'static [Self] = &[",
     );
     for ident in &idents {
+        let _ = writeln!(out, "        Self::{ident},");
+    }
+    out.push_str("    ];\n\n");
+    let _ = writeln!(
+        out,
+        "\
+    /// Every group, in the order the instrument lays them out.
+    ///
+    /// Not [`ALL`](Self::ALL), which is alphabetical and puts the effects third
+    /// and the oscillators eighth. A parameter's offset is its NRPN number and
+    /// its place in a dump, so the order the groups first appear in the table is
+    /// the order the panel is in: the LFOs, the oscillators, the filter, the
+    /// envelopes and the VCA, voicing, modulation, sequencing, the arpeggiator,
+    /// the effects, and the program's own settings last.
+    ///
+    /// Read off the parameter table rather than written down, so a group a later
+    /// specification adds arrives in its right place.
+    pub const ORDER: &'static [Self] = &["
+    );
+    for name in &laid_out {
+        let index = groups.iter().position(|group| group == name).unwrap_or(0);
+        let ident = idents.get(index).copied().unwrap_or("");
         let _ = writeln!(out, "        Self::{ident},");
     }
     out.push_str(
@@ -312,6 +351,14 @@ pub enum ParamId {
 }
 
 fn render_tables(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
+    // A value table entry names the parameters it moves under the names
+    // `parameters.toml` gives, which is what keeps the file readable by hand.
+    let by_name: BTreeMap<&str, &str> = spec
+        .parameters
+        .iter()
+        .zip(idents.parameters.iter())
+        .map(|(parameter, ident)| (parameter.name.as_str(), ident.as_str()))
+        .collect();
     let idents = &idents.tables;
     let ids: Vec<&str> = idents.keys().map(String::as_str).collect();
 
@@ -373,13 +420,35 @@ pub enum TableId {
         for entry in &table.entries {
             let _ = writeln!(
                 out,
-                "    ValueEntry {{ value: {}, name: {:?} }},",
-                entry.value, entry.name
+                "    ValueEntry {{ value: {}, name: {:?}, parameters: {} }},",
+                entry.value,
+                entry.name,
+                parameter_slice(&by_name, &entry.parameters)?
             );
         }
         out.push_str("] };\n\n");
     }
     Ok(())
+}
+
+/// Renders the parameters a value table entry names, as a `ParamId` slice.
+///
+/// The spec writes them under the names `parameters.toml` gives, which is what
+/// keeps the table readable; the loader has already checked that every one of
+/// them resolves.
+fn parameter_slice(by_name: &BTreeMap<&str, &str>, names: &[String]) -> Result<String, String> {
+    if names.is_empty() {
+        return Ok("&[]".to_owned());
+    }
+    let mut rendered = String::from("&[");
+    for name in names {
+        let ident = by_name
+            .get(name.as_str())
+            .ok_or_else(|| format!("enums.toml: no parameter named {name:?}"))?;
+        let _ = write!(rendered, "ParamId::{ident}, ");
+    }
+    rendered.push(']');
+    Ok(rendered)
 }
 
 /// Renders the body of one `table_for` arm: a static, or a chain choosing

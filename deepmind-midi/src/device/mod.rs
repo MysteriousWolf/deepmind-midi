@@ -85,6 +85,12 @@
 //! dump turns it back into [`Known::Confirmed`], and this layer never asks for
 //! one on its own: whether a resync is worth its latency is the host's call.
 //!
+//! Two answers are reported and deliberately not tracked. A stored program is
+//! not the sound the synthesizer is making, and a [`ControlApp`] reply names the
+//! slot the unit has selected at a moment nothing promises to repeat. Both
+//! arrive as events and are the host's to hold; a claim this layer could not
+//! keep honest is worse than no claim.
+//!
 //! # What arrives from the synthesizer
 //!
 //! Turning a knob on the front panel sends the parameter out, so inbound
@@ -122,10 +128,12 @@
 //! An event that does not fit is dropped and counted, and the count arrives as
 //! [`Event::Lost`] once the queue has room again. Nothing is dropped quietly.
 
+mod control_app;
 mod event;
 mod known;
 mod request;
 
+pub use control_app::ControlApp;
 pub use event::Event;
 pub use known::Known;
 pub use request::{MAX_OUTBOUND_LEN, Request};
@@ -455,6 +463,21 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
         self.ask(Request::Identity)
     }
 
+    /// Queues a control app notification, which is the only thing that reports
+    /// which program the synthesizer has selected.
+    ///
+    /// The answer arrives as [`Event::ControlApp`] and is not tracked: see
+    /// [`ControlApp`] for why. Announcing the host and reading the reply are
+    /// one message here because the protocol makes them one message; whether a
+    /// unit changes what it sends afterwards is a question for a cable.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::QueueFull`] when the outbound queue has no room.
+    pub fn request_control_app(&mut self) -> Result<()> {
+        self.ask(Request::ControlApp)
+    }
+
     /// Queues a request for the edit buffer, the program as it currently sounds.
     ///
     /// # Errors
@@ -687,6 +710,22 @@ impl<const EV: usize> Inbound<'_, EV> {
                     Err(error) => self.push(Event::Failed(error)),
                 }
             }
+            Message::ControlAppNotifyResponse {
+                rx_channel,
+                tx_channel,
+                interface,
+                bank,
+                program,
+            } => {
+                self.resolve(|request| request == Request::ControlApp);
+                self.push(Event::ControlApp(ControlApp {
+                    rx_channel,
+                    tx_channel,
+                    interface,
+                    bank,
+                    program,
+                }));
+            }
             _ => self.push(Event::Unhandled(message.command())),
         }
     }
@@ -825,7 +864,7 @@ mod tests {
     use crate::ids::ProtocolVersion;
     use crate::param::{DATA_ENTRY_LSB, DATA_ENTRY_MSB, NRPN_NUMBER_LSB, NRPN_NUMBER_MSB};
     use crate::program::ProgramName;
-    use crate::sysex::{Command, inquiry};
+    use crate::sysex::{Command, Interface, inquiry};
 
     /// Room for the longest frame these tests build, which is a program dump.
     const FRAME: usize = 320;
@@ -1316,6 +1355,99 @@ mod tests {
 
         assert_eq!(device.poll_event(), None);
         assert!(device.identity().is_unknown());
+    }
+
+    #[test]
+    fn a_control_app_reply_reports_what_the_interface_holds() {
+        let mut device: Device = Device::new(DeviceId::Unit(0));
+        device.request_control_app().expect("room in the queue");
+        drain(&mut device);
+        assert_eq!(
+            device.outstanding().next(),
+            Some(Request::ControlApp),
+            "announcing the host is a request like any other"
+        );
+
+        let mut out = [0; FRAME];
+        device.feed(frame(
+            &mut out,
+            Message::ControlAppNotifyResponse {
+                rx_channel: 1,
+                tx_channel: 0,
+                interface: Interface::Usb,
+                bank: Bank::from_letter('C').expect("C is a bank"),
+                program: ProgramNumber::new(40).expect("a program in a bank"),
+            },
+        ));
+
+        let Some(Event::ControlApp(answer)) = device.poll_event() else {
+            panic!("the only message that names the selected program was dropped");
+        };
+        assert_eq!(answer.slot().to_string(), "C41");
+        assert_eq!(answer.interface, Interface::Usb);
+        assert_eq!(answer.receive_channel(), Some(Channel::ONE));
+        assert_eq!(answer.transmit_channel(), Some(Channel::ONE));
+        assert_eq!(device.outstanding().count(), 0, "the request was answered");
+    }
+
+    /// Reported and not tracked: the selected program is the synthesizer's to
+    /// change at its own panel, and nothing here would hear it.
+    #[test]
+    fn a_control_app_reply_leaves_the_tracked_program_alone() {
+        let mut device: Device = Device::new(DeviceId::Unit(0));
+        feed_edit_buffer(&mut device, &program("Bass Sweep"));
+        while device.poll_event().is_some() {}
+
+        let mut out = [0; FRAME];
+        device.feed(frame(
+            &mut out,
+            Message::ControlAppNotifyResponse {
+                rx_channel: 0,
+                tx_channel: 0,
+                interface: Interface::Midi,
+                bank: Bank::A,
+                program: ProgramNumber::FIRST,
+            },
+        ));
+
+        assert!(matches!(device.poll_event(), Some(Event::ControlApp(_))));
+        assert!(device.program().is_confirmed());
+        assert_eq!(
+            device.program().value().map(Program::name),
+            Some(ProgramName::new("Bass Sweep").expect("a name the display can write"))
+        );
+    }
+
+    #[test]
+    fn an_unanswered_control_app_notification_times_out_like_the_rest() {
+        let mut device: Device = Device::new(DeviceId::Unit(0));
+        device.request_control_app().expect("room in the queue");
+        drain(&mut device);
+
+        device.tick(DEFAULT_TIMEOUT_MS);
+
+        assert_eq!(
+            device.poll_event(),
+            Some(Event::Timeout(Request::ControlApp))
+        );
+        assert_eq!(device.outstanding().count(), 0);
+    }
+
+    /// The manual prints one reserved byte and does not say what it is for, so
+    /// the request this layer sends is the frame the manual prints with a zero
+    /// in it.
+    #[test]
+    fn a_control_app_notification_is_the_frame_the_manual_prints() {
+        let mut device: Device = Device::new(DeviceId::Unit(0));
+        device.request_control_app().expect("room in the queue");
+        let mut port = Port::new();
+        device
+            .drain_tx(|bytes| port.send(bytes))
+            .expect("the port took it");
+        assert_eq!(
+            port.sent(),
+            &[0xF0, 0x00, 0x20, 0x32, 0x20, 0x00, 0x00, 0x00, 0xF7]
+        );
     }
 
     #[test]

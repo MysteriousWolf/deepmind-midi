@@ -34,6 +34,7 @@ const STORED: u8 = 4;
 #[derive(Arbitrary, Debug)]
 enum Action {
     Identity,
+    ControlApp,
     EditBuffer,
     Program {
         bank: u8,
@@ -100,6 +101,7 @@ fn number(byte: u8) -> ProgramNumber {
 fn act(device: &mut Device, action: Action) -> bool {
     match action {
         Action::Identity => device.request_identity().is_ok(),
+        Action::ControlApp => device.request_control_app().is_ok(),
         Action::EditBuffer => device.request_edit_buffer().is_ok(),
         Action::Program { bank: b, number: n } => device
             .request_program(Slot::new(bank(b), number(n)))
