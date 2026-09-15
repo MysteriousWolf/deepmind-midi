@@ -201,7 +201,7 @@ Two commands generate from these files:
 | Command | Output |
 |---|---|
 | `cargo xtask docs` | The tables in [`midi-spec.md`](midi-spec.md), the algorithms in [`effects.md`](effects.md), and everything under `docs/diagrams/`: the Mermaid sources, the envelope figure and a panel drawing per effect |
-| `cargo xtask codegen` | `deepmind-midi/src/param/generated.rs`, the 242 parameters as an enum whose discriminant is the NRPN number, with their groups, ranges, value tables per firmware and the controller map; and `deepmind-midi/src/program/generated.rs`, one Rust type per value table and a getter and setter for each of the 225 parameters that are not the program's name |
+| `cargo xtask codegen` | `deepmind-midi/src/param/generated.rs`, the 242 parameters as an enum whose discriminant is the NRPN number, with their groups, ranges, value tables per firmware, the parameters each modulation destination moves, and the controller map; `deepmind-midi/src/program/generated.rs`, one Rust type per value table and a getter and setter for each of the 225 parameters that are not the program's name; and `deepmind-midi/src/effect/generated.rs`, the 35 algorithms and what each of their slots is |
 
 The library is compiled for targets with no filesystem and no allocator, so
 the specification is compiled in rather than parsed at runtime.
@@ -227,9 +227,12 @@ than auto-commits to contributor branches.
 0..=241 exactly, every referenced value table must exist, an enumerated
 parameter's maximum must match its table, no controller number may repeat, no
 two controllers may claim the same parameter, every value table id must
-resolve to exactly one table per firmware version, every routing graph must be
-connected and its feedback flag must match the graph, and the slot count
-measured off each FX page must match `effects.toml`.
+resolve to exactly one table per firmware version, every parameter a value
+table entry names must exist and must be the same one in both firmware
+versions of that table, every routing graph must be connected and its feedback
+flag must match the graph, the engine offsets `effects.toml` declares must be
+where `parameters.toml` puts the slots, and the slot count measured off each FX
+page must match `effects.toml`.
 
 These checks have caught real errors: the parameter table carrying firmware
 1.0 ranges against firmware 1.1 value tables, and a twelfth slot on
