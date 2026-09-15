@@ -32,6 +32,12 @@
 //! values it decodes into. That is [`Parameter`], reached through
 //! [`ParamId::info`].
 //!
+//! It also carries what one parameter's value says about another, which the
+//! modulation matrix is the whole of: a `Mod n Destination` holds an
+//! abbreviation the display prints, and [`ParamId::targets`] is which parameters
+//! that abbreviation moves. Empty where the destination names something no
+//! program parameter addresses, which the specification says beside the entry.
+//!
 //! It does not carry the manual's prose. Notes, displayed ranges and the places
 //! this specification departs from the printed table live in
 //! `docs/midi-spec.md`, addressed by the same offsets, which keeps them out of
@@ -129,6 +135,20 @@ pub struct ValueEntry {
     pub value: u16,
     /// Name as the synthesizer displays it.
     pub name: &'static str,
+    /// The program parameters this value names, where it names any.
+    ///
+    /// The modulation matrix is what this is for: a destination is an
+    /// abbreviation the display prints, `VCF Freq` or `All Attack`, and this
+    /// is the parameter table's own answer to what the abbreviation moves. A
+    /// slice rather than one parameter because several destinations plainly
+    /// move more than one, and empty where the destination names something no
+    /// program parameter addresses — the pitch a key is playing, the amplitude
+    /// of a voice — which is more honest than a wrong single answer.
+    ///
+    /// Empty for every other table, and for a mapping that has not been
+    /// established. `docs/midi-spec.md` prints the reason beside the
+    /// destinations that have one.
+    pub parameters: &'static [ParamId],
 }
 
 /// A named set of values, as of one firmware version.
@@ -168,6 +188,20 @@ impl ValueTable {
             .iter()
             .find(|entry| entry.value == value)
             .map(|entry| entry.name)
+    }
+
+    /// Returns the program parameters this table's `value` names.
+    ///
+    /// Empty both for a value this table does not list and for one that names
+    /// nothing a program parameter addresses; see
+    /// [`ValueEntry::parameters`] for what the difference is and where it is
+    /// written down.
+    #[must_use]
+    pub fn parameters_of(&self, value: u16) -> &'static [ParamId] {
+        self.entries
+            .iter()
+            .find(|entry| entry.value == value)
+            .map_or(&[], |entry| entry.parameters)
     }
 }
 
@@ -360,6 +394,45 @@ impl ParamId {
     #[must_use]
     pub fn controller(self) -> Option<&'static Controller> {
         Controller::for_parameter(self)
+    }
+
+    /// Returns the program parameters this parameter's `value` names, on
+    /// [`DEFAULT_FIRMWARE`].
+    ///
+    /// The modulation matrix is what has an answer: a `Mod n Destination`
+    /// holding 20 reads `VCF Freq` on the display and moves
+    /// [`ParamId::VcfFrequency`], and a host drawing the matrix beside the
+    /// panels is the caller. Empty for every parameter whose values name no
+    /// other parameter, and for a destination that names something no program
+    /// parameter addresses.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// assert_eq!(
+    ///     ParamId::Mod3Destination.targets(20),
+    ///     &[ParamId::VcfFrequency],
+    /// );
+    /// assert!(ParamId::Mod3Destination.targets(0).is_empty());   // Off
+    /// assert!(ParamId::Lfo1Rate.targets(64).is_empty());         // a sweep
+    /// ```
+    #[must_use]
+    pub fn targets(self, value: u16) -> &'static [ParamId] {
+        self.targets_for(value, DEFAULT_FIRMWARE)
+    }
+
+    /// Returns the program parameters this parameter's `value` names, on the
+    /// firmware a device inquiry reported.
+    ///
+    /// Worth reaching for wherever [`label_for`](ParamId::label_for) is, and
+    /// for the same reason: firmware 1.1 renumbered the destination table, so
+    /// 120 of its 130 entries mean something else on 1.0.
+    #[must_use]
+    pub fn targets_for(self, value: u16, firmware: Version) -> &'static [ParamId] {
+        match self.kind() {
+            Kind::Continuous | Kind::Switch => &[],
+            Kind::Enumerated(table) => table.table_for(firmware).parameters_of(value),
+        }
     }
 
     /// Builds an NRPN edit setting this parameter to `value`.
@@ -693,6 +766,90 @@ mod tests {
         assert_eq!(ParamId::Mod1Source.label_for(6, FIRMWARE_1_0), Some("LFO1"));
         assert_eq!(TableId::ModSource.table_for(FIRMWARE_1_0).entries.len(), 23);
         assert_eq!(TableId::ModSource.table().entries.len(), 25);
+    }
+
+    /// The join the modulation matrix needs: a destination is an abbreviation
+    /// the display prints, and this is what it addresses.
+    #[test]
+    fn a_modulation_destination_names_the_parameters_it_moves() {
+        assert_eq!(ParamId::Mod3Destination.label(20), Some("VCF Freq"));
+        assert_eq!(
+            ParamId::Mod3Destination.targets(20),
+            &[ParamId::VcfFrequency]
+        );
+
+        // Several destinations plainly move more than one, which is why this
+        // is a slice.
+        let attacks = ParamId::Mod1Destination.targets(25);
+        assert_eq!(ParamId::Mod1Destination.label(25), Some("All Attack"));
+        assert_eq!(attacks.len(), 3);
+        assert!(attacks.contains(&ParamId::VcfEnvelopeAttackTime));
+    }
+
+    /// Empty is an answer here, and it means two different things: a
+    /// destination that addresses nothing a program holds, and a parameter
+    /// whose values name no parameter at all.
+    #[test]
+    fn a_destination_that_addresses_nothing_says_so_by_naming_nothing() {
+        assert!(ParamId::Mod1Destination.targets(0).is_empty(), "Off");
+        // Oscillator pitch is played rather than stored.
+        assert_eq!(ParamId::Mod1Destination.label(11), Some("OSC1 Pitch"));
+        assert!(ParamId::Mod1Destination.targets(11).is_empty());
+
+        assert!(ParamId::Lfo1Rate.targets(64).is_empty(), "a sweep");
+        assert!(ParamId::Lfo1KeySync.targets(1).is_empty(), "a switch");
+        assert!(ParamId::Lfo1Shape.targets(3).is_empty(), "a named set");
+    }
+
+    /// The renumbering reaches the join as well as the names: destination 20 is
+    /// the filter cutoff on 1.1 and the filter's LFO depth on 1.0.
+    #[test]
+    fn the_firmware_moves_what_a_destination_addresses() {
+        assert_eq!(
+            ParamId::Mod1Destination.targets(20),
+            &[ParamId::VcfFrequency]
+        );
+        assert_eq!(
+            ParamId::Mod1Destination.targets_for(20, FIRMWARE_1_0),
+            &[ParamId::VcfLfoDepth]
+        );
+        assert_eq!(
+            ParamId::Mod1Destination.targets_for(17, FIRMWARE_1_0),
+            &[ParamId::VcfFrequency]
+        );
+    }
+
+    /// Every FX slot a destination names is an FX slot parameter, which is what
+    /// lets a host label the 48 bytes through the panel tables.
+    #[test]
+    fn every_effect_slot_is_reachable_from_the_matrix() {
+        let table = TableId::ModDestination.table();
+        let slots: Vec<ParamId> = table
+            .entries
+            .iter()
+            .flat_map(|entry| entry.parameters.iter().copied())
+            .filter(|parameter| parameter.group() == Group::Effects)
+            .collect();
+        // Four engines of twelve slots, and the four output gains.
+        assert_eq!(slots.len(), 4 * 12 + 4);
+    }
+
+    /// A destination naming a parameter twice, or naming one that does not
+    /// exist, is caught in the specification rather than here; what this
+    /// checks is that nothing generated a name the table cannot resolve.
+    #[test]
+    fn every_parameter_a_table_names_is_a_parameter() {
+        for id in TableId::ALL {
+            for entry in id.table().entries {
+                for parameter in entry.parameters {
+                    assert_eq!(
+                        ParamId::from_offset(parameter.offset()),
+                        Ok(*parameter),
+                        "{entry:?} in {id}"
+                    );
+                }
+            }
+        }
     }
 
     #[test]

@@ -55,6 +55,14 @@ pub struct EnumEntry {
     /// Longer explanation, where the manual gives one.
     #[serde(default)]
     pub description: Option<String>,
+    /// Program parameters this value names, by their `parameters.toml` names.
+    ///
+    /// The modulation matrix is what needs it: a destination is an
+    /// abbreviation the display prints, and this is what it moves. Empty is
+    /// both "nothing written yet" and "nothing a program parameter
+    /// addresses", and the two are told apart by the entry's description.
+    #[serde(default)]
+    pub parameters: Vec<String>,
 }
 
 /// A firmware version that changes the protocol.
@@ -663,6 +671,7 @@ impl Spec {
     fn validate(&self) -> Result<(), String> {
         self.validate_firmware()?;
         self.validate_parameters()?;
+        self.validate_enum_parameters()?;
         self.validate_controllers()?;
         self.validate_effects()?;
         self.validate_layout()?;
@@ -748,6 +757,58 @@ impl Spec {
                     "parameter {} ({}) has max {} but table {id} tops out at {highest}",
                     parameter.offset, parameter.name, parameter.max
                 ));
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Checks the parameters a value table's entries name.
+    ///
+    /// Three things, all of which are how this table stays maintained rather
+    /// than transcribed: every name has to resolve, an entry must not name the
+    /// same parameter twice, and the versions of a renumbered table have to
+    /// agree about what a name moves. The last one is the one that matters:
+    /// the firmware 1.0 destination table is derived from the 1.1 one, so a
+    /// mapping added to one and forgotten in the other is exactly the drift
+    /// nobody would notice.
+    fn validate_enum_parameters(&self) -> Result<(), String> {
+        let named = |name: &str| self.parameters.iter().any(|p| p.name == name);
+        for table in &self.tables {
+            for entry in &table.entries {
+                for (index, name) in entry.parameters.iter().enumerate() {
+                    if !named(name) {
+                        return Err(format!(
+                            "enums.toml: table {} value {} ({}) names unknown parameter {name:?}",
+                            table.id, entry.value, entry.name
+                        ));
+                    }
+                    if entry.parameters[..index].contains(name) {
+                        return Err(format!(
+                            "enums.toml: table {} value {} ({}) names parameter {name:?} twice",
+                            table.id, entry.value, entry.name
+                        ));
+                    }
+                }
+            }
+        }
+
+        for table in &self.tables {
+            for other in self.versions_of(&table.id) {
+                if core::ptr::eq(other, table) {
+                    continue;
+                }
+                for entry in &table.entries {
+                    let Some(twin) = other.entries.iter().find(|e| e.name == entry.name) else {
+                        continue;
+                    };
+                    if twin.parameters != entry.parameters {
+                        return Err(format!(
+                            "enums.toml: {:?} moves different parameters in {} and {}",
+                            entry.name, table.name, other.name
+                        ));
+                    }
+                }
             }
         }
 
@@ -1315,6 +1376,34 @@ mod tests {
     fn firmware_ranges_split_into_numbers() {
         assert_eq!(version_parts("1.1+"), (1, 1));
         assert_eq!(version_parts("1.0"), (1, 0));
+    }
+
+    /// Every modulation destination either names the parameters it moves or
+    /// says why it names none.
+    ///
+    /// The blank and the not-yet-written look the same in the file, and this is
+    /// what keeps them apart: a destination added without a mapping fails here
+    /// rather than reaching a host as a silent empty answer.
+    #[test]
+    fn every_modulation_destination_is_accounted_for() {
+        let spec = spec();
+        let tables: Vec<_> = spec
+            .tables
+            .iter()
+            .filter(|table| table.id == "mod_destination")
+            .collect();
+        assert_eq!(tables.len(), 2, "one destination table per firmware");
+        for table in tables {
+            for entry in &table.entries {
+                assert!(
+                    !entry.parameters.is_empty() || entry.description.is_some(),
+                    "{}: {} ({}) names no parameter and does not say why",
+                    table.name,
+                    entry.value,
+                    entry.name
+                );
+            }
+        }
     }
 
     /// Fails when the library's command table drifts from `spec/messages.toml`.

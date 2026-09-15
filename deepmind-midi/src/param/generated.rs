@@ -2707,30 +2707,37 @@ static LFO_SHAPE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Sine",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Triangle",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Square",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "Ramp Up",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "Ramp Down",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Sample & Hold",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "Sample & Glide",
+            parameters: &[],
         },
     ],
 };
@@ -2744,14 +2751,17 @@ static OSC_RANGE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "16'",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "8'",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "4'",
+            parameters: &[],
         },
     ],
 };
@@ -2765,26 +2775,32 @@ static PWM_SOURCE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Manual",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "LFO 1",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "LFO 2",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "VCA Env",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "VCF Env",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Mod Env",
+            parameters: &[],
         },
     ],
 };
@@ -2798,26 +2814,32 @@ static TONE_MOD_SOURCE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Manual",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "LFO 1",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "LFO 2",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "VCA Env",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "VCF Env",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Mod Env",
+            parameters: &[],
         },
     ],
 };
@@ -2831,30 +2853,37 @@ static PITCH_MOD_SOURCE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "LFO 1",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "LFO 2",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "VCA Env",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "VCF Env",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "Mod Env",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "LFO 1 Unipolar",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "LFO 2 Unipolar",
+            parameters: &[],
         },
     ],
 };
@@ -2868,58 +2897,72 @@ static PORTAMENTO_MODE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Normal",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Fingered",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Fixed Rate",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "Fixed Rate Fingered",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "Exponential",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Exponential Fingered",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "Fixed +2",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "Fixed -2",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "Fixed +5",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "Fixed -5",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "Fixed +12",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "Fixed -12",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "Fixed +24",
+            parameters: &[],
         },
         ValueEntry {
             value: 13,
             name: "Fixed -24",
+            parameters: &[],
         },
     ],
 };
@@ -2933,10 +2976,12 @@ static OSC1_PITCH_MOD_MODE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "OSC 1 + 2",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "OSC 1 only",
+            parameters: &[],
         },
     ],
 };
@@ -2950,10 +2995,12 @@ static VCF_LFO_SELECT: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "LFO 1",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "LFO 2",
+            parameters: &[],
         },
     ],
 };
@@ -2967,10 +3014,12 @@ static VCF_ENVELOPE_POLARITY: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Negative",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Positive",
+            parameters: &[],
         },
     ],
 };
@@ -2984,10 +3033,12 @@ static VCF_POLE_MODE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "4 Pole",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "2 Pole",
+            parameters: &[],
         },
     ],
 };
@@ -3001,22 +3052,27 @@ static ENVELOPE_TRIGGER: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Key",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "LFO 1",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "LFO 2",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "Loop",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "Control Sequencer Step",
+            parameters: &[],
         },
     ],
 };
@@ -3030,14 +3086,17 @@ static VOICE_PRIORITY: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Lowest",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Highest",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Last",
+            parameters: &[],
         },
     ],
 };
@@ -3051,54 +3110,67 @@ static POLYPHONY_MODE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Poly",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Unison 2",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Unison 3",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "Unison 4",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "Unison 6",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Unison 12",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "Mono",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "Mono 2",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "Mono 3",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "Mono 4",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "Mono 6",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "Poly 6",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "Poly 8",
+            parameters: &[],
         },
     ],
 };
@@ -3112,18 +3184,22 @@ static KEY_ASSIGN_MODE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Mono",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Re-Trigger",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Legato",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "One-Shot",
+            parameters: &[],
         },
     ],
 };
@@ -3137,14 +3213,17 @@ static SEQUENCER_SYNC: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Loop on",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Key sync on",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Loop and key sync on",
+            parameters: &[],
         },
     ],
 };
@@ -3158,46 +3237,57 @@ static ARP_MODE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Up",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Down",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Up & Down",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "Up Inv",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "Down Inv",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Up & Down Inv",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "Up Alt",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "Down Alt",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "Random",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "As Played",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "Chord",
+            parameters: &[],
         },
     ],
 };
@@ -3211,42 +3301,52 @@ static FX_ROUTING: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Serial 1-2-3-4",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Parallel 1/2, serial 3-4",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Parallel 1/2, parallel 3/4",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "Parallel 1/2/3/4",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "Parallel 1/2/3, serial 4",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Serial 1-2, parallel 3/4",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "Serial 1, parallel 2/3/4",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "Parallel (serial 1-2-3)/4",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "Serial 3-4 feedback 4(1-2)",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "Serial 4 feedback 4(1-2-3)",
+            parameters: &[],
         },
     ],
 };
@@ -3260,14 +3360,17 @@ static FX_MODE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Insert",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Send",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Bypass",
+            parameters: &[],
         },
     ],
 };
@@ -3281,70 +3384,87 @@ static PROGRAM_CATEGORY: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "None",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Bass",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Pad",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "Lead",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "Mono",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Poly",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "Stab",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "SFX",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "Arp",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "Seq",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "Perc",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "Ambient",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "Modular",
+            parameters: &[],
         },
         ValueEntry {
             value: 13,
             name: "User-1",
+            parameters: &[],
         },
         ValueEntry {
             value: 14,
             name: "User-2",
+            parameters: &[],
         },
         ValueEntry {
             value: 15,
             name: "User-3",
+            parameters: &[],
         },
         ValueEntry {
             value: 16,
             name: "User-4",
+            parameters: &[],
         },
     ],
 };
@@ -3358,14 +3478,17 @@ static LFO_MONO_MODE: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Poly",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Mono",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "SPREAD-1",
+            parameters: &[],
         },
     ],
 };
@@ -3379,14 +3502,17 @@ static ARP_PATTERN: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "None",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Preset-1",
+            parameters: &[],
         },
         ValueEntry {
             value: 33,
             name: "User-1",
+            parameters: &[],
         },
     ],
 };
@@ -3400,54 +3526,67 @@ static ARP_CLOCK: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "1/2",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "3/8",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "1/3",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "1/4",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "3/16",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "1/6",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "1/8",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "3/32",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "1/12",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "1/16",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "1/24",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "1/32",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "1/48",
+            parameters: &[],
         },
     ],
 };
@@ -3461,82 +3600,102 @@ static SEQUENCER_CLOCK: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "4",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "3",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "2",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "1",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "1/2",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "3/8",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "1/3",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "1/4",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "3/16",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "1/6",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "1/8",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "3/32",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "1/12",
+            parameters: &[],
         },
         ValueEntry {
             value: 13,
             name: "1/16",
+            parameters: &[],
         },
         ValueEntry {
             value: 14,
             name: "3/64",
+            parameters: &[],
         },
         ValueEntry {
             value: 15,
             name: "1/24",
+            parameters: &[],
         },
         ValueEntry {
             value: 16,
             name: "1/32",
+            parameters: &[],
         },
         ValueEntry {
             value: 17,
             name: "3/128",
+            parameters: &[],
         },
         ValueEntry {
             value: 18,
             name: "1/48",
+            parameters: &[],
         },
         ValueEntry {
             value: 19,
             name: "1/64",
+            parameters: &[],
         },
     ],
 };
@@ -3550,82 +3709,102 @@ static LFO_CLOCK: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "4",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "3",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "2",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "1",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "1/2",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "3/8",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "1/3",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "1/4",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "3/16",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "1/6",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "1/8",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "3/32",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "1/12",
+            parameters: &[],
         },
         ValueEntry {
             value: 13,
             name: "1/16",
+            parameters: &[],
         },
         ValueEntry {
             value: 14,
             name: "3/64",
+            parameters: &[],
         },
         ValueEntry {
             value: 15,
             name: "1/24",
+            parameters: &[],
         },
         ValueEntry {
             value: 16,
             name: "1/32",
+            parameters: &[],
         },
         ValueEntry {
             value: 17,
             name: "3/128",
+            parameters: &[],
         },
         ValueEntry {
             value: 18,
             name: "1/48",
+            parameters: &[],
         },
         ValueEntry {
             value: 19,
             name: "1/64",
+            parameters: &[],
         },
     ],
 };
@@ -3639,102 +3818,127 @@ static MOD_SOURCE_FW_1_1: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Off",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Pitch Bend",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Mod Wheel",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "Foot Ctrl",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "BreathCtrl",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Pressure",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "Expression",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "LFO1",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "LFO2",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "Env 1",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "Env 2",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "Env 3",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "Note Num",
+            parameters: &[],
         },
         ValueEntry {
             value: 13,
             name: "Note Vel",
+            parameters: &[],
         },
         ValueEntry {
             value: 14,
             name: "Note Off Vel",
+            parameters: &[],
         },
         ValueEntry {
             value: 15,
             name: "Ctrl Seq",
+            parameters: &[],
         },
         ValueEntry {
             value: 16,
             name: "LFO1 (Uni)",
+            parameters: &[],
         },
         ValueEntry {
             value: 17,
             name: "LFO2 (Uni)",
+            parameters: &[],
         },
         ValueEntry {
             value: 18,
             name: "LFO1 (Fade)",
+            parameters: &[],
         },
         ValueEntry {
             value: 19,
             name: "LFO2 (Fade)",
+            parameters: &[],
         },
         ValueEntry {
             value: 20,
             name: "Voice Num",
+            parameters: &[],
         },
         ValueEntry {
             value: 21,
             name: "Uni Voice",
+            parameters: &[],
         },
         ValueEntry {
             value: 22,
             name: "CC X (115)",
+            parameters: &[],
         },
         ValueEntry {
             value: 23,
             name: "CC Y (116)",
+            parameters: &[],
         },
         ValueEntry {
             value: 24,
             name: "CC Z (117)",
+            parameters: &[],
         },
     ],
 };
@@ -3748,94 +3952,117 @@ static MOD_SOURCE_FW_1_0: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Off",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "Pitch Bend",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "Mod Wheel",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "Foot Ctrl",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "BreathCtrl",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "Pressure",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "LFO1",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "LFO2",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "Env 1",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "Env 2",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "Env 3",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "Note Num",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "Note Vel",
+            parameters: &[],
         },
         ValueEntry {
             value: 13,
             name: "Ctrl Seq",
+            parameters: &[],
         },
         ValueEntry {
             value: 14,
             name: "LFO1 (Uni)",
+            parameters: &[],
         },
         ValueEntry {
             value: 15,
             name: "LFO2 (Uni)",
+            parameters: &[],
         },
         ValueEntry {
             value: 16,
             name: "LFO1 (Fade)",
+            parameters: &[],
         },
         ValueEntry {
             value: 17,
             name: "LFO2 (Fade)",
+            parameters: &[],
         },
         ValueEntry {
             value: 18,
             name: "NoteOff Vel",
+            parameters: &[],
         },
         ValueEntry {
             value: 19,
             name: "Voice Num",
+            parameters: &[],
         },
         ValueEntry {
             value: 20,
             name: "CC X (114)",
+            parameters: &[],
         },
         ValueEntry {
             value: 21,
             name: "CC Y (115)",
+            parameters: &[],
         },
         ValueEntry {
             value: 22,
             name: "CC Z (116)",
+            parameters: &[],
         },
     ],
 };
@@ -3849,534 +4076,720 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Off",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "LFO1 Rate",
+            parameters: &[ParamId::Lfo1Rate],
         },
         ValueEntry {
             value: 2,
             name: "LFO1 Delay",
+            parameters: &[ParamId::Lfo1DelayFade],
         },
         ValueEntry {
             value: 3,
             name: "LFO1 Slew",
+            parameters: &[ParamId::Lfo1SlewRate],
         },
         ValueEntry {
             value: 4,
             name: "LFO1 Shape",
+            parameters: &[ParamId::Lfo1Shape],
         },
         ValueEntry {
             value: 5,
             name: "LFO2 Rate",
+            parameters: &[ParamId::Lfo2Rate],
         },
         ValueEntry {
             value: 6,
             name: "LFO2 Delay",
+            parameters: &[ParamId::Lfo2DelayFade],
         },
         ValueEntry {
             value: 7,
             name: "LFO2 Slew",
+            parameters: &[ParamId::Lfo2SlewRate],
         },
         ValueEntry {
             value: 8,
             name: "LFO2 Shape",
+            parameters: &[ParamId::Lfo2Shape],
         },
         ValueEntry {
             value: 9,
             name: "OSC1+2 Pit",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "OSC1+2 Fine",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "OSC1 Pitch",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "OSC1 Fine",
+            parameters: &[],
         },
         ValueEntry {
             value: 13,
             name: "OSC2 Pitch",
+            parameters: &[ParamId::Osc2Pitch],
         },
         ValueEntry {
             value: 14,
             name: "OSC2 Fine",
+            parameters: &[],
         },
         ValueEntry {
             value: 15,
             name: "OSC1 PM Dep",
+            parameters: &[ParamId::Osc1PitchModDepth],
         },
         ValueEntry {
             value: 16,
             name: "PWM Depth",
+            parameters: &[ParamId::Osc1PwmDepth],
         },
         ValueEntry {
             value: 17,
             name: "TMod Depth",
+            parameters: &[ParamId::Osc2ToneModDepth],
         },
         ValueEntry {
             value: 18,
             name: "OSC2 PM Dep",
+            parameters: &[ParamId::Osc2PitchModDepth],
         },
         ValueEntry {
             value: 19,
             name: "Porta Time",
+            parameters: &[ParamId::PortamentoTime],
         },
         ValueEntry {
             value: 20,
             name: "VCF Freq",
+            parameters: &[ParamId::VcfFrequency],
         },
         ValueEntry {
             value: 21,
             name: "VCF Res",
+            parameters: &[ParamId::VcfResonance],
         },
         ValueEntry {
             value: 22,
             name: "VCF Env",
+            parameters: &[ParamId::VcfEnvelopeDepth],
         },
         ValueEntry {
             value: 23,
             name: "VCF LFO",
+            parameters: &[ParamId::VcfLfoDepth],
         },
         ValueEntry {
             value: 24,
             name: "Env Rates",
+            parameters: &[
+                ParamId::VcaEnvelopeAttackTime,
+                ParamId::VcaEnvelopeDecayTime,
+                ParamId::VcaEnvelopeReleaseTime,
+                ParamId::VcfEnvelopeAttackTime,
+                ParamId::VcfEnvelopeDecayTime,
+                ParamId::VcfEnvelopeReleaseTime,
+                ParamId::ModEnvelopeAttackTime,
+                ParamId::ModEnvelopeDecayTime,
+                ParamId::ModEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 25,
             name: "All Attack",
+            parameters: &[
+                ParamId::VcaEnvelopeAttackTime,
+                ParamId::VcfEnvelopeAttackTime,
+                ParamId::ModEnvelopeAttackTime,
+            ],
         },
         ValueEntry {
             value: 26,
             name: "All Decay",
+            parameters: &[
+                ParamId::VcaEnvelopeDecayTime,
+                ParamId::VcfEnvelopeDecayTime,
+                ParamId::ModEnvelopeDecayTime,
+            ],
         },
         ValueEntry {
             value: 27,
             name: "All Sus",
+            parameters: &[
+                ParamId::VcaEnvelopeSustainLevel,
+                ParamId::VcfEnvelopeSustainLevel,
+                ParamId::ModEnvelopeSustainLevel,
+            ],
         },
         ValueEntry {
             value: 28,
             name: "All Rel",
+            parameters: &[
+                ParamId::VcaEnvelopeReleaseTime,
+                ParamId::VcfEnvelopeReleaseTime,
+                ParamId::ModEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 29,
             name: "Env1 Rates",
+            parameters: &[
+                ParamId::VcaEnvelopeAttackTime,
+                ParamId::VcaEnvelopeDecayTime,
+                ParamId::VcaEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 30,
             name: "Env2 Rates",
+            parameters: &[
+                ParamId::VcfEnvelopeAttackTime,
+                ParamId::VcfEnvelopeDecayTime,
+                ParamId::VcfEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 31,
             name: "Env3 Rates",
+            parameters: &[
+                ParamId::ModEnvelopeAttackTime,
+                ParamId::ModEnvelopeDecayTime,
+                ParamId::ModEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 32,
             name: "Env1CurveS",
+            parameters: &[
+                ParamId::VcaEnvelopeAttackCurve,
+                ParamId::VcaEnvelopeDecayCurve,
+                ParamId::VcaEnvelopeSustainCurve,
+                ParamId::VcaEnvelopeReleaseCurve,
+            ],
         },
         ValueEntry {
             value: 33,
             name: "Env2CurveS",
+            parameters: &[
+                ParamId::VcfEnvelopeAttackCurve,
+                ParamId::VcfEnvelopeDecayCurve,
+                ParamId::VcfEnvelopeSustainCurve,
+                ParamId::VcfEnvelopeReleaseCurve,
+            ],
         },
         ValueEntry {
             value: 34,
             name: "Env3CurveS",
+            parameters: &[
+                ParamId::ModEnvelopeAttackCurve,
+                ParamId::ModEnvelopeDecayCurve,
+                ParamId::ModEnvelopeSustainCurve,
+                ParamId::ModEnvelopeReleaseCurve,
+            ],
         },
         ValueEntry {
             value: 35,
             name: "Env1 Attack",
+            parameters: &[ParamId::VcaEnvelopeAttackTime],
         },
         ValueEntry {
             value: 36,
             name: "Env1 Decay",
+            parameters: &[ParamId::VcaEnvelopeDecayTime],
         },
         ValueEntry {
             value: 37,
             name: "Env1 Sus",
+            parameters: &[ParamId::VcaEnvelopeSustainLevel],
         },
         ValueEntry {
             value: 38,
             name: "Env1 Rel",
+            parameters: &[ParamId::VcaEnvelopeReleaseTime],
         },
         ValueEntry {
             value: 39,
             name: "Env1 AtCur",
+            parameters: &[ParamId::VcaEnvelopeAttackCurve],
         },
         ValueEntry {
             value: 40,
             name: "Env1 DcyCur",
+            parameters: &[ParamId::VcaEnvelopeDecayCurve],
         },
         ValueEntry {
             value: 41,
             name: "Env1 SuSCur",
+            parameters: &[ParamId::VcaEnvelopeSustainCurve],
         },
         ValueEntry {
             value: 42,
             name: "Env1 RelCur",
+            parameters: &[ParamId::VcaEnvelopeReleaseCurve],
         },
         ValueEntry {
             value: 43,
             name: "Env2 Attack",
+            parameters: &[ParamId::VcfEnvelopeAttackTime],
         },
         ValueEntry {
             value: 44,
             name: "Env2 Decay",
+            parameters: &[ParamId::VcfEnvelopeDecayTime],
         },
         ValueEntry {
             value: 45,
             name: "Env2 Sus",
+            parameters: &[ParamId::VcfEnvelopeSustainLevel],
         },
         ValueEntry {
             value: 46,
             name: "Env2 Rel",
+            parameters: &[ParamId::VcfEnvelopeReleaseTime],
         },
         ValueEntry {
             value: 47,
             name: "Env2 AtCur",
+            parameters: &[ParamId::VcfEnvelopeAttackCurve],
         },
         ValueEntry {
             value: 48,
             name: "Env2 DcyCur",
+            parameters: &[ParamId::VcfEnvelopeDecayCurve],
         },
         ValueEntry {
             value: 49,
             name: "Env2 SuSCur",
+            parameters: &[ParamId::VcfEnvelopeSustainCurve],
         },
         ValueEntry {
             value: 50,
             name: "Env2 RelCur",
+            parameters: &[ParamId::VcfEnvelopeReleaseCurve],
         },
         ValueEntry {
             value: 51,
             name: "Env3 Attack",
+            parameters: &[ParamId::ModEnvelopeAttackTime],
         },
         ValueEntry {
             value: 52,
             name: "Env3 Decay",
+            parameters: &[ParamId::ModEnvelopeDecayTime],
         },
         ValueEntry {
             value: 53,
             name: "Env3 Sus",
+            parameters: &[ParamId::ModEnvelopeSustainLevel],
         },
         ValueEntry {
             value: 54,
             name: "Env3 Rel",
+            parameters: &[ParamId::ModEnvelopeReleaseTime],
         },
         ValueEntry {
             value: 55,
             name: "Env3 AtCur",
+            parameters: &[ParamId::ModEnvelopeAttackCurve],
         },
         ValueEntry {
             value: 56,
             name: "Env3 DcyCur",
+            parameters: &[ParamId::ModEnvelopeDecayCurve],
         },
         ValueEntry {
             value: 57,
             name: "Env3 SuSCur",
+            parameters: &[ParamId::ModEnvelopeSustainCurve],
         },
         ValueEntry {
             value: 58,
             name: "Env3 RelCur",
+            parameters: &[ParamId::ModEnvelopeReleaseCurve],
         },
         ValueEntry {
             value: 59,
             name: "VCA All",
+            parameters: &[],
         },
         ValueEntry {
             value: 60,
             name: "VCA Active",
+            parameters: &[],
         },
         ValueEntry {
             value: 61,
             name: "VCA EnvDep",
+            parameters: &[ParamId::VcaEnvelopeDepth],
         },
         ValueEntry {
             value: 62,
             name: "Pan Spread",
+            parameters: &[ParamId::VcaPanSpread],
         },
         ValueEntry {
             value: 63,
             name: "VCA Pan",
+            parameters: &[],
         },
         ValueEntry {
             value: 64,
             name: "OSC2 Lvl",
+            parameters: &[ParamId::Osc2Level],
         },
         ValueEntry {
             value: 65,
             name: "Noise Lvl",
+            parameters: &[ParamId::NoiseLevel],
         },
         ValueEntry {
             value: 66,
             name: "HP Freq",
+            parameters: &[ParamId::VcfHighPassFrequency],
         },
         ValueEntry {
             value: 67,
             name: "Uni Detune",
+            parameters: &[ParamId::UnisonDetune],
         },
         ValueEntry {
             value: 68,
             name: "OSC Drift",
+            parameters: &[ParamId::VoiceDrift],
         },
         ValueEntry {
             value: 69,
             name: "Param Drift",
+            parameters: &[ParamId::ParameterDrift],
         },
         ValueEntry {
             value: 70,
             name: "Drift Rate",
+            parameters: &[ParamId::DriftRate],
         },
         ValueEntry {
             value: 71,
             name: "Arp Gate",
+            parameters: &[ParamId::ArpGateTime],
         },
         ValueEntry {
             value: 72,
             name: "Seq Slew",
+            parameters: &[ParamId::SlewRate],
         },
         ValueEntry {
             value: 73,
             name: "Mod 1 Dep",
+            parameters: &[ParamId::Mod1Depth],
         },
         ValueEntry {
             value: 74,
             name: "Mod 2 Dep",
+            parameters: &[ParamId::Mod2Depth],
         },
         ValueEntry {
             value: 75,
             name: "Mod 3 Dep",
+            parameters: &[ParamId::Mod3Depth],
         },
         ValueEntry {
             value: 76,
             name: "Mod 4 Dep",
+            parameters: &[ParamId::Mod4Depth],
         },
         ValueEntry {
             value: 77,
             name: "Mod 5 Dep",
+            parameters: &[ParamId::Mod5Depth],
         },
         ValueEntry {
             value: 78,
             name: "Mod 6 Dep",
+            parameters: &[ParamId::Mod6Depth],
         },
         ValueEntry {
             value: 79,
             name: "Mod 7 Dep",
+            parameters: &[ParamId::Mod7Depth],
         },
         ValueEntry {
             value: 80,
             name: "Mod 8 Dep",
+            parameters: &[ParamId::Mod8Depth],
         },
         ValueEntry {
             value: 81,
             name: "Fx 1 Param 1",
+            parameters: &[ParamId::Fx1Param1],
         },
         ValueEntry {
             value: 82,
             name: "Fx 1 Param 2",
+            parameters: &[ParamId::Fx1Param2],
         },
         ValueEntry {
             value: 83,
             name: "Fx 1 Param 3",
+            parameters: &[ParamId::Fx1Param3],
         },
         ValueEntry {
             value: 84,
             name: "Fx 1 Param 4",
+            parameters: &[ParamId::Fx1Param4],
         },
         ValueEntry {
             value: 85,
             name: "Fx 1 Param 5",
+            parameters: &[ParamId::Fx1Param5],
         },
         ValueEntry {
             value: 86,
             name: "Fx 1 Param 6",
+            parameters: &[ParamId::Fx1Param6],
         },
         ValueEntry {
             value: 87,
             name: "Fx 1 Param 7",
+            parameters: &[ParamId::Fx1Param7],
         },
         ValueEntry {
             value: 88,
             name: "Fx 1 Param 8",
+            parameters: &[ParamId::Fx1Param8],
         },
         ValueEntry {
             value: 89,
             name: "Fx 1 Param 9",
+            parameters: &[ParamId::Fx1Param9],
         },
         ValueEntry {
             value: 90,
             name: "Fx 1 Param 10",
+            parameters: &[ParamId::Fx1Param10],
         },
         ValueEntry {
             value: 91,
             name: "Fx 1 Param 11",
+            parameters: &[ParamId::Fx1Param11],
         },
         ValueEntry {
             value: 92,
             name: "Fx 1 Param 12",
+            parameters: &[ParamId::Fx1Param12],
         },
         ValueEntry {
             value: 93,
             name: "Fx 2 Param 1",
+            parameters: &[ParamId::Fx2Param1],
         },
         ValueEntry {
             value: 94,
             name: "Fx 2 Param 2",
+            parameters: &[ParamId::Fx2Param2],
         },
         ValueEntry {
             value: 95,
             name: "Fx 2 Param 3",
+            parameters: &[ParamId::Fx2Param3],
         },
         ValueEntry {
             value: 96,
             name: "Fx 2 Param 4",
+            parameters: &[ParamId::Fx2Param4],
         },
         ValueEntry {
             value: 97,
             name: "Fx 2 Param 5",
+            parameters: &[ParamId::Fx2Param5],
         },
         ValueEntry {
             value: 98,
             name: "Fx 2 Param 6",
+            parameters: &[ParamId::Fx2Param6],
         },
         ValueEntry {
             value: 99,
             name: "Fx 2 Param 7",
+            parameters: &[ParamId::Fx2Param7],
         },
         ValueEntry {
             value: 100,
             name: "Fx 2 Param 8",
+            parameters: &[ParamId::Fx2Param8],
         },
         ValueEntry {
             value: 101,
             name: "Fx 2 Param 9",
+            parameters: &[ParamId::Fx2Param9],
         },
         ValueEntry {
             value: 102,
             name: "Fx 2 Param 10",
+            parameters: &[ParamId::Fx2Param10],
         },
         ValueEntry {
             value: 103,
             name: "Fx 2 Param 11",
+            parameters: &[ParamId::Fx2Param11],
         },
         ValueEntry {
             value: 104,
             name: "Fx 2 Param 12",
+            parameters: &[ParamId::Fx2Param12],
         },
         ValueEntry {
             value: 105,
             name: "Fx 3 Param 1",
+            parameters: &[ParamId::Fx3Param1],
         },
         ValueEntry {
             value: 106,
             name: "Fx 3 Param 2",
+            parameters: &[ParamId::Fx3Param2],
         },
         ValueEntry {
             value: 107,
             name: "Fx 3 Param 3",
+            parameters: &[ParamId::Fx3Param3],
         },
         ValueEntry {
             value: 108,
             name: "Fx 3 Param 4",
+            parameters: &[ParamId::Fx3Param4],
         },
         ValueEntry {
             value: 109,
             name: "Fx 3 Param 5",
+            parameters: &[ParamId::Fx3Param5],
         },
         ValueEntry {
             value: 110,
             name: "Fx 3 Param 6",
+            parameters: &[ParamId::Fx3Param6],
         },
         ValueEntry {
             value: 111,
             name: "Fx 3 Param 7",
+            parameters: &[ParamId::Fx3Param7],
         },
         ValueEntry {
             value: 112,
             name: "Fx 3 Param 8",
+            parameters: &[ParamId::Fx3Param8],
         },
         ValueEntry {
             value: 113,
             name: "Fx 3 Param 9",
+            parameters: &[ParamId::Fx3Param9],
         },
         ValueEntry {
             value: 114,
             name: "Fx 3 Param 10",
+            parameters: &[ParamId::Fx3Param10],
         },
         ValueEntry {
             value: 115,
             name: "Fx 3 Param 11",
+            parameters: &[ParamId::Fx3Param11],
         },
         ValueEntry {
             value: 116,
             name: "Fx 3 Param 12",
+            parameters: &[ParamId::Fx3Param12],
         },
         ValueEntry {
             value: 117,
             name: "Fx 4 Param 1",
+            parameters: &[ParamId::Fx4Param1],
         },
         ValueEntry {
             value: 118,
             name: "Fx 4 Param 2",
+            parameters: &[ParamId::Fx4Param2],
         },
         ValueEntry {
             value: 119,
             name: "Fx 4 Param 3",
+            parameters: &[ParamId::Fx4Param3],
         },
         ValueEntry {
             value: 120,
             name: "Fx 4 Param 4",
+            parameters: &[ParamId::Fx4Param4],
         },
         ValueEntry {
             value: 121,
             name: "Fx 4 Param 5",
+            parameters: &[ParamId::Fx4Param5],
         },
         ValueEntry {
             value: 122,
             name: "Fx 4 Param 6",
+            parameters: &[ParamId::Fx4Param6],
         },
         ValueEntry {
             value: 123,
             name: "Fx 4 Param 7",
+            parameters: &[ParamId::Fx4Param7],
         },
         ValueEntry {
             value: 124,
             name: "Fx 4 Param 8",
+            parameters: &[ParamId::Fx4Param8],
         },
         ValueEntry {
             value: 125,
             name: "Fx 4 Param 9",
+            parameters: &[ParamId::Fx4Param9],
         },
         ValueEntry {
             value: 126,
             name: "Fx 4 Param 10",
+            parameters: &[ParamId::Fx4Param10],
         },
         ValueEntry {
             value: 127,
             name: "Fx 4 Param 11",
+            parameters: &[ParamId::Fx4Param11],
         },
         ValueEntry {
             value: 128,
             name: "Fx 4 Param 12",
+            parameters: &[ParamId::Fx4Param12],
         },
         ValueEntry {
             value: 129,
             name: "Fx 1 Level",
+            parameters: &[ParamId::Fx1OutputGain],
         },
         ValueEntry {
             value: 130,
             name: "Fx 2 Level",
+            parameters: &[ParamId::Fx2OutputGain],
         },
         ValueEntry {
             value: 131,
             name: "Fx 3 Level",
+            parameters: &[ParamId::Fx3OutputGain],
         },
         ValueEntry {
             value: 132,
             name: "Fx 4 Level",
+            parameters: &[ParamId::Fx4OutputGain],
         },
     ],
 };
@@ -4390,142 +4803,177 @@ static FX_TYPE_FW_1_1: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "TC-DeepVRB",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "AmbVerb",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "RoomRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "VintageRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "HallRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "ChamberRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "PlateRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "RichPltRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "GatedRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "Reverse",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "ChorusVerb",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "DelayVerb",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "FlangVerb",
+            parameters: &[],
         },
         ValueEntry {
             value: 13,
             name: "MidasEQ",
+            parameters: &[],
         },
         ValueEntry {
             value: 14,
             name: "Enhancer",
+            parameters: &[],
         },
         ValueEntry {
             value: 15,
             name: "FairComp",
+            parameters: &[],
         },
         ValueEntry {
             value: 16,
             name: "MulBndDist",
+            parameters: &[],
         },
         ValueEntry {
             value: 17,
             name: "RackAmp",
+            parameters: &[],
         },
         ValueEntry {
             value: 18,
             name: "EdisonEX1",
+            parameters: &[],
         },
         ValueEntry {
             value: 19,
             name: "Auto Pan",
+            parameters: &[],
         },
         ValueEntry {
             value: 20,
             name: "NoiseGate",
+            parameters: &[],
         },
         ValueEntry {
             value: 21,
             name: "Delay",
+            parameters: &[],
         },
         ValueEntry {
             value: 22,
             name: "3TapDelay",
+            parameters: &[],
         },
         ValueEntry {
             value: 23,
             name: "4TapDelay",
+            parameters: &[],
         },
         ValueEntry {
             value: 24,
             name: "T-RayDelay",
+            parameters: &[],
         },
         ValueEntry {
             value: 25,
             name: "DecimDelay",
+            parameters: &[],
         },
         ValueEntry {
             value: 26,
             name: "ModDlyRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 27,
             name: "Chorus",
+            parameters: &[],
         },
         ValueEntry {
             value: 28,
             name: "Chorus-D",
+            parameters: &[],
         },
         ValueEntry {
             value: 29,
             name: "Flanger",
+            parameters: &[],
         },
         ValueEntry {
             value: 30,
             name: "Phaser",
+            parameters: &[],
         },
         ValueEntry {
             value: 31,
             name: "MoodFilter",
+            parameters: &[],
         },
         ValueEntry {
             value: 32,
             name: "DualPitch",
+            parameters: &[],
         },
         ValueEntry {
             value: 33,
             name: "Vintage Pitch",
+            parameters: &[],
         },
         ValueEntry {
             value: 34,
             name: "RotarySpkr",
+            parameters: &[],
         },
     ],
 };
@@ -4539,522 +4987,705 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "Off",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "LFO1 Rate",
+            parameters: &[ParamId::Lfo1Rate],
         },
         ValueEntry {
             value: 2,
             name: "LFO1 Delay",
+            parameters: &[ParamId::Lfo1DelayFade],
         },
         ValueEntry {
             value: 3,
             name: "LFO1 Slew",
+            parameters: &[ParamId::Lfo1SlewRate],
         },
         ValueEntry {
             value: 4,
             name: "LFO1 Shape",
+            parameters: &[ParamId::Lfo1Shape],
         },
         ValueEntry {
             value: 5,
             name: "LFO2 Rate",
+            parameters: &[ParamId::Lfo2Rate],
         },
         ValueEntry {
             value: 6,
             name: "LFO2 Delay",
+            parameters: &[ParamId::Lfo2DelayFade],
         },
         ValueEntry {
             value: 7,
             name: "LFO2 Slew",
+            parameters: &[ParamId::Lfo2SlewRate],
         },
         ValueEntry {
             value: 8,
             name: "LFO2 Shape",
+            parameters: &[ParamId::Lfo2Shape],
         },
         ValueEntry {
             value: 9,
             name: "OSC1+2 Pit",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "OSC1 Pitch",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "OSC2 Pitch",
+            parameters: &[ParamId::Osc2Pitch],
         },
         ValueEntry {
             value: 12,
             name: "OSC1 PM Dep",
+            parameters: &[ParamId::Osc1PitchModDepth],
         },
         ValueEntry {
             value: 13,
             name: "PWM Depth",
+            parameters: &[ParamId::Osc1PwmDepth],
         },
         ValueEntry {
             value: 14,
             name: "TMod Depth",
+            parameters: &[ParamId::Osc2ToneModDepth],
         },
         ValueEntry {
             value: 15,
             name: "OSC2 PM Dep",
+            parameters: &[ParamId::Osc2PitchModDepth],
         },
         ValueEntry {
             value: 16,
             name: "Porta Time",
+            parameters: &[ParamId::PortamentoTime],
         },
         ValueEntry {
             value: 17,
             name: "VCF Freq",
+            parameters: &[ParamId::VcfFrequency],
         },
         ValueEntry {
             value: 18,
             name: "VCF Res",
+            parameters: &[ParamId::VcfResonance],
         },
         ValueEntry {
             value: 19,
             name: "VCF Env",
+            parameters: &[ParamId::VcfEnvelopeDepth],
         },
         ValueEntry {
             value: 20,
             name: "VCF LFO",
+            parameters: &[ParamId::VcfLfoDepth],
         },
         ValueEntry {
             value: 21,
             name: "Env Rates",
+            parameters: &[
+                ParamId::VcaEnvelopeAttackTime,
+                ParamId::VcaEnvelopeDecayTime,
+                ParamId::VcaEnvelopeReleaseTime,
+                ParamId::VcfEnvelopeAttackTime,
+                ParamId::VcfEnvelopeDecayTime,
+                ParamId::VcfEnvelopeReleaseTime,
+                ParamId::ModEnvelopeAttackTime,
+                ParamId::ModEnvelopeDecayTime,
+                ParamId::ModEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 22,
             name: "All Attack",
+            parameters: &[
+                ParamId::VcaEnvelopeAttackTime,
+                ParamId::VcfEnvelopeAttackTime,
+                ParamId::ModEnvelopeAttackTime,
+            ],
         },
         ValueEntry {
             value: 23,
             name: "All Decay",
+            parameters: &[
+                ParamId::VcaEnvelopeDecayTime,
+                ParamId::VcfEnvelopeDecayTime,
+                ParamId::ModEnvelopeDecayTime,
+            ],
         },
         ValueEntry {
             value: 24,
             name: "All Sus",
+            parameters: &[
+                ParamId::VcaEnvelopeSustainLevel,
+                ParamId::VcfEnvelopeSustainLevel,
+                ParamId::ModEnvelopeSustainLevel,
+            ],
         },
         ValueEntry {
             value: 25,
             name: "All Rel",
+            parameters: &[
+                ParamId::VcaEnvelopeReleaseTime,
+                ParamId::VcfEnvelopeReleaseTime,
+                ParamId::ModEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 26,
             name: "Env1 Rates",
+            parameters: &[
+                ParamId::VcaEnvelopeAttackTime,
+                ParamId::VcaEnvelopeDecayTime,
+                ParamId::VcaEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 27,
             name: "Env2 Rates",
+            parameters: &[
+                ParamId::VcfEnvelopeAttackTime,
+                ParamId::VcfEnvelopeDecayTime,
+                ParamId::VcfEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 28,
             name: "Env3 Rates",
+            parameters: &[
+                ParamId::ModEnvelopeAttackTime,
+                ParamId::ModEnvelopeDecayTime,
+                ParamId::ModEnvelopeReleaseTime,
+            ],
         },
         ValueEntry {
             value: 29,
             name: "Env1CurveS",
+            parameters: &[
+                ParamId::VcaEnvelopeAttackCurve,
+                ParamId::VcaEnvelopeDecayCurve,
+                ParamId::VcaEnvelopeSustainCurve,
+                ParamId::VcaEnvelopeReleaseCurve,
+            ],
         },
         ValueEntry {
             value: 30,
             name: "Env2CurveS",
+            parameters: &[
+                ParamId::VcfEnvelopeAttackCurve,
+                ParamId::VcfEnvelopeDecayCurve,
+                ParamId::VcfEnvelopeSustainCurve,
+                ParamId::VcfEnvelopeReleaseCurve,
+            ],
         },
         ValueEntry {
             value: 31,
             name: "Env3CurveS",
+            parameters: &[
+                ParamId::ModEnvelopeAttackCurve,
+                ParamId::ModEnvelopeDecayCurve,
+                ParamId::ModEnvelopeSustainCurve,
+                ParamId::ModEnvelopeReleaseCurve,
+            ],
         },
         ValueEntry {
             value: 32,
             name: "Env1 Attack",
+            parameters: &[ParamId::VcaEnvelopeAttackTime],
         },
         ValueEntry {
             value: 33,
             name: "Env1 Decay",
+            parameters: &[ParamId::VcaEnvelopeDecayTime],
         },
         ValueEntry {
             value: 34,
             name: "Env1 Sus",
+            parameters: &[ParamId::VcaEnvelopeSustainLevel],
         },
         ValueEntry {
             value: 35,
             name: "Env1 Rel",
+            parameters: &[ParamId::VcaEnvelopeReleaseTime],
         },
         ValueEntry {
             value: 36,
             name: "Env1 AtCur",
+            parameters: &[ParamId::VcaEnvelopeAttackCurve],
         },
         ValueEntry {
             value: 37,
             name: "Env1 DcyCur",
+            parameters: &[ParamId::VcaEnvelopeDecayCurve],
         },
         ValueEntry {
             value: 38,
             name: "Env1 SuSCur",
+            parameters: &[ParamId::VcaEnvelopeSustainCurve],
         },
         ValueEntry {
             value: 39,
             name: "Env1 RelCur",
+            parameters: &[ParamId::VcaEnvelopeReleaseCurve],
         },
         ValueEntry {
             value: 40,
             name: "Env2 Attack",
+            parameters: &[ParamId::VcfEnvelopeAttackTime],
         },
         ValueEntry {
             value: 41,
             name: "Env2 Decay",
+            parameters: &[ParamId::VcfEnvelopeDecayTime],
         },
         ValueEntry {
             value: 42,
             name: "Env2 Sus",
+            parameters: &[ParamId::VcfEnvelopeSustainLevel],
         },
         ValueEntry {
             value: 43,
             name: "Env2 Rel",
+            parameters: &[ParamId::VcfEnvelopeReleaseTime],
         },
         ValueEntry {
             value: 44,
             name: "Env2 AtCur",
+            parameters: &[ParamId::VcfEnvelopeAttackCurve],
         },
         ValueEntry {
             value: 45,
             name: "Env2 DcyCur",
+            parameters: &[ParamId::VcfEnvelopeDecayCurve],
         },
         ValueEntry {
             value: 46,
             name: "Env2 SuSCur",
+            parameters: &[ParamId::VcfEnvelopeSustainCurve],
         },
         ValueEntry {
             value: 47,
             name: "Env2 RelCur",
+            parameters: &[ParamId::VcfEnvelopeReleaseCurve],
         },
         ValueEntry {
             value: 48,
             name: "Env3 Attack",
+            parameters: &[ParamId::ModEnvelopeAttackTime],
         },
         ValueEntry {
             value: 49,
             name: "Env3 Decay",
+            parameters: &[ParamId::ModEnvelopeDecayTime],
         },
         ValueEntry {
             value: 50,
             name: "Env3 Sus",
+            parameters: &[ParamId::ModEnvelopeSustainLevel],
         },
         ValueEntry {
             value: 51,
             name: "Env3 Rel",
+            parameters: &[ParamId::ModEnvelopeReleaseTime],
         },
         ValueEntry {
             value: 52,
             name: "Env3 AtCur",
+            parameters: &[ParamId::ModEnvelopeAttackCurve],
         },
         ValueEntry {
             value: 53,
             name: "Env3 DcyCur",
+            parameters: &[ParamId::ModEnvelopeDecayCurve],
         },
         ValueEntry {
             value: 54,
             name: "Env3 SuSCur",
+            parameters: &[ParamId::ModEnvelopeSustainCurve],
         },
         ValueEntry {
             value: 55,
             name: "Env3 RelCur",
+            parameters: &[ParamId::ModEnvelopeReleaseCurve],
         },
         ValueEntry {
             value: 56,
             name: "VCA All",
+            parameters: &[],
         },
         ValueEntry {
             value: 57,
             name: "VCA Active",
+            parameters: &[],
         },
         ValueEntry {
             value: 58,
             name: "VCA EnvDep",
+            parameters: &[ParamId::VcaEnvelopeDepth],
         },
         ValueEntry {
             value: 59,
             name: "Pan Spread",
+            parameters: &[ParamId::VcaPanSpread],
         },
         ValueEntry {
             value: 60,
             name: "VCA Pan",
+            parameters: &[],
         },
         ValueEntry {
             value: 61,
             name: "OSC2 Lvl",
+            parameters: &[ParamId::Osc2Level],
         },
         ValueEntry {
             value: 62,
             name: "Noise Lvl",
+            parameters: &[ParamId::NoiseLevel],
         },
         ValueEntry {
             value: 63,
             name: "HP Freq",
+            parameters: &[ParamId::VcfHighPassFrequency],
         },
         ValueEntry {
             value: 64,
             name: "Uni Detune",
+            parameters: &[ParamId::UnisonDetune],
         },
         ValueEntry {
             value: 65,
             name: "OSC Drift",
+            parameters: &[ParamId::VoiceDrift],
         },
         ValueEntry {
             value: 66,
             name: "Param Drift",
+            parameters: &[ParamId::ParameterDrift],
         },
         ValueEntry {
             value: 67,
             name: "Drift Rate",
+            parameters: &[ParamId::DriftRate],
         },
         ValueEntry {
             value: 68,
             name: "Arp Gate",
+            parameters: &[ParamId::ArpGateTime],
         },
         ValueEntry {
             value: 69,
             name: "Seq Slew",
+            parameters: &[ParamId::SlewRate],
         },
         ValueEntry {
             value: 70,
             name: "Mod 1 Dep",
+            parameters: &[ParamId::Mod1Depth],
         },
         ValueEntry {
             value: 71,
             name: "Mod 2 Dep",
+            parameters: &[ParamId::Mod2Depth],
         },
         ValueEntry {
             value: 72,
             name: "Mod 3 Dep",
+            parameters: &[ParamId::Mod3Depth],
         },
         ValueEntry {
             value: 73,
             name: "Mod 4 Dep",
+            parameters: &[ParamId::Mod4Depth],
         },
         ValueEntry {
             value: 74,
             name: "Mod 5 Dep",
+            parameters: &[ParamId::Mod5Depth],
         },
         ValueEntry {
             value: 75,
             name: "Mod 6 Dep",
+            parameters: &[ParamId::Mod6Depth],
         },
         ValueEntry {
             value: 76,
             name: "Mod 7 Dep",
+            parameters: &[ParamId::Mod7Depth],
         },
         ValueEntry {
             value: 77,
             name: "Mod 8 Dep",
+            parameters: &[ParamId::Mod8Depth],
         },
         ValueEntry {
             value: 78,
             name: "Fx 1 Param 1",
+            parameters: &[ParamId::Fx1Param1],
         },
         ValueEntry {
             value: 79,
             name: "Fx 1 Param 2",
+            parameters: &[ParamId::Fx1Param2],
         },
         ValueEntry {
             value: 80,
             name: "Fx 1 Param 3",
+            parameters: &[ParamId::Fx1Param3],
         },
         ValueEntry {
             value: 81,
             name: "Fx 1 Param 4",
+            parameters: &[ParamId::Fx1Param4],
         },
         ValueEntry {
             value: 82,
             name: "Fx 1 Param 5",
+            parameters: &[ParamId::Fx1Param5],
         },
         ValueEntry {
             value: 83,
             name: "Fx 1 Param 6",
+            parameters: &[ParamId::Fx1Param6],
         },
         ValueEntry {
             value: 84,
             name: "Fx 1 Param 7",
+            parameters: &[ParamId::Fx1Param7],
         },
         ValueEntry {
             value: 85,
             name: "Fx 1 Param 8",
+            parameters: &[ParamId::Fx1Param8],
         },
         ValueEntry {
             value: 86,
             name: "Fx 1 Param 9",
+            parameters: &[ParamId::Fx1Param9],
         },
         ValueEntry {
             value: 87,
             name: "Fx 1 Param 10",
+            parameters: &[ParamId::Fx1Param10],
         },
         ValueEntry {
             value: 88,
             name: "Fx 1 Param 11",
+            parameters: &[ParamId::Fx1Param11],
         },
         ValueEntry {
             value: 89,
             name: "Fx 1 Param 12",
+            parameters: &[ParamId::Fx1Param12],
         },
         ValueEntry {
             value: 90,
             name: "Fx 2 Param 1",
+            parameters: &[ParamId::Fx2Param1],
         },
         ValueEntry {
             value: 91,
             name: "Fx 2 Param 2",
+            parameters: &[ParamId::Fx2Param2],
         },
         ValueEntry {
             value: 92,
             name: "Fx 2 Param 3",
+            parameters: &[ParamId::Fx2Param3],
         },
         ValueEntry {
             value: 93,
             name: "Fx 2 Param 4",
+            parameters: &[ParamId::Fx2Param4],
         },
         ValueEntry {
             value: 94,
             name: "Fx 2 Param 5",
+            parameters: &[ParamId::Fx2Param5],
         },
         ValueEntry {
             value: 95,
             name: "Fx 2 Param 6",
+            parameters: &[ParamId::Fx2Param6],
         },
         ValueEntry {
             value: 96,
             name: "Fx 2 Param 7",
+            parameters: &[ParamId::Fx2Param7],
         },
         ValueEntry {
             value: 97,
             name: "Fx 2 Param 8",
+            parameters: &[ParamId::Fx2Param8],
         },
         ValueEntry {
             value: 98,
             name: "Fx 2 Param 9",
+            parameters: &[ParamId::Fx2Param9],
         },
         ValueEntry {
             value: 99,
             name: "Fx 2 Param 10",
+            parameters: &[ParamId::Fx2Param10],
         },
         ValueEntry {
             value: 100,
             name: "Fx 2 Param 11",
+            parameters: &[ParamId::Fx2Param11],
         },
         ValueEntry {
             value: 101,
             name: "Fx 2 Param 12",
+            parameters: &[ParamId::Fx2Param12],
         },
         ValueEntry {
             value: 102,
             name: "Fx 3 Param 1",
+            parameters: &[ParamId::Fx3Param1],
         },
         ValueEntry {
             value: 103,
             name: "Fx 3 Param 2",
+            parameters: &[ParamId::Fx3Param2],
         },
         ValueEntry {
             value: 104,
             name: "Fx 3 Param 3",
+            parameters: &[ParamId::Fx3Param3],
         },
         ValueEntry {
             value: 105,
             name: "Fx 3 Param 4",
+            parameters: &[ParamId::Fx3Param4],
         },
         ValueEntry {
             value: 106,
             name: "Fx 3 Param 5",
+            parameters: &[ParamId::Fx3Param5],
         },
         ValueEntry {
             value: 107,
             name: "Fx 3 Param 6",
+            parameters: &[ParamId::Fx3Param6],
         },
         ValueEntry {
             value: 108,
             name: "Fx 3 Param 7",
+            parameters: &[ParamId::Fx3Param7],
         },
         ValueEntry {
             value: 109,
             name: "Fx 3 Param 8",
+            parameters: &[ParamId::Fx3Param8],
         },
         ValueEntry {
             value: 110,
             name: "Fx 3 Param 9",
+            parameters: &[ParamId::Fx3Param9],
         },
         ValueEntry {
             value: 111,
             name: "Fx 3 Param 10",
+            parameters: &[ParamId::Fx3Param10],
         },
         ValueEntry {
             value: 112,
             name: "Fx 3 Param 11",
+            parameters: &[ParamId::Fx3Param11],
         },
         ValueEntry {
             value: 113,
             name: "Fx 3 Param 12",
+            parameters: &[ParamId::Fx3Param12],
         },
         ValueEntry {
             value: 114,
             name: "Fx 4 Param 1",
+            parameters: &[ParamId::Fx4Param1],
         },
         ValueEntry {
             value: 115,
             name: "Fx 4 Param 2",
+            parameters: &[ParamId::Fx4Param2],
         },
         ValueEntry {
             value: 116,
             name: "Fx 4 Param 3",
+            parameters: &[ParamId::Fx4Param3],
         },
         ValueEntry {
             value: 117,
             name: "Fx 4 Param 4",
+            parameters: &[ParamId::Fx4Param4],
         },
         ValueEntry {
             value: 118,
             name: "Fx 4 Param 5",
+            parameters: &[ParamId::Fx4Param5],
         },
         ValueEntry {
             value: 119,
             name: "Fx 4 Param 6",
+            parameters: &[ParamId::Fx4Param6],
         },
         ValueEntry {
             value: 120,
             name: "Fx 4 Param 7",
+            parameters: &[ParamId::Fx4Param7],
         },
         ValueEntry {
             value: 121,
             name: "Fx 4 Param 8",
+            parameters: &[ParamId::Fx4Param8],
         },
         ValueEntry {
             value: 122,
             name: "Fx 4 Param 9",
+            parameters: &[ParamId::Fx4Param9],
         },
         ValueEntry {
             value: 123,
             name: "Fx 4 Param 10",
+            parameters: &[ParamId::Fx4Param10],
         },
         ValueEntry {
             value: 124,
             name: "Fx 4 Param 11",
+            parameters: &[ParamId::Fx4Param11],
         },
         ValueEntry {
             value: 125,
             name: "Fx 4 Param 12",
+            parameters: &[ParamId::Fx4Param12],
         },
         ValueEntry {
             value: 126,
             name: "Fx 1 Level",
+            parameters: &[ParamId::Fx1OutputGain],
         },
         ValueEntry {
             value: 127,
             name: "Fx 2 Level",
+            parameters: &[ParamId::Fx2OutputGain],
         },
         ValueEntry {
             value: 128,
             name: "Fx 3 Level",
+            parameters: &[ParamId::Fx3OutputGain],
         },
         ValueEntry {
             value: 129,
             name: "Fx 4 Level",
+            parameters: &[ParamId::Fx4OutputGain],
         },
     ],
 };
@@ -5068,138 +5699,172 @@ static FX_TYPE_FW_1_0: ValueTable = ValueTable {
         ValueEntry {
             value: 0,
             name: "TC-DeepVRB",
+            parameters: &[],
         },
         ValueEntry {
             value: 1,
             name: "AmbVerb",
+            parameters: &[],
         },
         ValueEntry {
             value: 2,
             name: "RoomRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 3,
             name: "VintageRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 4,
             name: "HallRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 5,
             name: "ChamberRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 6,
             name: "PlateRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 7,
             name: "RichPltRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 8,
             name: "GatedRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 9,
             name: "Reverse",
+            parameters: &[],
         },
         ValueEntry {
             value: 10,
             name: "ChorusVerb",
+            parameters: &[],
         },
         ValueEntry {
             value: 11,
             name: "DelayVerb",
+            parameters: &[],
         },
         ValueEntry {
             value: 12,
             name: "FlangVerb",
+            parameters: &[],
         },
         ValueEntry {
             value: 13,
             name: "MidasEQ",
+            parameters: &[],
         },
         ValueEntry {
             value: 14,
             name: "Enhancer",
+            parameters: &[],
         },
         ValueEntry {
             value: 15,
             name: "FairComp",
+            parameters: &[],
         },
         ValueEntry {
             value: 16,
             name: "MulBndDist",
+            parameters: &[],
         },
         ValueEntry {
             value: 17,
             name: "RackAmp",
+            parameters: &[],
         },
         ValueEntry {
             value: 18,
             name: "EdisonEX1",
+            parameters: &[],
         },
         ValueEntry {
             value: 19,
             name: "Auto Pan",
+            parameters: &[],
         },
         ValueEntry {
             value: 20,
             name: "NoiseGate",
+            parameters: &[],
         },
         ValueEntry {
             value: 21,
             name: "Delay",
+            parameters: &[],
         },
         ValueEntry {
             value: 22,
             name: "3TapDelay",
+            parameters: &[],
         },
         ValueEntry {
             value: 23,
             name: "4TapDelay",
+            parameters: &[],
         },
         ValueEntry {
             value: 24,
             name: "T-RayDelay",
+            parameters: &[],
         },
         ValueEntry {
             value: 25,
             name: "DecimDelay",
+            parameters: &[],
         },
         ValueEntry {
             value: 26,
             name: "ModDlyRev",
+            parameters: &[],
         },
         ValueEntry {
             value: 27,
             name: "Chorus",
+            parameters: &[],
         },
         ValueEntry {
             value: 28,
             name: "Chorus-D",
+            parameters: &[],
         },
         ValueEntry {
             value: 29,
             name: "Flanger",
+            parameters: &[],
         },
         ValueEntry {
             value: 30,
             name: "Phaser",
+            parameters: &[],
         },
         ValueEntry {
             value: 31,
             name: "MoodFilter",
+            parameters: &[],
         },
         ValueEntry {
             value: 32,
             name: "DualPitch",
+            parameters: &[],
         },
         ValueEntry {
             value: 33,
             name: "RotarySpkr",
+            parameters: &[],
         },
     ],
 };

@@ -419,11 +419,27 @@ fn render_value_tables(spec: &Spec) -> String {
                 "> Unconfirmed. This mapping is inferred and needs checking against hardware.\n\n",
             );
         }
-        out.push_str("| Value | Name | Notes |\n|---|---|---|\n");
+        // Only the modulation destinations join to the parameter table today,
+        // so the column appears where there is something in it rather than as
+        // an empty one on all twenty-odd tables.
+        let joins = table
+            .entries
+            .iter()
+            .any(|entry| !entry.parameters.is_empty());
+        if joins {
+            out.push_str("| Value | Name | Moves | Notes |\n|---|---|---|---|\n");
+        } else {
+            out.push_str("| Value | Name | Notes |\n|---|---|---|\n");
+        }
         for entry in &table.entries {
+            let moves = if joins {
+                format!("{} | ", cell(&entry.parameters.join(", ")))
+            } else {
+                String::new()
+            };
             let _ = writeln!(
                 out,
-                "| {} | {} | {} |",
+                "| {} | {} | {moves}{} |",
                 entry.value,
                 cell(&entry.name),
                 cell(entry.description.as_deref().unwrap_or(""))

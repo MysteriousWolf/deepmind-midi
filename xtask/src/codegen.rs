@@ -312,6 +312,14 @@ pub enum ParamId {
 }
 
 fn render_tables(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
+    // A value table entry names the parameters it moves under the names
+    // `parameters.toml` gives, which is what keeps the file readable by hand.
+    let by_name: BTreeMap<&str, &str> = spec
+        .parameters
+        .iter()
+        .zip(idents.parameters.iter())
+        .map(|(parameter, ident)| (parameter.name.as_str(), ident.as_str()))
+        .collect();
     let idents = &idents.tables;
     let ids: Vec<&str> = idents.keys().map(String::as_str).collect();
 
@@ -373,13 +381,35 @@ pub enum TableId {
         for entry in &table.entries {
             let _ = writeln!(
                 out,
-                "    ValueEntry {{ value: {}, name: {:?} }},",
-                entry.value, entry.name
+                "    ValueEntry {{ value: {}, name: {:?}, parameters: {} }},",
+                entry.value,
+                entry.name,
+                parameter_slice(&by_name, &entry.parameters)?
             );
         }
         out.push_str("] };\n\n");
     }
     Ok(())
+}
+
+/// Renders the parameters a value table entry names, as a `ParamId` slice.
+///
+/// The spec writes them under the names `parameters.toml` gives, which is what
+/// keeps the table readable; the loader has already checked that every one of
+/// them resolves.
+fn parameter_slice(by_name: &BTreeMap<&str, &str>, names: &[String]) -> Result<String, String> {
+    if names.is_empty() {
+        return Ok("&[]".to_owned());
+    }
+    let mut rendered = String::from("&[");
+    for name in names {
+        let ident = by_name
+            .get(name.as_str())
+            .ok_or_else(|| format!("enums.toml: no parameter named {name:?}"))?;
+        let _ = write!(rendered, "ParamId::{ident}, ");
+    }
+    rendered.push(']');
+    Ok(rendered)
 }
 
 /// Renders the body of one `table_for` arm: a static, or a chain choosing

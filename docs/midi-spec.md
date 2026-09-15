@@ -1228,7 +1228,7 @@ Firmware 1.1+.
 
 | Value | Name | Notes |
 |---|---|---|
-| 0 | Off |  |
+| 0 | Off | The matrix row is switched off |
 | 1 | Pitch Bend | Pitch bend wheel |
 | 2 | Mod Wheel | Modulation wheel |
 | 3 | Foot Ctrl | Foot controller |
@@ -1264,7 +1264,7 @@ Value 0 selects Off.
 
 | Value | Name | Notes |
 |---|---|---|
-| 0 | Off |  |
+| 0 | Off | The matrix row is switched off |
 | 1 | Pitch Bend |  |
 | 2 | Mod Wheel |  |
 | 3 | Foot Ctrl |  |
@@ -1294,141 +1294,143 @@ Value 0 selects Off.
 
 Firmware 1.1+.
 
-| Value | Name | Notes |
-|---|---|---|
-| 0 | Off |  |
-| 1 | LFO1 Rate |  |
-| 2 | LFO1 Delay |  |
-| 3 | LFO1 Slew |  |
-| 4 | LFO1 Shape |  |
-| 5 | LFO2 Rate |  |
-| 6 | LFO2 Delay |  |
-| 7 | LFO2 Slew |  |
-| 8 | LFO2 Shape |  |
-| 9 | OSC1+2 Pit |  |
-| 10 | OSC1+2 Fine |  |
-| 11 | OSC1 Pitch |  |
-| 12 | OSC1 Fine |  |
-| 13 | OSC2 Pitch |  |
-| 14 | OSC2 Fine |  |
-| 15 | OSC1 PM Dep |  |
-| 16 | PWM Depth |  |
-| 17 | TMod Depth |  |
-| 18 | OSC2 PM Dep |  |
-| 19 | Porta Time |  |
-| 20 | VCF Freq |  |
-| 21 | VCF Res |  |
-| 22 | VCF Env |  |
-| 23 | VCF LFO |  |
-| 24 | Env Rates |  |
-| 25 | All Attack |  |
-| 26 | All Decay |  |
-| 27 | All Sus |  |
-| 28 | All Rel |  |
-| 29 | Env1 Rates |  |
-| 30 | Env2 Rates |  |
-| 31 | Env3 Rates |  |
-| 32 | Env1CurveS |  |
-| 33 | Env2CurveS |  |
-| 34 | Env3CurveS |  |
-| 35 | Env1 Attack |  |
-| 36 | Env1 Decay |  |
-| 37 | Env1 Sus |  |
-| 38 | Env1 Rel |  |
-| 39 | Env1 AtCur |  |
-| 40 | Env1 DcyCur |  |
-| 41 | Env1 SuSCur |  |
-| 42 | Env1 RelCur |  |
-| 43 | Env2 Attack |  |
-| 44 | Env2 Decay |  |
-| 45 | Env2 Sus |  |
-| 46 | Env2 Rel |  |
-| 47 | Env2 AtCur |  |
-| 48 | Env2 DcyCur |  |
-| 49 | Env2 SuSCur |  |
-| 50 | Env2 RelCur |  |
-| 51 | Env3 Attack |  |
-| 52 | Env3 Decay |  |
-| 53 | Env3 Sus |  |
-| 54 | Env3 Rel |  |
-| 55 | Env3 AtCur |  |
-| 56 | Env3 DcyCur |  |
-| 57 | Env3 SuSCur |  |
-| 58 | Env3 RelCur |  |
-| 59 | VCA All |  |
-| 60 | VCA Active |  |
-| 61 | VCA EnvDep |  |
-| 62 | Pan Spread |  |
-| 63 | VCA Pan |  |
-| 64 | OSC2 Lvl |  |
-| 65 | Noise Lvl |  |
-| 66 | HP Freq |  |
-| 67 | Uni Detune |  |
-| 68 | OSC Drift |  |
-| 69 | Param Drift |  |
-| 70 | Drift Rate |  |
-| 71 | Arp Gate |  |
-| 72 | Seq Slew |  |
-| 73 | Mod 1 Dep |  |
-| 74 | Mod 2 Dep |  |
-| 75 | Mod 3 Dep |  |
-| 76 | Mod 4 Dep |  |
-| 77 | Mod 5 Dep |  |
-| 78 | Mod 6 Dep |  |
-| 79 | Mod 7 Dep |  |
-| 80 | Mod 8 Dep |  |
-| 81 | Fx 1 Param 1 |  |
-| 82 | Fx 1 Param 2 |  |
-| 83 | Fx 1 Param 3 |  |
-| 84 | Fx 1 Param 4 |  |
-| 85 | Fx 1 Param 5 |  |
-| 86 | Fx 1 Param 6 |  |
-| 87 | Fx 1 Param 7 |  |
-| 88 | Fx 1 Param 8 |  |
-| 89 | Fx 1 Param 9 |  |
-| 90 | Fx 1 Param 10 |  |
-| 91 | Fx 1 Param 11 |  |
-| 92 | Fx 1 Param 12 |  |
-| 93 | Fx 2 Param 1 |  |
-| 94 | Fx 2 Param 2 |  |
-| 95 | Fx 2 Param 3 |  |
-| 96 | Fx 2 Param 4 |  |
-| 97 | Fx 2 Param 5 |  |
-| 98 | Fx 2 Param 6 |  |
-| 99 | Fx 2 Param 7 |  |
-| 100 | Fx 2 Param 8 |  |
-| 101 | Fx 2 Param 9 |  |
-| 102 | Fx 2 Param 10 |  |
-| 103 | Fx 2 Param 11 |  |
-| 104 | Fx 2 Param 12 |  |
-| 105 | Fx 3 Param 1 |  |
-| 106 | Fx 3 Param 2 |  |
-| 107 | Fx 3 Param 3 |  |
-| 108 | Fx 3 Param 4 |  |
-| 109 | Fx 3 Param 5 |  |
-| 110 | Fx 3 Param 6 |  |
-| 111 | Fx 3 Param 7 |  |
-| 112 | Fx 3 Param 8 |  |
-| 113 | Fx 3 Param 9 |  |
-| 114 | Fx 3 Param 10 |  |
-| 115 | Fx 3 Param 11 |  |
-| 116 | Fx 3 Param 12 |  |
-| 117 | Fx 4 Param 1 |  |
-| 118 | Fx 4 Param 2 |  |
-| 119 | Fx 4 Param 3 |  |
-| 120 | Fx 4 Param 4 |  |
-| 121 | Fx 4 Param 5 |  |
-| 122 | Fx 4 Param 6 |  |
-| 123 | Fx 4 Param 7 |  |
-| 124 | Fx 4 Param 8 |  |
-| 125 | Fx 4 Param 9 |  |
-| 126 | Fx 4 Param 10 |  |
-| 127 | Fx 4 Param 11 |  |
-| 128 | Fx 4 Param 12 |  |
-| 129 | Fx 1 Level |  |
-| 130 | Fx 2 Level |  |
-| 131 | Fx 3 Level |  |
-| 132 | Fx 4 Level |  |
+The Moves column joins each destination to the program parameters it reaches, so that a host holding `Mod 3 Destination = 20` can say that the byte it addresses is offset 39. It is this project's reading of the abbreviations the display prints, checked against the parameter table, not a mapping the manual publishes. A blank there is deliberate: the destination names something no program parameter holds, such as the pitch a key is playing or the amplitude of one voice, and the Notes column says which. Several destinations plainly move more than one parameter, which is why this is a list.
+
+| Value | Name | Moves | Notes |
+|---|---|---|---|
+| 0 | Off |  | The matrix row is switched off |
+| 1 | LFO1 Rate | LFO 1 Rate |  |
+| 2 | LFO1 Delay | LFO 1 Delay / Fade |  |
+| 3 | LFO1 Slew | LFO 1 Slew Rate |  |
+| 4 | LFO1 Shape | LFO 1 Shape |  |
+| 5 | LFO2 Rate | LFO 2 Rate |  |
+| 6 | LFO2 Delay | LFO 2 Delay / Fade |  |
+| 7 | LFO2 Slew | LFO 2 Slew Rate |  |
+| 8 | LFO2 Shape | LFO 2 Shape |  |
+| 9 | OSC1+2 Pit |  | Both oscillators' pitch, which is played rather than stored: no program parameter holds it |
+| 10 | OSC1+2 Fine |  | Both oscillators' fine pitch, which no program parameter holds |
+| 11 | OSC1 Pitch |  | Oscillator 1 sets the played pitch, so no program parameter holds it |
+| 12 | OSC1 Fine |  | Oscillator 1's fine pitch, which no program parameter holds |
+| 13 | OSC2 Pitch | OSC 2 Pitch |  |
+| 14 | OSC2 Fine |  | Oscillator 2 stores one pitch byte covering semitones and cents, which OSC2 Pitch already names |
+| 15 | OSC1 PM Dep | OSC 1 Pitch Mod Depth |  |
+| 16 | PWM Depth | OSC 1 PWM Depth |  |
+| 17 | TMod Depth | OSC 2 Tone Mod Depth |  |
+| 18 | OSC2 PM Dep | OSC 2 Pitch Mod Depth |  |
+| 19 | Porta Time | Portamento time |  |
+| 20 | VCF Freq | VCF Frequency |  |
+| 21 | VCF Res | VCF Resonance |  |
+| 22 | VCF Env | VCF Envelope Depth |  |
+| 23 | VCF LFO | VCF LFO Depth |  |
+| 24 | Env Rates | VCA Envelope Attack Time, VCA Envelope Decay Time, VCA Envelope Release Time, VCF Envelope Attack Time, VCF Envelope Decay Time, VCF Envelope Release Time, Mod Envelope Attack Time, Mod Envelope Decay Time, Mod Envelope Release Time | Attack, decay and release of all three envelopes. Sustain is a level rather than a rate, and All Sus names it |
+| 25 | All Attack | VCA Envelope Attack Time, VCF Envelope Attack Time, Mod Envelope Attack Time |  |
+| 26 | All Decay | VCA Envelope Decay Time, VCF Envelope Decay Time, Mod Envelope Decay Time |  |
+| 27 | All Sus | VCA Envelope Sustain Level, VCF Envelope Sustain Level, Mod Envelope Sustain Level |  |
+| 28 | All Rel | VCA Envelope Release Time, VCF Envelope Release Time, Mod Envelope Release Time |  |
+| 29 | Env1 Rates | VCA Envelope Attack Time, VCA Envelope Decay Time, VCA Envelope Release Time | Attack, decay and release of the VCA envelope |
+| 30 | Env2 Rates | VCF Envelope Attack Time, VCF Envelope Decay Time, VCF Envelope Release Time | Attack, decay and release of the VCF envelope |
+| 31 | Env3 Rates | Mod Envelope Attack Time, Mod Envelope Decay Time, Mod Envelope Release Time | Attack, decay and release of the mod envelope |
+| 32 | Env1CurveS | VCA Envelope Attack Curve, VCA Envelope Decay Curve, VCA Envelope Sustain Curve, VCA Envelope Release Curve | All four curves of the VCA envelope |
+| 33 | Env2CurveS | VCF Envelope Attack Curve, VCF Envelope Decay Curve, VCF Envelope Sustain Curve, VCF Envelope Release Curve | All four curves of the VCF envelope |
+| 34 | Env3CurveS | Mod Envelope Attack Curve, Mod Envelope Decay Curve, Mod Envelope Sustain Curve, Mod Envelope Release Curve | All four curves of the mod envelope |
+| 35 | Env1 Attack | VCA Envelope Attack Time |  |
+| 36 | Env1 Decay | VCA Envelope Decay Time |  |
+| 37 | Env1 Sus | VCA Envelope Sustain Level |  |
+| 38 | Env1 Rel | VCA Envelope Release Time |  |
+| 39 | Env1 AtCur | VCA Envelope Attack Curve |  |
+| 40 | Env1 DcyCur | VCA Envelope Decay Curve |  |
+| 41 | Env1 SuSCur | VCA Envelope Sustain Curve |  |
+| 42 | Env1 RelCur | VCA Envelope Release Curve |  |
+| 43 | Env2 Attack | VCF Envelope Attack Time |  |
+| 44 | Env2 Decay | VCF Envelope Decay Time |  |
+| 45 | Env2 Sus | VCF Envelope Sustain Level |  |
+| 46 | Env2 Rel | VCF Envelope Release Time |  |
+| 47 | Env2 AtCur | VCF Envelope Attack Curve |  |
+| 48 | Env2 DcyCur | VCF Envelope Decay Curve |  |
+| 49 | Env2 SuSCur | VCF Envelope Sustain Curve |  |
+| 50 | Env2 RelCur | VCF Envelope Release Curve |  |
+| 51 | Env3 Attack | Mod Envelope Attack Time |  |
+| 52 | Env3 Decay | Mod Envelope Decay Time |  |
+| 53 | Env3 Sus | Mod Envelope Sustain Level |  |
+| 54 | Env3 Rel | Mod Envelope Release Time |  |
+| 55 | Env3 AtCur | Mod Envelope Attack Curve |  |
+| 56 | Env3 DcyCur | Mod Envelope Decay Curve |  |
+| 57 | Env3 SuSCur | Mod Envelope Sustain Curve |  |
+| 58 | Env3 RelCur | Mod Envelope Release Curve |  |
+| 59 | VCA All |  | Amplitude of every voice, which no program parameter holds |
+| 60 | VCA Active |  | Amplitude of the sounding voice, which no program parameter holds |
+| 61 | VCA EnvDep | VCA Envelope Depth |  |
+| 62 | Pan Spread | VCA Pan Spread |  |
+| 63 | VCA Pan |  | Per-voice pan position, which no program parameter holds; Pan Spread is the stored one |
+| 64 | OSC2 Lvl | OSC 2 Level |  |
+| 65 | Noise Lvl | Noise Level |  |
+| 66 | HP Freq | VCF HighPass Frequency |  |
+| 67 | Uni Detune | Unison Detune |  |
+| 68 | OSC Drift | Voice Drift | The parameter table calls this Voice Drift |
+| 69 | Param Drift | Parameter Drift |  |
+| 70 | Drift Rate | Drift Rate |  |
+| 71 | Arp Gate | Arp Gate Time | The arpeggiator's Gate Time |
+| 72 | Seq Slew | Slew Rate | The control sequencer's Slew Rate |
+| 73 | Mod 1 Dep | Mod 1 Depth |  |
+| 74 | Mod 2 Dep | Mod 2 Depth |  |
+| 75 | Mod 3 Dep | Mod 3 Depth |  |
+| 76 | Mod 4 Dep | Mod 4 Depth |  |
+| 77 | Mod 5 Dep | Mod 5 Depth |  |
+| 78 | Mod 6 Dep | Mod 6 Depth |  |
+| 79 | Mod 7 Dep | Mod 7 Depth |  |
+| 80 | Mod 8 Dep | Mod 8 Depth |  |
+| 81 | Fx 1 Param 1 | FX 1 Param 1 |  |
+| 82 | Fx 1 Param 2 | FX 1 Param 2 |  |
+| 83 | Fx 1 Param 3 | FX 1 Param 3 |  |
+| 84 | Fx 1 Param 4 | FX 1 Param 4 |  |
+| 85 | Fx 1 Param 5 | FX 1 Param 5 |  |
+| 86 | Fx 1 Param 6 | FX 1 Param 6 |  |
+| 87 | Fx 1 Param 7 | FX 1 Param 7 |  |
+| 88 | Fx 1 Param 8 | FX 1 Param 8 |  |
+| 89 | Fx 1 Param 9 | FX 1 Param 9 |  |
+| 90 | Fx 1 Param 10 | FX 1 Param 10 |  |
+| 91 | Fx 1 Param 11 | FX 1 Param 11 |  |
+| 92 | Fx 1 Param 12 | FX 1 Param 12 |  |
+| 93 | Fx 2 Param 1 | FX 2 Param 1 |  |
+| 94 | Fx 2 Param 2 | FX 2 Param 2 |  |
+| 95 | Fx 2 Param 3 | FX 2 Param 3 |  |
+| 96 | Fx 2 Param 4 | FX 2 Param 4 |  |
+| 97 | Fx 2 Param 5 | FX 2 Param 5 |  |
+| 98 | Fx 2 Param 6 | FX 2 Param 6 |  |
+| 99 | Fx 2 Param 7 | FX 2 Param 7 |  |
+| 100 | Fx 2 Param 8 | FX 2 Param 8 |  |
+| 101 | Fx 2 Param 9 | FX 2 Param 9 |  |
+| 102 | Fx 2 Param 10 | FX 2 Param 10 |  |
+| 103 | Fx 2 Param 11 | FX 2 Param 11 |  |
+| 104 | Fx 2 Param 12 | FX 2 Param 12 |  |
+| 105 | Fx 3 Param 1 | FX 3 Param 1 |  |
+| 106 | Fx 3 Param 2 | FX 3 Param 2 |  |
+| 107 | Fx 3 Param 3 | FX 3 Param 3 |  |
+| 108 | Fx 3 Param 4 | FX 3 Param 4 |  |
+| 109 | Fx 3 Param 5 | FX 3 Param 5 |  |
+| 110 | Fx 3 Param 6 | FX 3 Param 6 |  |
+| 111 | Fx 3 Param 7 | FX 3 Param 7 |  |
+| 112 | Fx 3 Param 8 | FX 3 Param 8 |  |
+| 113 | Fx 3 Param 9 | FX 3 Param 9 |  |
+| 114 | Fx 3 Param 10 | FX 3 Param 10 |  |
+| 115 | Fx 3 Param 11 | FX 3 Param 11 |  |
+| 116 | Fx 3 Param 12 | FX 3 Param 12 |  |
+| 117 | Fx 4 Param 1 | FX 4 Param 1 |  |
+| 118 | Fx 4 Param 2 | FX 4 Param 2 |  |
+| 119 | Fx 4 Param 3 | FX 4 Param 3 |  |
+| 120 | Fx 4 Param 4 | FX 4 Param 4 |  |
+| 121 | Fx 4 Param 5 | FX 4 Param 5 |  |
+| 122 | Fx 4 Param 6 | FX 4 Param 6 |  |
+| 123 | Fx 4 Param 7 | FX 4 Param 7 |  |
+| 124 | Fx 4 Param 8 | FX 4 Param 8 |  |
+| 125 | Fx 4 Param 9 | FX 4 Param 9 |  |
+| 126 | Fx 4 Param 10 | FX 4 Param 10 |  |
+| 127 | Fx 4 Param 11 | FX 4 Param 11 |  |
+| 128 | Fx 4 Param 12 | FX 4 Param 12 |  |
+| 129 | Fx 1 Level | FX 1 Output Gain |  |
+| 130 | Fx 2 Level | FX 2 Output Gain |  |
+| 131 | Fx 3 Level | FX 3 Output Gain |  |
+| 132 | Fx 4 Level | FX 4 Output Gain |  |
 
 <a id="fx_type"></a>
 
@@ -1480,142 +1482,142 @@ Firmware 1.1+.
 
 Firmware 1.0.
 
-Value 0 selects Off. Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual. It offers 129 destinations, and the mod matrix diagram on page 19 of the firmware 1.1 manual, which was left at its firmware 1.0 numbers, says 130. That diagram counts 22 sources, which is this table's companion mod_source list with Off excluded, so by the same convention 130 means 130 selectable destinations and this table is one entry short. Which entry is missing needs a firmware 1.0 manual or the hardware.
+Value 0 selects Off. Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual. It offers 129 destinations, and the mod matrix diagram on page 19 of the firmware 1.1 manual, which was left at its firmware 1.0 numbers, says 130. That diagram counts 22 sources, which is this table's companion mod_source list with Off excluded, so by the same convention 130 means 130 selectable destinations and this table is one entry short. Which entry is missing needs a firmware 1.0 manual or the hardware. The Moves column is inherited entry by entry from the firmware 1.1 table, which the loader checks, so it is exactly as certain as the renumbering it annotates and no more.
 
 > Unconfirmed. This mapping is inferred and needs checking against hardware.
 
-| Value | Name | Notes |
-|---|---|---|
-| 0 | Off |  |
-| 1 | LFO1 Rate |  |
-| 2 | LFO1 Delay |  |
-| 3 | LFO1 Slew |  |
-| 4 | LFO1 Shape |  |
-| 5 | LFO2 Rate |  |
-| 6 | LFO2 Delay |  |
-| 7 | LFO2 Slew |  |
-| 8 | LFO2 Shape |  |
-| 9 | OSC1+2 Pit |  |
-| 10 | OSC1 Pitch |  |
-| 11 | OSC2 Pitch |  |
-| 12 | OSC1 PM Dep |  |
-| 13 | PWM Depth |  |
-| 14 | TMod Depth |  |
-| 15 | OSC2 PM Dep |  |
-| 16 | Porta Time |  |
-| 17 | VCF Freq |  |
-| 18 | VCF Res |  |
-| 19 | VCF Env |  |
-| 20 | VCF LFO |  |
-| 21 | Env Rates |  |
-| 22 | All Attack |  |
-| 23 | All Decay |  |
-| 24 | All Sus |  |
-| 25 | All Rel |  |
-| 26 | Env1 Rates |  |
-| 27 | Env2 Rates |  |
-| 28 | Env3 Rates |  |
-| 29 | Env1CurveS |  |
-| 30 | Env2CurveS |  |
-| 31 | Env3CurveS |  |
-| 32 | Env1 Attack |  |
-| 33 | Env1 Decay |  |
-| 34 | Env1 Sus |  |
-| 35 | Env1 Rel |  |
-| 36 | Env1 AtCur |  |
-| 37 | Env1 DcyCur |  |
-| 38 | Env1 SuSCur |  |
-| 39 | Env1 RelCur |  |
-| 40 | Env2 Attack |  |
-| 41 | Env2 Decay |  |
-| 42 | Env2 Sus |  |
-| 43 | Env2 Rel |  |
-| 44 | Env2 AtCur |  |
-| 45 | Env2 DcyCur |  |
-| 46 | Env2 SuSCur |  |
-| 47 | Env2 RelCur |  |
-| 48 | Env3 Attack |  |
-| 49 | Env3 Decay |  |
-| 50 | Env3 Sus |  |
-| 51 | Env3 Rel |  |
-| 52 | Env3 AtCur |  |
-| 53 | Env3 DcyCur |  |
-| 54 | Env3 SuSCur |  |
-| 55 | Env3 RelCur |  |
-| 56 | VCA All |  |
-| 57 | VCA Active |  |
-| 58 | VCA EnvDep |  |
-| 59 | Pan Spread |  |
-| 60 | VCA Pan |  |
-| 61 | OSC2 Lvl |  |
-| 62 | Noise Lvl |  |
-| 63 | HP Freq |  |
-| 64 | Uni Detune |  |
-| 65 | OSC Drift |  |
-| 66 | Param Drift |  |
-| 67 | Drift Rate |  |
-| 68 | Arp Gate |  |
-| 69 | Seq Slew |  |
-| 70 | Mod 1 Dep |  |
-| 71 | Mod 2 Dep |  |
-| 72 | Mod 3 Dep |  |
-| 73 | Mod 4 Dep |  |
-| 74 | Mod 5 Dep |  |
-| 75 | Mod 6 Dep |  |
-| 76 | Mod 7 Dep |  |
-| 77 | Mod 8 Dep |  |
-| 78 | Fx 1 Param 1 |  |
-| 79 | Fx 1 Param 2 |  |
-| 80 | Fx 1 Param 3 |  |
-| 81 | Fx 1 Param 4 |  |
-| 82 | Fx 1 Param 5 |  |
-| 83 | Fx 1 Param 6 |  |
-| 84 | Fx 1 Param 7 |  |
-| 85 | Fx 1 Param 8 |  |
-| 86 | Fx 1 Param 9 |  |
-| 87 | Fx 1 Param 10 |  |
-| 88 | Fx 1 Param 11 |  |
-| 89 | Fx 1 Param 12 |  |
-| 90 | Fx 2 Param 1 |  |
-| 91 | Fx 2 Param 2 |  |
-| 92 | Fx 2 Param 3 |  |
-| 93 | Fx 2 Param 4 |  |
-| 94 | Fx 2 Param 5 |  |
-| 95 | Fx 2 Param 6 |  |
-| 96 | Fx 2 Param 7 |  |
-| 97 | Fx 2 Param 8 |  |
-| 98 | Fx 2 Param 9 |  |
-| 99 | Fx 2 Param 10 |  |
-| 100 | Fx 2 Param 11 |  |
-| 101 | Fx 2 Param 12 |  |
-| 102 | Fx 3 Param 1 |  |
-| 103 | Fx 3 Param 2 |  |
-| 104 | Fx 3 Param 3 |  |
-| 105 | Fx 3 Param 4 |  |
-| 106 | Fx 3 Param 5 |  |
-| 107 | Fx 3 Param 6 |  |
-| 108 | Fx 3 Param 7 |  |
-| 109 | Fx 3 Param 8 |  |
-| 110 | Fx 3 Param 9 |  |
-| 111 | Fx 3 Param 10 |  |
-| 112 | Fx 3 Param 11 |  |
-| 113 | Fx 3 Param 12 |  |
-| 114 | Fx 4 Param 1 |  |
-| 115 | Fx 4 Param 2 |  |
-| 116 | Fx 4 Param 3 |  |
-| 117 | Fx 4 Param 4 |  |
-| 118 | Fx 4 Param 5 |  |
-| 119 | Fx 4 Param 6 |  |
-| 120 | Fx 4 Param 7 |  |
-| 121 | Fx 4 Param 8 |  |
-| 122 | Fx 4 Param 9 |  |
-| 123 | Fx 4 Param 10 |  |
-| 124 | Fx 4 Param 11 |  |
-| 125 | Fx 4 Param 12 |  |
-| 126 | Fx 1 Level |  |
-| 127 | Fx 2 Level |  |
-| 128 | Fx 3 Level |  |
-| 129 | Fx 4 Level |  |
+| Value | Name | Moves | Notes |
+|---|---|---|---|
+| 0 | Off |  | The matrix row is switched off |
+| 1 | LFO1 Rate | LFO 1 Rate |  |
+| 2 | LFO1 Delay | LFO 1 Delay / Fade |  |
+| 3 | LFO1 Slew | LFO 1 Slew Rate |  |
+| 4 | LFO1 Shape | LFO 1 Shape |  |
+| 5 | LFO2 Rate | LFO 2 Rate |  |
+| 6 | LFO2 Delay | LFO 2 Delay / Fade |  |
+| 7 | LFO2 Slew | LFO 2 Slew Rate |  |
+| 8 | LFO2 Shape | LFO 2 Shape |  |
+| 9 | OSC1+2 Pit |  | Both oscillators' pitch, which is played rather than stored: no program parameter holds it |
+| 10 | OSC1 Pitch |  | Oscillator 1 sets the played pitch, so no program parameter holds it |
+| 11 | OSC2 Pitch | OSC 2 Pitch |  |
+| 12 | OSC1 PM Dep | OSC 1 Pitch Mod Depth |  |
+| 13 | PWM Depth | OSC 1 PWM Depth |  |
+| 14 | TMod Depth | OSC 2 Tone Mod Depth |  |
+| 15 | OSC2 PM Dep | OSC 2 Pitch Mod Depth |  |
+| 16 | Porta Time | Portamento time |  |
+| 17 | VCF Freq | VCF Frequency |  |
+| 18 | VCF Res | VCF Resonance |  |
+| 19 | VCF Env | VCF Envelope Depth |  |
+| 20 | VCF LFO | VCF LFO Depth |  |
+| 21 | Env Rates | VCA Envelope Attack Time, VCA Envelope Decay Time, VCA Envelope Release Time, VCF Envelope Attack Time, VCF Envelope Decay Time, VCF Envelope Release Time, Mod Envelope Attack Time, Mod Envelope Decay Time, Mod Envelope Release Time | Attack, decay and release of all three envelopes. Sustain is a level rather than a rate, and All Sus names it |
+| 22 | All Attack | VCA Envelope Attack Time, VCF Envelope Attack Time, Mod Envelope Attack Time |  |
+| 23 | All Decay | VCA Envelope Decay Time, VCF Envelope Decay Time, Mod Envelope Decay Time |  |
+| 24 | All Sus | VCA Envelope Sustain Level, VCF Envelope Sustain Level, Mod Envelope Sustain Level |  |
+| 25 | All Rel | VCA Envelope Release Time, VCF Envelope Release Time, Mod Envelope Release Time |  |
+| 26 | Env1 Rates | VCA Envelope Attack Time, VCA Envelope Decay Time, VCA Envelope Release Time | Attack, decay and release of the VCA envelope |
+| 27 | Env2 Rates | VCF Envelope Attack Time, VCF Envelope Decay Time, VCF Envelope Release Time | Attack, decay and release of the VCF envelope |
+| 28 | Env3 Rates | Mod Envelope Attack Time, Mod Envelope Decay Time, Mod Envelope Release Time | Attack, decay and release of the mod envelope |
+| 29 | Env1CurveS | VCA Envelope Attack Curve, VCA Envelope Decay Curve, VCA Envelope Sustain Curve, VCA Envelope Release Curve | All four curves of the VCA envelope |
+| 30 | Env2CurveS | VCF Envelope Attack Curve, VCF Envelope Decay Curve, VCF Envelope Sustain Curve, VCF Envelope Release Curve | All four curves of the VCF envelope |
+| 31 | Env3CurveS | Mod Envelope Attack Curve, Mod Envelope Decay Curve, Mod Envelope Sustain Curve, Mod Envelope Release Curve | All four curves of the mod envelope |
+| 32 | Env1 Attack | VCA Envelope Attack Time |  |
+| 33 | Env1 Decay | VCA Envelope Decay Time |  |
+| 34 | Env1 Sus | VCA Envelope Sustain Level |  |
+| 35 | Env1 Rel | VCA Envelope Release Time |  |
+| 36 | Env1 AtCur | VCA Envelope Attack Curve |  |
+| 37 | Env1 DcyCur | VCA Envelope Decay Curve |  |
+| 38 | Env1 SuSCur | VCA Envelope Sustain Curve |  |
+| 39 | Env1 RelCur | VCA Envelope Release Curve |  |
+| 40 | Env2 Attack | VCF Envelope Attack Time |  |
+| 41 | Env2 Decay | VCF Envelope Decay Time |  |
+| 42 | Env2 Sus | VCF Envelope Sustain Level |  |
+| 43 | Env2 Rel | VCF Envelope Release Time |  |
+| 44 | Env2 AtCur | VCF Envelope Attack Curve |  |
+| 45 | Env2 DcyCur | VCF Envelope Decay Curve |  |
+| 46 | Env2 SuSCur | VCF Envelope Sustain Curve |  |
+| 47 | Env2 RelCur | VCF Envelope Release Curve |  |
+| 48 | Env3 Attack | Mod Envelope Attack Time |  |
+| 49 | Env3 Decay | Mod Envelope Decay Time |  |
+| 50 | Env3 Sus | Mod Envelope Sustain Level |  |
+| 51 | Env3 Rel | Mod Envelope Release Time |  |
+| 52 | Env3 AtCur | Mod Envelope Attack Curve |  |
+| 53 | Env3 DcyCur | Mod Envelope Decay Curve |  |
+| 54 | Env3 SuSCur | Mod Envelope Sustain Curve |  |
+| 55 | Env3 RelCur | Mod Envelope Release Curve |  |
+| 56 | VCA All |  | Amplitude of every voice, which no program parameter holds |
+| 57 | VCA Active |  | Amplitude of the sounding voice, which no program parameter holds |
+| 58 | VCA EnvDep | VCA Envelope Depth |  |
+| 59 | Pan Spread | VCA Pan Spread |  |
+| 60 | VCA Pan |  | Per-voice pan position, which no program parameter holds; Pan Spread is the stored one |
+| 61 | OSC2 Lvl | OSC 2 Level |  |
+| 62 | Noise Lvl | Noise Level |  |
+| 63 | HP Freq | VCF HighPass Frequency |  |
+| 64 | Uni Detune | Unison Detune |  |
+| 65 | OSC Drift | Voice Drift | The parameter table calls this Voice Drift |
+| 66 | Param Drift | Parameter Drift |  |
+| 67 | Drift Rate | Drift Rate |  |
+| 68 | Arp Gate | Arp Gate Time | The arpeggiator's Gate Time |
+| 69 | Seq Slew | Slew Rate | The control sequencer's Slew Rate |
+| 70 | Mod 1 Dep | Mod 1 Depth |  |
+| 71 | Mod 2 Dep | Mod 2 Depth |  |
+| 72 | Mod 3 Dep | Mod 3 Depth |  |
+| 73 | Mod 4 Dep | Mod 4 Depth |  |
+| 74 | Mod 5 Dep | Mod 5 Depth |  |
+| 75 | Mod 6 Dep | Mod 6 Depth |  |
+| 76 | Mod 7 Dep | Mod 7 Depth |  |
+| 77 | Mod 8 Dep | Mod 8 Depth |  |
+| 78 | Fx 1 Param 1 | FX 1 Param 1 |  |
+| 79 | Fx 1 Param 2 | FX 1 Param 2 |  |
+| 80 | Fx 1 Param 3 | FX 1 Param 3 |  |
+| 81 | Fx 1 Param 4 | FX 1 Param 4 |  |
+| 82 | Fx 1 Param 5 | FX 1 Param 5 |  |
+| 83 | Fx 1 Param 6 | FX 1 Param 6 |  |
+| 84 | Fx 1 Param 7 | FX 1 Param 7 |  |
+| 85 | Fx 1 Param 8 | FX 1 Param 8 |  |
+| 86 | Fx 1 Param 9 | FX 1 Param 9 |  |
+| 87 | Fx 1 Param 10 | FX 1 Param 10 |  |
+| 88 | Fx 1 Param 11 | FX 1 Param 11 |  |
+| 89 | Fx 1 Param 12 | FX 1 Param 12 |  |
+| 90 | Fx 2 Param 1 | FX 2 Param 1 |  |
+| 91 | Fx 2 Param 2 | FX 2 Param 2 |  |
+| 92 | Fx 2 Param 3 | FX 2 Param 3 |  |
+| 93 | Fx 2 Param 4 | FX 2 Param 4 |  |
+| 94 | Fx 2 Param 5 | FX 2 Param 5 |  |
+| 95 | Fx 2 Param 6 | FX 2 Param 6 |  |
+| 96 | Fx 2 Param 7 | FX 2 Param 7 |  |
+| 97 | Fx 2 Param 8 | FX 2 Param 8 |  |
+| 98 | Fx 2 Param 9 | FX 2 Param 9 |  |
+| 99 | Fx 2 Param 10 | FX 2 Param 10 |  |
+| 100 | Fx 2 Param 11 | FX 2 Param 11 |  |
+| 101 | Fx 2 Param 12 | FX 2 Param 12 |  |
+| 102 | Fx 3 Param 1 | FX 3 Param 1 |  |
+| 103 | Fx 3 Param 2 | FX 3 Param 2 |  |
+| 104 | Fx 3 Param 3 | FX 3 Param 3 |  |
+| 105 | Fx 3 Param 4 | FX 3 Param 4 |  |
+| 106 | Fx 3 Param 5 | FX 3 Param 5 |  |
+| 107 | Fx 3 Param 6 | FX 3 Param 6 |  |
+| 108 | Fx 3 Param 7 | FX 3 Param 7 |  |
+| 109 | Fx 3 Param 8 | FX 3 Param 8 |  |
+| 110 | Fx 3 Param 9 | FX 3 Param 9 |  |
+| 111 | Fx 3 Param 10 | FX 3 Param 10 |  |
+| 112 | Fx 3 Param 11 | FX 3 Param 11 |  |
+| 113 | Fx 3 Param 12 | FX 3 Param 12 |  |
+| 114 | Fx 4 Param 1 | FX 4 Param 1 |  |
+| 115 | Fx 4 Param 2 | FX 4 Param 2 |  |
+| 116 | Fx 4 Param 3 | FX 4 Param 3 |  |
+| 117 | Fx 4 Param 4 | FX 4 Param 4 |  |
+| 118 | Fx 4 Param 5 | FX 4 Param 5 |  |
+| 119 | Fx 4 Param 6 | FX 4 Param 6 |  |
+| 120 | Fx 4 Param 7 | FX 4 Param 7 |  |
+| 121 | Fx 4 Param 8 | FX 4 Param 8 |  |
+| 122 | Fx 4 Param 9 | FX 4 Param 9 |  |
+| 123 | Fx 4 Param 10 | FX 4 Param 10 |  |
+| 124 | Fx 4 Param 11 | FX 4 Param 11 |  |
+| 125 | Fx 4 Param 12 | FX 4 Param 12 |  |
+| 126 | Fx 1 Level | FX 1 Output Gain |  |
+| 127 | Fx 2 Level | FX 2 Output Gain |  |
+| 128 | Fx 3 Level | FX 3 Output Gain |  |
+| 129 | Fx 4 Level | FX 4 Output Gain |  |
 
 <a id="fx_type-fw10"></a>
 

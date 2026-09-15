@@ -616,6 +616,7 @@ mod tests {
                     value: u16::try_from(value).unwrap_or(0),
                     name: (*name).to_owned(),
                     description: None,
+                    parameters: Vec::new(),
                 })
                 .collect(),
         }
