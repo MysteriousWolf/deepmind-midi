@@ -554,6 +554,7 @@ impl<'a> BankNames<'a> {
 mod tests {
     use super::*;
     use crate::ids::Bank;
+    use crate::param::Group;
     use crate::sysex::inquiry::Version;
 
     /// Firmware 1.0, which numbers three value tables differently.
@@ -561,6 +562,45 @@ mod tests {
 
     fn program() -> Program {
         Program::new(ProtocolVersion::V6)
+    }
+
+    /// Seventeen parameters holding a character each are one word to whoever
+    /// is reading them, and a host has to know which seventeen.
+    #[test]
+    fn the_name_is_the_parameters_at_the_offsets_the_field_occupies() {
+        assert_eq!(NAME_PARAMETERS.len(), NAME_LEN);
+        assert_eq!(
+            NAME_PARAMETERS.first().map(|parameter| parameter.offset()),
+            Some(NAME_OFFSET)
+        );
+        for (index, parameter) in NAME_PARAMETERS.iter().enumerate() {
+            let offset = NAME_OFFSET + u8::try_from(index).expect("seventeen fit in a byte");
+            assert_eq!(parameter.offset(), offset);
+            assert_eq!(parameter.group(), Group::Program);
+        }
+
+        // The seventeenth byte is the terminator and belongs to the field
+        // rather than to the name.
+        assert_eq!(NAME_PARAMETERS.len(), ProgramName::MAX_CHARS + 1);
+    }
+
+    /// A keystroke costs one message to the one character it moved, which is
+    /// what makes drawing the seventeen as one field free.
+    #[test]
+    fn naming_a_program_moves_only_the_characters_that_changed() {
+        let mut program = program();
+        program.set_name(ProgramName::new("Bass").expect("a name the display can write"));
+
+        let mut renamed = program.clone();
+        renamed.set_name(ProgramName::new("Bassy").expect("a name the display can write"));
+
+        let moved: Vec<(ParamId, u8)> = program.changes(&renamed).collect();
+        assert_eq!(moved, [(ParamId::ProgramNameChar5, b'y')]);
+        assert!(
+            moved
+                .iter()
+                .all(|(parameter, _)| NAME_PARAMETERS.contains(parameter))
+        );
     }
 
     #[test]

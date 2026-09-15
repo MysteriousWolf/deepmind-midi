@@ -321,6 +321,27 @@ impl ParamId {
         self.info().group
     }
 
+    /// Returns the name without the group's, where the name starts with it.
+    ///
+    /// `VCF Envelope Depth` is `Envelope Depth`, because a panel prints its
+    /// group once as a heading and repeating it in every slot costs the width
+    /// the rest of the name needs. A name that does not start with its group is
+    /// returned whole, which is every parameter of the modulation matrix and of
+    /// the arpeggiator.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// assert_eq!(ParamId::VcfEnvelopeDepth.short_name(), "Envelope Depth");
+    /// assert_eq!(ParamId::Mod1Source.short_name(), "Mod 1 Source");
+    /// ```
+    #[must_use]
+    pub fn short_name(self) -> &'static str {
+        let name = self.name();
+        name.strip_prefix(self.group().name())
+            .map_or(name, |rest| rest.trim_start())
+    }
+
     /// Returns how the raw value is to be read.
     #[must_use]
     pub const fn kind(self) -> Kind {
@@ -388,6 +409,63 @@ impl ParamId {
             },
             Kind::Enumerated(table) => table.table_for(firmware).name_of(value),
         }
+    }
+
+    /// Returns the named values this parameter accepts, on
+    /// [`DEFAULT_FIRMWARE`].
+    ///
+    /// `None` unless the parameter's table names **every** value it accepts,
+    /// which is the question a host has to answer before drawing a list.
+    /// A table that names some of them would make a control that silently
+    /// dropped the rest: opening the list on an unnamed value and picking the
+    /// nearest name is a control that moves the sound when somebody looks at
+    /// it. Where this answers `None` the raw value is the honest reading.
+    ///
+    /// Also `None` for a switch, whose two values [`label`](ParamId::label)
+    /// names and which a host draws as a light rather than a list.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// let shapes = ParamId::Lfo1Shape.choices().expect("all seven are named");
+    /// assert_eq!(shapes.len(), 7);
+    /// assert_eq!(shapes.first().map(|entry| entry.name), Some("Sine"));
+    ///
+    /// // A table that only writes down the start of a documented run cannot
+    /// // name the rest of it, and says so rather than guessing.
+    /// assert!(ParamId::Lfo1MonoMode.choices().is_none());
+    /// assert!(ParamId::Lfo1Rate.choices().is_none());
+    /// ```
+    #[must_use]
+    pub fn choices(self) -> Option<&'static [ValueEntry]> {
+        self.choices_for(DEFAULT_FIRMWARE)
+    }
+
+    /// Returns the named values this parameter accepts, on the firmware a
+    /// device inquiry reported.
+    ///
+    /// Worth reaching for wherever [`label_for`](ParamId::label_for) is: a list
+    /// drawn from the wrong firmware's table is a list of the wrong names.
+    #[must_use]
+    pub fn choices_for(self, firmware: Version) -> Option<&'static [ValueEntry]> {
+        let Kind::Enumerated(table) = self.kind() else {
+            return None;
+        };
+        let entries = table.table_for(firmware).entries;
+        // The entries are in value order, so the ones this parameter accepts
+        // are one run of them. Counting the run and comparing it with the range
+        // is what says the table covers the range rather than part of it.
+        let first = entries.iter().position(|entry| self.accepts(entry.value))?;
+        let run = entries.get(first..)?;
+        let named = run
+            .iter()
+            .take_while(|entry| self.accepts(entry.value))
+            .count();
+        let span = usize::from(self.max() - self.min()) + 1;
+        if named != span {
+            return None;
+        }
+        run.get(..named)
     }
 
     /// Returns the controller that drives this parameter, if one does.
@@ -849,6 +927,95 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+
+    /// The order the panel is in, which a host would otherwise read off the
+    /// offsets itself. `ALL` is alphabetical and is not that order.
+    #[test]
+    fn the_groups_are_listed_twice_in_two_different_orders() {
+        assert_eq!(Group::ORDER.len(), Group::ALL.len());
+        for group in Group::ALL {
+            assert!(Group::ORDER.contains(group), "{group} is not laid out");
+        }
+
+        let starts: Vec<u8> = Group::ORDER
+            .iter()
+            .map(|group| {
+                group
+                    .parameters()
+                    .next()
+                    .expect("a group in the table has a parameter")
+                    .offset()
+            })
+            .collect();
+        let mut sorted = starts.clone();
+        sorted.sort_unstable();
+        assert_eq!(starts, sorted, "the order is not the instrument's own");
+        assert_eq!(Group::ORDER.first(), Some(&Group::Lfo1));
+        assert_eq!(Group::ORDER.last(), Some(&Group::Program));
+    }
+
+    /// A list is only honest where the table names every value the parameter
+    /// accepts; anywhere else the raw number is the reading.
+    #[test]
+    fn a_parameter_offers_a_list_only_when_every_value_has_a_name() {
+        let shapes = ParamId::Lfo1Shape.choices().expect("all seven are named");
+        assert_eq!(shapes.len(), usize::from(ParamId::Lfo1Shape.max()) + 1);
+        assert_eq!(shapes.first().map(|entry| entry.name), Some("Sine"));
+        assert_eq!(
+            shapes.last().map(|entry| entry.name),
+            Some("Sample & Glide")
+        );
+
+        // A table that writes down the start of a documented run names the
+        // first of 254 values and not the rest.
+        assert!(TableId::LfoMonoMode.table().partial);
+        assert!(ParamId::Lfo1MonoMode.choices().is_none());
+
+        assert!(ParamId::Lfo1Rate.choices().is_none(), "a sweep");
+        assert!(ParamId::Lfo1KeySync.choices().is_none(), "a switch");
+    }
+
+    /// Whatever a list offers has a name, which is what makes it safe to draw
+    /// as one: a host picking an entry never picks an unnamed value.
+    #[test]
+    fn every_value_a_list_offers_is_named_and_accepted() {
+        for firmware in [DEFAULT_FIRMWARE, FIRMWARE_1_0] {
+            for parameter in ParamId::ALL.iter().copied() {
+                let Some(choices) = parameter.choices_for(firmware) else {
+                    continue;
+                };
+                for entry in choices {
+                    assert!(parameter.accepts(entry.value), "{parameter}");
+                    assert_eq!(
+                        parameter.label_for(entry.value, firmware),
+                        Some(entry.name),
+                        "{parameter}"
+                    );
+                }
+                for value in parameter.min()..=parameter.max() {
+                    assert!(
+                        choices.iter().any(|entry| entry.value == value),
+                        "{parameter} offers a list that skips {value}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn a_parameter_name_drops_the_group_a_panel_already_prints() {
+        assert_eq!(ParamId::VcfEnvelopeDepth.short_name(), "Envelope Depth");
+        assert_eq!(ParamId::Lfo1Rate.short_name(), "Rate");
+        assert_eq!(ParamId::ProgramNameChar1.short_name(), "Name Char 1");
+        // A name that does not start with its group keeps all of itself.
+        assert_eq!(ParamId::Mod1Source.short_name(), "Mod 1 Source");
+
+        for parameter in ParamId::ALL.iter().copied() {
+            let short = parameter.short_name();
+            assert!(!short.is_empty(), "{parameter} shortens to nothing");
+            assert!(parameter.name().ends_with(short), "{parameter}");
         }
     }
 

@@ -26,6 +26,37 @@ pub const NAME_OFFSET: u8 = 223;
 /// Bytes the name occupies. It holds sixteen characters and a terminator.
 pub const NAME_LEN: usize = 17;
 
+/// The parameters the program's name is stored in, in the order they print.
+///
+/// The instrument stores a name one character to a parameter, which is the
+/// truth about the wire and a lie about what a person is editing. A host
+/// drawing the parameter table needs to know which of its slots are the name,
+/// so that seventeen faders become the one field the display shows; this is
+/// that answer, and it moves with the field rather than being counted again.
+///
+/// Typing a letter still costs one message to the one parameter it moved:
+/// [`Program::set_name`] writes the field and
+/// [`Program::changes`](super::Program::changes) works out what that cost.
+pub static NAME_PARAMETERS: [ParamId; NAME_LEN] = [
+    ParamId::ProgramNameChar1,
+    ParamId::ProgramNameChar2,
+    ParamId::ProgramNameChar3,
+    ParamId::ProgramNameChar4,
+    ParamId::ProgramNameChar5,
+    ParamId::ProgramNameChar6,
+    ParamId::ProgramNameChar7,
+    ParamId::ProgramNameChar8,
+    ParamId::ProgramNameChar9,
+    ParamId::ProgramNameChar10,
+    ParamId::ProgramNameChar11,
+    ParamId::ProgramNameChar12,
+    ParamId::ProgramNameChar13,
+    ParamId::ProgramNameChar14,
+    ParamId::ProgramNameChar15,
+    ParamId::ProgramNameChar16,
+    ParamId::ProgramNameChar17,
+];
+
 /// Arpeggiator Mode.
 ///
 /// Every value the synthesizer has a name for. A byte outside the table is not

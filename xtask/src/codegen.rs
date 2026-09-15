@@ -150,7 +150,7 @@ fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     let mut out = String::new();
     out.push_str(HEADER);
     render_counts(spec, &mut out);
-    render_groups(idents, &mut out);
+    render_groups(spec, idents, &mut out);
     render_parameters(spec, idents, &mut out)?;
     render_tables(spec, idents, &mut out)?;
     render_controllers(spec, idents, &mut out)?;
@@ -201,8 +201,17 @@ pub const DEFAULT_FIRMWARE: Version = Version {{
     );
 }
 
-fn render_groups(idents: &Identifiers, out: &mut String) {
+fn render_groups(spec: &Spec, idents: &Identifiers, out: &mut String) {
     let groups: Vec<&str> = idents.groups.keys().map(String::as_str).collect();
+    // The order the groups first appear in the parameter table, which is the
+    // order the instrument lays its panel out. Read off the offsets rather than
+    // written down, so a group a later parameter table adds lands in its place.
+    let mut laid_out: Vec<&str> = Vec::with_capacity(groups.len());
+    for parameter in &spec.parameters {
+        if !laid_out.contains(&parameter.group.as_str()) {
+            laid_out.push(parameter.group.as_str());
+        }
+    }
     let idents: Vec<&str> = idents.groups.values().map(String::as_str).collect();
 
     out.push_str(
@@ -226,6 +235,28 @@ pub enum Group {
         "    /// Every group, in alphabetical order.\n    pub const ALL: &'static [Self] = &[",
     );
     for ident in &idents {
+        let _ = writeln!(out, "        Self::{ident},");
+    }
+    out.push_str("    ];\n\n");
+    let _ = writeln!(
+        out,
+        "\
+    /// Every group, in the order the instrument lays them out.
+    ///
+    /// Not [`ALL`](Self::ALL), which is alphabetical and puts the effects third
+    /// and the oscillators eighth. A parameter's offset is its NRPN number and
+    /// its place in a dump, so the order the groups first appear in the table is
+    /// the order the panel is in: the LFOs, the oscillators, the filter, the
+    /// envelopes and the VCA, voicing, modulation, sequencing, the arpeggiator,
+    /// the effects, and the program's own settings last.
+    ///
+    /// Read off the parameter table rather than written down, so a group a later
+    /// specification adds arrives in its right place.
+    pub const ORDER: &'static [Self] = &["
+    );
+    for name in &laid_out {
+        let index = groups.iter().position(|group| group == name).unwrap_or(0);
+        let ident = idents.get(index).copied().unwrap_or("");
         let _ = writeln!(out, "        Self::{ident},");
     }
     out.push_str(

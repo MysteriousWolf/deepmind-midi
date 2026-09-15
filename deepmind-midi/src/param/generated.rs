@@ -81,6 +81,34 @@ impl Group {
         Self::Voicing,
     ];
 
+    /// Every group, in the order the instrument lays them out.
+    ///
+    /// Not [`ALL`](Self::ALL), which is alphabetical and puts the effects third
+    /// and the oscillators eighth. A parameter's offset is its NRPN number and
+    /// its place in a dump, so the order the groups first appear in the table is
+    /// the order the panel is in: the LFOs, the oscillators, the filter, the
+    /// envelopes and the VCA, voicing, modulation, sequencing, the arpeggiator,
+    /// the effects, and the program's own settings last.
+    ///
+    /// Read off the parameter table rather than written down, so a group a later
+    /// specification adds arrives in its right place.
+    pub const ORDER: &'static [Self] = &[
+        Self::Lfo1,
+        Self::Lfo2,
+        Self::Oscillators,
+        Self::Vcf,
+        Self::VcaEnvelope,
+        Self::VcfEnvelope,
+        Self::ModEnvelope,
+        Self::Vca,
+        Self::Voicing,
+        Self::ModMatrix,
+        Self::ControlSequencer,
+        Self::Arpeggiator,
+        Self::Effects,
+        Self::Program,
+    ];
+
     /// Returns the group's name.
     #[must_use]
     pub const fn name(self) -> &'static str {
