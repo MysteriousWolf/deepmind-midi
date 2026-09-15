@@ -4,7 +4,10 @@
 //! when it does not match the specification it came from. The types these tables
 //! fill, and everything that reads them, are in the parent module.
 
-use super::{Algorithm, EngineParameters, FxSlot};
+use super::{
+    Algorithm, Align, Colour, Control, Engine, EngineParameters, FxSlot, Grid, Mode, Panel,
+    Routing, Row, Source,
+};
 use crate::param::{Kind, ParamId};
 
 /// Number of effect algorithms the newest firmware offers.
@@ -102,210 +105,245 @@ pub(super) static ENGINES: [EngineParameters; ENGINE_COUNT] = [
 /// Every algorithm, in the order the newest firmware numbers them.
 pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
     Algorithm {
+        index: 0,
         name: "TC-DeepVRB",
         full_name: "TC Deep Reverb",
         category: "Reverb",
         slots: &TC_DEEP_VRB,
     },
     Algorithm {
+        index: 1,
         name: "AmbVerb",
         full_name: "Ambient Reverb",
         category: "Reverb",
         slots: &AMB_VERB,
     },
     Algorithm {
+        index: 2,
         name: "RoomRev",
         full_name: "Room Reverb",
         category: "Reverb",
         slots: &ROOM_REV,
     },
     Algorithm {
+        index: 3,
         name: "VintageRev",
         full_name: "Vintage Room Reverb",
         category: "Reverb",
         slots: &VINTAGE_REV,
     },
     Algorithm {
+        index: 4,
         name: "HallRev",
         full_name: "Hall Reverb",
         category: "Reverb",
         slots: &HALL_REV,
     },
     Algorithm {
+        index: 5,
         name: "ChamberRev",
         full_name: "Chamber Reverb",
         category: "Reverb",
         slots: &CHAMBER_REV,
     },
     Algorithm {
+        index: 6,
         name: "PlateRev",
         full_name: "Plate Reverb",
         category: "Reverb",
         slots: &PLATE_REV,
     },
     Algorithm {
+        index: 7,
         name: "RichPltRev",
         full_name: "Rich Plate Reverb",
         category: "Reverb",
         slots: &RICH_PLT_REV,
     },
     Algorithm {
+        index: 8,
         name: "GatedRev",
         full_name: "Gated Reverb",
         category: "Reverb",
         slots: &GATED_REV,
     },
     Algorithm {
+        index: 9,
         name: "Reverse",
         full_name: "Reverse Reverb",
         category: "Reverb",
         slots: &REVERSE,
     },
     Algorithm {
+        index: 10,
         name: "ChorusVerb",
         full_name: "Chorus and Reverb",
         category: "Reverb",
         slots: &CHORUS_VERB,
     },
     Algorithm {
+        index: 11,
         name: "DelayVerb",
         full_name: "Delay and Reverb",
         category: "Reverb",
         slots: &DELAY_VERB,
     },
     Algorithm {
+        index: 12,
         name: "FlangVerb",
         full_name: "Flanger and Reverb",
         category: "Reverb",
         slots: &FLANG_VERB,
     },
     Algorithm {
+        index: 13,
         name: "MidasEQ",
         full_name: "Midas Equaliser",
         category: "Processing",
         slots: &MIDAS_EQ,
     },
     Algorithm {
+        index: 14,
         name: "Enhancer",
         full_name: "Enhancing EQ",
         category: "Processing",
         slots: &ENHANCER,
     },
     Algorithm {
+        index: 15,
         name: "FairComp",
         full_name: "Compressor",
         category: "Processing",
         slots: &FAIR_COMP,
     },
     Algorithm {
+        index: 16,
         name: "MulBndDist",
         full_name: "Multiband Distortion",
         category: "Processing",
         slots: &MUL_BND_DIST,
     },
     Algorithm {
+        index: 17,
         name: "RackAmp",
         full_name: "Rack Amplifier",
         category: "Processing",
         slots: &RACK_AMP,
     },
     Algorithm {
+        index: 18,
         name: "EdisonEX1",
         full_name: "Stereo Imaging",
         category: "Processing",
         slots: &EDISON_EX1,
     },
     Algorithm {
+        index: 19,
         name: "Auto Pan",
         full_name: "Auto Panning",
         category: "Processing",
         slots: &AUTO_PAN,
     },
     Algorithm {
+        index: 20,
         name: "NoiseGate",
         full_name: "Noise Gate",
         category: "Processing",
         slots: &NOISE_GATE,
     },
     Algorithm {
+        index: 21,
         name: "Delay",
         full_name: "Stereo Delay",
         category: "Delay",
         slots: &DELAY,
     },
     Algorithm {
+        index: 22,
         name: "3TapDelay",
         full_name: "3-Tap Delay",
         category: "Delay",
         slots: &THREE_TAP_DELAY,
     },
     Algorithm {
+        index: 23,
         name: "4TapDelay",
         full_name: "4-Tap Delay",
         category: "Delay",
         slots: &FOUR_TAP_DELAY,
     },
     Algorithm {
+        index: 24,
         name: "T-RayDelay",
         full_name: "Tel-Ray Delay",
         category: "Delay",
         slots: &T_RAY_DELAY,
     },
     Algorithm {
+        index: 25,
         name: "DecimDelay",
         full_name: "Decimator Delay",
         category: "Delay",
         slots: &DECIM_DELAY,
     },
     Algorithm {
+        index: 26,
         name: "ModDlyRev",
         full_name: "Modulation, Delay and Reverb",
         category: "Delay",
         slots: &MOD_DLY_REV,
     },
     Algorithm {
+        index: 27,
         name: "Chorus",
         full_name: "Stereo Chorus",
         category: "Creative",
         slots: &CHORUS,
     },
     Algorithm {
+        index: 28,
         name: "Chorus-D",
         full_name: "Dimensional Chorus",
         category: "Creative",
         slots: &CHORUS_D,
     },
     Algorithm {
+        index: 29,
         name: "Flanger",
         full_name: "Stereo Flanger",
         category: "Creative",
         slots: &FLANGER,
     },
     Algorithm {
+        index: 30,
         name: "Phaser",
         full_name: "Stereo Phaser",
         category: "Creative",
         slots: &PHASER,
     },
     Algorithm {
+        index: 31,
         name: "MoodFilter",
         full_name: "Moog-Type Filter",
         category: "Creative",
         slots: &MOOD_FILTER,
     },
     Algorithm {
+        index: 32,
         name: "DualPitch",
         full_name: "Dual Pitch Shifter",
         category: "Creative",
         slots: &DUAL_PITCH,
     },
     Algorithm {
+        index: 33,
         name: "Vintage Pitch",
         full_name: "Dual Pitch Shifter",
         category: "Creative",
         slots: &VINTAGE_PITCH,
     },
     Algorithm {
+        index: 34,
         name: "RotarySpkr",
         full_name: "Rotary Speaker",
         category: "Creative",
@@ -338,6 +376,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -350,6 +390,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: Some("6.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -362,6 +404,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -374,6 +418,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -386,6 +432,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
 ];
 
@@ -402,6 +450,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -414,6 +464,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("7.3"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -426,6 +478,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -438,6 +492,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -450,6 +506,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("30.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -462,6 +520,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -474,6 +534,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -486,6 +548,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -498,6 +562,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -510,6 +576,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
 ];
 
@@ -526,6 +594,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -538,6 +608,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("28.9"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -550,6 +622,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("76.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -562,6 +636,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -574,6 +650,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -586,6 +664,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -598,6 +678,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -610,6 +692,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -622,6 +706,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -634,6 +720,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -646,6 +734,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("250.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -658,6 +748,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -674,6 +766,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -686,6 +780,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -698,6 +794,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("20.7"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -710,6 +808,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -722,6 +822,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -734,6 +836,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -746,6 +850,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -758,6 +864,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -770,6 +878,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -782,6 +892,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -794,6 +906,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -806,6 +920,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("ON"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -822,6 +938,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -834,6 +952,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("4.9"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -846,6 +966,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -858,6 +980,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -870,6 +994,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("30.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -882,6 +1008,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -894,6 +1022,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -906,6 +1036,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -918,6 +1050,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("2.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -930,6 +1064,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -942,6 +1078,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("250.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -954,6 +1092,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -970,6 +1110,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -982,6 +1124,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("28.9"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -994,6 +1138,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("76.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -1006,6 +1152,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -1018,6 +1166,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -1030,6 +1180,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -1042,6 +1194,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -1054,6 +1208,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -1066,6 +1222,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -1078,6 +1236,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -1090,6 +1250,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("250.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -1102,6 +1264,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -1118,6 +1282,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -1130,6 +1296,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -1142,6 +1310,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -1154,6 +1324,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -1166,6 +1338,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("30.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -1178,6 +1352,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -1190,6 +1366,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -1202,6 +1380,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -1214,6 +1394,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("2.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -1226,6 +1408,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -1238,6 +1422,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -1250,6 +1436,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -1266,6 +1454,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -1278,6 +1468,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("28.9"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -1290,6 +1482,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("39.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -1302,6 +1496,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -1314,6 +1510,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -1326,6 +1524,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -1338,6 +1538,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -1350,6 +1552,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -1362,6 +1566,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -1374,6 +1580,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -1386,6 +1594,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -1398,6 +1608,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -1414,6 +1626,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -1426,6 +1640,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("1000.0"),
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -1438,6 +1654,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("30.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -1450,6 +1668,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -1462,6 +1682,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -1474,6 +1696,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -1486,6 +1710,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -1498,6 +1724,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -1510,6 +1738,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("0.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -1522,6 +1752,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 1,
     },
 ];
 
@@ -1538,6 +1770,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -1550,6 +1784,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("1000.0"),
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -1562,6 +1798,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -1574,6 +1812,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("30.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -1586,6 +1826,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -1598,6 +1840,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -1610,6 +1854,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -1622,6 +1868,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -1634,6 +1882,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("0.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
 ];
 
@@ -1650,6 +1900,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -1662,6 +1914,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -1674,6 +1928,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -1686,6 +1942,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("180.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -1698,6 +1956,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -1710,6 +1970,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -1722,6 +1984,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -1734,6 +1998,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("5.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -1746,6 +2012,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -1758,6 +2026,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -1770,6 +2040,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -1782,6 +2054,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -1798,6 +2072,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -1810,6 +2086,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -1822,6 +2100,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -1834,6 +2114,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -1846,6 +2128,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -1858,6 +2142,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -1870,6 +2156,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -1882,6 +2170,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("5.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -1894,6 +2184,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -1906,6 +2198,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -1918,6 +2212,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -1930,6 +2226,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -1946,6 +2244,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -1958,6 +2258,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -1970,6 +2272,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("20.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -1982,6 +2286,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("180.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -1994,6 +2300,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("90.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -2006,6 +2314,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -2018,6 +2328,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -2030,6 +2342,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("5.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -2042,6 +2356,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -2054,6 +2370,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -2066,6 +2384,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -2078,6 +2398,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -2094,6 +2416,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("12.0"),
         group: Some("low"),
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -2106,6 +2430,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: Some("low"),
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -2118,6 +2444,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("12.0"),
         group: Some("low-mid"),
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -2130,6 +2458,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: Some("low-mid"),
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -2142,6 +2472,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("5.0"),
         group: Some("low-mid"),
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -2154,6 +2486,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("12.0"),
         group: Some("high-mid"),
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -2166,6 +2500,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: Some("high-mid"),
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -2178,6 +2514,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("5.0"),
         group: Some("high-mid"),
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -2190,6 +2528,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("12.0"),
         group: Some("high"),
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -2202,6 +2542,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: Some("high"),
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -2214,6 +2556,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: None,
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
 ];
 
@@ -2230,6 +2574,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("12.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -2242,6 +2588,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -2254,6 +2602,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("100"),
         group: Some("low"),
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -2266,6 +2616,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("50.0"),
         group: Some("low"),
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -2278,6 +2630,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("100"),
         group: Some("mid"),
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -2290,6 +2644,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("50.0"),
         group: Some("mid"),
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -2302,6 +2658,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("100"),
         group: Some("high"),
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -2314,6 +2672,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("50.0"),
         group: Some("high"),
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -2326,6 +2686,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
 ];
 
@@ -2342,6 +2704,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -2354,6 +2718,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("0.0"),
         group: Some("left-mid"),
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -2366,6 +2732,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("10.0"),
         group: Some("left-mid"),
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -2378,6 +2746,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("6.0"),
         group: Some("left-mid"),
         modulatable: false,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -2390,6 +2760,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("left-mid"),
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -2402,6 +2774,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("6.0"),
         group: Some("left-mid"),
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -2414,6 +2788,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -2426,6 +2802,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("0.0"),
         group: Some("right-side"),
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -2438,6 +2816,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("10.0"),
         group: Some("right-side"),
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -2450,6 +2830,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("6.0"),
         group: Some("right-side"),
         modulatable: false,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -2462,6 +2844,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("right-side"),
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -2474,6 +2858,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("6.0"),
         group: Some("right-side"),
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -2490,6 +2876,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("24.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -2502,6 +2890,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -2514,6 +2904,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("low"),
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -2526,6 +2918,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("low"),
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -2538,6 +2932,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("9000.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -2550,6 +2946,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("mid"),
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -2562,6 +2960,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("mid"),
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -2574,6 +2974,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("9000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -2586,6 +2988,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("high"),
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -2598,6 +3002,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("high"),
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -2612,6 +3018,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -2624,6 +3032,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("12.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -2640,6 +3050,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -2652,6 +3064,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -2664,6 +3078,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -2676,6 +3092,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -2688,6 +3106,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -2700,6 +3120,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -2712,6 +3134,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -2724,6 +3148,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -2736,6 +3162,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
 ];
 
@@ -2752,6 +3180,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -2764,6 +3194,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -2776,6 +3208,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -2788,6 +3222,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -2800,6 +3236,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -2812,6 +3250,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -2824,6 +3264,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -2836,6 +3278,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("12.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
 ];
 
@@ -2852,6 +3296,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("5.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -2864,6 +3310,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("180.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -2876,6 +3324,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -2888,6 +3338,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -2900,6 +3352,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -2912,6 +3366,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -2924,6 +3380,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("1000.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -2936,6 +3394,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("2000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -2948,6 +3408,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("1000.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
 ];
 
@@ -2964,6 +3426,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("0.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -2976,6 +3440,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("0.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -2988,6 +3454,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("20.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -3000,6 +3468,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("1999.9"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -3012,6 +3482,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("1999.9"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -3024,6 +3496,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("6.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -3036,6 +3510,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -3048,6 +3524,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("OFF"),
         group: None,
         modulatable: false,
+        column: 1,
+        row: 1,
     },
 ];
 
@@ -3064,6 +3542,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -3076,6 +3556,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -3088,6 +3570,8 @@ static DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -3102,6 +3586,8 @@ static DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -3116,6 +3602,8 @@ static DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -3128,6 +3616,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -3140,6 +3630,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -3152,6 +3644,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -3164,6 +3658,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -3176,6 +3672,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -3188,6 +3686,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -3200,6 +3700,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -3216,6 +3718,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -3228,6 +3732,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -3240,6 +3746,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -3252,6 +3760,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -3266,6 +3776,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -3278,6 +3790,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -3290,6 +3804,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -3304,6 +3820,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -3316,6 +3834,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -3328,6 +3848,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -3340,6 +3862,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -3352,6 +3876,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -3368,6 +3894,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -3380,6 +3908,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -3392,6 +3922,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -3404,6 +3936,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("6.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -3418,6 +3952,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -3430,6 +3966,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -3444,6 +3982,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -3456,6 +3996,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -3470,6 +4012,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -3482,6 +4026,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -3494,6 +4040,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("1.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -3506,6 +4054,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -3522,6 +4072,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -3534,6 +4086,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -3546,6 +4100,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -3558,6 +4114,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -3570,6 +4128,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
 ];
 
@@ -3586,6 +4146,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -3598,6 +4160,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -3610,6 +4174,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -3624,6 +4190,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -3638,6 +4206,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -3650,6 +4220,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("1"),
         group: None,
         modulatable: false,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -3662,6 +4234,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -3674,6 +4248,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -3686,6 +4262,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -3698,6 +4276,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -3710,6 +4290,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -3722,6 +4304,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -3738,6 +4322,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -3752,6 +4338,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -3764,6 +4352,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -3776,6 +4366,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -3788,6 +4380,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -3800,6 +4394,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -3812,6 +4408,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -3824,6 +4422,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -3836,6 +4436,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -3848,6 +4450,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -3860,6 +4464,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -3872,6 +4478,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -3888,6 +4496,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("5"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -3900,6 +4510,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -3912,6 +4524,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -3924,6 +4538,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -3936,6 +4552,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -3948,6 +4566,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -3960,6 +4580,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -3972,6 +4594,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -3984,6 +4608,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -3996,6 +4622,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -4008,6 +4636,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
 ];
 
@@ -4024,6 +4654,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -4036,6 +4668,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -4048,6 +4682,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -4060,6 +4696,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: Some("channel-1"),
         modulatable: false,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -4072,6 +4710,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: Some("channel-2"),
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -4084,6 +4724,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -4096,6 +4738,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 1,
     },
 ];
 
@@ -4112,6 +4756,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("5"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -4124,6 +4770,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -4136,6 +4784,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -4148,6 +4798,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("20.0"),
         group: None,
         modulatable: false,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -4160,6 +4812,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("20.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -4172,6 +4826,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -4184,6 +4840,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -4196,6 +4854,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -4208,6 +4868,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("180.0"),
         group: None,
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -4220,6 +4882,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -4232,6 +4896,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -4244,6 +4910,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("90.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -4260,6 +4928,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("5"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -4272,6 +4942,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -4284,6 +4956,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -4296,6 +4970,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("15000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -4308,6 +4984,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("12.0"),
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -4320,6 +4998,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -4332,6 +5012,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -4344,6 +5026,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("180.0"),
         group: None,
         modulatable: false,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -4356,6 +5040,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -4368,6 +5054,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("1000.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -4380,6 +5068,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("2000.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -4392,6 +5082,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("1000.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -4408,6 +5100,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("20.0"),
         group: None,
         modulatable: false,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -4420,6 +5114,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -4432,6 +5128,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -4444,6 +5142,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("15000"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -4456,6 +5156,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -4468,6 +5170,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -4482,6 +5186,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -4494,6 +5200,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -4506,6 +5214,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("249.9"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -4518,6 +5228,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -4530,6 +5242,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -4542,6 +5256,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -4558,6 +5274,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("channel-1"),
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -4570,6 +5288,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("50.0"),
         group: Some("channel-1"),
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -4582,6 +5302,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("500.0"),
         group: Some("channel-1"),
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -4594,6 +5316,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-1"),
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -4606,6 +5330,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-1"),
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -4618,6 +5344,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -4630,6 +5358,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("channel-2"),
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -4642,6 +5372,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("50.0"),
         group: Some("channel-2"),
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -4654,6 +5386,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("500.0"),
         group: Some("channel-2"),
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -4666,6 +5400,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-2"),
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -4678,6 +5414,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-2"),
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -4690,6 +5428,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -4706,6 +5446,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("channel-1"),
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -4718,6 +5460,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("50.0"),
         group: Some("channel-1"),
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -4730,6 +5474,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("500.0"),
         group: Some("channel-1"),
         modulatable: false,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -4742,6 +5488,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-1"),
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -4754,6 +5502,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-1"),
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -4766,6 +5516,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -4778,6 +5530,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("channel-2"),
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -4790,6 +5544,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("50.0"),
         group: Some("channel-2"),
         modulatable: true,
+        column: 1,
+        row: 1,
     },
     FxSlot {
         slot: 9,
@@ -4802,6 +5558,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("500.0"),
         group: Some("channel-2"),
         modulatable: false,
+        column: 2,
+        row: 1,
     },
     FxSlot {
         slot: 10,
@@ -4814,6 +5572,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-2"),
         modulatable: true,
+        column: 3,
+        row: 1,
     },
     FxSlot {
         slot: 11,
@@ -4826,6 +5586,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-2"),
         modulatable: true,
+        column: 4,
+        row: 1,
     },
     FxSlot {
         slot: 12,
@@ -4838,6 +5600,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("20000 k"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 1,
     },
 ];
 
@@ -4854,6 +5618,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        column: 0,
+        row: 0,
     },
     FxSlot {
         slot: 2,
@@ -4866,6 +5632,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("9.9"),
         group: None,
         modulatable: true,
+        column: 1,
+        row: 0,
     },
     FxSlot {
         slot: 3,
@@ -4878,6 +5646,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 2,
+        row: 0,
     },
     FxSlot {
         slot: 4,
@@ -4890,6 +5660,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 3,
+        row: 0,
     },
     FxSlot {
         slot: 5,
@@ -4902,6 +5674,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        column: 4,
+        row: 0,
     },
     FxSlot {
         slot: 6,
@@ -4914,6 +5688,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        column: 5,
+        row: 0,
     },
     FxSlot {
         slot: 7,
@@ -4926,6 +5702,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: true,
+        column: 0,
+        row: 1,
     },
     FxSlot {
         slot: 8,
@@ -4938,5 +5716,893 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: true,
+        column: 1,
+        row: 1,
+    },
+];
+
+/// The one grid every algorithm's slots are placed on.
+pub(super) static GRID: Grid = Grid {
+    columns: 6,
+    rows: 2,
+    display_width: 128.0,
+    display_height: 64.0,
+    first_x: 13.5,
+    first_y: 14.4,
+    column_pitch: 20.0,
+    row_pitch: 18.6,
+    control_diameter: 11.9,
+};
+
+/// What each algorithm's own editor panel is made of, in the same order as
+/// `ALGORITHMS`.
+pub(super) static PANELS: [Panel; ALGORITHM_COUNT] = [
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(94, 102, 125),
+        face: Colour::new(93, 99, 121),
+        cap: Colour::new(51, 57, 69),
+        accent: Colour::new(66, 76, 104),
+        rows: &TC_DEEP_VRB_ROWS,
+    },
+    Panel {
+        control: Control::Fader,
+        chassis: Colour::new(231, 220, 194),
+        face: Colour::new(231, 222, 204),
+        cap: Colour::new(108, 102, 94),
+        accent: Colour::new(3, 252, 251),
+        rows: &AMB_VERB_ROWS,
+    },
+    Panel {
+        control: Control::Fader,
+        chassis: Colour::new(228, 216, 191),
+        face: Colour::new(221, 209, 192),
+        cap: Colour::new(152, 147, 136),
+        accent: Colour::new(250, 152, 3),
+        rows: &ROOM_REV_ROWS,
+    },
+    Panel {
+        control: Control::Display,
+        chassis: Colour::new(21, 25, 43),
+        face: Colour::new(77, 83, 92),
+        cap: Colour::new(129, 131, 138),
+        accent: Colour::new(237, 1, 2),
+        rows: &VINTAGE_REV_ROWS,
+    },
+    Panel {
+        control: Control::Fader,
+        chassis: Colour::new(227, 214, 188),
+        face: Colour::new(229, 218, 196),
+        cap: Colour::new(111, 106, 99),
+        accent: Colour::new(251, 1, 3),
+        rows: &HALL_REV_ROWS,
+    },
+    Panel {
+        control: Control::Fader,
+        chassis: Colour::new(229, 216, 191),
+        face: Colour::new(227, 217, 195),
+        cap: Colour::new(155, 151, 137),
+        accent: Colour::new(248, 250, 3),
+        rows: &CHAMBER_REV_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(17, 17, 17),
+        face: Colour::new(46, 46, 46),
+        cap: Colour::new(98, 98, 98),
+        accent: Colour::new(0, 90, 233),
+        rows: &PLATE_REV_ROWS,
+    },
+    Panel {
+        control: Control::Fader,
+        chassis: Colour::new(230, 217, 191),
+        face: Colour::new(231, 222, 204),
+        cap: Colour::new(119, 114, 104),
+        accent: Colour::new(10, 252, 2),
+        rows: &RICH_PLT_REV_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(15, 15, 15),
+        face: Colour::new(46, 48, 47),
+        cap: Colour::new(97, 97, 97),
+        accent: Colour::new(50, 198, 99),
+        rows: &GATED_REV_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(12, 12, 12),
+        face: Colour::new(47, 48, 47),
+        cap: Colour::new(100, 100, 100),
+        accent: Colour::new(49, 194, 97),
+        rows: &REVERSE_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(13, 13, 13),
+        face: Colour::new(46, 46, 47),
+        cap: Colour::new(83, 95, 97),
+        accent: Colour::new(0, 89, 233),
+        rows: &CHORUS_VERB_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(17, 17, 17),
+        face: Colour::new(46, 47, 47),
+        cap: Colour::new(93, 95, 95),
+        accent: Colour::new(0, 89, 233),
+        rows: &DELAY_VERB_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(16, 16, 16),
+        face: Colour::new(47, 47, 47),
+        cap: Colour::new(96, 97, 97),
+        accent: Colour::new(0, 89, 233),
+        rows: &FLANG_VERB_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(36, 87, 113),
+        face: Colour::new(48, 50, 54),
+        cap: Colour::new(99, 100, 104),
+        accent: Colour::new(42, 104, 135),
+        rows: &MIDAS_EQ_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(209, 185, 106),
+        face: Colour::new(232, 209, 141),
+        cap: Colour::new(169, 154, 109),
+        accent: Colour::new(214, 189, 110),
+        rows: &ENHANCER_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(29, 37, 40),
+        face: Colour::new(38, 46, 48),
+        cap: Colour::new(88, 93, 97),
+        accent: Colour::new(88, 93, 97),
+        rows: &FAIR_COMP_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(48, 65, 60),
+        face: Colour::new(78, 111, 101),
+        cap: Colour::new(109, 160, 146),
+        accent: Colour::new(119, 179, 163),
+        rows: &MUL_BND_DIST_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(40, 40, 40),
+        face: Colour::new(78, 78, 78),
+        cap: Colour::new(119, 119, 119),
+        accent: Colour::new(119, 119, 119),
+        rows: &RACK_AMP_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(211, 211, 211),
+        face: Colour::new(49, 50, 49),
+        cap: Colour::new(101, 101, 101),
+        accent: Colour::new(92, 67, 1),
+        rows: &EDISON_EX1_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(41, 143, 110),
+        face: Colour::new(77, 77, 77),
+        cap: Colour::new(130, 130, 130),
+        accent: Colour::new(41, 149, 113),
+        rows: &AUTO_PAN_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(163, 37, 33),
+        face: Colour::new(220, 220, 220),
+        cap: Colour::new(168, 167, 166),
+        accent: Colour::new(164, 37, 34),
+        rows: &NOISE_GATE_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(16, 16, 16),
+        face: Colour::new(45, 45, 45),
+        cap: Colour::new(94, 94, 94),
+        accent: Colour::new(86, 197, 2),
+        rows: &DELAY_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(18, 18, 18),
+        face: Colour::new(45, 45, 45),
+        cap: Colour::new(91, 92, 92),
+        accent: Colour::new(91, 92, 92),
+        rows: &THREE_TAP_DELAY_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(20, 20, 20),
+        face: Colour::new(47, 47, 47),
+        cap: Colour::new(91, 91, 91),
+        accent: Colour::new(91, 91, 91),
+        rows: &FOUR_TAP_DELAY_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(176, 184, 186),
+        face: Colour::new(176, 233, 237),
+        cap: Colour::new(34, 34, 36),
+        accent: Colour::new(34, 34, 36),
+        rows: &T_RAY_DELAY_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(23, 45, 48),
+        face: Colour::new(41, 82, 94),
+        cap: Colour::new(86, 124, 135),
+        accent: Colour::new(49, 120, 139),
+        rows: &DECIM_DELAY_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(16, 16, 16),
+        face: Colour::new(23, 23, 23),
+        cap: Colour::new(69, 69, 69),
+        accent: Colour::new(1, 229, 1),
+        rows: &MOD_DLY_REV_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(17, 140, 172),
+        face: Colour::new(77, 77, 77),
+        cap: Colour::new(129, 129, 129),
+        accent: Colour::new(25, 146, 178),
+        rows: &CHORUS_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(24, 24, 24),
+        face: Colour::new(23, 22, 22),
+        cap: Colour::new(187, 186, 185),
+        accent: Colour::new(142, 29, 2),
+        rows: &CHORUS_D_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(142, 16, 170),
+        face: Colour::new(77, 77, 77),
+        cap: Colour::new(126, 124, 126),
+        accent: Colour::new(150, 19, 175),
+        rows: &FLANGER_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(38, 115, 39),
+        face: Colour::new(77, 77, 77),
+        cap: Colour::new(129, 129, 129),
+        accent: Colour::new(38, 129, 38),
+        rows: &PHASER_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(40, 40, 40),
+        face: Colour::new(50, 53, 53),
+        cap: Colour::new(60, 105, 116),
+        accent: Colour::new(37, 172, 205),
+        rows: &MOOD_FILTER_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(19, 19, 19),
+        face: Colour::new(44, 44, 44),
+        cap: Colour::new(100, 100, 100),
+        accent: Colour::new(100, 100, 100),
+        rows: &DUAL_PITCH_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(51, 9, 9),
+        face: Colour::new(221, 209, 186),
+        cap: Colour::new(90, 87, 87),
+        accent: Colour::new(222, 6, 6),
+        rows: &VINTAGE_PITCH_ROWS,
+    },
+    Panel {
+        control: Control::Knob,
+        chassis: Colour::new(78, 15, 6),
+        face: Colour::new(124, 119, 118),
+        cap: Colour::new(78, 69, 67),
+        accent: Colour::new(124, 44, 19),
+        rows: &ROTARY_SPKR_ROWS,
+    },
+];
+
+/// The rows TC Deep Reverb fills.
+static TC_DEEP_VRB_ROWS: [Row; 1] = [Row {
+    slots: &[1, 2, 3, 4, 5],
+    align: Align::Left,
+}];
+
+/// The rows Ambient Reverb fills.
+static AMB_VERB_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10],
+        align: Align::Left,
+    },
+];
+
+/// The rows Room Reverb fills.
+static ROOM_REV_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Vintage Room Reverb fills.
+static VINTAGE_REV_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Hall Reverb fills.
+static HALL_REV_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Chamber Reverb fills.
+static CHAMBER_REV_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Plate Reverb fills.
+static PLATE_REV_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Rich Plate Reverb fills.
+static RICH_PLT_REV_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Gated Reverb fills.
+static GATED_REV_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10],
+        align: Align::Left,
+    },
+];
+
+/// The rows Reverse Reverb fills.
+static REVERSE_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9],
+        align: Align::Left,
+    },
+];
+
+/// The rows Chorus and Reverb fills.
+static CHORUS_VERB_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Delay and Reverb fills.
+static DELAY_VERB_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Flanger and Reverb fills.
+static FLANG_VERB_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Midas Equaliser fills.
+static MIDAS_EQ_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11],
+        align: Align::Left,
+    },
+];
+
+/// The rows Enhancing EQ fills.
+static ENHANCER_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9],
+        align: Align::Left,
+    },
+];
+
+/// The rows Compressor fills.
+static FAIR_COMP_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Multiband Distortion fills.
+static MUL_BND_DIST_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Rack Amplifier fills.
+static RACK_AMP_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9],
+        align: Align::Left,
+    },
+];
+
+/// The rows Stereo Imaging fills.
+static EDISON_EX1_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8],
+        align: Align::Left,
+    },
+];
+
+/// The rows Auto Panning fills.
+static AUTO_PAN_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9],
+        align: Align::Left,
+    },
+];
+
+/// The rows Noise Gate fills.
+static NOISE_GATE_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8],
+        align: Align::Left,
+    },
+];
+
+/// The rows Stereo Delay fills.
+static DELAY_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows `3-Tap` Delay fills.
+static THREE_TAP_DELAY_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows `4-Tap` Delay fills.
+static FOUR_TAP_DELAY_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows `Tel-Ray` Delay fills.
+static T_RAY_DELAY_ROWS: [Row; 1] = [Row {
+    slots: &[1, 2, 3, 4, 5],
+    align: Align::Left,
+}];
+
+/// The rows Decimator Delay fills.
+static DECIM_DELAY_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Modulation, Delay and Reverb fills.
+static MOD_DLY_REV_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Stereo Chorus fills.
+static CHORUS_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11],
+        align: Align::Left,
+    },
+];
+
+/// The rows Dimensional Chorus fills.
+static CHORUS_D_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7],
+        align: Align::Left,
+    },
+];
+
+/// The rows Stereo Flanger fills.
+static FLANGER_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Stereo Phaser fills.
+static PHASER_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows `Moog-Type` Filter fills.
+static MOOD_FILTER_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Dual Pitch Shifter fills.
+static DUAL_PITCH_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Dual Pitch Shifter fills.
+static VINTAGE_PITCH_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8, 9, 10, 11, 12],
+        align: Align::Left,
+    },
+];
+
+/// The rows Rotary Speaker fills.
+static ROTARY_SPKR_ROWS: [Row; 2] = [
+    Row {
+        slots: &[1, 2, 3, 4, 5, 6],
+        align: Align::Left,
+    },
+    Row {
+        slots: &[7, 8],
+        align: Align::Left,
+    },
+];
+
+/// Number of ways the four engines can be wired.
+pub const ROUTING_COUNT: usize = 10;
+
+/// Number of settings the `FX Mode` byte has.
+pub const MODE_COUNT: usize = 3;
+
+/// Every topology, in the order the `FX Routing` byte numbers them.
+pub(super) static ROUTINGS: [Routing; ROUTING_COUNT] = [
+    Routing {
+        value: 0,
+        label: "M-1",
+        name: "Serial 1-2-3-4",
+        feedback: false,
+        note: None,
+        feeds: [
+            &[Source::Input],
+            &[Source::Engine(Engine::One)],
+            &[Source::Engine(Engine::Two)],
+            &[Source::Engine(Engine::Three)],
+        ],
+        output: &[Engine::Four],
+    },
+    Routing {
+        value: 1,
+        label: "M-2",
+        name: "Parallel 1/2, serial 3-4",
+        feedback: false,
+        note: None,
+        feeds: [
+            &[Source::Input],
+            &[Source::Input],
+            &[Source::Engine(Engine::One), Source::Engine(Engine::Two)],
+            &[Source::Engine(Engine::Three)],
+        ],
+        output: &[Engine::Four],
+    },
+    Routing {
+        value: 2,
+        label: "M-3",
+        name: "Parallel 1/2, parallel 3/4",
+        feedback: false,
+        note: None,
+        feeds: [
+            &[Source::Input],
+            &[Source::Engine(Engine::One)],
+            &[Source::Input],
+            &[Source::Engine(Engine::Three)],
+        ],
+        output: &[Engine::Two, Engine::Four],
+    },
+    Routing {
+        value: 3,
+        label: "M-4",
+        name: "Parallel 1/2/3/4",
+        feedback: false,
+        note: None,
+        feeds: [
+            &[Source::Input],
+            &[Source::Input],
+            &[Source::Input],
+            &[Source::Input],
+        ],
+        output: &[Engine::One, Engine::Two, Engine::Three, Engine::Four],
+    },
+    Routing {
+        value: 4,
+        label: "M-5",
+        name: "Parallel 1/2/3, serial 4",
+        feedback: false,
+        note: None,
+        feeds: [
+            &[Source::Input],
+            &[Source::Input],
+            &[Source::Input],
+            &[
+                Source::Engine(Engine::One),
+                Source::Engine(Engine::Two),
+                Source::Engine(Engine::Three),
+            ],
+        ],
+        output: &[Engine::Four],
+    },
+    Routing {
+        value: 5,
+        label: "M-6",
+        name: "Serial 1-2, parallel 3/4",
+        feedback: false,
+        note: None,
+        feeds: [
+            &[Source::Input],
+            &[Source::Engine(Engine::One)],
+            &[Source::Engine(Engine::Two)],
+            &[Source::Engine(Engine::Two)],
+        ],
+        output: &[Engine::Three, Engine::Four],
+    },
+    Routing {
+        value: 6,
+        label: "M-7",
+        name: "Serial 1, parallel 2/3/4",
+        feedback: false,
+        note: None,
+        feeds: [
+            &[Source::Input],
+            &[Source::Engine(Engine::One)],
+            &[Source::Engine(Engine::One)],
+            &[Source::Engine(Engine::One)],
+        ],
+        output: &[Engine::Two, Engine::Three, Engine::Four],
+    },
+    Routing {
+        value: 7,
+        label: "M-8",
+        name: "Parallel (serial 1-2-3)/4",
+        feedback: false,
+        note: None,
+        feeds: [
+            &[Source::Input],
+            &[Source::Engine(Engine::One)],
+            &[Source::Engine(Engine::Two)],
+            &[Source::Input],
+        ],
+        output: &[Engine::Three, Engine::Four],
+    },
+    Routing {
+        value: 8,
+        label: "M-9",
+        name: "Serial 3-4 feedback 4(1-2)",
+        feedback: true,
+        note: Some(
+            "The input reaches slot 3 and the output leaves slot 4. Slots 1 and 2 sit in a loop that taps slot 4's output and returns ahead of slot 4.",
+        ),
+        feeds: [
+            &[Source::Engine(Engine::Four)],
+            &[Source::Engine(Engine::One)],
+            &[Source::Input],
+            &[Source::Engine(Engine::Three), Source::Engine(Engine::Two)],
+        ],
+        output: &[Engine::Four],
+    },
+    Routing {
+        value: 9,
+        label: "M-10",
+        name: "Serial 4 feedback 4(1-2-3)",
+        feedback: true,
+        note: Some(
+            "The input reaches slot 4 and the output leaves it. Slots 1, 2 and 3 sit in a loop that taps slot 4's output and returns ahead of slot 4.",
+        ),
+        feeds: [
+            &[Source::Engine(Engine::Four)],
+            &[Source::Engine(Engine::One)],
+            &[Source::Engine(Engine::Two)],
+            &[Source::Input, Source::Engine(Engine::Three)],
+        ],
+        output: &[Engine::Four],
+    },
+];
+
+/// Every `FX Mode` setting, in the order the byte numbers them.
+pub(super) static MODES: [Mode; MODE_COUNT] = [
+    Mode {
+        value: 0,
+        name: "Insert",
+        analog_path: false,
+        digital_path: true,
+    },
+    Mode {
+        value: 1,
+        name: "Send",
+        analog_path: true,
+        digital_path: true,
+    },
+    Mode {
+        value: 2,
+        name: "Bypass",
+        analog_path: true,
+        digital_path: false,
     },
 ];

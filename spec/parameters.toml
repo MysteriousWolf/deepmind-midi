@@ -311,6 +311,8 @@ name = "Pitch Bend Up Depth"
 group = "Oscillators"
 min = 0
 max = 48
+shape = "bipolar"
+centre = 24
 confirmed = false
 display = "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pushing up bends down."
 correction = "The NRPN table gives a range of 0-24, but section 8.4.4 states both pitch bend depths run from -24 to +24, which is 49 values. Encoded as 0-48 with 24 as zero, matching how the manual encodes Global Transpose (0-96 for -48 to +48). Needs confirming against hardware."
@@ -321,6 +323,8 @@ name = "Pitch Bend Down Depth"
 group = "Oscillators"
 min = 0
 max = 48
+shape = "bipolar"
+centre = 24
 confirmed = false
 display = "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pulling down bends up."
 correction = "Same as offset 36."
@@ -667,6 +671,8 @@ name = "VCA Pan Spread"
 group = "VCA"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -730,6 +736,8 @@ name = "OSC Portamento Balance"
 group = "Voicing"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -765,6 +773,8 @@ name = "Mod 1 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -791,6 +801,8 @@ name = "Mod 2 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -817,6 +829,8 @@ name = "Mod 3 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -843,6 +857,8 @@ name = "Mod 4 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -869,6 +885,8 @@ name = "Mod 5 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -895,6 +913,8 @@ name = "Mod 6 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -921,6 +941,8 @@ name = "Mod 7 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -947,6 +969,8 @@ name = "Mod 8 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
 
 [[parameter]]
@@ -1007,6 +1031,10 @@ name = "Seq Step Value 1"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1015,6 +1043,10 @@ name = "Seq Step Value 2"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1023,6 +1055,10 @@ name = "Seq Step Value 3"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1031,6 +1067,10 @@ name = "Seq Step Value 4"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1039,6 +1079,10 @@ name = "Seq Step Value 5"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1047,6 +1091,10 @@ name = "Seq Step Value 6"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1055,6 +1103,10 @@ name = "Seq Step Value 7"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1063,6 +1115,10 @@ name = "Seq Step Value 8"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1071,8 +1127,12 @@ name = "Seq Step Value 9"
 group = "Control Sequencer"
 min = 0
 max = 255
-kind = "switch"
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+correction = "The manual's table carries kind switch on this step alone, which its own range of 0-255 and its own note contradict. Read as the bipolar sweep every other step is."
 
 [[parameter]]
 offset = 132
@@ -1080,6 +1140,10 @@ name = "Seq Step Value 10"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1088,8 +1152,12 @@ name = "Seq Step Value 11"
 group = "Control Sequencer"
 min = 0
 max = 255
-kind = "switch"
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+correction = "The manual's table carries kind switch on this step alone, which its own range of 0-255 and its own note contradict. Read as the bipolar sweep every other step is."
 
 [[parameter]]
 offset = 134
@@ -1097,6 +1165,10 @@ name = "Seq Step Value 12"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1105,6 +1177,10 @@ name = "Seq Step Value 13"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1113,6 +1189,10 @@ name = "Seq Step Value 14"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1121,6 +1201,10 @@ name = "Seq Step Value 15"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1129,6 +1213,10 @@ name = "Seq Step Value 16"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1137,6 +1225,10 @@ name = "Seq Step Value 17"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1145,6 +1237,10 @@ name = "Seq Step Value 18"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1153,6 +1249,10 @@ name = "Seq Step Value 19"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1161,6 +1261,10 @@ name = "Seq Step Value 20"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1169,6 +1273,10 @@ name = "Seq Step Value 21"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1177,6 +1285,10 @@ name = "Seq Step Value 22"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1185,6 +1297,10 @@ name = "Seq Step Value 23"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1193,6 +1309,10 @@ name = "Seq Step Value 24"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1201,6 +1321,10 @@ name = "Seq Step Value 25"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1209,6 +1333,10 @@ name = "Seq Step Value 26"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1217,6 +1345,10 @@ name = "Seq Step Value 27"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1225,6 +1357,10 @@ name = "Seq Step Value 28"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1233,6 +1369,10 @@ name = "Seq Step Value 29"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1241,6 +1381,10 @@ name = "Seq Step Value 30"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1249,6 +1393,10 @@ name = "Seq Step Value 31"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1257,6 +1405,10 @@ name = "Seq Step Value 32"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
 
 [[parameter]]
@@ -1959,5 +2111,7 @@ name = "Program Transpose"
 group = "Program"
 min = 80
 max = 176
+shape = "bipolar"
+centre = 128
 note = "-48 (80) ... 0 (128) ... +48 (176)"
 

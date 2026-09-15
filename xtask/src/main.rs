@@ -21,6 +21,7 @@ mod codegen;
 mod diagrams;
 mod docs;
 mod effect;
+mod front;
 mod fx;
 mod output;
 mod program;

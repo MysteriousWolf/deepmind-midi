@@ -1,0 +1,159 @@
+# The front of the synthesizer: which parameters have a physical control, what
+# is printed over each one, and which group of the panel it sits in.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md.
+#
+# parameters.toml says what exists, controllers.toml says what has a CC, and
+# layout.toml says where an *effect's* slots sit on its own editor panel. None
+# of the three says that `VCF Frequency` has a fader on the instrument with
+# `FREQ` silkscreened over it. This file does, and it is the one fact about this
+# synthesizer a person can see in a photograph.
+#
+# Parameters are named rather than numbered, the way enums.toml names the ones a
+# modulation destination moves: a renamed parameter is a load error here instead
+# of a fader with the wrong legend under it.
+
+[meta]
+source = """
+The front panel of a DeepMind 12, as the manual's own figures print it and as \
+any product photograph of the instrument shows it. Section 4 (Controls) names \
+the groups; the legends are the silkscreen."""
+unit = """
+A DeepMind 12. The 6 has the same 242 parameters and its own front, and this \
+file describes only what has been read off an instrument: a variant gets its \
+own table when somebody has one in front of them, the way a value table gets \
+its own firmware range."""
+legends = """
+The legend is not the parameter's name. A silkscreen has room for `KYBD` and \
+`RES` where the parameter table says `VCF Keyboard Tracking` and `VCF \
+Resonance`, which is right for a rack slot and does not fit over a fader. Two \
+words are printed on two lines, which is what the panel does with `PITCH MOD`. \
+Every legend here is as the instrument prints it, in caps."""
+shapes = """
+The shape is not derivable from the parameter's kind. `Arp On/Off` is a button \
+and `Arp Rate (tempo)` is a fader, and to the parameter table they are a switch \
+and a sweep — which says how a byte is read and not what a hand touches. \
+`lamps` is a column of legends with one of them lit, which is how the panel \
+shows an LFO's shape."""
+omissions = """
+Three controls on the panel are deliberately absent, because none of them \
+addresses a program byte: the `DATA ENTRY` fader, which edits whatever the \
+display is showing; the encoder that selects programs; and the row of twelve \
+lamps over `POLY`, which counts the voices that are sounding. A table that \
+carried them would be describing a workflow rather than a sound. The buttons \
+that open another section are absent for the same reason."""
+rows = 2
+shape_kinds = ["fader", "button", "lamps"]
+
+# Row 0 is what a player reaches for between notes: the arpeggiator, the two
+# LFOs, and the voicing, with the display between the LFOs and POLY.
+
+[[section]]
+name = "ARP / SEQ"
+row = 0
+group = "Arpeggiator"
+controls = [
+    { parameter = "Arp Rate (tempo)", legend = "RATE", shape = "fader" },
+    { parameter = "Arp Gate Time", legend = "GATE TIME", shape = "fader" },
+    { parameter = "Arp On/Off", legend = "ON/OFF", shape = "button" },
+    { parameter = "Arp Hold", legend = "HOLD", shape = "button" },
+]
+
+[[section]]
+name = "LFO 1"
+row = 0
+group = "LFO 1"
+controls = [
+    { parameter = "LFO 1 Rate", legend = "RATE", shape = "fader" },
+    { parameter = "LFO 1 Delay / Fade", legend = "DELAY TIME", shape = "fader" },
+    { parameter = "LFO 1 Shape", legend = "SHAPE", shape = "lamps" },
+]
+
+[[section]]
+name = "LFO 2"
+row = 0
+group = "LFO 2"
+controls = [
+    { parameter = "LFO 2 Rate", legend = "RATE", shape = "fader" },
+    { parameter = "LFO 2 Delay / Fade", legend = "DELAY TIME", shape = "fader" },
+    { parameter = "LFO 2 Shape", legend = "SHAPE", shape = "lamps" },
+]
+
+[[section]]
+name = "POLY"
+row = 0
+group = "Voicing"
+note = """
+One fader, where the instrument has two. The other is `DATA ENTRY`, which edits \
+whatever the display is showing rather than a parameter of its own."""
+controls = [
+    { parameter = "Unison Detune", legend = "UNISON DETUNE", shape = "fader" },
+]
+
+# Row 1 is the voice itself, left to right in the order the signal takes it:
+# oscillators, filter, amplifier, the high-pass, and the envelopes that move
+# them.
+
+[[section]]
+name = "DCO 1 & 2"
+row = 1
+group = "Oscillators"
+controls = [
+    { parameter = "OSC 1 Pitch Mod Depth", legend = "PITCH MOD", shape = "fader" },
+    { parameter = "OSC 1 PWM Depth", legend = "PWM", shape = "fader" },
+    { parameter = "OSC 2 Pitch Mod Depth", legend = "PITCH MOD", shape = "fader" },
+    { parameter = "OSC 2 Tone Mod Depth", legend = "TONE MOD", shape = "fader" },
+    { parameter = "OSC 2 Pitch", legend = "PITCH", shape = "fader" },
+    { parameter = "OSC 2 Level", legend = "LEVEL", shape = "fader" },
+    { parameter = "Noise Level", legend = "NOISE", shape = "fader" },
+    { parameter = "OSC Sync Enable", legend = "SYNC", shape = "button" },
+]
+
+[[section]]
+name = "VCF"
+row = 1
+group = "VCF"
+controls = [
+    { parameter = "VCF Frequency", legend = "FREQ", shape = "fader" },
+    { parameter = "VCF Resonance", legend = "RES", shape = "fader" },
+    { parameter = "VCF Envelope Depth", legend = "ENV", shape = "fader" },
+    { parameter = "VCF LFO Depth", legend = "LFO", shape = "fader" },
+    { parameter = "VCF Keyboard Tracking", legend = "KYBD", shape = "fader" },
+    { parameter = "VCF 2 Pole Mode", legend = "POLES", shape = "button" },
+]
+
+[[section]]
+name = "VCA"
+row = 1
+group = "VCA"
+controls = [
+    { parameter = "VCA Level", legend = "LEVEL", shape = "fader" },
+]
+
+[[section]]
+name = "HPF"
+row = 1
+group = "VCF"
+note = """
+The high-pass has a plate of its own on the panel and its two parameters are in \
+the VCF group of the table, which is why a section's group is not a key."""
+controls = [
+    { parameter = "VCF HighPass Frequency", legend = "FREQ", shape = "fader" },
+    { parameter = "VCF Bass Boost", legend = "BOOST", shape = "button" },
+]
+
+[[section]]
+name = "ENVELOPES"
+row = 1
+group = "VCA Envelope"
+note = """
+Four faders shared by three envelopes: the panel's own `VCA`, `VCF` and `MOD` \
+buttons choose which one they address, and the group here is the one they \
+address when the instrument is switched on."""
+controls = [
+    { parameter = "VCA Envelope Attack Time", legend = "A", shape = "fader" },
+    { parameter = "VCA Envelope Decay Time", legend = "D", shape = "fader" },
+    { parameter = "VCA Envelope Sustain Level", legend = "S", shape = "fader" },
+    { parameter = "VCA Envelope Release Time", legend = "R", shape = "fader" },
+]

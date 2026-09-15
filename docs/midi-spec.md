@@ -20,6 +20,7 @@ by hand: change the spec and run `cargo xtask docs`.
 - [Continuous controllers](#continuous-controllers)
 - [Program data layout](#program-data-layout)
 - [Program parameters](#program-parameters)
+- [Front panel](#front-panel)
 - [Firmware versions](#firmware-versions)
 - [Value tables](#value-tables)
 - [Global settings](#global-settings)
@@ -697,9 +698,9 @@ sends an NRPN edit and wants confirmation has to re-request the edit buffer.
 | 128 | Seq Step Value 6 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
 | 129 | Seq Step Value 7 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
 | 130 | Seq Step Value 8 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
-| 131 | Seq Step Value 9 | 0-255 | Off (0), On (1) |  |
+| 131 | Seq Step Value 9 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
 | 132 | Seq Step Value 10 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
-| 133 | Seq Step Value 11 | 0-255 | Off (0), On (1) |  |
+| 133 | Seq Step Value 11 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
 | 134 | Seq Step Value 12 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
 | 135 | Seq Step Value 13 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
 | 136 | Seq Step Value 14 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  |
@@ -825,6 +826,89 @@ sends an NRPN edit and wants confirmation has to re-request the edit buffer.
 | 241 | Program Transpose | 80-176 | -48 (80) ... 0 (128) ... +48 (176) |  |
 
 <!-- /generated:parameters -->
+
+## Front panel
+
+Which of those parameters the instrument puts a physical control under, what is
+silkscreened over each one, and which of the panel's two rows its plate is in.
+It is the one fact about this synthesizer a person can see in a photograph and
+cannot get from the tables above: the parameter table says what exists, the
+controller table says what has a CC, and neither says what has a fader.
+
+The legend is not the parameter's name. A silkscreen has room for `KYBD` and
+`RES` where the table says `VCF Keyboard Tracking` and `VCF Resonance`, and two
+words are printed on two lines, which is what the panel does with `PITCH MOD`.
+Nor is the shape derivable: `Arp On/Off` is a button and `Arp Rate (tempo)` is a
+fader, and to the parameter table they are a switch and a sweep, which says how
+a byte is read rather than what a hand touches.
+
+Three controls on the instrument are deliberately absent, because none of them
+addresses a program byte: the `DATA ENTRY` fader, which edits whatever the
+display is showing; the encoder that selects programs; and the row of twelve
+lamps over `POLY`, which counts the voices that are sounding. The buttons that
+open another section on the display are absent for the same reason.
+
+Read off a DeepMind 12. The 6 has the same 242 parameters and its own front; a
+variant gets its own table when somebody has one in front of them, the way a
+value table gets its own firmware range.
+
+<!-- generated:front-panel -->
+
+32 of the 242 parameters have a control on the front of the instrument, across 9 plates in 2 rows.
+
+#### Row 0
+
+`ARP / SEQ`, `LFO 1`, `LFO 2`, `POLY`, left to right.
+
+| Plate | Printed | Control | Parameter | Offset |
+|---|---|---|---|---|
+| ARP / SEQ | `RATE` | fader | Arp Rate (tempo) | 157 |
+| ARP / SEQ | `GATE TIME` | fader | Arp Gate Time | 160 |
+| ARP / SEQ | `ON/OFF` | button | Arp On/Off | 155 |
+| ARP / SEQ | `HOLD` | button | Arp Hold | 161 |
+| LFO 1 | `RATE` | fader | LFO 1 Rate | 0 |
+| LFO 1 | `DELAY TIME` | fader | LFO 1 Delay / Fade | 1 |
+| LFO 1 | `SHAPE` | lamps | LFO 1 Shape | 2 |
+| LFO 2 | `RATE` | fader | LFO 2 Rate | 7 |
+| LFO 2 | `DELAY TIME` | fader | LFO 2 Delay / Fade | 8 |
+| LFO 2 | `SHAPE` | lamps | LFO 2 Shape | 9 |
+| POLY | `UNISON DETUNE` | fader | Unison Detune | 87 |
+
+- **POLY.** One fader, where the instrument has two. The other is `DATA ENTRY`, which edits whatever the display is showing rather than a parameter of its own.
+
+#### Row 1
+
+`DCO 1 & 2`, `VCF`, `VCA`, `HPF`, `ENVELOPES`, left to right.
+
+| Plate | Printed | Control | Parameter | Offset |
+|---|---|---|---|---|
+| DCO 1 & 2 | `PITCH MOD` | fader | OSC 1 Pitch Mod Depth | 21 |
+| DCO 1 & 2 | `PWM` | fader | OSC 1 PWM Depth | 25 |
+| DCO 1 & 2 | `PITCH MOD` | fader | OSC 2 Pitch Mod Depth | 29 |
+| DCO 1 & 2 | `TONE MOD` | fader | OSC 2 Tone Mod Depth | 28 |
+| DCO 1 & 2 | `PITCH` | fader | OSC 2 Pitch | 27 |
+| DCO 1 & 2 | `LEVEL` | fader | OSC 2 Level | 26 |
+| DCO 1 & 2 | `NOISE` | fader | Noise Level | 33 |
+| DCO 1 & 2 | `SYNC` | button | OSC Sync Enable | 20 |
+| VCF | `FREQ` | fader | VCF Frequency | 39 |
+| VCF | `RES` | fader | VCF Resonance | 41 |
+| VCF | `ENV` | fader | VCF Envelope Depth | 42 |
+| VCF | `LFO` | fader | VCF LFO Depth | 45 |
+| VCF | `KYBD` | fader | VCF Keyboard Tracking | 49 |
+| VCF | `POLES` | button | VCF 2 Pole Mode | 51 |
+| VCA | `LEVEL` | fader | VCA Level | 80 |
+| HPF | `FREQ` | fader | VCF HighPass Frequency | 40 |
+| HPF | `BOOST` | button | VCF Bass Boost | 52 |
+| ENVELOPES | `A` | fader | VCA Envelope Attack Time | 53 |
+| ENVELOPES | `D` | fader | VCA Envelope Decay Time | 54 |
+| ENVELOPES | `S` | fader | VCA Envelope Sustain Level | 55 |
+| ENVELOPES | `R` | fader | VCA Envelope Release Time | 56 |
+
+- **HPF.** The high-pass has a plate of its own on the panel and its two parameters are in the VCF group of the table, which is why a section's group is not a key.
+
+- **ENVELOPES.** Four faders shared by three envelopes: the panel's own `VCA`, `VCF` and `MOD` buttons choose which one they address, and the group here is the one they address when the instrument is switched on.
+
+<!-- /generated:front-panel -->
 
 ## Firmware versions
 
@@ -1785,6 +1869,7 @@ Where this document departs from what the manual prints, and why.
 | 118 | Ctrl Sequencer Clock Divider | Section 8.1.8 lists twenty clock divisions against this range of 0-15. The range is left as printed and the value table is marked unconfirmed. |
 | 119 | Sequence Length | The manual runs the range and the first note value together as "0-311 (0) to 32 (31) steps". The range is 0-31. |
 | 120 | Sequencer Swing Timing | The NRPN note reads "0% (0) to 75% (25)". Sections 8.1.7 and 8.1.8 give the swing range as 50% to 75%, so 0 is 50% and 255 is 75%. |
+| 131, 133 | Seq Step Value 9 and 1 more | The manual's table carries kind switch on this step alone, which its own range of 0-255 and its own note contradict. Read as the bipolar sweep every other step is. |
 | 163 | Arp Swing | Same as offset 120. |
 | 164 | Arp Octaves | The manual prints "0-51 to 6 Octaves". The range is 0-5. |
 | 166, 179, 192, 205 | FX 1 Type and 3 more | Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range. |

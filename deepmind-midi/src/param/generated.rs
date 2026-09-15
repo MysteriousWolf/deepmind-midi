@@ -8,7 +8,7 @@
 // chunks to satisfy a length lint would only hide what it is.
 #![expect(clippy::too_many_lines, reason = "a generated table, not logic")]
 
-use super::{Controller, ControllerKind, Kind, Parameter, ValueEntry, ValueTable};
+use super::{Controller, ControllerKind, Kind, Parameter, Shape, ValueEntry, ValueTable};
 use crate::sysex::inquiry::Version;
 
 /// Number of program parameters. Offsets run `0..PARAMETER_COUNT`.
@@ -1800,7 +1800,7 @@ impl ParamId {
                 group: Group::ControlSequencer,
                 min: 0,
                 max: 255,
-                kind: Kind::Switch,
+                kind: Kind::Continuous,
             },
             Self::SeqStepValue10 => Parameter {
                 name: "Seq Step Value 10",
@@ -1814,7 +1814,7 @@ impl ParamId {
                 group: Group::ControlSequencer,
                 min: 0,
                 max: 255,
-                kind: Kind::Switch,
+                kind: Kind::Continuous,
             },
             Self::SeqStepValue12 => Parameter {
                 name: "Seq Step Value 12",
@@ -2573,6 +2573,464 @@ impl ParamId {
                 kind: Kind::Continuous,
             },
         }
+    }
+}
+
+impl ParamId {
+    /// Returns what this parameter's raw value means beyond its range.
+    ///
+    /// [`Shape::Unipolar`] for all but 45 of them, which keeps a host's
+    /// "where does this control sit" code one path rather than an [`Option`]
+    /// every caller unwraps the same way.
+    #[must_use]
+    pub const fn shape(self) -> Shape {
+        match self {
+            Self::PitchBendUpDepth | Self::PitchBendDownDepth => Shape::Bipolar { centre: 24 },
+            Self::VcaPanSpread
+            | Self::OscPortamentoBalance
+            | Self::Mod1Depth
+            | Self::Mod2Depth
+            | Self::Mod3Depth
+            | Self::Mod4Depth
+            | Self::Mod5Depth
+            | Self::Mod6Depth
+            | Self::Mod7Depth
+            | Self::Mod8Depth
+            | Self::SeqStepValue1
+            | Self::SeqStepValue2
+            | Self::SeqStepValue3
+            | Self::SeqStepValue4
+            | Self::SeqStepValue5
+            | Self::SeqStepValue6
+            | Self::SeqStepValue7
+            | Self::SeqStepValue8
+            | Self::SeqStepValue9
+            | Self::SeqStepValue10
+            | Self::SeqStepValue11
+            | Self::SeqStepValue12
+            | Self::SeqStepValue13
+            | Self::SeqStepValue14
+            | Self::SeqStepValue15
+            | Self::SeqStepValue16
+            | Self::SeqStepValue17
+            | Self::SeqStepValue18
+            | Self::SeqStepValue19
+            | Self::SeqStepValue20
+            | Self::SeqStepValue21
+            | Self::SeqStepValue22
+            | Self::SeqStepValue23
+            | Self::SeqStepValue24
+            | Self::SeqStepValue25
+            | Self::SeqStepValue26
+            | Self::SeqStepValue27
+            | Self::SeqStepValue28
+            | Self::SeqStepValue29
+            | Self::SeqStepValue30
+            | Self::SeqStepValue31
+            | Self::SeqStepValue32
+            | Self::ProgramTranspose => Shape::Bipolar { centre: 128 },
+            _ => Shape::Unipolar,
+        }
+    }
+
+    /// Returns the value that means "not set" rather than a position in the
+    /// range, where this parameter has one.
+    ///
+    /// `Some(0)` for a sequencer step, where zero is "skip this step" and not
+    /// the smallest modulation it can apply: a strip that drew it as the
+    /// smallest would state the wrong musical fact.
+    #[must_use]
+    pub const fn inactive(self) -> Option<u16> {
+        match self {
+            Self::SeqStepValue1
+            | Self::SeqStepValue2
+            | Self::SeqStepValue3
+            | Self::SeqStepValue4
+            | Self::SeqStepValue5
+            | Self::SeqStepValue6
+            | Self::SeqStepValue7
+            | Self::SeqStepValue8
+            | Self::SeqStepValue9
+            | Self::SeqStepValue10
+            | Self::SeqStepValue11
+            | Self::SeqStepValue12
+            | Self::SeqStepValue13
+            | Self::SeqStepValue14
+            | Self::SeqStepValue15
+            | Self::SeqStepValue16
+            | Self::SeqStepValue17
+            | Self::SeqStepValue18
+            | Self::SeqStepValue19
+            | Self::SeqStepValue20
+            | Self::SeqStepValue21
+            | Self::SeqStepValue22
+            | Self::SeqStepValue23
+            | Self::SeqStepValue24
+            | Self::SeqStepValue25
+            | Self::SeqStepValue26
+            | Self::SeqStepValue27
+            | Self::SeqStepValue28
+            | Self::SeqStepValue29
+            | Self::SeqStepValue30
+            | Self::SeqStepValue31
+            | Self::SeqStepValue32 => Some(0),
+            _ => None,
+        }
+    }
+
+    /// Returns the parameter that says how many of a run are used, where one
+    /// does.
+    ///
+    /// [`ParamId::SequenceLength`] for each of the 32 sequencer steps, so that
+    /// a host drawing the run can dim what is not played instead of implying
+    /// all of it is.
+    #[must_use]
+    pub const fn bounded_by(self) -> Option<Self> {
+        match self {
+            Self::SeqStepValue1
+            | Self::SeqStepValue2
+            | Self::SeqStepValue3
+            | Self::SeqStepValue4
+            | Self::SeqStepValue5
+            | Self::SeqStepValue6
+            | Self::SeqStepValue7
+            | Self::SeqStepValue8
+            | Self::SeqStepValue9
+            | Self::SeqStepValue10
+            | Self::SeqStepValue11
+            | Self::SeqStepValue12
+            | Self::SeqStepValue13
+            | Self::SeqStepValue14
+            | Self::SeqStepValue15
+            | Self::SeqStepValue16
+            | Self::SeqStepValue17
+            | Self::SeqStepValue18
+            | Self::SeqStepValue19
+            | Self::SeqStepValue20
+            | Self::SeqStepValue21
+            | Self::SeqStepValue22
+            | Self::SeqStepValue23
+            | Self::SeqStepValue24
+            | Self::SeqStepValue25
+            | Self::SeqStepValue26
+            | Self::SeqStepValue27
+            | Self::SeqStepValue28
+            | Self::SeqStepValue29
+            | Self::SeqStepValue30
+            | Self::SeqStepValue31
+            | Self::SeqStepValue32 => Some(Self::SequenceLength),
+            _ => None,
+        }
+    }
+}
+
+impl ParamId {
+    /// Returns what the specification records about this parameter beyond its
+    /// table row.
+    ///
+    /// The manual's own words, kept as prose because that is what they are: a
+    /// sentence about when a rate becomes a clock division, or about a value
+    /// that skips a step rather than sounding it. What a control has to act on
+    /// is typed — see [`ParamId::shape`], [`ParamId::inactive`] and
+    /// [`ParamId::bounded_by`] — and this is the rest of it, for a host with
+    /// somewhere to print it.
+    ///
+    /// `None` for the 113 parameters the manual says nothing more about.
+    #[must_use]
+    pub const fn note(self) -> Option<&'static str> {
+        match self {
+            Self::Lfo1Rate => Some(
+                "When LFO 1 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate.",
+            ),
+            Self::Lfo1KeySync
+            | Self::Lfo1ArpSync
+            | Self::Lfo2KeySync
+            | Self::Lfo2ArpSync
+            | Self::Osc1PulseEnable
+            | Self::Osc1SawEnable
+            | Self::OscSyncEnable
+            | Self::VcfBassBoost
+            | Self::OscKeyDownReset
+            | Self::CtrlSequencerEnable
+            | Self::ArpOnOff
+            | Self::ArpKeySync
+            | Self::ArpHold => Some("Off (0), On (1)"),
+            Self::Lfo2Rate => Some(
+                "When LFO 2 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate.",
+            ),
+            Self::VcaPanSpread
+            | Self::OscPortamentoBalance
+            | Self::Mod1Depth
+            | Self::Mod2Depth
+            | Self::Mod3Depth
+            | Self::Mod4Depth
+            | Self::Mod5Depth
+            | Self::Mod6Depth
+            | Self::Mod7Depth
+            | Self::Mod8Depth => Some("-128 (0) to +127 (255)"),
+            Self::UnisonDetune => Some("Sets the amount phatness!"),
+            Self::SequenceLength => Some("1 (0) to 32 (31) steps"),
+            Self::SequencerSwingTiming | Self::ArpSwing => {
+                Some("0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel.")
+            }
+            Self::SeqStepValue1
+            | Self::SeqStepValue2
+            | Self::SeqStepValue3
+            | Self::SeqStepValue4
+            | Self::SeqStepValue5
+            | Self::SeqStepValue6
+            | Self::SeqStepValue7
+            | Self::SeqStepValue8
+            | Self::SeqStepValue9
+            | Self::SeqStepValue10
+            | Self::SeqStepValue11
+            | Self::SeqStepValue12
+            | Self::SeqStepValue13
+            | Self::SeqStepValue14
+            | Self::SeqStepValue15
+            | Self::SeqStepValue16
+            | Self::SeqStepValue17
+            | Self::SeqStepValue18
+            | Self::SeqStepValue19
+            | Self::SeqStepValue20
+            | Self::SeqStepValue21
+            | Self::SeqStepValue22
+            | Self::SeqStepValue23
+            | Self::SeqStepValue24
+            | Self::SeqStepValue25
+            | Self::SeqStepValue26
+            | Self::SeqStepValue27
+            | Self::SeqStepValue28
+            | Self::SeqStepValue29
+            | Self::SeqStepValue30
+            | Self::SeqStepValue31
+            | Self::SeqStepValue32 => {
+                Some("Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\".")
+            }
+            Self::ArpRateTempo => Some("20 bpm (0) to 275 bpm (255)"),
+            Self::ArpOctaves => Some("1 to 6 octaves"),
+            Self::Fx1Param1
+            | Self::Fx1Param2
+            | Self::Fx1Param3
+            | Self::Fx1Param4
+            | Self::Fx1Param5
+            | Self::Fx1Param6
+            | Self::Fx1Param7
+            | Self::Fx1Param8
+            | Self::Fx1Param9
+            | Self::Fx1Param10
+            | Self::Fx1Param11
+            | Self::Fx1Param12 => Some("Meaning depends on FX 1 Type"),
+            Self::Fx2Param1
+            | Self::Fx2Param2
+            | Self::Fx2Param3
+            | Self::Fx2Param4
+            | Self::Fx2Param5
+            | Self::Fx2Param6
+            | Self::Fx2Param7
+            | Self::Fx2Param8
+            | Self::Fx2Param9
+            | Self::Fx2Param10
+            | Self::Fx2Param11
+            | Self::Fx2Param12 => Some("Meaning depends on FX 2 Type"),
+            Self::Fx3Param1
+            | Self::Fx3Param2
+            | Self::Fx3Param3
+            | Self::Fx3Param4
+            | Self::Fx3Param5
+            | Self::Fx3Param6
+            | Self::Fx3Param7
+            | Self::Fx3Param8
+            | Self::Fx3Param9
+            | Self::Fx3Param10
+            | Self::Fx3Param11
+            | Self::Fx3Param12 => Some("Meaning depends on FX 3 Type"),
+            Self::Fx4Param1
+            | Self::Fx4Param2
+            | Self::Fx4Param3
+            | Self::Fx4Param4
+            | Self::Fx4Param5
+            | Self::Fx4Param6
+            | Self::Fx4Param7
+            | Self::Fx4Param8
+            | Self::Fx4Param9
+            | Self::Fx4Param10
+            | Self::Fx4Param11
+            | Self::Fx4Param12 => Some("Meaning depends on FX 4 Type"),
+            Self::ProgramNameChar1
+            | Self::ProgramNameChar2
+            | Self::ProgramNameChar3
+            | Self::ProgramNameChar4
+            | Self::ProgramNameChar5
+            | Self::ProgramNameChar6
+            | Self::ProgramNameChar7
+            | Self::ProgramNameChar8
+            | Self::ProgramNameChar9
+            | Self::ProgramNameChar10
+            | Self::ProgramNameChar11
+            | Self::ProgramNameChar12
+            | Self::ProgramNameChar13
+            | Self::ProgramNameChar14
+            | Self::ProgramNameChar15
+            | Self::ProgramNameChar16
+            | Self::ProgramNameChar17 => Some("Null-terminated 16 char ASCII string"),
+            Self::ProgramTranspose => Some("-48 (80) ... 0 (128) ... +48 (176)"),
+            _ => None,
+        }
+    }
+
+    /// Returns the range the synthesizer's own display shows for this
+    /// parameter, as the manual prints it.
+    ///
+    /// The smallest useful thing a panel can say about a byte whose curve
+    /// nobody has measured: the reading stays raw, and this is what the two
+    /// ends of it mean. The same answer [`FxSlot::min`](crate::effect::FxSlot::min)
+    /// and [`FxSlot::max`](crate::effect::FxSlot::max) give for an effect slot,
+    /// in one string because these are not all ranges — one of them has a
+    /// discrete value before a range in it, and another is a sentence about two
+    /// different behaviours.
+    ///
+    /// Not a conversion, and no promise that the curve between the ends is a
+    /// straight line. `None` where the manual gives none, which is 216 of them.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// assert_eq!(
+    ///     ParamId::VcfFrequency.display(),
+    ///     Some("50.0 Hz to 20000.0 Hz"),
+    /// );
+    /// assert_eq!(ParamId::Lfo1SlewRate.display(), None);
+    /// ```
+    #[must_use]
+    pub const fn display(self) -> Option<&'static str> {
+        match self {
+            Self::Lfo1Rate | Self::Lfo2Rate => {
+                Some("0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix")
+            }
+            Self::Lfo1DelayFade | Self::Lfo2DelayFade => Some("0.00 s to 6.59 s"),
+            Self::Osc1PitchModDepth | Self::Osc2PitchModDepth => {
+                Some("0.00 cents to 36.0 semitones, on a non-linear fader response")
+            }
+            Self::Osc1PwmDepth => Some(
+                "50.0% to 99.0% pulse width when the source is Manual, otherwise 0 to plus or minus 49% modulation",
+            ),
+            Self::Osc2Level => Some("Off, then -48.0 dB to 0.0 dB"),
+            Self::Osc2Pitch => Some("-12.0 to +12.0 semitones"),
+            Self::Osc2ToneModDepth => Some(
+                "50% to 100% tone modulation when the source is Manual, otherwise 0 to plus or minus 49%",
+            ),
+            Self::NoiseLevel => Some("Off, then -48.1 dB to 0.0 dB"),
+            Self::PortamentoTime => Some("0.00 s to 10.00 s"),
+            Self::PitchBendUpDepth => Some(
+                "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pushing up bends down.",
+            ),
+            Self::PitchBendDownDepth => Some(
+                "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pulling down bends up.",
+            ),
+            Self::VcfFrequency => Some("50.0 Hz to 20000.0 Hz"),
+            Self::VcfHighPassFrequency => Some("20.0 Hz to 2000.0 Hz"),
+            Self::VcfResonance
+            | Self::VcfEnvelopeDepth
+            | Self::VcfLfoDepth
+            | Self::VcfKeyboardTracking => Some("0.0% to 100.0%"),
+            Self::VcaLevel => Some("-12.0 dB to +6.0 dB"),
+            Self::UnisonDetune => Some("plus or minus 0.0 to 50.0 cents"),
+            Self::DriftRate => Some(
+                "Each drift step lasts a random time between 25-50 ms at 0 and 2.5-5.0 s at 255",
+            ),
+            Self::SequencerSwingTiming | Self::ArpSwing => Some("50% to 75%"),
+            Self::ArpRateTempo => Some("20.0 to 275.0 BPM"),
+            _ => None,
+        }
+    }
+
+    /// Returns why this parameter's row departs from what the manual prints,
+    /// where it does.
+    ///
+    /// 37 rows do. The manual contradicts itself about a range, or runs two
+    /// numbers together, and the specification records both the reading it took
+    /// and the reason. Worth showing to somebody convinced the editor is wrong
+    /// about a range, and worth reading beside
+    /// [`ParamId::confirmed`](Self::confirmed).
+    #[must_use]
+    pub const fn correction(self) -> Option<&'static str> {
+        match self {
+            Self::Lfo1MonoMode => Some(
+                "The manual prints 0-1, but its own note describes Poly (0), Mono (1) and SPREAD-1 (2) through SPREAD-254 (255), matching LFO 2 Mono Mode at offset 12.",
+            ),
+            Self::Osc1Range => {
+                Some("The manual prints \"0-216' (0), 8' (1), 4' (2)\". The range is 0-2.")
+            }
+            Self::Osc2Range => Some("Same run-together as offset 14. The range is 0-2."),
+            Self::PitchBendUpDepth => Some(
+                "The NRPN table gives a range of 0-24, but section 8.4.4 states both pitch bend depths run from -24 to +24, which is 49 values. Encoded as 0-48 with 24 as zero, matching how the manual encodes Global Transpose (0-96 for -48 to +48). Needs confirming against hardware.",
+            ),
+            Self::PitchBendDownDepth => Some("Same as offset 36."),
+            Self::Osc1PitchModMode => {
+                Some("The manual prints \"0-10 (OSC1+2), 1 (OSC 1 Only)\". The range is 0-1.")
+            }
+            Self::Vcf2PoleMode => {
+                Some("The manual prints \"0-14 Pole (0), 2 Pole (1)\". The range is 0-1.")
+            }
+            Self::VcaEnvelopeReleaseCurve => Some(
+                "The manual repeats \"Attack Curve\" here. Offsets 58-61 are the attack, decay, sustain and release curves, matching the Env1 AtCur / DcyCur / SuSCur / RelCur modulation destinations.",
+            ),
+            Self::VcfEnvelopeReleaseCurve | Self::ModEnvelopeReleaseCurve => {
+                Some("Same repeated-name error as offset 61.")
+            }
+            Self::Mod1Source
+            | Self::Mod2Source
+            | Self::Mod3Source
+            | Self::Mod4Source
+            | Self::Mod5Source
+            | Self::Mod6Source
+            | Self::Mod7Source
+            | Self::Mod8Source => Some(
+                "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range.",
+            ),
+            Self::Mod1Destination
+            | Self::Mod2Destination
+            | Self::Mod3Destination
+            | Self::Mod4Destination
+            | Self::Mod5Destination
+            | Self::Mod6Destination
+            | Self::Mod7Destination
+            | Self::Mod8Destination => Some(
+                "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range.",
+            ),
+            Self::CtrlSequencerClockDivider => Some(
+                "Section 8.1.8 lists twenty clock divisions against this range of 0-15. The range is left as printed and the value table is marked unconfirmed.",
+            ),
+            Self::SequenceLength => Some(
+                "The manual runs the range and the first note value together as \"0-311 (0) to 32 (31) steps\". The range is 0-31.",
+            ),
+            Self::SequencerSwingTiming => Some(
+                "The NRPN note reads \"0% (0) to 75% (25)\". Sections 8.1.7 and 8.1.8 give the swing range as 50% to 75%, so 0 is 50% and 255 is 75%.",
+            ),
+            Self::SeqStepValue9 | Self::SeqStepValue11 => Some(
+                "The manual's table carries kind switch on this step alone, which its own range of 0-255 and its own note contradict. Read as the bipolar sweep every other step is.",
+            ),
+            Self::ArpSwing => Some("Same as offset 120."),
+            Self::ArpOctaves => Some("The manual prints \"0-51 to 6 Octaves\". The range is 0-5."),
+            Self::Fx1Type | Self::Fx2Type | Self::Fx3Type | Self::Fx4Type => Some(
+                "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range.",
+            ),
+            _ => None,
+        }
+    }
+
+    /// Returns whether the specification's reading of this parameter has been
+    /// confirmed.
+    ///
+    /// `false` where a range or an ordering is inferred from the manual's prose
+    /// because its own table contradicts itself, and no hardware has settled it;
+    /// [`ParamId::correction`](Self::correction) is the reason in each case. A
+    /// host with room to say so can mark the control rather than presenting a
+    /// guess as a fact.
+    #[must_use]
+    pub const fn confirmed(self) -> bool {
+        !matches!(self, Self::PitchBendUpDepth | Self::PitchBendDownDepth)
     }
 }
 

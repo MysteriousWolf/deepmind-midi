@@ -18,6 +18,7 @@
 //! | [`sysex`]     | `DeepMind` framing, the packed MS-bit codec, typed messages        |
 //! | [`param`]     | The 242 program parameters: names, ranges, value tables, NRPN      |
 //! | [`effect`]    | What an effect engine's twelve bytes are, per algorithm            |
+//! | [`front`]     | What the instrument's own front panel puts a control under         |
 //! | [`program`]   | A program: the 242 bytes, typed accessors, names, value types      |
 //! | [`syx`]       | `.syx` files: the programs a preset pack carries, and building one |
 //! | [`device`]    | The state machine: what the synthesizer holds, and what to send    |
@@ -75,6 +76,7 @@ extern crate alloc;
 pub mod device;
 pub mod effect;
 pub mod error;
+pub mod front;
 pub mod ids;
 mod nrpn;
 pub mod param;
