@@ -137,7 +137,7 @@ pub use clock::StdClock;
 pub use error::Error;
 pub use port::Port;
 
-use crate::device::{DEFAULT_EVENT_DEPTH, DEFAULT_TX_DEPTH, Device, Event, Request};
+use crate::device::{ControlApp, DEFAULT_EVENT_DEPTH, DEFAULT_TX_DEPTH, Device, Event, Request};
 use crate::ids::{Bank, ProgramNumber, Slot};
 use crate::program::Program;
 use crate::queue::Queue;
@@ -397,6 +397,24 @@ where
         self.device.request_identity()?;
         self.answer(Request::Identity, |event| match event {
             Event::Identity(identity) => Offer::Answer(identity),
+            other => Offer::Other(other),
+        })
+    }
+
+    /// Announces the host and waits for what the interface answers.
+    ///
+    /// The only thing that reports which program the synthesizer has selected,
+    /// which is otherwise something a host infers. The answer is handed back
+    /// rather than tracked: see [`ControlApp`] for why.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Timeout`] when nothing answers, [`Error::Port`] when the
+    /// port fails, and [`Error::Protocol`] when the outbound queue has no room.
+    pub fn control_app(&mut self) -> Result<ControlApp, Error<P::Error>> {
+        self.device.request_control_app()?;
+        self.answer(Request::ControlApp, |event| match event {
+            Event::ControlApp(control_app) => Offer::Answer(control_app),
             other => Offer::Other(other),
         })
     }

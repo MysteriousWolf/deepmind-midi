@@ -9,7 +9,7 @@ use crate::program::Program;
 use crate::sysex::{Command, Identity};
 use crate::wire::{Channel, ChannelMessage};
 
-use super::Request;
+use super::{ControlApp, Request};
 
 /// Something that happened, waiting to be polled.
 ///
@@ -42,6 +42,11 @@ pub enum Event {
     /// A device inquiry was answered, which is the only thing that reports
     /// firmware.
     Identity(Identity),
+    /// A control app notification was answered, which is the only thing that
+    /// reports which program the synthesizer has selected.
+    ///
+    /// Reported and not tracked, for the reasons [`ControlApp`] gives.
+    ControlApp(ControlApp),
     /// One parameter changed at the synthesizer, by NRPN or by its controller.
     ///
     /// Whether the tracked program still counts as confirmed after it is what
@@ -97,6 +102,7 @@ impl fmt::Display for Event {
             Self::EditBuffer(program) => write!(f, "edit buffer: {}", program.name()),
             Self::Program { slot, program } => write!(f, "{slot}: {}", program.name()),
             Self::Identity(identity) => write!(f, "firmware {}", identity.firmware),
+            Self::ControlApp(control_app) => write!(f, "selected {control_app}"),
             Self::Parameter { parameter, value } => write!(f, "{parameter} = {value}"),
             Self::Channel { channel, message } => write!(f, "channel {channel}: {message}"),
             Self::Timeout(request) => write!(f, "no answer to the {request}"),

@@ -27,6 +27,13 @@ pub const MAX_OUTBOUND_LEN: usize = 16;
 pub enum Request {
     /// A device inquiry, answered by an identity.
     Identity,
+    /// An announcement to the synthesizer, answered by what the interface
+    /// currently holds.
+    ///
+    /// The one request whose answer names the selected program. What a unit
+    /// does with the announcement itself, and whether it answers at all, is
+    /// open until one is on the bench.
+    ControlApp,
     /// The edit buffer, answered by one dump.
     EditBuffer,
     /// One stored program, answered by one dump.
@@ -50,6 +57,7 @@ impl fmt::Display for Request {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Identity => f.write_str("device inquiry"),
+            Self::ControlApp => f.write_str("control app notification"),
             Self::EditBuffer => f.write_str("edit buffer dump"),
             Self::Program(slot) => write!(f, "program dump {slot}"),
             Self::Bank { bank, first, last } => {
@@ -96,6 +104,9 @@ impl Outbound {
         let message = match self {
             Self::Edit(edit) => return edit.encode_into(channel, out),
             Self::Ask(Request::Identity) => return inquiry::request_into(device, out),
+            // The manual prints one reserved payload byte and does not say what
+            // it is for, so a host announcing itself sends a zero.
+            Self::Ask(Request::ControlApp) => Message::ControlAppNotifyRequest { reserved: 0 },
             Self::Ask(Request::EditBuffer) => Message::EditBufferDumpRequest,
             Self::Ask(Request::Program(slot)) => Message::ProgramDumpRequest {
                 bank: slot.bank,
@@ -127,6 +138,7 @@ mod tests {
         let slot = Slot::new(Bank::H, ProgramNumber::LAST);
         let items = [
             Outbound::Ask(Request::Identity),
+            Outbound::Ask(Request::ControlApp),
             Outbound::Ask(Request::EditBuffer),
             Outbound::Ask(Request::Program(slot)),
             Outbound::Ask(Request::Bank {
