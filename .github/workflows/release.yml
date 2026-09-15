@@ -136,7 +136,9 @@ jobs:
 
       # `cargo publish` leaves the crate unpacked under target/package, and the
       # cache action's cleanup walks into it looking for build directories that
-      # a source tree does not have. Nothing needs it after this point.
+      # a source tree does not have. Nothing needs it after this point. It also
+      # walks what it restores, so a cache saved before this step existed keeps
+      # reporting the same thing until one saved after it replaces it.
       - name: Remove the unpacked package
         if: always()
         run: rm -rf target/package
