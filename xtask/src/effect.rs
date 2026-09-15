@@ -299,9 +299,9 @@ pub(super) static GRID: Grid = Grid {{
 /// Renders what each algorithm's own editor panel is made of: its control
 /// shape, its four measured colours, and the rows it fills.
 ///
-/// A separate table from [`ALGORITHMS`], reached by index, so that a host that
-/// never draws a panel does not carry twelve bytes of colour per effect: nothing
-/// in the algorithm table points at this one.
+/// A separate table from the algorithm table, reached by index, so that a host
+/// that never draws a panel does not carry twelve bytes of colour per effect:
+/// nothing in the algorithm table points at this one.
 ///
 /// # Errors
 ///

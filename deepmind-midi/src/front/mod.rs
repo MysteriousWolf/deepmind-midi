@@ -10,7 +10,7 @@
 //! the one fact about this synthesizer a person can see in a photograph.
 //!
 //! ```
-//! use deepmind_midi::front::{Shape, sections};
+//! use deepmind_midi::front::{PanelShape, sections};
 //! use deepmind_midi::param::{Group, ParamId};
 //!
 //! let vcf = sections().iter().find(|s| s.name() == "VCF").expect("a filter");
@@ -20,7 +20,7 @@
 //! let frequency = vcf.controls().first().expect("five faders and a button");
 //! assert_eq!(frequency.parameter(), ParamId::VcfFrequency);
 //! assert_eq!(frequency.legend(), "FREQ");
-//! assert_eq!(frequency.shape(), Shape::Fader);
+//! assert_eq!(frequency.shape(), PanelShape::Fader);
 //! ```
 //!
 //! # Why it is here rather than in each host
@@ -92,7 +92,7 @@ pub struct Section {
     row: u8,
     group: Group,
     note: Option<&'static str>,
-    controls: &'static [Control],
+    controls: &'static [PanelControl],
 }
 
 impl Section {
@@ -124,7 +124,7 @@ impl Section {
     /// Returns the controls this plate carries, in the order the panel puts
     /// them.
     #[must_use]
-    pub const fn controls(&self) -> &'static [Control] {
+    pub const fn controls(&self) -> &'static [PanelControl] {
         self.controls
     }
 
@@ -148,13 +148,13 @@ impl fmt::Display for Section {
 /// One control the front panel puts under a legend.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
-pub struct Control {
+pub struct PanelControl {
     parameter: ParamId,
     legend: &'static str,
-    shape: Shape,
+    shape: PanelShape,
 }
 
-impl Control {
+impl PanelControl {
     /// Returns the parameter it moves.
     #[must_use]
     pub const fn parameter(&self) -> ParamId {
@@ -173,12 +173,12 @@ impl Control {
 
     /// Returns what a hand touches.
     #[must_use]
-    pub const fn shape(&self) -> Shape {
+    pub const fn shape(&self) -> PanelShape {
         self.shape
     }
 }
 
-impl fmt::Display for Control {
+impl fmt::Display for PanelControl {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.legend)
     }
@@ -193,7 +193,7 @@ impl fmt::Display for Control {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[non_exhaustive]
-pub enum Shape {
+pub enum PanelShape {
     /// A vertical fader.
     Fader,
     /// A lit button in the row under the faders.
@@ -208,7 +208,7 @@ pub enum Shape {
     reason = "a failed expectation is the test failure"
 )]
 mod tests {
-    use super::{PANEL_CONTROL_COUNT, PANEL_ROWS, Shape, sections};
+    use super::{PANEL_CONTROL_COUNT, PANEL_ROWS, PanelShape, sections};
     use crate::param::{Group, Kind, PARAMETER_COUNT, ParamId};
 
     #[test]
@@ -273,7 +273,7 @@ mod tests {
     fn a_strip_of_lamps_has_names_to_light() {
         for section in sections() {
             for control in section.controls() {
-                if control.shape() != Shape::Lamps {
+                if control.shape() != PanelShape::Lamps {
                     continue;
                 }
                 assert!(

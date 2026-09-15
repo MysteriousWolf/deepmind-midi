@@ -4,7 +4,7 @@
 //! when it does not match the specification it came from. The types these tables
 //! fill, and everything that reads them, are in the parent module.
 
-use super::{Control, Section, Shape};
+use super::{PanelControl, PanelShape, Section};
 use crate::param::{Group, ParamId};
 
 /// Number of groups the front panel is divided into.
@@ -94,193 +94,193 @@ pub(super) static SECTIONS: [Section; SECTION_COUNT] = [
 ];
 
 /// The controls the ARP / SEQ plate carries.
-static ARP_SEQ: [Control; 4] = [
-    Control {
+static ARP_SEQ: [PanelControl; 4] = [
+    PanelControl {
         parameter: ParamId::ArpRateTempo,
         legend: "RATE",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::ArpGateTime,
         legend: "GATE TIME",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::ArpOnOff,
         legend: "ON/OFF",
-        shape: Shape::Button,
+        shape: PanelShape::Button,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::ArpHold,
         legend: "HOLD",
-        shape: Shape::Button,
+        shape: PanelShape::Button,
     },
 ];
 
 /// The controls the LFO 1 plate carries.
-static LFO1: [Control; 3] = [
-    Control {
+static LFO1: [PanelControl; 3] = [
+    PanelControl {
         parameter: ParamId::Lfo1Rate,
         legend: "RATE",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Lfo1DelayFade,
         legend: "DELAY TIME",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Lfo1Shape,
         legend: "SHAPE",
-        shape: Shape::Lamps,
+        shape: PanelShape::Lamps,
     },
 ];
 
 /// The controls the LFO 2 plate carries.
-static LFO2: [Control; 3] = [
-    Control {
+static LFO2: [PanelControl; 3] = [
+    PanelControl {
         parameter: ParamId::Lfo2Rate,
         legend: "RATE",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Lfo2DelayFade,
         legend: "DELAY TIME",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Lfo2Shape,
         legend: "SHAPE",
-        shape: Shape::Lamps,
+        shape: PanelShape::Lamps,
     },
 ];
 
 /// The controls the POLY plate carries.
-static POLY: [Control; 1] = [Control {
+static POLY: [PanelControl; 1] = [PanelControl {
     parameter: ParamId::UnisonDetune,
     legend: "UNISON DETUNE",
-    shape: Shape::Fader,
+    shape: PanelShape::Fader,
 }];
 
 /// The controls the DCO 1 & 2 plate carries.
-static DCO1_AND2: [Control; 8] = [
-    Control {
+static DCO1_AND2: [PanelControl; 8] = [
+    PanelControl {
         parameter: ParamId::Osc1PitchModDepth,
         legend: "PITCH MOD",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Osc1PwmDepth,
         legend: "PWM",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Osc2PitchModDepth,
         legend: "PITCH MOD",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Osc2ToneModDepth,
         legend: "TONE MOD",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Osc2Pitch,
         legend: "PITCH",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Osc2Level,
         legend: "LEVEL",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::NoiseLevel,
         legend: "NOISE",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::OscSyncEnable,
         legend: "SYNC",
-        shape: Shape::Button,
+        shape: PanelShape::Button,
     },
 ];
 
 /// The controls the VCF plate carries.
-static VCF: [Control; 6] = [
-    Control {
+static VCF: [PanelControl; 6] = [
+    PanelControl {
         parameter: ParamId::VcfFrequency,
         legend: "FREQ",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::VcfResonance,
         legend: "RES",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::VcfEnvelopeDepth,
         legend: "ENV",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::VcfLfoDepth,
         legend: "LFO",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::VcfKeyboardTracking,
         legend: "KYBD",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::Vcf2PoleMode,
         legend: "POLES",
-        shape: Shape::Button,
+        shape: PanelShape::Button,
     },
 ];
 
 /// The controls the VCA plate carries.
-static VCA: [Control; 1] = [Control {
+static VCA: [PanelControl; 1] = [PanelControl {
     parameter: ParamId::VcaLevel,
     legend: "LEVEL",
-    shape: Shape::Fader,
+    shape: PanelShape::Fader,
 }];
 
 /// The controls the HPF plate carries.
-static HPF: [Control; 2] = [
-    Control {
+static HPF: [PanelControl; 2] = [
+    PanelControl {
         parameter: ParamId::VcfHighPassFrequency,
         legend: "FREQ",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::VcfBassBoost,
         legend: "BOOST",
-        shape: Shape::Button,
+        shape: PanelShape::Button,
     },
 ];
 
 /// The controls the ENVELOPES plate carries.
-static ENVELOPES: [Control; 4] = [
-    Control {
+static ENVELOPES: [PanelControl; 4] = [
+    PanelControl {
         parameter: ParamId::VcaEnvelopeAttackTime,
         legend: "A",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::VcaEnvelopeDecayTime,
         legend: "D",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::VcaEnvelopeSustainLevel,
         legend: "S",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
-    Control {
+    PanelControl {
         parameter: ParamId::VcaEnvelopeReleaseTime,
         legend: "R",
-        shape: Shape::Fader,
+        shape: PanelShape::Fader,
     },
 ];

@@ -83,6 +83,8 @@ pub use generated::{
     TableId,
 };
 
+use generated::{CONTROLLER_OF_PARAMETER, NO_CONTROLLER};
+
 use core::fmt;
 
 use crate::error::{Error, Result};
@@ -224,10 +226,7 @@ impl ValueTable {
     /// documented run whose first entry is listed.
     #[must_use]
     pub fn name_of(&self, value: u16) -> Option<&'static str> {
-        self.entries
-            .iter()
-            .find(|entry| entry.value == value)
-            .map(|entry| entry.name)
+        self.entry(value).map(|entry| entry.name)
     }
 
     /// Returns the program parameters this table's `value` names.
@@ -238,10 +237,21 @@ impl ValueTable {
     /// written down.
     #[must_use]
     pub fn parameters_of(&self, value: u16) -> &'static [ParamId] {
-        self.entries
-            .iter()
-            .find(|entry| entry.value == value)
-            .map_or(&[], |entry| entry.parameters)
+        self.entry(value).map_or(&[], |entry| entry.parameters)
+    }
+
+    /// Returns this table's entry for `value`.
+    ///
+    /// A binary search: the entries are in ascending value order, which the
+    /// specification checks when it loads, and the largest table has 133 of
+    /// them. It runs once per control a panel redraws.
+    #[must_use]
+    pub fn entry(&self, value: u16) -> Option<&'static ValueEntry> {
+        let index = self
+            .entries
+            .binary_search_by_key(&value, |entry| entry.value)
+            .ok()?;
+        self.entries.get(index)
     }
 }
 
@@ -298,13 +308,17 @@ impl Controller {
 
     /// Returns the controller that drives this parameter, if one does.
     ///
-    /// No two controllers claim the same parameter, which the specification
-    /// checks when it loads.
+    /// A table indexed by the parameter's own offset rather than a scan over
+    /// the 128 controllers; a panel asks it once per control it draws. No two
+    /// controllers claim the same parameter, which the specification checks
+    /// when it loads and which is what makes the table one entry wide.
     #[must_use]
     pub fn for_parameter(parameter: ParamId) -> Option<&'static Self> {
-        CONTROLLERS
-            .iter()
-            .find(|controller| controller.parameter == Some(parameter))
+        let index = CONTROLLER_OF_PARAMETER
+            .get(usize::from(parameter.offset()))
+            .copied()
+            .filter(|index| *index != NO_CONTROLLER)?;
+        CONTROLLERS.get(usize::from(index))
     }
 }
 

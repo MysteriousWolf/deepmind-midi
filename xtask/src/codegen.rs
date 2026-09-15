@@ -791,6 +791,62 @@ pub const CONTROLLERS: [Controller; CONTROLLER_COUNT] = [
             controller.cc, controller.name
         );
     }
+    out.push_str("];\n\n");
+    render_controller_index(spec, out)
+}
+
+/// Renders the way from a parameter to the controller that drives it.
+///
+/// A table indexed by offset rather than a scan over the controllers: a panel
+/// asks this once per control it draws, and one byte per parameter is a cheaper
+/// answer than a search. `NO_CONTROLLER` stands for the parameters NRPN is the
+/// only way to reach.
+///
+/// # Errors
+///
+/// Returns a message when there are so many controllers that an index could be
+/// the byte standing for "none", which would make a real controller unreachable.
+fn render_controller_index(spec: &Spec, out: &mut String) -> Result<(), String> {
+    if spec.controllers.len() >= usize::from(u8::MAX) {
+        return Err(format!(
+            "controllers.toml has {} controllers, and the parameter index reserves {} for none",
+            spec.controllers.len(),
+            u8::MAX
+        ));
+    }
+    let mut index: Vec<String> = vec!["NO_CONTROLLER".to_owned(); spec.parameters.len()];
+    for (position, controller) in spec.controllers.iter().enumerate() {
+        let Some(offset) = controller.parameter else {
+            continue;
+        };
+        if let Some(slot) = index.get_mut(usize::from(offset)) {
+            *slot = position.to_string();
+        }
+    }
+    out.push_str(
+        "\
+/// Stands for a parameter no controller drives, in `CONTROLLER_OF_PARAMETER`.
+///
+/// The table holds indices into `CONTROLLERS`, which is shorter than a byte, so
+/// the largest byte is free to mean \"none\" and the table stays one byte wide.
+pub(super) const NO_CONTROLLER: u8 = u8::MAX;
+
+/// The controller that drives each parameter, by the parameter's own offset.
+pub(super) static CONTROLLER_OF_PARAMETER: [u8; PARAMETER_COUNT] = [
+",
+    );
+    let _ = writeln!(
+        out,
+        "    // {} of the {} parameters; NRPN is the only way to the rest.",
+        index
+            .iter()
+            .filter(|entry| *entry != "NO_CONTROLLER")
+            .count(),
+        index.len(),
+    );
+    for entry in &index {
+        let _ = writeln!(out, "    {entry},");
+    }
     out.push_str("];\n");
     Ok(())
 }

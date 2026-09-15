@@ -24,7 +24,7 @@ const HEADER: &str = "\
 //! when it does not match the specification it came from. The types these tables
 //! fill, and everything that reads them, are in the parent module.
 
-use super::{Control, Section, Shape};
+use super::{PanelControl, PanelShape, Section};
 use crate::param::{Group, ParamId};
 
 ";
@@ -123,7 +123,7 @@ fn render_controls(
     for (section, name) in spec.sections.iter().zip(statics) {
         let _ = writeln!(
             out,
-            "/// The controls the {} plate carries.\nstatic {name}: [Control; {}] = [",
+            "/// The controls the {} plate carries.\nstatic {name}: [PanelControl; {}] = [",
             doc(&section.name),
             section.controls.len()
         );
@@ -133,7 +133,7 @@ fn render_controls(
                 .ok_or_else(|| format!("front.toml: no parameter named {:?}", control.parameter))?;
             let _ = writeln!(
                 out,
-                "    Control {{ parameter: ParamId::{parameter}, legend: {:?}, shape: {} }},",
+                "    PanelControl {{ parameter: ParamId::{parameter}, legend: {:?}, shape: {} }},",
                 control.legend,
                 shape(&control.shape)?
             );
@@ -146,9 +146,9 @@ fn render_controls(
 /// Renders what a hand touches on the panel.
 fn shape(name: &str) -> Result<String, String> {
     Ok(match name {
-        "fader" => "Shape::Fader",
-        "button" => "Shape::Button",
-        "lamps" => "Shape::Lamps",
+        "fader" => "PanelShape::Fader",
+        "button" => "PanelShape::Button",
+        "lamps" => "PanelShape::Lamps",
         other => return Err(format!("front.toml: unknown shape {other:?}")),
     }
     .to_owned())

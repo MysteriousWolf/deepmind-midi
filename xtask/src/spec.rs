@@ -777,6 +777,21 @@ impl Spec {
             return Err("firmware.toml: more than one version marked default".to_owned());
         }
 
+        for table in &self.tables {
+            // The library binary-searches these, so a table out of order would
+            // be a name the lookup cannot find rather than a slow one.
+            let ascending = table
+                .entries
+                .windows(2)
+                .all(|pair| matches!(pair, [a, b] if a.value < b.value));
+            if !ascending {
+                return Err(format!(
+                    "enums.toml: table {} is not in ascending value order",
+                    table.id
+                ));
+            }
+        }
+
         let mut ids: Vec<&str> = self.tables.iter().map(|t| t.id.as_str()).collect();
         ids.sort_unstable();
         ids.dedup();
