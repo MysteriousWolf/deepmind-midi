@@ -38,16 +38,35 @@
 //! that abbreviation moves. Empty where the destination names something no
 //! program parameter addresses, which the specification says beside the entry.
 //!
-//! It does not carry the manual's prose. Notes, displayed ranges and the places
-//! this specification departs from the printed table live in
-//! `docs/midi-spec.md`, addressed by the same offsets, which keeps them out of
-//! the binary on the targets this crate is meant for. Value-table entries carry
-//! names and not descriptions for the same reason.
+//! It carries what a raw value means beyond its range, where the manual says:
+//! [`ParamId::shape`] is the point a bipolar parameter is read about,
+//! [`ParamId::inactive`] the value that means "not set" rather than the
+//! smallest one, and [`ParamId::bounded_by`] the parameter saying how many of a
+//! run are played. Those three decide what a control *is*, so they are typed.
+//!
+//! The manual's own prose is reachable and costs nothing to ignore.
+//! [`ParamId::note`], [`ParamId::display`] and [`ParamId::correction`] are each
+//! a function over its own strings, referenced by nothing else, so a host that
+//! never calls one does not carry it: the 11 kB of manual between them is
+//! dropped by any linker collecting unreachable sections. Value-table entries
+//! carry names and not descriptions, which is the same trade made the other
+//! way — a description would sit inside a table every host already reaches.
+//!
+//! What a parameter *does* is [`ParamId::description`], and that one is behind
+//! the `descriptions` feature rather than only behind a linker: every parameter
+//! has a sentence, which is 30 kB, and the host that wants one would pull in
+//! all of them. It answers `None` with the feature off and keeps its signature
+//! either way, so a host writes one code path. Those sentences are written for
+//! this specification rather than transcribed — unlike
+//! [`FxSlot::description`](crate::effect::FxSlot::description), which is the
+//! manual's own words about an effect slot and is behind the same feature.
 //!
 //! Nor does it carry conversions from a raw value to the number the synthesizer
 //! displays. The manual publishes the two ends of a range and almost never the
-//! curve between them. Conversions arrive per parameter as they are measured;
-//! see the scaling section of `docs/midi-spec.md`.
+//! curve between them, so [`ParamId::display`] hands over the ends as the
+//! manual prints them and stops there: a reading invented between them would be
+//! wrong in every host at once, and invisibly. Conversions arrive per parameter
+//! as they are measured; see the scaling section of `docs/midi-spec.md`.
 //!
 //! # Firmware
 //!
@@ -72,6 +91,8 @@ pub use generated::{
     CONTROLLER_COUNT, CONTROLLERS, DEFAULT_FIRMWARE, Group, PARAMETER_COUNT, ParamId, TABLE_COUNT,
     TableId,
 };
+
+use generated::{CONTROLLER_OF_PARAMETER, NO_CONTROLLER};
 
 use core::fmt;
 
@@ -124,6 +145,36 @@ pub enum Kind {
     Switch,
     /// One of a named set, listed in the value table named here.
     Enumerated(TableId),
+}
+
+/// What a parameter's raw value means beyond the range it sits in.
+///
+/// [`Kind`] says how a byte is read — a sweep, two states, or one of a named
+/// set. This says where the middle of a sweep is, which is a different question
+/// and the one that decides what a control looks like: a bipolar value drawn
+/// from the bottom of its range is a bar that is half full at no modulation, so
+/// a matrix of eight depths set to nothing reads as a matrix of half of it.
+///
+/// Reached through [`ParamId::shape`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum Shape {
+    /// Counts up from [`min`](ParamId::min), which is 197 of the 242.
+    Unipolar,
+    /// Signed about a centre: `centre` reads as zero, and the two ends of the
+    /// range as the largest readings either side of it.
+    ///
+    /// The ends are [`min`](ParamId::min) and [`max`](ParamId::max) as always,
+    /// so what a reading is comes out as `value - centre` and needs nothing
+    /// published here. They are deliberately not a single `±extent`: ten of the
+    /// forty-five bipolar parameters run -128 to +127 about 128, which is one
+    /// further below the centre than above it, and a symmetric extent would be
+    /// a wrong answer for most of the set.
+    Bipolar {
+        /// The raw value that reads as zero.
+        centre: u16,
+    },
 }
 
 /// One value of an enumerated parameter.
@@ -184,10 +235,7 @@ impl ValueTable {
     /// documented run whose first entry is listed.
     #[must_use]
     pub fn name_of(&self, value: u16) -> Option<&'static str> {
-        self.entries
-            .iter()
-            .find(|entry| entry.value == value)
-            .map(|entry| entry.name)
+        self.entry(value).map(|entry| entry.name)
     }
 
     /// Returns the program parameters this table's `value` names.
@@ -198,10 +246,21 @@ impl ValueTable {
     /// written down.
     #[must_use]
     pub fn parameters_of(&self, value: u16) -> &'static [ParamId] {
-        self.entries
-            .iter()
-            .find(|entry| entry.value == value)
-            .map_or(&[], |entry| entry.parameters)
+        self.entry(value).map_or(&[], |entry| entry.parameters)
+    }
+
+    /// Returns this table's entry for `value`.
+    ///
+    /// A binary search: the entries are in ascending value order, which the
+    /// specification checks when it loads, and the largest table has 133 of
+    /// them. It runs once per control a panel redraws.
+    #[must_use]
+    pub fn entry(&self, value: u16) -> Option<&'static ValueEntry> {
+        let index = self
+            .entries
+            .binary_search_by_key(&value, |entry| entry.value)
+            .ok()?;
+        self.entries.get(index)
     }
 }
 
@@ -258,13 +317,17 @@ impl Controller {
 
     /// Returns the controller that drives this parameter, if one does.
     ///
-    /// No two controllers claim the same parameter, which the specification
-    /// checks when it loads.
+    /// A table indexed by the parameter's own offset rather than a scan over
+    /// the 128 controllers; a panel asks it once per control it draws. No two
+    /// controllers claim the same parameter, which the specification checks
+    /// when it loads and which is what makes the table one entry wide.
     #[must_use]
     pub fn for_parameter(parameter: ParamId) -> Option<&'static Self> {
-        CONTROLLERS
-            .iter()
-            .find(|controller| controller.parameter == Some(parameter))
+        let index = CONTROLLER_OF_PARAMETER
+            .get(usize::from(parameter.offset()))
+            .copied()
+            .filter(|index| *index != NO_CONTROLLER)?;
+        CONTROLLERS.get(usize::from(index))
     }
 }
 
@@ -1085,5 +1148,166 @@ mod tests {
         assert_eq!(alloc::format!("{edit}"), "LFO 1 Shape = Triangle");
         let sweep = ParamId::Lfo1Rate.edit(64).expect("64 is in range");
         assert_eq!(alloc::format!("{sweep}"), "LFO 1 Rate = 64");
+    }
+
+    /// A centre outside the range would be a control drawn about a point it
+    /// cannot reach, and a centre at either end would not be a centre.
+    #[test]
+    fn a_bipolar_centre_is_inside_the_range_and_not_at_an_end() {
+        let mut bipolar = 0;
+        for parameter in ParamId::ALL.iter().copied() {
+            let Shape::Bipolar { centre } = parameter.shape() else {
+                continue;
+            };
+            bipolar += 1;
+            assert!(parameter.accepts(centre), "{parameter}");
+            assert!(centre > parameter.min(), "{parameter} centres on its floor");
+            assert!(centre < parameter.max(), "{parameter} centres on its top");
+        }
+        assert_eq!(bipolar, 45);
+
+        assert_eq!(
+            ParamId::Mod1Depth.shape(),
+            Shape::Bipolar { centre: 128 },
+            "-128 at 0 and +127 at 255"
+        );
+        assert_eq!(ParamId::Lfo1Rate.shape(), Shape::Unipolar);
+    }
+
+    /// The whole of what the sequencer strip needs: a centre to draw about, a
+    /// value that is not a position, and the parameter that says how much of
+    /// the run is played.
+    #[test]
+    fn a_sequencer_step_says_what_it_is() {
+        let step = ParamId::SeqStepValue1;
+        assert_eq!(step.shape(), Shape::Bipolar { centre: 128 });
+        assert_eq!(step.inactive(), Some(0), "zero skips the step");
+        assert_eq!(step.bounded_by(), Some(ParamId::SequenceLength));
+
+        // All 32 of them, and nothing else in the table.
+        let steps: Vec<ParamId> = ParamId::ALL
+            .iter()
+            .copied()
+            .filter(|parameter| parameter.bounded_by().is_some())
+            .collect();
+        assert_eq!(steps.len(), 32);
+        for step in steps {
+            assert_eq!(step.group(), Group::ControlSequencer);
+            assert_eq!(step.inactive(), Some(0));
+            assert!(step.name().starts_with("Seq Step Value"));
+        }
+        assert_eq!(ParamId::SequenceLength.bounded_by(), None);
+        assert_eq!(ParamId::Lfo1Rate.inactive(), None);
+    }
+
+    /// Two steps carried `kind = "switch"` while accepting 256 values, which
+    /// their own range and their own note contradicted. Every step is the same
+    /// sweep as every other, and the reason the table used to say otherwise is
+    /// recorded where a host can show it.
+    #[test]
+    fn every_sequencer_step_reads_the_same_way() {
+        for step in ParamId::ALL
+            .iter()
+            .copied()
+            .filter(|p| p.name().starts_with("Seq Step Value"))
+        {
+            assert_eq!(step.kind(), Kind::Continuous, "{step}");
+            assert_eq!(step.max(), 255, "{step}");
+        }
+        assert!(
+            ParamId::SeqStepValue9
+                .correction()
+                .is_some_and(|text| text.contains("switch")),
+            "the slip is recorded"
+        );
+        assert_eq!(ParamId::SeqStepValue1.correction(), None);
+    }
+
+    /// The prose is a getter over what the specification records, and it is
+    /// there for every parameter the manual says anything about.
+    #[test]
+    fn the_manuals_own_words_are_reachable() {
+        assert_eq!(
+            ParamId::VcfFrequency.display(),
+            Some("50.0 Hz to 20000.0 Hz")
+        );
+        assert_eq!(ParamId::Lfo1SlewRate.display(), None);
+        assert_eq!(ParamId::Lfo1SlewRate.note(), None);
+        assert!(
+            ParamId::Lfo1Rate
+                .note()
+                .is_some_and(|note| note.contains("Arp Sync"))
+        );
+
+        let counted = |field: fn(ParamId) -> Option<&'static str>| {
+            ParamId::ALL
+                .iter()
+                .copied()
+                .filter(|parameter| field(*parameter).is_some())
+                .count()
+        };
+        assert_eq!(counted(ParamId::display), 26);
+        assert_eq!(counted(ParamId::note), 129);
+        assert_eq!(counted(ParamId::correction), 37);
+    }
+
+    /// The description answers the same way for every parameter, whichever way
+    /// the feature is set: the point of the `Option` is that a host writes one
+    /// code path and not two.
+    #[test]
+    fn a_description_is_there_exactly_when_the_feature_is() {
+        let described = ParamId::ALL
+            .iter()
+            .copied()
+            .filter(|parameter| parameter.description().is_some())
+            .count();
+        assert_eq!(
+            described,
+            if cfg!(feature = "descriptions") {
+                PARAMETER_COUNT
+            } else {
+                0
+            }
+        );
+    }
+
+    /// A description says what the control does. What a value decodes to is the
+    /// note and the value table, and duplicating it here would be two places to
+    /// correct the day one of them is wrong.
+    #[cfg(feature = "descriptions")]
+    #[test]
+    fn a_description_says_what_the_control_does() {
+        assert!(
+            ParamId::VcfFrequency
+                .description()
+                .is_some_and(|text| text.contains("cutoff")),
+        );
+        for parameter in ParamId::ALL.iter().copied() {
+            let text = parameter.description().expect("every parameter has one");
+            assert!(text.ends_with('.'), "{parameter}: not a sentence");
+            assert!(
+                !text.is_empty() && text.starts_with(char::is_uppercase),
+                "{parameter}: {text:?}"
+            );
+            assert_ne!(
+                Some(text),
+                parameter.note(),
+                "{parameter}: repeats its note"
+            );
+        }
+    }
+
+    /// An unconfirmed reading says so, and says why in the same breath.
+    #[test]
+    fn an_inferred_reading_is_marked_and_explained() {
+        assert!(!ParamId::PitchBendUpDepth.confirmed());
+        assert!(ParamId::PitchBendUpDepth.correction().is_some());
+        assert!(ParamId::VcfFrequency.confirmed());
+        for parameter in ParamId::ALL.iter().copied() {
+            assert!(
+                parameter.confirmed() || parameter.correction().is_some(),
+                "{parameter} is unconfirmed and does not say why"
+            );
+        }
     }
 }

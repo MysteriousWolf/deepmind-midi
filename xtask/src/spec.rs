@@ -27,12 +27,39 @@ pub struct Parameter {
     /// `"switch"` for two-state parameters, absent otherwise.
     #[serde(default)]
     pub kind: Option<String>,
+    /// `"bipolar"` where the manual states the raw value that reads as zero,
+    /// absent where the value counts up from `min` like every other parameter.
+    #[serde(default)]
+    pub shape: Option<String>,
+    /// The raw value that reads as zero, for a bipolar parameter.
+    #[serde(default)]
+    pub centre: Option<u16>,
+    /// A value that means "not set" rather than a position in the range.
+    ///
+    /// `0` on a sequencer step, where zero is "skip this step" and not the
+    /// smallest modulation the step can apply.
+    #[serde(default)]
+    pub inactive: Option<u16>,
+    /// The parameter saying how many of a run are used, by its name here.
+    ///
+    /// `Sequence Length` on each of the 32 steps, so that a host drawing the
+    /// run can dim what is not played rather than implying all of it is.
+    #[serde(default)]
+    pub bounded_by: Option<String>,
     /// Identifier of the value table in `enums.toml` that decodes this parameter.
     #[serde(default, rename = "enum")]
     pub value_table: Option<String>,
     /// Free-form note carried through from the manual.
     #[serde(default)]
     pub note: Option<String>,
+    /// One sentence saying what the parameter does, for a host with room to
+    /// print it.
+    ///
+    /// Written here rather than transcribed: see the `descriptions` key in this
+    /// file's `[meta]` for where these come from and what they are not. Absent
+    /// where nothing can be said without guessing.
+    #[serde(default)]
+    pub description: Option<String>,
     /// The physical range the synthesizer shows for the same raw value, where the
     /// manual states one. Hz, dB, seconds and so on.
     #[serde(default)]
@@ -393,6 +420,33 @@ pub struct FxMode {
     pub digital_path: bool,
 }
 
+/// One control the front panel puts under a legend.
+#[derive(Debug, Deserialize)]
+pub struct FrontControl {
+    /// The program parameter it moves, by its `parameters.toml` name.
+    pub parameter: String,
+    /// What the panel prints over it, as the silkscreen has it.
+    pub legend: String,
+    /// What a hand touches: `fader`, `button` or `lamps`.
+    pub shape: String,
+}
+
+/// One group of controls as the front panel prints it, such as `VCF`.
+#[derive(Debug, Deserialize)]
+pub struct Section {
+    /// The name across the top of the plate, as the silkscreen has it.
+    pub name: String,
+    /// Which of the panel's rows it is in, counting from 0.
+    pub row: u8,
+    /// The group of the parameter table its controls belong to.
+    pub group: String,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+    /// The controls, in the order the panel puts them.
+    pub controls: Vec<FrontControl>,
+}
+
 /// One field of a transport's byte pattern.
 #[derive(Debug, Deserialize)]
 pub struct MappingField {
@@ -550,6 +604,18 @@ struct Globals {
     globals: Vec<Global>,
 }
 
+#[derive(Debug, Deserialize)]
+struct Front {
+    meta: FrontMeta,
+    section: Vec<Section>,
+}
+
+#[derive(Debug, Deserialize)]
+struct FrontMeta {
+    rows: u8,
+    shape_kinds: Vec<String>,
+}
+
 /// Everything in `spec/`, loaded and validated.
 #[derive(Debug)]
 pub struct Spec {
@@ -589,6 +655,12 @@ pub struct Spec {
     pub fx_modes: Vec<FxMode>,
     /// Raw values read off the manual's screenshots with what they displayed.
     pub measurements: Vec<Measurement>,
+    /// The front panel's groups, in the order the instrument prints them.
+    pub sections: Vec<Section>,
+    /// How many rows the front panel is printed in.
+    pub panel_rows: u8,
+    /// The control shapes a front panel control may declare.
+    pub shape_kinds: Vec<String>,
 }
 
 impl Spec {
@@ -614,6 +686,7 @@ impl Spec {
         let layouts: Layouts = read(&spec.join("layout.toml"))?;
         let routings: Routings = read(&spec.join("routing.toml"))?;
         let measurements: Measurements = read(&spec.join("measurements.toml"))?;
+        let front: Front = read(&spec.join("front.toml"))?;
 
         let this = Self {
             parameters: parameters.parameter,
@@ -634,6 +707,9 @@ impl Spec {
             routings: routings.routing,
             fx_modes: routings.mode,
             measurements: measurements.measurement,
+            sections: front.section,
+            panel_rows: front.meta.rows,
+            shape_kinds: front.meta.shape_kinds,
         };
         this.validate()?;
         Ok(this)
@@ -691,6 +767,7 @@ impl Spec {
         self.validate_layout()?;
         self.validate_routing()?;
         self.validate_measurements()?;
+        self.validate_front()?;
         self.validate_mapping()?;
         self.validate_messages()
     }
@@ -706,6 +783,21 @@ impl Spec {
         }
         if self.firmwares.iter().filter(|f| f.default).count() > 1 {
             return Err("firmware.toml: more than one version marked default".to_owned());
+        }
+
+        for table in &self.tables {
+            // The library binary-searches these, so a table out of order would
+            // be a name the lookup cannot find rather than a slow one.
+            let ascending = table
+                .entries
+                .windows(2)
+                .all(|pair| matches!(pair, [a, b] if a.value < b.value));
+            if !ascending {
+                return Err(format!(
+                    "enums.toml: table {} is not in ascending value order",
+                    table.id
+                ));
+            }
         }
 
         let mut ids: Vec<&str> = self.tables.iter().map(|t| t.id.as_str()).collect();
@@ -744,6 +836,7 @@ impl Spec {
         }
 
         for parameter in &self.parameters {
+            self.validate_shape(parameter)?;
             let Some(id) = &parameter.value_table else {
                 continue;
             };
@@ -774,6 +867,72 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    /// Checks what a parameter says about its value beyond the range.
+    ///
+    /// A centre outside the range, or a bound naming a parameter that does not
+    /// exist, would reach a host as a control drawn about the wrong point or a
+    /// run dimmed by nothing. Both are transcription slips rather than things
+    /// hardware could settle, so they are caught here.
+    fn validate_shape(&self, parameter: &Parameter) -> Result<(), String> {
+        let named = |field: &str, name: &Option<String>| -> Result<(), String> {
+            let Some(name) = name else { return Ok(()) };
+            if self.parameters.iter().any(|p| &p.name == name) {
+                return Ok(());
+            }
+            Err(format!(
+                "parameters.toml: {} {field} names unknown parameter {name:?}",
+                parameter.name
+            ))
+        };
+        named("bounded_by", &parameter.bounded_by)?;
+
+        match (parameter.shape.as_deref(), parameter.centre) {
+            (None, None) => {}
+            (Some("bipolar"), Some(centre)) => {
+                if centre < parameter.min || centre > parameter.max {
+                    return Err(format!(
+                        "parameters.toml: {} centres on {centre}, outside its range {}-{}",
+                        parameter.name, parameter.min, parameter.max
+                    ));
+                }
+                if centre == parameter.min || centre == parameter.max {
+                    return Err(format!(
+                        "parameters.toml: {} centres on one end of its range, which is not bipolar",
+                        parameter.name
+                    ));
+                }
+            }
+            (Some("bipolar"), None) => {
+                return Err(format!(
+                    "parameters.toml: {} is bipolar and says nothing reads as zero",
+                    parameter.name
+                ));
+            }
+            (None, Some(_)) => {
+                return Err(format!(
+                    "parameters.toml: {} has a centre and no shape",
+                    parameter.name
+                ));
+            }
+            (Some(other), _) => {
+                return Err(format!(
+                    "parameters.toml: {} has unknown shape {other:?}",
+                    parameter.name
+                ));
+            }
+        }
+
+        if let Some(inactive) = parameter.inactive {
+            if inactive < parameter.min || inactive > parameter.max {
+                return Err(format!(
+                    "parameters.toml: {} is inactive at {inactive}, outside its range",
+                    parameter.name
+                ));
+            }
+        }
         Ok(())
     }
 
@@ -861,6 +1020,104 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    /// Checks the front panel against the parameter table it names.
+    ///
+    /// The panel is the one part of this specification that cannot be read off
+    /// the MIDI appendix, so it is held to the rest of the specification
+    /// instead: every parameter it names has to exist, a parameter may carry
+    /// one control and not two, and a plate's controls have to belong to the
+    /// group its name claims. That last one is what catches a parameter moved
+    /// between groups by a later reading of the manual.
+    fn validate_front(&self) -> Result<(), String> {
+        let groups: Vec<&str> = self.parameters.iter().map(|p| p.group.as_str()).collect();
+        let mut claimed: Vec<&str> = Vec::new();
+        if self.sections.is_empty() {
+            return Err("front.toml: no sections".to_owned());
+        }
+        for section in &self.sections {
+            if section.row >= self.panel_rows {
+                return Err(format!(
+                    "front.toml: {} is in row {}, the panel has {}",
+                    section.name, section.row, self.panel_rows
+                ));
+            }
+            if !groups.contains(&section.group.as_str()) {
+                return Err(format!(
+                    "front.toml: {} opens {:?}, which is not a group",
+                    section.name, section.group
+                ));
+            }
+            if section.controls.is_empty() {
+                return Err(format!("front.toml: {} has no controls", section.name));
+            }
+            for control in &section.controls {
+                let parameter = self
+                    .parameters
+                    .iter()
+                    .find(|p| p.name == control.parameter)
+                    .ok_or_else(|| {
+                        format!(
+                            "front.toml: {} names unknown parameter {:?}",
+                            section.name, control.parameter
+                        )
+                    })?;
+                if parameter.group != section.group {
+                    return Err(format!(
+                        "front.toml: {} is on the {} plate and parameters.toml puts it in {}",
+                        parameter.name, section.name, parameter.group
+                    ));
+                }
+                if claimed.contains(&parameter.name.as_str()) {
+                    return Err(format!(
+                        "front.toml: {} has a control on the panel twice",
+                        parameter.name
+                    ));
+                }
+                claimed.push(parameter.name.as_str());
+                if !self.shape_kinds.contains(&control.shape) {
+                    return Err(format!(
+                        "front.toml: {} has shape {:?}, which meta.shape_kinds does not list",
+                        control.legend, control.shape
+                    ));
+                }
+                // A legend is a silkscreen: caps, and short enough for a lane.
+                if control.legend.trim().is_empty()
+                    || control.legend.to_uppercase() != control.legend
+                {
+                    return Err(format!(
+                        "front.toml: {} is not printed the way a panel prints one",
+                        section.name
+                    ));
+                }
+                if control.legend.split(' ').any(|word| word.len() > 6) {
+                    return Err(format!(
+                        "front.toml: {:?} is too long a word to print over a fader",
+                        control.legend
+                    ));
+                }
+                // A column of lit legends is only worth drawing for a parameter
+                // that has names to light.
+                if control.shape == "lamps" && parameter.value_table.is_none() {
+                    return Err(format!(
+                        "front.toml: {} is drawn as lamps and names no value table",
+                        parameter.name
+                    ));
+                }
+            }
+        }
+        // Not a second rack: the panel is the handful a player reaches for, and
+        // a table that grew past a fraction of the instrument would have stopped
+        // describing one.
+        if claimed.len() * 4 >= self.parameters.len() {
+            return Err(format!(
+                "front.toml: {} of {} parameters are on the panel, which is not a front panel",
+                claimed.len(),
+                self.parameters.len()
+            ));
+        }
         Ok(())
     }
 

@@ -76,6 +76,7 @@ pub fn generate(spec: &Spec, root: &Path, check: bool) -> Result<Vec<String>, St
                 ("value-tables", render_value_tables(spec)),
                 ("globals", render_globals(spec)),
                 ("controllers", render_controllers(spec)),
+                ("front-panel", render_front(spec)),
                 ("routing", render_routing(spec)),
                 ("measurements", render_measurements(spec)),
                 ("corrections", render_corrections(spec)),
@@ -285,8 +286,9 @@ fn render_parameters(spec: &Spec) -> String {
             group = &parameter.group;
             let _ = write!(
                 out,
-                "\n### {group}\n\n| Offset | Parameter | Raw | Values | Shows as |\n\
-                 |---|---|---|---|---|\n"
+                "\n### {group}\n\n\
+                 | Offset | Parameter | Raw | Values | Shows as | What it does |\n\
+                 |---|---|---|---|---|---|\n"
             );
         }
         let values = match (&parameter.kind, &parameter.value_table, &parameter.note) {
@@ -305,12 +307,13 @@ fn render_parameters(spec: &Spec) -> String {
         };
         let _ = writeln!(
             out,
-            "| {} | {} | {}-{} | {values} | {} |",
+            "| {} | {} | {}-{} | {values} | {} | {} |",
             parameter.offset,
             cell(&parameter.name),
             parameter.min,
             parameter.max,
-            cell(parameter.display.as_deref().unwrap_or(""))
+            cell(parameter.display.as_deref().unwrap_or("")),
+            cell(parameter.description.as_deref().unwrap_or("")),
         );
     }
     out
@@ -524,7 +527,69 @@ fn render_controllers(spec: &Spec) -> String {
     out
 }
 
+/// Renders the front panel: which parameters the instrument puts a control
+/// under, what is printed over each one, and which row its plate is in.
+///
+/// One table per row, because the rows are the arrangement: the upper one is
+/// what a player reaches for between notes and the lower one is the voice, left
+/// to right in the order the signal takes it.
+fn render_front(spec: &Spec) -> String {
+    let controls: usize = spec.sections.iter().map(|s| s.controls.len()).sum();
+    let mut out = format!(
+        "{controls} of the {} parameters have a control on the front of the \
+         instrument, across {} plates in {} rows.\n",
+        spec.parameters.len(),
+        spec.sections.len(),
+        spec.panel_rows,
+    );
+    for row in 0..spec.panel_rows {
+        let plates: Vec<&crate::spec::Section> = spec
+            .sections
+            .iter()
+            .filter(|section| section.row == row)
+            .collect();
+        if plates.is_empty() {
+            continue;
+        }
+        let names: Vec<String> = plates
+            .iter()
+            .map(|section| format!("`{}`", section.name))
+            .collect();
+        let _ = write!(
+            out,
+            "\n#### Row {row}\n\n{}, left to right.\n\n\
+             | Plate | Printed | Control | Parameter | Offset |\n|---|---|---|---|---|\n",
+            names.join(", ")
+        );
+        for section in plates {
+            for control in &section.controls {
+                let parameter = spec.parameters.iter().find(|p| p.name == control.parameter);
+                let _ = writeln!(
+                    out,
+                    "| {} | `{}` | {} | {} | {} |",
+                    cell(&section.name),
+                    cell(&control.legend),
+                    control.shape,
+                    parameter.map_or_else(
+                        || cell(&control.parameter),
+                        |parameter| cell(&parameter.name)
+                    ),
+                    parameter
+                        .map_or_else(|| "-".to_owned(), |parameter| parameter.offset.to_string())
+                );
+            }
+        }
+        for section in spec.sections.iter().filter(|s| s.row == row) {
+            if let Some(note) = &section.note {
+                let _ = writeln!(out, "\n- **{}.** {}", cell(&section.name), cell(note));
+            }
+        }
+    }
+    out
+}
+
 /// Renders the measured grid, so the numbers the drawings are built from are
+/// readable next to them./// Renders the measured grid, so the numbers the drawings are built from are
 /// readable next to them.
 fn render_grid(spec: &Spec) -> String {
     let grid = &spec.grid;

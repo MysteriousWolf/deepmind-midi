@@ -17,16 +17,17 @@ use std::path::Path;
 use std::process::Command;
 
 use crate::output::Output;
-use crate::spec::{Spec, ValueTable, version_parts};
+use crate::spec::{Parameter, Spec, ValueTable, version_parts};
 
 /// Path of the generated parameter tables, relative to the repository root.
 pub const CODE_PATH: &str = "deepmind-midi/src/param/generated.rs";
 
 /// Every generated source file, in the order they are written.
-pub const CODE_PATHS: [&str; 3] = [
+pub const CODE_PATHS: [&str; 4] = [
     CODE_PATH,
     crate::program::CODE_PATH,
     crate::effect::CODE_PATH,
+    crate::front::CODE_PATH,
 ];
 
 /// Loads the spec, then renders the generated source files as [`generate`].
@@ -59,6 +60,10 @@ pub fn generate(spec: &Spec, root: &Path, check: bool) -> Result<Vec<String>, St
         (
             crate::effect::CODE_PATH,
             crate::effect::render(spec, &idents)?,
+        ),
+        (
+            crate::front::CODE_PATH,
+            crate::front::render(spec, &idents)?,
         ),
     ];
 
@@ -152,6 +157,9 @@ fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     render_counts(spec, &mut out);
     render_groups(spec, idents, &mut out);
     render_parameters(spec, idents, &mut out)?;
+    render_readings(spec, idents, &mut out)?;
+    render_prose(spec, idents, &mut out);
+    render_descriptions(spec, idents, &mut out);
     render_tables(spec, idents, &mut out)?;
     render_controllers(spec, idents, &mut out)?;
     Ok(out)
@@ -168,7 +176,7 @@ const HEADER: &str = "\
 // chunks to satisfy a length lint would only hide what it is.
 #![expect(clippy::too_many_lines, reason = \"a generated table, not logic\")]
 
-use super::{Controller, ControllerKind, Kind, Parameter, ValueEntry, ValueTable};
+use super::{Controller, ControllerKind, Kind, Parameter, Shape, ValueEntry, ValueTable};
 use crate::sysex::inquiry::Version;
 
 ";
@@ -348,6 +356,371 @@ pub enum ParamId {
     }
     out.push_str("        }\n    }\n}\n\n");
     Ok(())
+}
+
+/// Renders what a raw value means beyond its range: the centre a bipolar
+/// parameter is read about, the value that means "not set", and the parameter
+/// that bounds a run.
+///
+/// One match each, with a fallback arm, rather than fields on [`Parameter`].
+/// 45 of the 242 have a shape worth stating and 32 have the other two, so arms
+/// for the rest would be 600 lines saying nothing; and keeping them out of
+/// `info` means a host that never asks does not carry the answer.
+fn render_readings(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
+    let by_name: BTreeMap<&str, &str> = spec
+        .parameters
+        .iter()
+        .zip(idents.parameters.iter())
+        .map(|(parameter, ident)| (parameter.name.as_str(), ident.as_str()))
+        .collect();
+    let idents = &idents.parameters;
+
+    out.push_str(
+        "\
+impl ParamId {
+    /// Returns what this parameter's raw value means beyond its range.
+    ///
+    /// [`Shape::Unipolar`] for all but 45 of them, which keeps a host's
+    /// \"where does this control sit\" code one path rather than an [`Option`]
+    /// every caller unwraps the same way.
+    #[must_use]
+    pub const fn shape(self) -> Shape {
+        match self {
+",
+    );
+    // Grouped by the value that reads as zero: two centres cover all 45, and a
+    // run of arms per centre is shorter than one per parameter.
+    let mut centres: BTreeMap<u16, Vec<&str>> = BTreeMap::new();
+    for (parameter, ident) in spec.parameters.iter().zip(idents) {
+        if let Some(centre) = parameter.centre {
+            centres.entry(centre).or_default().push(ident);
+        }
+    }
+    for (centre, members) in &centres {
+        let _ = writeln!(
+            out,
+            "            {} => Shape::Bipolar {{ centre: {centre} }},",
+            arm(members)
+        );
+    }
+    out.push_str(
+        "\
+            _ => Shape::Unipolar,
+        }
+    }
+
+    /// Returns the value that means \"not set\" rather than a position in the
+    /// range, where this parameter has one.
+    ///
+    /// `Some(0)` for a sequencer step, where zero is \"skip this step\" and not
+    /// the smallest modulation it can apply: a strip that drew it as the
+    /// smallest would state the wrong musical fact.
+    #[must_use]
+    pub const fn inactive(self) -> Option<u16> {
+        match self {
+",
+    );
+    let mut inactive: BTreeMap<u16, Vec<&str>> = BTreeMap::new();
+    let mut bounded: BTreeMap<&str, Vec<&str>> = BTreeMap::new();
+    for (parameter, ident) in spec.parameters.iter().zip(idents) {
+        if let Some(value) = parameter.inactive {
+            inactive.entry(value).or_default().push(ident);
+        }
+        if let Some(name) = &parameter.bounded_by {
+            bounded.entry(name.as_str()).or_default().push(ident);
+        }
+    }
+    for (value, members) in &inactive {
+        let _ = writeln!(out, "            {} => Some({value}),", arm(members));
+    }
+    out.push_str(
+        "\
+            _ => None,
+        }
+    }
+
+    /// Returns the parameter that says how many of a run are used, where one
+    /// does.
+    ///
+    /// [`ParamId::SequenceLength`] for each of the 32 sequencer steps, so that
+    /// a host drawing the run can dim what is not played instead of implying
+    /// all of it is.
+    #[must_use]
+    pub const fn bounded_by(self) -> Option<Self> {
+        match self {
+",
+    );
+    for (name, members) in &bounded {
+        let target = by_name
+            .get(name)
+            .ok_or_else(|| format!("parameters.toml: nothing bounds a run as {name:?}"))?;
+        let _ = writeln!(out, "            {} => Some(Self::{target}),", arm(members));
+    }
+    out.push_str("            _ => None,\n        }\n    }\n}\n\n");
+    Ok(())
+}
+
+/// One prose field of a parameter: the accessor's name, its documentation, and
+/// how to read the field off a parameter.
+type Prose = (&'static str, &'static str, fn(&Parameter) -> Option<&str>);
+
+/// Renders the prose the specification records beside a parameter's table row.
+///
+/// Each one is its own function over its own strings, so a host that never asks
+/// does not carry 11 kB of manual in its binary: nothing else references these,
+/// and a linker drops what nothing reaches.
+fn render_prose(spec: &Spec, idents: &Identifiers, out: &mut String) {
+    let idents = &idents.parameters;
+    out.push_str("impl ParamId {\n");
+
+    let mut first = true;
+    let fields: [Prose; 3] = [
+        (
+            "note",
+            "\
+    /// Returns what the specification records about this parameter beyond its
+    /// table row.
+    ///
+    /// The manual's own words, kept as prose because that is what they are: a
+    /// sentence about when a rate becomes a clock division, or about a value
+    /// that skips a step rather than sounding it. What a control has to act on
+    /// is typed — see [`ParamId::shape`], [`ParamId::inactive`] and
+    /// [`ParamId::bounded_by`] — and this is the rest of it, for a host with
+    /// somewhere to print it.
+    ///
+    /// `None` for the {missing} parameters the manual says nothing more about.",
+            |parameter| parameter.note.as_deref(),
+        ),
+        (
+            "display",
+            "\
+    /// Returns the range the synthesizer's own display shows for this
+    /// parameter, as the manual prints it.
+    ///
+    /// The smallest useful thing a panel can say about a byte whose curve
+    /// nobody has measured: the reading stays raw, and this is what the two
+    /// ends of it mean. The same answer [`FxSlot::min`](crate::effect::FxSlot::min)
+    /// and [`FxSlot::max`](crate::effect::FxSlot::max) give for an effect slot,
+    /// in one string because these are not all ranges — one of them has a
+    /// discrete value before a range in it, and another is a sentence about two
+    /// different behaviours.
+    ///
+    /// Not a conversion, and no promise that the curve between the ends is a
+    /// straight line. `None` where the manual gives none, which is {missing} of them.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// assert_eq!(
+    ///     ParamId::VcfFrequency.display(),
+    ///     Some(\"50.0 Hz to 20000.0 Hz\"),
+    /// );
+    /// assert_eq!(ParamId::Lfo1SlewRate.display(), None);
+    /// ```",
+            |parameter| parameter.display.as_deref(),
+        ),
+        (
+            "correction",
+            "\
+    /// Returns why this parameter's row departs from what the manual prints,
+    /// where it does.
+    ///
+    /// {present} rows do. The manual contradicts itself about a range, or runs two
+    /// numbers together, and the specification records both the reading it took
+    /// and the reason. Worth showing to somebody convinced the editor is wrong
+    /// about a range, and worth reading beside
+    /// [`ParamId::confirmed`](Self::confirmed).",
+            |parameter| parameter.correction.as_deref(),
+        ),
+    ];
+    for (name, docs, field) in fields {
+        if !first {
+            out.push('\n');
+        }
+        first = false;
+        let present = spec
+            .parameters
+            .iter()
+            .filter(|p| field(p).is_some())
+            .count();
+        let docs = docs
+            .replace("{present}", &present.to_string())
+            .replace("{missing}", &(spec.parameters.len() - present).to_string());
+        let _ = writeln!(
+            out,
+            "{docs}\n    #[must_use]\n    pub const fn {name}(self) -> Option<&'static str> {{\n        match self {{"
+        );
+        // Grouped by the text itself: the 32 sequencer steps carry one sentence
+        // between them and the eight modulation depths another, so grouping
+        // turns 129 arms into 60 and the strings into one copy each.
+        let mut texts: Vec<(&str, Vec<&str>)> = Vec::new();
+        for (parameter, ident) in spec.parameters.iter().zip(idents) {
+            let Some(text) = field(parameter) else {
+                continue;
+            };
+            match texts.iter_mut().find(|(seen, _)| *seen == text) {
+                Some((_, members)) => members.push(ident),
+                None => texts.push((text, vec![ident])),
+            }
+        }
+        for (text, members) in &texts {
+            let _ = writeln!(out, "            {} => Some({text:?}),", arm(members));
+        }
+        out.push_str("            _ => None,\n        }\n    }\n");
+    }
+
+    out.push_str(
+        "\n\
+    /// Returns whether the specification's reading of this parameter has been
+    /// confirmed.
+    ///
+    /// `false` where a range or an ordering is inferred from the manual's prose
+    /// because its own table contradicts itself, and no hardware has settled it;
+    /// [`ParamId::correction`](Self::correction) is the reason in each case. A
+    /// host with room to say so can mark the control rather than presenting a
+    /// guess as a fact.
+    #[must_use]
+    pub const fn confirmed(self) -> bool {
+",
+    );
+    let unconfirmed: Vec<&str> = spec
+        .parameters
+        .iter()
+        .zip(idents)
+        .filter(|(parameter, _)| !parameter.confirmed)
+        .map(|(_, ident)| ident.as_str())
+        .collect();
+    // A `matches!` rather than a match, which is what clippy asks of a
+    // two-armed one and what this is whether two rows are unconfirmed or none.
+    if unconfirmed.is_empty() {
+        out.push_str("        true\n");
+    } else {
+        let _ = writeln!(out, "        !matches!(self, {})", arm(&unconfirmed));
+    }
+    out.push_str("    }\n}\n\n");
+}
+
+/// Renders the sentence saying what each parameter does, behind the
+/// `descriptions` feature.
+///
+/// Its own function over its own strings, like the prose above, and behind a
+/// feature on top of that: prose is the one thing in this table a host wants and
+/// a microcontroller has no room for. The accessor exists either way and answers
+/// `None` with the feature off, so a caller writes one code path.
+fn render_descriptions(spec: &Spec, idents: &Identifiers, out: &mut String) {
+    let idents = &idents.parameters;
+    let described: Vec<(&str, &str)> = spec
+        .parameters
+        .iter()
+        .zip(idents)
+        .filter_map(|(parameter, ident)| Some((parameter.description.as_deref()?, ident.as_str())))
+        .collect();
+    let described_all = described.len() == spec.parameters.len();
+
+    let _ = writeln!(
+        out,
+        "\
+impl ParamId {{
+    /// Returns what this parameter does, in a sentence.
+    ///
+    /// The answer to the question somebody points at a control to ask, which
+    /// the name and the range on their own do not give: [`ParamId::name`] says
+    /// `VCF Keyboard Tracking` and this says what happens when it is turned up.
+    ///
+    /// # Behind a feature
+    ///
+    /// `None` for every parameter unless the `descriptions` feature is on.
+    /// {coverage}
+    /// The signature does not change with the feature, so a host writes one
+    /// code path: a caller given `None` draws the name and the range it already
+    /// has.
+    ///
+    /// The feature is off by default because these {present} sentences are {kib} kB
+    /// of prose: free on a desktop host, real money on the microcontrollers
+    /// this crate is also meant for, and so a cost that should land on whoever
+    /// asked for it.
+    ///
+    /// # Where these come from
+    ///
+    /// Written for this specification against what the rest of it records, and
+    /// *not* transcribed from the manual — unlike
+    /// [`FxSlot::description`](crate::effect::FxSlot::description), which is the
+    /// manual's own words. A parameter whose behaviour this specification does
+    /// not establish has no sentence rather than a guessed one. See the
+    /// `descriptions` key in `spec/parameters.toml`.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// let described = ParamId::VcfFrequency.description().is_some();
+    /// assert_eq!(described, cfg!(feature = \"descriptions\"));
+    /// ```
+    #[must_use]
+    pub const fn description(self) -> Option<&'static str> {{
+        #[cfg(feature = \"descriptions\")]
+        {{
+            match self {{",
+        coverage = if described_all {
+            "With it on, every parameter has one."
+        } else {
+            "Still `None`, with it on, for the ones this specification has\n\
+             /// nothing trustworthy to say about."
+        },
+        present = described.len(),
+        kib = described
+            .iter()
+            .map(|(text, _)| text.len())
+            .sum::<usize>()
+            .div_ceil(1000),
+    );
+
+    // Grouped by the text itself, as the prose above is: the three envelopes
+    // and the eight modulation slots say the same thing about the same control,
+    // so one string serves every parameter that carries it.
+    let mut texts: Vec<(&str, Vec<&str>)> = Vec::new();
+    for (text, ident) in described {
+        match texts.iter_mut().find(|(seen, _)| *seen == text) {
+            Some((_, members)) => members.push(ident),
+            None => texts.push((text, vec![ident])),
+        }
+    }
+    for (text, members) in &texts {
+        let _ = writeln!(out, "                {} => Some({text:?}),", arm(members));
+    }
+    // Only where one is reachable: every parameter carrying a description makes
+    // the match exhaustive, and a wildcard after it is a warning, which this
+    // repository builds as an error.
+    if described_all {
+        out.push_str("            }\n");
+    } else {
+        out.push_str(
+            "                _ => None,
+            }
+",
+        );
+    }
+
+    out.push_str(
+        "        }
+        #[cfg(not(feature = \"descriptions\"))]
+        {
+            let _ = self;
+            None
+        }
+    }
+}
+
+",
+    );
+}
+
+/// Renders one match arm's patterns: `Self::A | Self::B | Self::C`.
+fn arm(members: &[&str]) -> String {
+    members
+        .iter()
+        .map(|ident| format!("Self::{ident}"))
+        .collect::<Vec<_>>()
+        .join(" | ")
 }
 
 fn render_tables(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
@@ -532,6 +905,62 @@ pub const CONTROLLERS: [Controller; CONTROLLER_COUNT] = [
             "    Controller {{ cc: {}, name: {:?}, kind: {kind}, parameter: {parameter} }},",
             controller.cc, controller.name
         );
+    }
+    out.push_str("];\n\n");
+    render_controller_index(spec, out)
+}
+
+/// Renders the way from a parameter to the controller that drives it.
+///
+/// A table indexed by offset rather than a scan over the controllers: a panel
+/// asks this once per control it draws, and one byte per parameter is a cheaper
+/// answer than a search. `NO_CONTROLLER` stands for the parameters NRPN is the
+/// only way to reach.
+///
+/// # Errors
+///
+/// Returns a message when there are so many controllers that an index could be
+/// the byte standing for "none", which would make a real controller unreachable.
+fn render_controller_index(spec: &Spec, out: &mut String) -> Result<(), String> {
+    if spec.controllers.len() >= usize::from(u8::MAX) {
+        return Err(format!(
+            "controllers.toml has {} controllers, and the parameter index reserves {} for none",
+            spec.controllers.len(),
+            u8::MAX
+        ));
+    }
+    let mut index: Vec<String> = vec!["NO_CONTROLLER".to_owned(); spec.parameters.len()];
+    for (position, controller) in spec.controllers.iter().enumerate() {
+        let Some(offset) = controller.parameter else {
+            continue;
+        };
+        if let Some(slot) = index.get_mut(usize::from(offset)) {
+            *slot = position.to_string();
+        }
+    }
+    out.push_str(
+        "\
+/// Stands for a parameter no controller drives, in `CONTROLLER_OF_PARAMETER`.
+///
+/// The table holds indices into `CONTROLLERS`, which is shorter than a byte, so
+/// the largest byte is free to mean \"none\" and the table stays one byte wide.
+pub(super) const NO_CONTROLLER: u8 = u8::MAX;
+
+/// The controller that drives each parameter, by the parameter's own offset.
+pub(super) static CONTROLLER_OF_PARAMETER: [u8; PARAMETER_COUNT] = [
+",
+    );
+    let _ = writeln!(
+        out,
+        "    // {} of the {} parameters; NRPN is the only way to the rest.",
+        index
+            .iter()
+            .filter(|entry| *entry != "NO_CONTROLLER")
+            .count(),
+        index.len(),
+    );
+    for entry in &index {
+        let _ = writeln!(out, "    {entry},");
     }
     out.push_str("];\n");
     Ok(())

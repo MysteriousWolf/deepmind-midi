@@ -52,6 +52,13 @@ is numeric displays. The colours are sampled from the same picture. All of it
 lives in [`spec/layout.toml`](../spec/layout.toml), which records how each was
 taken.
 
+An editor drawing its own panels wants that data and not these drawings, so the
+crate publishes it: `effect::grid()` is the grid, `FxSlot::position` is where a
+slot lands on it, and `Algorithm::panel` is the control shape and the four
+colours. The grid is in the pixels of the 128x64 display it was measured on,
+with the display's dimensions beside it, so what a host scales is a proportion
+rather than a size.
+
 Each drawing is filed and linked under the `FX Type` value and the manual's full
 name, so `31-moog-type-filter` is the Mood Filter. The number is needed: the
 manual gives types 32 and 33 the same full name, Dual Pitch Shifter, and only

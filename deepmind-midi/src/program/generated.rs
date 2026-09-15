@@ -5778,15 +5778,15 @@ impl Program {
 
     /// Seq Step Value 9.
     ///
-    /// Offset 131. Off is zero and on is one.
+    /// Offset 131, 0 to 255.
     #[must_use]
-    pub fn seq_step_value9(&self) -> bool {
-        self.get(ParamId::SeqStepValue9) != 0
+    pub fn seq_step_value9(&self) -> u8 {
+        self.get(ParamId::SeqStepValue9)
     }
 
-    /// Sets Seq Step Value 9.
-    pub fn set_seq_step_value9(&mut self, value: bool) {
-        self.set_clamped(ParamId::SeqStepValue9, u8::from(value));
+    /// Sets Seq Step Value 9, clamped to 0 to 255.
+    pub fn set_seq_step_value9(&mut self, value: u8) {
+        self.set_clamped(ParamId::SeqStepValue9, value);
     }
 
     /// Seq Step Value 10.
@@ -5804,15 +5804,15 @@ impl Program {
 
     /// Seq Step Value 11.
     ///
-    /// Offset 133. Off is zero and on is one.
+    /// Offset 133, 0 to 255.
     #[must_use]
-    pub fn seq_step_value11(&self) -> bool {
-        self.get(ParamId::SeqStepValue11) != 0
+    pub fn seq_step_value11(&self) -> u8 {
+        self.get(ParamId::SeqStepValue11)
     }
 
-    /// Sets Seq Step Value 11.
-    pub fn set_seq_step_value11(&mut self, value: bool) {
-        self.set_clamped(ParamId::SeqStepValue11, u8::from(value));
+    /// Sets Seq Step Value 11, clamped to 0 to 255.
+    pub fn set_seq_step_value11(&mut self, value: u8) {
+        self.set_clamped(ParamId::SeqStepValue11, value);
     }
 
     /// Seq Step Value 12.

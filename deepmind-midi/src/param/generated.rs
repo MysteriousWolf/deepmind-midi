@@ -8,7 +8,7 @@
 // chunks to satisfy a length lint would only hide what it is.
 #![expect(clippy::too_many_lines, reason = "a generated table, not logic")]
 
-use super::{Controller, ControllerKind, Kind, Parameter, ValueEntry, ValueTable};
+use super::{Controller, ControllerKind, Kind, Parameter, Shape, ValueEntry, ValueTable};
 use crate::sysex::inquiry::Version;
 
 /// Number of program parameters. Offsets run `0..PARAMETER_COUNT`.
@@ -1800,7 +1800,7 @@ impl ParamId {
                 group: Group::ControlSequencer,
                 min: 0,
                 max: 255,
-                kind: Kind::Switch,
+                kind: Kind::Continuous,
             },
             Self::SeqStepValue10 => Parameter {
                 name: "Seq Step Value 10",
@@ -1814,7 +1814,7 @@ impl ParamId {
                 group: Group::ControlSequencer,
                 min: 0,
                 max: 255,
-                kind: Kind::Switch,
+                kind: Kind::Continuous,
             },
             Self::SeqStepValue12 => Parameter {
                 name: "Seq Step Value 12",
@@ -2572,6 +2572,953 @@ impl ParamId {
                 max: 176,
                 kind: Kind::Continuous,
             },
+        }
+    }
+}
+
+impl ParamId {
+    /// Returns what this parameter's raw value means beyond its range.
+    ///
+    /// [`Shape::Unipolar`] for all but 45 of them, which keeps a host's
+    /// "where does this control sit" code one path rather than an [`Option`]
+    /// every caller unwraps the same way.
+    #[must_use]
+    pub const fn shape(self) -> Shape {
+        match self {
+            Self::PitchBendUpDepth | Self::PitchBendDownDepth => Shape::Bipolar { centre: 24 },
+            Self::VcaPanSpread
+            | Self::OscPortamentoBalance
+            | Self::Mod1Depth
+            | Self::Mod2Depth
+            | Self::Mod3Depth
+            | Self::Mod4Depth
+            | Self::Mod5Depth
+            | Self::Mod6Depth
+            | Self::Mod7Depth
+            | Self::Mod8Depth
+            | Self::SeqStepValue1
+            | Self::SeqStepValue2
+            | Self::SeqStepValue3
+            | Self::SeqStepValue4
+            | Self::SeqStepValue5
+            | Self::SeqStepValue6
+            | Self::SeqStepValue7
+            | Self::SeqStepValue8
+            | Self::SeqStepValue9
+            | Self::SeqStepValue10
+            | Self::SeqStepValue11
+            | Self::SeqStepValue12
+            | Self::SeqStepValue13
+            | Self::SeqStepValue14
+            | Self::SeqStepValue15
+            | Self::SeqStepValue16
+            | Self::SeqStepValue17
+            | Self::SeqStepValue18
+            | Self::SeqStepValue19
+            | Self::SeqStepValue20
+            | Self::SeqStepValue21
+            | Self::SeqStepValue22
+            | Self::SeqStepValue23
+            | Self::SeqStepValue24
+            | Self::SeqStepValue25
+            | Self::SeqStepValue26
+            | Self::SeqStepValue27
+            | Self::SeqStepValue28
+            | Self::SeqStepValue29
+            | Self::SeqStepValue30
+            | Self::SeqStepValue31
+            | Self::SeqStepValue32
+            | Self::ProgramTranspose => Shape::Bipolar { centre: 128 },
+            _ => Shape::Unipolar,
+        }
+    }
+
+    /// Returns the value that means "not set" rather than a position in the
+    /// range, where this parameter has one.
+    ///
+    /// `Some(0)` for a sequencer step, where zero is "skip this step" and not
+    /// the smallest modulation it can apply: a strip that drew it as the
+    /// smallest would state the wrong musical fact.
+    #[must_use]
+    pub const fn inactive(self) -> Option<u16> {
+        match self {
+            Self::SeqStepValue1
+            | Self::SeqStepValue2
+            | Self::SeqStepValue3
+            | Self::SeqStepValue4
+            | Self::SeqStepValue5
+            | Self::SeqStepValue6
+            | Self::SeqStepValue7
+            | Self::SeqStepValue8
+            | Self::SeqStepValue9
+            | Self::SeqStepValue10
+            | Self::SeqStepValue11
+            | Self::SeqStepValue12
+            | Self::SeqStepValue13
+            | Self::SeqStepValue14
+            | Self::SeqStepValue15
+            | Self::SeqStepValue16
+            | Self::SeqStepValue17
+            | Self::SeqStepValue18
+            | Self::SeqStepValue19
+            | Self::SeqStepValue20
+            | Self::SeqStepValue21
+            | Self::SeqStepValue22
+            | Self::SeqStepValue23
+            | Self::SeqStepValue24
+            | Self::SeqStepValue25
+            | Self::SeqStepValue26
+            | Self::SeqStepValue27
+            | Self::SeqStepValue28
+            | Self::SeqStepValue29
+            | Self::SeqStepValue30
+            | Self::SeqStepValue31
+            | Self::SeqStepValue32 => Some(0),
+            _ => None,
+        }
+    }
+
+    /// Returns the parameter that says how many of a run are used, where one
+    /// does.
+    ///
+    /// [`ParamId::SequenceLength`] for each of the 32 sequencer steps, so that
+    /// a host drawing the run can dim what is not played instead of implying
+    /// all of it is.
+    #[must_use]
+    pub const fn bounded_by(self) -> Option<Self> {
+        match self {
+            Self::SeqStepValue1
+            | Self::SeqStepValue2
+            | Self::SeqStepValue3
+            | Self::SeqStepValue4
+            | Self::SeqStepValue5
+            | Self::SeqStepValue6
+            | Self::SeqStepValue7
+            | Self::SeqStepValue8
+            | Self::SeqStepValue9
+            | Self::SeqStepValue10
+            | Self::SeqStepValue11
+            | Self::SeqStepValue12
+            | Self::SeqStepValue13
+            | Self::SeqStepValue14
+            | Self::SeqStepValue15
+            | Self::SeqStepValue16
+            | Self::SeqStepValue17
+            | Self::SeqStepValue18
+            | Self::SeqStepValue19
+            | Self::SeqStepValue20
+            | Self::SeqStepValue21
+            | Self::SeqStepValue22
+            | Self::SeqStepValue23
+            | Self::SeqStepValue24
+            | Self::SeqStepValue25
+            | Self::SeqStepValue26
+            | Self::SeqStepValue27
+            | Self::SeqStepValue28
+            | Self::SeqStepValue29
+            | Self::SeqStepValue30
+            | Self::SeqStepValue31
+            | Self::SeqStepValue32 => Some(Self::SequenceLength),
+            _ => None,
+        }
+    }
+}
+
+impl ParamId {
+    /// Returns what the specification records about this parameter beyond its
+    /// table row.
+    ///
+    /// The manual's own words, kept as prose because that is what they are: a
+    /// sentence about when a rate becomes a clock division, or about a value
+    /// that skips a step rather than sounding it. What a control has to act on
+    /// is typed — see [`ParamId::shape`], [`ParamId::inactive`] and
+    /// [`ParamId::bounded_by`] — and this is the rest of it, for a host with
+    /// somewhere to print it.
+    ///
+    /// `None` for the 113 parameters the manual says nothing more about.
+    #[must_use]
+    pub const fn note(self) -> Option<&'static str> {
+        match self {
+            Self::Lfo1Rate => Some(
+                "When LFO 1 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate.",
+            ),
+            Self::Lfo1KeySync
+            | Self::Lfo1ArpSync
+            | Self::Lfo2KeySync
+            | Self::Lfo2ArpSync
+            | Self::Osc1PulseEnable
+            | Self::Osc1SawEnable
+            | Self::OscSyncEnable
+            | Self::VcfBassBoost
+            | Self::OscKeyDownReset
+            | Self::CtrlSequencerEnable
+            | Self::ArpOnOff
+            | Self::ArpKeySync
+            | Self::ArpHold => Some("Off (0), On (1)"),
+            Self::Lfo2Rate => Some(
+                "When LFO 2 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate.",
+            ),
+            Self::VcaPanSpread
+            | Self::OscPortamentoBalance
+            | Self::Mod1Depth
+            | Self::Mod2Depth
+            | Self::Mod3Depth
+            | Self::Mod4Depth
+            | Self::Mod5Depth
+            | Self::Mod6Depth
+            | Self::Mod7Depth
+            | Self::Mod8Depth => Some("-128 (0) to +127 (255)"),
+            Self::UnisonDetune => Some("Sets the amount phatness!"),
+            Self::SequenceLength => Some("1 (0) to 32 (31) steps"),
+            Self::SequencerSwingTiming | Self::ArpSwing => {
+                Some("0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel.")
+            }
+            Self::SeqStepValue1
+            | Self::SeqStepValue2
+            | Self::SeqStepValue3
+            | Self::SeqStepValue4
+            | Self::SeqStepValue5
+            | Self::SeqStepValue6
+            | Self::SeqStepValue7
+            | Self::SeqStepValue8
+            | Self::SeqStepValue9
+            | Self::SeqStepValue10
+            | Self::SeqStepValue11
+            | Self::SeqStepValue12
+            | Self::SeqStepValue13
+            | Self::SeqStepValue14
+            | Self::SeqStepValue15
+            | Self::SeqStepValue16
+            | Self::SeqStepValue17
+            | Self::SeqStepValue18
+            | Self::SeqStepValue19
+            | Self::SeqStepValue20
+            | Self::SeqStepValue21
+            | Self::SeqStepValue22
+            | Self::SeqStepValue23
+            | Self::SeqStepValue24
+            | Self::SeqStepValue25
+            | Self::SeqStepValue26
+            | Self::SeqStepValue27
+            | Self::SeqStepValue28
+            | Self::SeqStepValue29
+            | Self::SeqStepValue30
+            | Self::SeqStepValue31
+            | Self::SeqStepValue32 => {
+                Some("Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\".")
+            }
+            Self::ArpRateTempo => Some("20 bpm (0) to 275 bpm (255)"),
+            Self::ArpOctaves => Some("1 to 6 octaves"),
+            Self::Fx1Param1
+            | Self::Fx1Param2
+            | Self::Fx1Param3
+            | Self::Fx1Param4
+            | Self::Fx1Param5
+            | Self::Fx1Param6
+            | Self::Fx1Param7
+            | Self::Fx1Param8
+            | Self::Fx1Param9
+            | Self::Fx1Param10
+            | Self::Fx1Param11
+            | Self::Fx1Param12 => Some("Meaning depends on FX 1 Type"),
+            Self::Fx2Param1
+            | Self::Fx2Param2
+            | Self::Fx2Param3
+            | Self::Fx2Param4
+            | Self::Fx2Param5
+            | Self::Fx2Param6
+            | Self::Fx2Param7
+            | Self::Fx2Param8
+            | Self::Fx2Param9
+            | Self::Fx2Param10
+            | Self::Fx2Param11
+            | Self::Fx2Param12 => Some("Meaning depends on FX 2 Type"),
+            Self::Fx3Param1
+            | Self::Fx3Param2
+            | Self::Fx3Param3
+            | Self::Fx3Param4
+            | Self::Fx3Param5
+            | Self::Fx3Param6
+            | Self::Fx3Param7
+            | Self::Fx3Param8
+            | Self::Fx3Param9
+            | Self::Fx3Param10
+            | Self::Fx3Param11
+            | Self::Fx3Param12 => Some("Meaning depends on FX 3 Type"),
+            Self::Fx4Param1
+            | Self::Fx4Param2
+            | Self::Fx4Param3
+            | Self::Fx4Param4
+            | Self::Fx4Param5
+            | Self::Fx4Param6
+            | Self::Fx4Param7
+            | Self::Fx4Param8
+            | Self::Fx4Param9
+            | Self::Fx4Param10
+            | Self::Fx4Param11
+            | Self::Fx4Param12 => Some("Meaning depends on FX 4 Type"),
+            Self::ProgramNameChar1
+            | Self::ProgramNameChar2
+            | Self::ProgramNameChar3
+            | Self::ProgramNameChar4
+            | Self::ProgramNameChar5
+            | Self::ProgramNameChar6
+            | Self::ProgramNameChar7
+            | Self::ProgramNameChar8
+            | Self::ProgramNameChar9
+            | Self::ProgramNameChar10
+            | Self::ProgramNameChar11
+            | Self::ProgramNameChar12
+            | Self::ProgramNameChar13
+            | Self::ProgramNameChar14
+            | Self::ProgramNameChar15
+            | Self::ProgramNameChar16
+            | Self::ProgramNameChar17 => Some("Null-terminated 16 char ASCII string"),
+            Self::ProgramTranspose => Some("-48 (80) ... 0 (128) ... +48 (176)"),
+            _ => None,
+        }
+    }
+
+    /// Returns the range the synthesizer's own display shows for this
+    /// parameter, as the manual prints it.
+    ///
+    /// The smallest useful thing a panel can say about a byte whose curve
+    /// nobody has measured: the reading stays raw, and this is what the two
+    /// ends of it mean. The same answer [`FxSlot::min`](crate::effect::FxSlot::min)
+    /// and [`FxSlot::max`](crate::effect::FxSlot::max) give for an effect slot,
+    /// in one string because these are not all ranges — one of them has a
+    /// discrete value before a range in it, and another is a sentence about two
+    /// different behaviours.
+    ///
+    /// Not a conversion, and no promise that the curve between the ends is a
+    /// straight line. `None` where the manual gives none, which is 216 of them.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// assert_eq!(
+    ///     ParamId::VcfFrequency.display(),
+    ///     Some("50.0 Hz to 20000.0 Hz"),
+    /// );
+    /// assert_eq!(ParamId::Lfo1SlewRate.display(), None);
+    /// ```
+    #[must_use]
+    pub const fn display(self) -> Option<&'static str> {
+        match self {
+            Self::Lfo1Rate | Self::Lfo2Rate => {
+                Some("0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix")
+            }
+            Self::Lfo1DelayFade | Self::Lfo2DelayFade => Some("0.00 s to 6.59 s"),
+            Self::Osc1PitchModDepth | Self::Osc2PitchModDepth => {
+                Some("0.00 cents to 36.0 semitones, on a non-linear fader response")
+            }
+            Self::Osc1PwmDepth => Some(
+                "50.0% to 99.0% pulse width when the source is Manual, otherwise 0 to plus or minus 49% modulation",
+            ),
+            Self::Osc2Level => Some("Off, then -48.0 dB to 0.0 dB"),
+            Self::Osc2Pitch => Some("-12.0 to +12.0 semitones"),
+            Self::Osc2ToneModDepth => Some(
+                "50% to 100% tone modulation when the source is Manual, otherwise 0 to plus or minus 49%",
+            ),
+            Self::NoiseLevel => Some("Off, then -48.1 dB to 0.0 dB"),
+            Self::PortamentoTime => Some("0.00 s to 10.00 s"),
+            Self::PitchBendUpDepth => Some(
+                "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pushing up bends down.",
+            ),
+            Self::PitchBendDownDepth => Some(
+                "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pulling down bends up.",
+            ),
+            Self::VcfFrequency => Some("50.0 Hz to 20000.0 Hz"),
+            Self::VcfHighPassFrequency => Some("20.0 Hz to 2000.0 Hz"),
+            Self::VcfResonance
+            | Self::VcfEnvelopeDepth
+            | Self::VcfLfoDepth
+            | Self::VcfKeyboardTracking => Some("0.0% to 100.0%"),
+            Self::VcaLevel => Some("-12.0 dB to +6.0 dB"),
+            Self::UnisonDetune => Some("plus or minus 0.0 to 50.0 cents"),
+            Self::DriftRate => Some(
+                "Each drift step lasts a random time between 25-50 ms at 0 and 2.5-5.0 s at 255",
+            ),
+            Self::SequencerSwingTiming | Self::ArpSwing => Some("50% to 75%"),
+            Self::ArpRateTempo => Some("20.0 to 275.0 BPM"),
+            _ => None,
+        }
+    }
+
+    /// Returns why this parameter's row departs from what the manual prints,
+    /// where it does.
+    ///
+    /// 37 rows do. The manual contradicts itself about a range, or runs two
+    /// numbers together, and the specification records both the reading it took
+    /// and the reason. Worth showing to somebody convinced the editor is wrong
+    /// about a range, and worth reading beside
+    /// [`ParamId::confirmed`](Self::confirmed).
+    #[must_use]
+    pub const fn correction(self) -> Option<&'static str> {
+        match self {
+            Self::Lfo1MonoMode => Some(
+                "The manual prints 0-1, but its own note describes Poly (0), Mono (1) and SPREAD-1 (2) through SPREAD-254 (255), matching LFO 2 Mono Mode at offset 12.",
+            ),
+            Self::Osc1Range => {
+                Some("The manual prints \"0-216' (0), 8' (1), 4' (2)\". The range is 0-2.")
+            }
+            Self::Osc2Range => Some("Same run-together as offset 14. The range is 0-2."),
+            Self::PitchBendUpDepth => Some(
+                "The NRPN table gives a range of 0-24, but section 8.4.4 states both pitch bend depths run from -24 to +24, which is 49 values. Encoded as 0-48 with 24 as zero, matching how the manual encodes Global Transpose (0-96 for -48 to +48). Needs confirming against hardware.",
+            ),
+            Self::PitchBendDownDepth => Some("Same as offset 36."),
+            Self::Osc1PitchModMode => {
+                Some("The manual prints \"0-10 (OSC1+2), 1 (OSC 1 Only)\". The range is 0-1.")
+            }
+            Self::Vcf2PoleMode => {
+                Some("The manual prints \"0-14 Pole (0), 2 Pole (1)\". The range is 0-1.")
+            }
+            Self::VcaEnvelopeReleaseCurve => Some(
+                "The manual repeats \"Attack Curve\" here. Offsets 58-61 are the attack, decay, sustain and release curves, matching the Env1 AtCur / DcyCur / SuSCur / RelCur modulation destinations.",
+            ),
+            Self::VcfEnvelopeReleaseCurve | Self::ModEnvelopeReleaseCurve => {
+                Some("Same repeated-name error as offset 61.")
+            }
+            Self::Mod1Source
+            | Self::Mod2Source
+            | Self::Mod3Source
+            | Self::Mod4Source
+            | Self::Mod5Source
+            | Self::Mod6Source
+            | Self::Mod7Source
+            | Self::Mod8Source => Some(
+                "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range.",
+            ),
+            Self::Mod1Destination
+            | Self::Mod2Destination
+            | Self::Mod3Destination
+            | Self::Mod4Destination
+            | Self::Mod5Destination
+            | Self::Mod6Destination
+            | Self::Mod7Destination
+            | Self::Mod8Destination => Some(
+                "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range.",
+            ),
+            Self::CtrlSequencerClockDivider => Some(
+                "Section 8.1.8 lists twenty clock divisions against this range of 0-15. The range is left as printed and the value table is marked unconfirmed.",
+            ),
+            Self::SequenceLength => Some(
+                "The manual runs the range and the first note value together as \"0-311 (0) to 32 (31) steps\". The range is 0-31.",
+            ),
+            Self::SequencerSwingTiming => Some(
+                "The NRPN note reads \"0% (0) to 75% (25)\". Sections 8.1.7 and 8.1.8 give the swing range as 50% to 75%, so 0 is 50% and 255 is 75%.",
+            ),
+            Self::SeqStepValue9 | Self::SeqStepValue11 => Some(
+                "The manual's table carries kind switch on this step alone, which its own range of 0-255 and its own note contradict. Read as the bipolar sweep every other step is.",
+            ),
+            Self::ArpSwing => Some("Same as offset 120."),
+            Self::ArpOctaves => Some("The manual prints \"0-51 to 6 Octaves\". The range is 0-5."),
+            Self::Fx1Type | Self::Fx2Type | Self::Fx3Type | Self::Fx4Type => Some(
+                "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range.",
+            ),
+            _ => None,
+        }
+    }
+
+    /// Returns whether the specification's reading of this parameter has been
+    /// confirmed.
+    ///
+    /// `false` where a range or an ordering is inferred from the manual's prose
+    /// because its own table contradicts itself, and no hardware has settled it;
+    /// [`ParamId::correction`](Self::correction) is the reason in each case. A
+    /// host with room to say so can mark the control rather than presenting a
+    /// guess as a fact.
+    #[must_use]
+    pub const fn confirmed(self) -> bool {
+        !matches!(self, Self::PitchBendUpDepth | Self::PitchBendDownDepth)
+    }
+}
+
+impl ParamId {
+    /// Returns what this parameter does, in a sentence.
+    ///
+    /// The answer to the question somebody points at a control to ask, which
+    /// the name and the range on their own do not give: [`ParamId::name`] says
+    /// `VCF Keyboard Tracking` and this says what happens when it is turned up.
+    ///
+    /// # Behind a feature
+    ///
+    /// `None` for every parameter unless the `descriptions` feature is on.
+    /// With it on, every parameter has one.
+    /// The signature does not change with the feature, so a host writes one
+    /// code path: a caller given `None` draws the name and the range it already
+    /// has.
+    ///
+    /// The feature is off by default because these 242 sentences are 31 kB
+    /// of prose: free on a desktop host, real money on the microcontrollers
+    /// this crate is also meant for, and so a cost that should land on whoever
+    /// asked for it.
+    ///
+    /// # Where these come from
+    ///
+    /// Written for this specification against what the rest of it records, and
+    /// *not* transcribed from the manual — unlike
+    /// [`FxSlot::description`](crate::effect::FxSlot::description), which is the
+    /// manual's own words. A parameter whose behaviour this specification does
+    /// not establish has no sentence rather than a guessed one. See the
+    /// `descriptions` key in `spec/parameters.toml`.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// let described = ParamId::VcfFrequency.description().is_some();
+    /// assert_eq!(described, cfg!(feature = "descriptions"));
+    /// ```
+    #[must_use]
+    pub const fn description(self) -> Option<&'static str> {
+        #[cfg(feature = "descriptions")]
+        {
+            match self {
+                Self::Lfo1Rate => Some(
+                    "Sets how fast LFO 1 runs, which is what the modulation depths elsewhere in the program are a depth of.",
+                ),
+                Self::Lfo1DelayFade => Some(
+                    "Sets how long LFO 1 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack.",
+                ),
+                Self::Lfo1Shape => Some(
+                    "Chooses the waveform LFO 1 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle.",
+                ),
+                Self::Lfo1KeySync => Some(
+                    "Restarts LFO 1 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to.",
+                ),
+                Self::Lfo1ArpSync => Some(
+                    "Locks LFO 1 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed.",
+                ),
+                Self::Lfo1MonoMode => Some(
+                    "Chooses whether each voice gets its own copy of LFO 1, whether all voices share one, or whether the voices' copies are spread apart in phase.",
+                ),
+                Self::Lfo1SlewRate => Some(
+                    "Rounds the corners off LFO 1's waveform, which turns a square into something that ramps between its two levels rather than jumping.",
+                ),
+                Self::Lfo2Rate => Some(
+                    "Sets how fast LFO 2 runs, which is what the modulation depths elsewhere in the program are a depth of.",
+                ),
+                Self::Lfo2DelayFade => Some(
+                    "Sets how long LFO 2 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack.",
+                ),
+                Self::Lfo2Shape => Some(
+                    "Chooses the waveform LFO 2 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle.",
+                ),
+                Self::Lfo2KeySync => Some(
+                    "Restarts LFO 2 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to.",
+                ),
+                Self::Lfo2ArpSync => Some(
+                    "Locks LFO 2 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed.",
+                ),
+                Self::Lfo2MonoMode => Some(
+                    "Chooses whether each voice gets its own copy of LFO 2, whether all voices share one, or whether the voices' copies are spread apart in phase.",
+                ),
+                Self::Lfo2SlewRate => Some(
+                    "Rounds the corners off LFO 2's waveform, which turns a square into something that ramps between its two levels rather than jumping.",
+                ),
+                Self::Osc1Range => Some(
+                    "Sets the octave OSC 1 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest.",
+                ),
+                Self::Osc2Range => Some(
+                    "Sets the octave OSC 2 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest.",
+                ),
+                Self::Osc1PwmSource => Some(
+                    "Chooses what moves OSC 1's pulse width: a fixed setting, either LFO, or one of the three envelopes.",
+                ),
+                Self::Osc2ToneModSource => Some(
+                    "Chooses what moves OSC 2's tone modulation: a fixed setting, either LFO, or one of the three envelopes.",
+                ),
+                Self::Osc1PulseEnable => Some(
+                    "Adds OSC 1's pulse wave to the mix. It and the saw are independent, so either, both or neither can sound.",
+                ),
+                Self::Osc1SawEnable => Some(
+                    "Adds OSC 1's sawtooth wave to the mix. It and the pulse are independent, so either, both or neither can sound.",
+                ),
+                Self::OscSyncEnable => Some(
+                    "Hard-syncs the oscillators, so that one restarts each time the other completes a cycle and its own pitch becomes a timbre control rather than a note.",
+                ),
+                Self::Osc1PitchModDepth => Some(
+                    "Sets how far the source chosen by OSC 1 Pitch Mod Select moves OSC 1's pitch.",
+                ),
+                Self::Osc1PitchModSelect => Some(
+                    "Chooses what moves OSC 1's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way.",
+                ),
+                Self::Osc1AftertouchToPitchModDepth => Some(
+                    "Sets how much aftertouch adds to OSC 1's pitch modulation depth, so that leaning on a held key deepens the vibrato.",
+                ),
+                Self::Osc1ModWheelToPitchModDepth => Some(
+                    "Sets how much the modulation wheel adds to OSC 1's pitch modulation depth.",
+                ),
+                Self::Osc1PwmDepth => Some(
+                    "Sets how far OSC 1's pulse width moves. With a fixed source this is the width itself; with an LFO or an envelope it is how far that source sweeps it.",
+                ),
+                Self::Osc2Level => Some("Sets how much of OSC 2 reaches the filter."),
+                Self::Osc2Pitch => Some(
+                    "Tunes OSC 2 away from OSC 1, up to an octave either way, which is what a detune or an interval between the two is set with.",
+                ),
+                Self::Osc2ToneModDepth => Some(
+                    "Sets how far OSC 2's tone modulation moves. With a fixed source this is the setting itself; with an LFO or an envelope it is how far that source sweeps it.",
+                ),
+                Self::Osc2PitchModDepth => Some(
+                    "Sets how far the source chosen by OSC 2 Pitch Mod Select moves OSC 2's pitch.",
+                ),
+                Self::Osc2AftertouchToPitchModDepth => Some(
+                    "Sets how much aftertouch adds to OSC 2's pitch modulation depth, so that leaning on a held key deepens the vibrato.",
+                ),
+                Self::Osc2ModWheelToPitchModDepth => Some(
+                    "Sets how much the modulation wheel adds to OSC 2's pitch modulation depth.",
+                ),
+                Self::Osc2PitchModSelect => Some(
+                    "Chooses what moves OSC 2's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way.",
+                ),
+                Self::NoiseLevel => Some(
+                    "Sets how much of the noise generator is mixed in with the oscillators ahead of the filter.",
+                ),
+                Self::PortamentoTime => Some(
+                    "Sets how long a new note takes to slide to its pitch from the note before it.",
+                ),
+                Self::PortamentoMode => Some(
+                    "Chooses how the slide behaves: whether it happens on every note or only where two overlap, whether its time or its rate is what stays fixed, and whether it is a fixed interval away rather than a slide at all.",
+                ),
+                Self::PitchBendUpDepth => {
+                    Some("Sets how far the pitch bender bends when it is pushed up.")
+                }
+                Self::PitchBendDownDepth => {
+                    Some("Sets how far the pitch bender bends when it is pulled down.")
+                }
+                Self::Osc1PitchModMode => Some(
+                    "Chooses whether OSC 1's pitch modulation moves both oscillators together or OSC 1 alone.",
+                ),
+                Self::VcfFrequency => Some(
+                    "Sets the cutoff frequency of the low pass filter, the point above which the oscillators' harmonics are removed. Turning it down darkens the sound.",
+                ),
+                Self::VcfHighPassFrequency => Some(
+                    "Sets the cutoff of the high pass filter, which removes what is below it. The manual's block diagram places this after the VCA, so it acts on the mixed voices rather than on one.",
+                ),
+                Self::VcfResonance => Some(
+                    "Emphasises the frequencies around the low pass cutoff, which sharpens the filter's peak and thins out what sits below it.",
+                ),
+                Self::VcfEnvelopeDepth => Some(
+                    "Sets how far the VCF envelope moves the low pass cutoff, and so how much of the filter's sweep is played by the envelope rather than set by hand.",
+                ),
+                Self::VcfEnvelopeVelocitySensitivity => Some(
+                    "Sets how much playing harder deepens the VCF envelope's effect on the cutoff.",
+                ),
+                Self::VcfPitchBendToFreqDepth => Some(
+                    "Sets how much the pitch bender moves the low pass cutoff along with the pitch.",
+                ),
+                Self::VcfLfoDepth => {
+                    Some("Sets how far the LFO chosen by VCF LFO Select moves the low pass cutoff.")
+                }
+                Self::VcfLfoSelect => {
+                    Some("Chooses which of the two LFOs moves the low pass cutoff.")
+                }
+                Self::VcfAftertouchToLfoDepth => Some(
+                    "Sets how much aftertouch adds to the LFO's effect on the cutoff, so that leaning on a held key opens up the filter's wobble.",
+                ),
+                Self::VcfModWheelToLfoDepth => Some(
+                    "Sets how much the modulation wheel adds to the LFO's effect on the cutoff.",
+                ),
+                Self::VcfKeyboardTracking => Some(
+                    "Sets how far the low pass cutoff follows the note played, so that high notes keep the brightness low ones have instead of being filtered away.",
+                ),
+                Self::VcfEnvelopePolarity => {
+                    Some("Chooses whether the VCF envelope opens the filter or closes it.")
+                }
+                Self::Vcf2PoleMode => Some(
+                    "Chooses the low pass filter's slope: four poles for the steeper, darker response, two for the gentler one.",
+                ),
+                Self::VcfBassBoost => Some(
+                    "Lifts the low end after the filter, putting back the weight a resonant low pass takes out.",
+                ),
+                Self::VcaEnvelopeAttackTime
+                | Self::VcfEnvelopeAttackTime
+                | Self::ModEnvelopeAttackTime => Some(
+                    "Sets how long the envelope takes to rise to full level once it is triggered.",
+                ),
+                Self::VcaEnvelopeDecayTime
+                | Self::VcfEnvelopeDecayTime
+                | Self::ModEnvelopeDecayTime => Some(
+                    "Sets how long the envelope takes to fall from full level to its sustain level.",
+                ),
+                Self::VcaEnvelopeSustainLevel
+                | Self::VcfEnvelopeSustainLevel
+                | Self::ModEnvelopeSustainLevel => {
+                    Some("Sets the level the envelope holds at for as long as the note is held.")
+                }
+                Self::VcaEnvelopeReleaseTime
+                | Self::VcfEnvelopeReleaseTime
+                | Self::ModEnvelopeReleaseTime => Some(
+                    "Sets how long the envelope takes to fall back to nothing once the key is released.",
+                ),
+                Self::VcaEnvelopeTriggerMode
+                | Self::VcfEnvelopeTriggerMode
+                | Self::ModEnvelopeTriggerMode => Some(
+                    "Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer.",
+                ),
+                Self::VcaEnvelopeAttackCurve
+                | Self::VcfEnvelopeAttackCurve
+                | Self::ModEnvelopeAttackCurve => Some(
+                    "Bends the attack segment away from a straight line, towards an exponential in either direction.",
+                ),
+                Self::VcaEnvelopeDecayCurve
+                | Self::VcfEnvelopeDecayCurve
+                | Self::ModEnvelopeDecayCurve => Some(
+                    "Bends the decay segment away from a straight line, towards an exponential in either direction.",
+                ),
+                Self::VcaEnvelopeSustainCurve
+                | Self::VcfEnvelopeSustainCurve
+                | Self::ModEnvelopeSustainCurve => Some(
+                    "Bends the sustain segment away from a straight line, towards an exponential in either direction.",
+                ),
+                Self::VcaEnvelopeReleaseCurve
+                | Self::VcfEnvelopeReleaseCurve
+                | Self::ModEnvelopeReleaseCurve => Some(
+                    "Bends the release segment away from a straight line, towards an exponential in either direction.",
+                ),
+                Self::VcaLevel => Some(
+                    "Sets the level the voice leaves the amplifier at, ahead of the high pass and the effects.",
+                ),
+                Self::VcaEnvelopeDepth => Some(
+                    "Sets how far the VCA envelope moves the voice's level, and so how much of the loudness is played by the envelope rather than held flat.",
+                ),
+                Self::VcaEnvelopeVelocitySensitivity => {
+                    Some("Sets how much playing harder raises the voice's level.")
+                }
+                Self::VcaPanSpread => Some(
+                    "Spreads the voices across the stereo field, so that a chord is placed across it rather than stacked in the middle.",
+                ),
+                Self::VoicePriorityMode => Some(
+                    "Chooses which note keeps a voice when more are held than there are voices: the lowest, the highest, or the most recently played.",
+                ),
+                Self::PolyphonyMode => Some(
+                    "Chooses how the voices are handed out: one to a note, several stacked on each note in unison, a limited number of them at a time, or the whole instrument reduced to one voice.",
+                ),
+                Self::EnvelopeTriggerMode => Some(
+                    "Chooses whether the envelopes restart on each new note or run on from where they are when notes overlap, and whether they run once through however long the key is held.",
+                ),
+                Self::UnisonDetune => Some(
+                    "Sets how far the stacked voices of a unison mode are tuned apart from one another, which is what thickens the sound.",
+                ),
+                Self::VoiceDrift => Some(
+                    "Sets how much drift is applied per voice, which is what keeps two voices playing the same note from being identical.",
+                ),
+                Self::ParameterDrift => Some(
+                    "Sets how much drift is applied to parameter values, which is what keeps a setting from sounding exactly where it was left.",
+                ),
+                Self::DriftRate => {
+                    Some("Sets how quickly drift moves from one random value to the next.")
+                }
+                Self::OscPortamentoBalance => Some(
+                    "Sets how the portamento time is split between the two oscillators, so that one can arrive at the new note ahead of the other.",
+                ),
+                Self::OscKeyDownReset => Some(
+                    "Restarts the oscillators' waveforms on each new note, so that every note begins from the same point in the cycle.",
+                ),
+                Self::Mod1Source
+                | Self::Mod2Source
+                | Self::Mod3Source
+                | Self::Mod4Source
+                | Self::Mod5Source
+                | Self::Mod6Source
+                | Self::Mod7Source
+                | Self::Mod8Source => Some(
+                    "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer.",
+                ),
+                Self::Mod1Destination
+                | Self::Mod2Destination
+                | Self::Mod3Destination
+                | Self::Mod4Destination
+                | Self::Mod5Destination
+                | Self::Mod6Destination
+                | Self::Mod7Destination
+                | Self::Mod8Destination => Some(
+                    "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together.",
+                ),
+                Self::Mod1Depth
+                | Self::Mod2Depth
+                | Self::Mod3Depth
+                | Self::Mod4Depth
+                | Self::Mod5Depth
+                | Self::Mod6Depth
+                | Self::Mod7Depth
+                | Self::Mod8Depth => Some(
+                    "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does.",
+                ),
+                Self::CtrlSequencerEnable => Some(
+                    "Runs the control sequencer, the stepped modulation source the matrix can draw on.",
+                ),
+                Self::CtrlSequencerClockDivider => {
+                    Some("Sets how fast the sequencer steps, as a division of the master tempo.")
+                }
+                Self::SequenceLength => Some(
+                    "Sets how many of the 32 steps are played before the sequence returns to the first.",
+                ),
+                Self::SequencerSwingTiming => Some(
+                    "Holds every second step back, which is what turns an even run of steps into a swung one.",
+                ),
+                Self::KeySyncAndLoop => Some(
+                    "Chooses whether the sequence restarts on a new note, whether it repeats when it reaches its end, or both.",
+                ),
+                Self::SlewRate => Some(
+                    "Smooths the jump from one step's value to the next, which turns a staircase into a slope.",
+                ),
+                Self::SeqStepValue1
+                | Self::SeqStepValue2
+                | Self::SeqStepValue3
+                | Self::SeqStepValue4
+                | Self::SeqStepValue5
+                | Self::SeqStepValue6
+                | Self::SeqStepValue7
+                | Self::SeqStepValue8
+                | Self::SeqStepValue9
+                | Self::SeqStepValue10
+                | Self::SeqStepValue11
+                | Self::SeqStepValue12
+                | Self::SeqStepValue13
+                | Self::SeqStepValue14
+                | Self::SeqStepValue15
+                | Self::SeqStepValue16
+                | Self::SeqStepValue17
+                | Self::SeqStepValue18
+                | Self::SeqStepValue19
+                | Self::SeqStepValue20
+                | Self::SeqStepValue21
+                | Self::SeqStepValue22
+                | Self::SeqStepValue23
+                | Self::SeqStepValue24
+                | Self::SeqStepValue25
+                | Self::SeqStepValue26
+                | Self::SeqStepValue27
+                | Self::SeqStepValue28
+                | Self::SeqStepValue29
+                | Self::SeqStepValue30
+                | Self::SeqStepValue31
+                | Self::SeqStepValue32 => Some(
+                    "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing.",
+                ),
+                Self::ArpOnOff => Some("Runs the arpeggiator over the notes being held."),
+                Self::ArpMode => Some(
+                    "Chooses the order the held notes are played in: up, down, alternating, as they were played, at random, or all at once.",
+                ),
+                Self::ArpRateTempo => Some(
+                    "Sets the master tempo, in beats per minute. The arpeggiator, the control sequencer and a tempo-locked LFO all divide it.",
+                ),
+                Self::ArpClock => {
+                    Some("Sets how fast the arpeggiator steps, as a division of the master tempo.")
+                }
+                Self::ArpKeySync => Some(
+                    "Restarts the arpeggiated pattern on each new note rather than letting it run on.",
+                ),
+                Self::ArpGateTime => Some(
+                    "Sets how much of each step the note actually sounds for, from a short stab to a run that joins up.",
+                ),
+                Self::ArpHold => Some("Keeps the arpeggio running after the keys are let go."),
+                Self::ArpPattern => Some(
+                    "Chooses the rhythm the arpeggiator plays: which of its steps sound and which are rests.",
+                ),
+                Self::ArpSwing => Some(
+                    "Holds every second step of the arpeggio back, which is what turns an even run into a swung one.",
+                ),
+                Self::ArpOctaves => Some(
+                    "Sets how many octaves the arpeggio climbs through before it returns to the note it started on.",
+                ),
+                Self::FxRouting => Some(
+                    "Chooses how the four effect engines are wired to each other: in a chain, side by side, or a mixture of the two, with two of the ten routings feeding a later engine back into an earlier one.",
+                ),
+                Self::Fx1Type | Self::Fx2Type | Self::Fx3Type | Self::Fx4Type => Some(
+                    "Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean.",
+                ),
+                Self::Fx1Param1
+                | Self::Fx1Param2
+                | Self::Fx1Param3
+                | Self::Fx1Param4
+                | Self::Fx1Param5
+                | Self::Fx1Param6
+                | Self::Fx1Param7
+                | Self::Fx1Param8
+                | Self::Fx1Param9
+                | Self::Fx1Param10
+                | Self::Fx1Param11
+                | Self::Fx1Param12
+                | Self::Fx2Param1
+                | Self::Fx2Param2
+                | Self::Fx2Param3
+                | Self::Fx2Param4
+                | Self::Fx2Param5
+                | Self::Fx2Param6
+                | Self::Fx2Param7
+                | Self::Fx2Param8
+                | Self::Fx2Param9
+                | Self::Fx2Param10
+                | Self::Fx2Param11
+                | Self::Fx2Param12
+                | Self::Fx3Param1
+                | Self::Fx3Param2
+                | Self::Fx3Param3
+                | Self::Fx3Param4
+                | Self::Fx3Param5
+                | Self::Fx3Param6
+                | Self::Fx3Param7
+                | Self::Fx3Param8
+                | Self::Fx3Param9
+                | Self::Fx3Param10
+                | Self::Fx3Param11
+                | Self::Fx3Param12
+                | Self::Fx4Param1
+                | Self::Fx4Param2
+                | Self::Fx4Param3
+                | Self::Fx4Param4
+                | Self::Fx4Param5
+                | Self::Fx4Param6
+                | Self::Fx4Param7
+                | Self::Fx4Param8
+                | Self::Fx4Param9
+                | Self::Fx4Param10
+                | Self::Fx4Param11
+                | Self::Fx4Param12 => Some(
+                    "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show.",
+                ),
+                Self::Fx1OutputGain
+                | Self::Fx2OutputGain
+                | Self::Fx3OutputGain
+                | Self::Fx4OutputGain => Some(
+                    "Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output.",
+                ),
+                Self::FxMode => Some(
+                    "Chooses what the effects do to the two signal paths: sit in the chain, be fed from a send alongside it, or be bypassed.",
+                ),
+                Self::ProgramNameChar1
+                | Self::ProgramNameChar2
+                | Self::ProgramNameChar3
+                | Self::ProgramNameChar4
+                | Self::ProgramNameChar5
+                | Self::ProgramNameChar6
+                | Self::ProgramNameChar7
+                | Self::ProgramNameChar8
+                | Self::ProgramNameChar9
+                | Self::ProgramNameChar10
+                | Self::ProgramNameChar11
+                | Self::ProgramNameChar12
+                | Self::ProgramNameChar13
+                | Self::ProgramNameChar14
+                | Self::ProgramNameChar15
+                | Self::ProgramNameChar16
+                | Self::ProgramNameChar17 => Some(
+                    "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends.",
+                ),
+                Self::ProgramCategory => Some(
+                    "Tags the program with the kind of sound it is, which is what the instrument's own browser sorts and filters on.",
+                ),
+                Self::ProgramTranspose => {
+                    Some("Shifts the whole program in semitones, either side of its centre.")
+                }
+            }
+        }
+        #[cfg(not(feature = "descriptions"))]
+        {
+            let _ = self;
+            None
         }
     }
 }
@@ -6575,4 +7522,257 @@ pub const CONTROLLERS: [Controller; CONTROLLER_COUNT] = [
         kind: ControllerKind::Other,
         parameter: None,
     },
+];
+
+/// Stands for a parameter no controller drives, in `CONTROLLER_OF_PARAMETER`.
+///
+/// The table holds indices into `CONTROLLERS`, which is shorter than a byte, so
+/// the largest byte is free to mean "none" and the table stays one byte wide.
+pub(super) const NO_CONTROLLER: u8 = u8::MAX;
+
+/// The controller that drives each parameter, by the parameter's own offset.
+pub(super) static CONTROLLER_OF_PARAMETER: [u8; PARAMETER_COUNT] = [
+    // 90 of the 242 parameters; NRPN is the only way to the rest.
+    11,
+    12,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    13,
+    14,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    15,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    16,
+    20,
+    19,
+    18,
+    17,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    21,
+    3,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    23,
+    29,
+    24,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    27,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    28,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    31,
+    33,
+    34,
+    35,
+    NO_CONTROLLER,
+    44,
+    45,
+    46,
+    47,
+    36,
+    37,
+    38,
+    39,
+    NO_CONTROLLER,
+    48,
+    49,
+    50,
+    51,
+    40,
+    41,
+    42,
+    43,
+    NO_CONTROLLER,
+    52,
+    53,
+    54,
+    55,
+    30,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    22,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    9,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    10,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    99,
+    56,
+    57,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    100,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    101,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    96,
+    97,
+    98,
+    102,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    103,
+    104,
+    105,
+    106,
+    108,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
+    NO_CONTROLLER,
 ];

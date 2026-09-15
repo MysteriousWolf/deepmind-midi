@@ -10,6 +10,16 @@
 source = "DeepMind 12 User Manual, section 17 (MIDI NRPN Commands)"
 program_data_len = { v6 = 242, v7 = 245 }
 reserved_offsets = "242-244, present only in protocol version 7, zero in all factory programs examined"
+descriptions = """
+The `description` on each parameter is written for this specification against
+what the rest of it records - the signal path, the value tables, the notes and
+the ranges - and is not a transcription of the manual. That is the opposite of
+`spec/effects.toml`, whose descriptions are the manual's own words and are
+credited in NOTICE; the manual's program parameter descriptions have not been
+transcribed here. A parameter whose behaviour this specification does not
+establish gets no description rather than a guessed one, and a description says
+what the control does, never what a value decodes to - that is `note` and the
+value tables."""
 
 [[parameter]]
 offset = 0
@@ -18,6 +28,7 @@ group = "LFO 1"
 min = 0
 max = 255
 note = "When LFO 1 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate."
+description = "Sets how fast LFO 1 runs, which is what the modulation depths elsewhere in the program are a depth of."
 display = "0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix"
 
 [[parameter]]
@@ -26,6 +37,7 @@ name = "LFO 1 Delay / Fade"
 group = "LFO 1"
 min = 0
 max = 255
+description = "Sets how long LFO 1 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack."
 display = "0.00 s to 6.59 s"
 
 [[parameter]]
@@ -35,6 +47,7 @@ group = "LFO 1"
 min = 0
 max = 6
 enum = "lfo_shape"
+description = "Chooses the waveform LFO 1 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle."
 
 [[parameter]]
 offset = 3
@@ -44,6 +57,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Restarts LFO 1 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to."
 
 [[parameter]]
 offset = 4
@@ -53,6 +67,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Locks LFO 1 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed."
 
 [[parameter]]
 offset = 5
@@ -61,6 +76,7 @@ group = "LFO 1"
 min = 0
 max = 255
 enum = "lfo_mono_mode"
+description = "Chooses whether each voice gets its own copy of LFO 1, whether all voices share one, or whether the voices' copies are spread apart in phase."
 correction = "The manual prints 0-1, but its own note describes Poly (0), Mono (1) and SPREAD-1 (2) through SPREAD-254 (255), matching LFO 2 Mono Mode at offset 12."
 
 [[parameter]]
@@ -69,6 +85,7 @@ name = "LFO 1 Slew Rate"
 group = "LFO 1"
 min = 0
 max = 255
+description = "Rounds the corners off LFO 1's waveform, which turns a square into something that ramps between its two levels rather than jumping."
 
 [[parameter]]
 offset = 7
@@ -77,6 +94,7 @@ group = "LFO 2"
 min = 0
 max = 255
 note = "When LFO 2 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate."
+description = "Sets how fast LFO 2 runs, which is what the modulation depths elsewhere in the program are a depth of."
 display = "0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix"
 
 [[parameter]]
@@ -85,6 +103,7 @@ name = "LFO 2 Delay / Fade"
 group = "LFO 2"
 min = 0
 max = 255
+description = "Sets how long LFO 2 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack."
 display = "0.00 s to 6.59 s"
 
 [[parameter]]
@@ -94,6 +113,7 @@ group = "LFO 2"
 min = 0
 max = 6
 enum = "lfo_shape"
+description = "Chooses the waveform LFO 2 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle."
 
 [[parameter]]
 offset = 10
@@ -103,6 +123,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Restarts LFO 2 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to."
 
 [[parameter]]
 offset = 11
@@ -112,6 +133,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Locks LFO 2 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed."
 
 [[parameter]]
 offset = 12
@@ -120,6 +142,7 @@ group = "LFO 2"
 min = 0
 max = 255
 enum = "lfo_mono_mode"
+description = "Chooses whether each voice gets its own copy of LFO 2, whether all voices share one, or whether the voices' copies are spread apart in phase."
 
 [[parameter]]
 offset = 13
@@ -127,6 +150,7 @@ name = "LFO 2 Slew Rate"
 group = "LFO 2"
 min = 0
 max = 255
+description = "Rounds the corners off LFO 2's waveform, which turns a square into something that ramps between its two levels rather than jumping."
 
 [[parameter]]
 offset = 14
@@ -135,6 +159,7 @@ group = "Oscillators"
 min = 0
 max = 2
 enum = "osc_range"
+description = "Sets the octave OSC 1 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest."
 correction = "The manual prints \"0-216' (0), 8' (1), 4' (2)\". The range is 0-2."
 
 [[parameter]]
@@ -144,6 +169,7 @@ group = "Oscillators"
 min = 0
 max = 2
 enum = "osc_range"
+description = "Sets the octave OSC 2 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest."
 correction = "Same run-together as offset 14. The range is 0-2."
 
 [[parameter]]
@@ -153,6 +179,7 @@ group = "Oscillators"
 min = 0
 max = 5
 enum = "pwm_source"
+description = "Chooses what moves OSC 1's pulse width: a fixed setting, either LFO, or one of the three envelopes."
 
 [[parameter]]
 offset = 17
@@ -161,6 +188,7 @@ group = "Oscillators"
 min = 0
 max = 5
 enum = "tone_mod_source"
+description = "Chooses what moves OSC 2's tone modulation: a fixed setting, either LFO, or one of the three envelopes."
 
 [[parameter]]
 offset = 18
@@ -170,6 +198,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Adds OSC 1's pulse wave to the mix. It and the saw are independent, so either, both or neither can sound."
 
 [[parameter]]
 offset = 19
@@ -179,6 +208,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Adds OSC 1's sawtooth wave to the mix. It and the pulse are independent, so either, both or neither can sound."
 
 [[parameter]]
 offset = 20
@@ -188,6 +218,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Hard-syncs the oscillators, so that one restarts each time the other completes a cycle and its own pitch becomes a timbre control rather than a note."
 
 [[parameter]]
 offset = 21
@@ -195,6 +226,7 @@ name = "OSC 1 Pitch Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how far the source chosen by OSC 1 Pitch Mod Select moves OSC 1's pitch."
 display = "0.00 cents to 36.0 semitones, on a non-linear fader response"
 
 [[parameter]]
@@ -204,6 +236,7 @@ group = "Oscillators"
 min = 0
 max = 6
 enum = "pitch_mod_source"
+description = "Chooses what moves OSC 1's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way."
 
 [[parameter]]
 offset = 23
@@ -211,6 +244,7 @@ name = "OSC 1 Aftertouch > Pitch Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how much aftertouch adds to OSC 1's pitch modulation depth, so that leaning on a held key deepens the vibrato."
 
 [[parameter]]
 offset = 24
@@ -218,6 +252,7 @@ name = "OSC 1 Mod Wheel > Pitch Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how much the modulation wheel adds to OSC 1's pitch modulation depth."
 
 [[parameter]]
 offset = 25
@@ -225,6 +260,7 @@ name = "OSC 1 PWM Depth"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how far OSC 1's pulse width moves. With a fixed source this is the width itself; with an LFO or an envelope it is how far that source sweeps it."
 display = "50.0% to 99.0% pulse width when the source is Manual, otherwise 0 to plus or minus 49% modulation"
 
 [[parameter]]
@@ -233,6 +269,7 @@ name = "OSC 2 Level"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how much of OSC 2 reaches the filter."
 display = "Off, then -48.0 dB to 0.0 dB"
 
 [[parameter]]
@@ -241,6 +278,7 @@ name = "OSC 2 Pitch"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Tunes OSC 2 away from OSC 1, up to an octave either way, which is what a detune or an interval between the two is set with."
 display = "-12.0 to +12.0 semitones"
 
 [[parameter]]
@@ -249,6 +287,7 @@ name = "OSC 2 Tone Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how far OSC 2's tone modulation moves. With a fixed source this is the setting itself; with an LFO or an envelope it is how far that source sweeps it."
 display = "50% to 100% tone modulation when the source is Manual, otherwise 0 to plus or minus 49%"
 
 [[parameter]]
@@ -257,6 +296,7 @@ name = "OSC 2 Pitch Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how far the source chosen by OSC 2 Pitch Mod Select moves OSC 2's pitch."
 display = "0.00 cents to 36.0 semitones, on a non-linear fader response"
 
 [[parameter]]
@@ -265,6 +305,7 @@ name = "OSC 2 Aftertouch > Pitch Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how much aftertouch adds to OSC 2's pitch modulation depth, so that leaning on a held key deepens the vibrato."
 
 [[parameter]]
 offset = 31
@@ -272,6 +313,7 @@ name = "OSC 2 Mod Wheel > Pitch Mod Depth"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how much the modulation wheel adds to OSC 2's pitch modulation depth."
 
 [[parameter]]
 offset = 32
@@ -280,6 +322,7 @@ group = "Oscillators"
 min = 0
 max = 6
 enum = "pitch_mod_source"
+description = "Chooses what moves OSC 2's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way."
 
 [[parameter]]
 offset = 33
@@ -287,6 +330,7 @@ name = "Noise Level"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how much of the noise generator is mixed in with the oscillators ahead of the filter."
 display = "Off, then -48.1 dB to 0.0 dB"
 
 [[parameter]]
@@ -295,6 +339,7 @@ name = "Portamento time"
 group = "Oscillators"
 min = 0
 max = 255
+description = "Sets how long a new note takes to slide to its pitch from the note before it."
 display = "0.00 s to 10.00 s"
 
 [[parameter]]
@@ -304,6 +349,7 @@ group = "Oscillators"
 min = 0
 max = 13
 enum = "portamento_mode"
+description = "Chooses how the slide behaves: whether it happens on every note or only where two overlap, whether its time or its rate is what stays fixed, and whether it is a fixed interval away rather than a slide at all."
 
 [[parameter]]
 offset = 36
@@ -311,6 +357,9 @@ name = "Pitch Bend Up Depth"
 group = "Oscillators"
 min = 0
 max = 48
+shape = "bipolar"
+centre = 24
+description = "Sets how far the pitch bender bends when it is pushed up."
 confirmed = false
 display = "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pushing up bends down."
 correction = "The NRPN table gives a range of 0-24, but section 8.4.4 states both pitch bend depths run from -24 to +24, which is 49 values. Encoded as 0-48 with 24 as zero, matching how the manual encodes Global Transpose (0-96 for -48 to +48). Needs confirming against hardware."
@@ -321,6 +370,9 @@ name = "Pitch Bend Down Depth"
 group = "Oscillators"
 min = 0
 max = 48
+shape = "bipolar"
+centre = 24
+description = "Sets how far the pitch bender bends when it is pulled down."
 confirmed = false
 display = "-24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pulling down bends up."
 correction = "Same as offset 36."
@@ -332,6 +384,7 @@ group = "Oscillators"
 min = 0
 max = 1
 enum = "osc1_pitch_mod_mode"
+description = "Chooses whether OSC 1's pitch modulation moves both oscillators together or OSC 1 alone."
 correction = "The manual prints \"0-10 (OSC1+2), 1 (OSC 1 Only)\". The range is 0-1."
 
 [[parameter]]
@@ -340,6 +393,7 @@ name = "VCF Frequency"
 group = "VCF"
 min = 0
 max = 255
+description = "Sets the cutoff frequency of the low pass filter, the point above which the oscillators' harmonics are removed. Turning it down darkens the sound."
 display = "50.0 Hz to 20000.0 Hz"
 
 [[parameter]]
@@ -348,6 +402,7 @@ name = "VCF HighPass Frequency"
 group = "VCF"
 min = 0
 max = 255
+description = "Sets the cutoff of the high pass filter, which removes what is below it. The manual's block diagram places this after the VCA, so it acts on the mixed voices rather than on one."
 display = "20.0 Hz to 2000.0 Hz"
 
 [[parameter]]
@@ -356,6 +411,7 @@ name = "VCF Resonance"
 group = "VCF"
 min = 0
 max = 255
+description = "Emphasises the frequencies around the low pass cutoff, which sharpens the filter's peak and thins out what sits below it."
 display = "0.0% to 100.0%"
 
 [[parameter]]
@@ -364,6 +420,7 @@ name = "VCF Envelope Depth"
 group = "VCF"
 min = 0
 max = 255
+description = "Sets how far the VCF envelope moves the low pass cutoff, and so how much of the filter's sweep is played by the envelope rather than set by hand."
 display = "0.0% to 100.0%"
 
 [[parameter]]
@@ -372,6 +429,7 @@ name = "VCF Envelope Velocity Sensitivity"
 group = "VCF"
 min = 0
 max = 255
+description = "Sets how much playing harder deepens the VCF envelope's effect on the cutoff."
 
 [[parameter]]
 offset = 44
@@ -379,6 +437,7 @@ name = "VCF Pitch Bend to Freq Depth"
 group = "VCF"
 min = 0
 max = 255
+description = "Sets how much the pitch bender moves the low pass cutoff along with the pitch."
 
 [[parameter]]
 offset = 45
@@ -386,6 +445,7 @@ name = "VCF LFO Depth"
 group = "VCF"
 min = 0
 max = 255
+description = "Sets how far the LFO chosen by VCF LFO Select moves the low pass cutoff."
 display = "0.0% to 100.0%"
 
 [[parameter]]
@@ -395,6 +455,7 @@ group = "VCF"
 min = 0
 max = 1
 enum = "vcf_lfo_select"
+description = "Chooses which of the two LFOs moves the low pass cutoff."
 
 [[parameter]]
 offset = 47
@@ -402,6 +463,7 @@ name = "VCF Aftertouch > LFO Depth"
 group = "VCF"
 min = 0
 max = 255
+description = "Sets how much aftertouch adds to the LFO's effect on the cutoff, so that leaning on a held key opens up the filter's wobble."
 
 [[parameter]]
 offset = 48
@@ -409,6 +471,7 @@ name = "VCF Mod Wheel > LFO Depth"
 group = "VCF"
 min = 0
 max = 255
+description = "Sets how much the modulation wheel adds to the LFO's effect on the cutoff."
 
 [[parameter]]
 offset = 49
@@ -416,6 +479,7 @@ name = "VCF Keyboard Tracking"
 group = "VCF"
 min = 0
 max = 255
+description = "Sets how far the low pass cutoff follows the note played, so that high notes keep the brightness low ones have instead of being filtered away."
 display = "0.0% to 100.0%"
 
 [[parameter]]
@@ -425,6 +489,7 @@ group = "VCF"
 min = 0
 max = 1
 enum = "vcf_envelope_polarity"
+description = "Chooses whether the VCF envelope opens the filter or closes it."
 
 [[parameter]]
 offset = 51
@@ -433,6 +498,7 @@ group = "VCF"
 min = 0
 max = 1
 enum = "vcf_pole_mode"
+description = "Chooses the low pass filter's slope: four poles for the steeper, darker response, two for the gentler one."
 correction = "The manual prints \"0-14 Pole (0), 2 Pole (1)\". The range is 0-1."
 
 [[parameter]]
@@ -443,6 +509,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Lifts the low end after the filter, putting back the weight a resonant low pass takes out."
 
 [[parameter]]
 offset = 53
@@ -450,6 +517,7 @@ name = "VCA Envelope Attack Time"
 group = "VCA Envelope"
 min = 0
 max = 255
+description = "Sets how long the envelope takes to rise to full level once it is triggered."
 
 [[parameter]]
 offset = 54
@@ -457,6 +525,7 @@ name = "VCA Envelope Decay Time"
 group = "VCA Envelope"
 min = 0
 max = 255
+description = "Sets how long the envelope takes to fall from full level to its sustain level."
 
 [[parameter]]
 offset = 55
@@ -464,6 +533,7 @@ name = "VCA Envelope Sustain Level"
 group = "VCA Envelope"
 min = 0
 max = 255
+description = "Sets the level the envelope holds at for as long as the note is held."
 
 [[parameter]]
 offset = 56
@@ -471,6 +541,7 @@ name = "VCA Envelope Release Time"
 group = "VCA Envelope"
 min = 0
 max = 255
+description = "Sets how long the envelope takes to fall back to nothing once the key is released."
 
 [[parameter]]
 offset = 57
@@ -479,6 +550,7 @@ group = "VCA Envelope"
 min = 0
 max = 4
 enum = "envelope_trigger"
+description = "Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer."
 
 [[parameter]]
 offset = 58
@@ -486,6 +558,7 @@ name = "VCA Envelope Attack Curve"
 group = "VCA Envelope"
 min = 0
 max = 255
+description = "Bends the attack segment away from a straight line, towards an exponential in either direction."
 
 [[parameter]]
 offset = 59
@@ -493,6 +566,7 @@ name = "VCA Envelope Decay Curve"
 group = "VCA Envelope"
 min = 0
 max = 255
+description = "Bends the decay segment away from a straight line, towards an exponential in either direction."
 
 [[parameter]]
 offset = 60
@@ -500,6 +574,7 @@ name = "VCA Envelope Sustain Curve"
 group = "VCA Envelope"
 min = 0
 max = 255
+description = "Bends the sustain segment away from a straight line, towards an exponential in either direction."
 
 [[parameter]]
 offset = 61
@@ -507,6 +582,7 @@ name = "VCA Envelope Release Curve"
 group = "VCA Envelope"
 min = 0
 max = 255
+description = "Bends the release segment away from a straight line, towards an exponential in either direction."
 correction = "The manual repeats \"Attack Curve\" here. Offsets 58-61 are the attack, decay, sustain and release curves, matching the Env1 AtCur / DcyCur / SuSCur / RelCur modulation destinations."
 
 [[parameter]]
@@ -515,6 +591,7 @@ name = "VCF Envelope Attack Time"
 group = "VCF Envelope"
 min = 0
 max = 255
+description = "Sets how long the envelope takes to rise to full level once it is triggered."
 
 [[parameter]]
 offset = 63
@@ -522,6 +599,7 @@ name = "VCF Envelope Decay Time"
 group = "VCF Envelope"
 min = 0
 max = 255
+description = "Sets how long the envelope takes to fall from full level to its sustain level."
 
 [[parameter]]
 offset = 64
@@ -529,6 +607,7 @@ name = "VCF Envelope Sustain Level"
 group = "VCF Envelope"
 min = 0
 max = 255
+description = "Sets the level the envelope holds at for as long as the note is held."
 
 [[parameter]]
 offset = 65
@@ -536,6 +615,7 @@ name = "VCF Envelope Release Time"
 group = "VCF Envelope"
 min = 0
 max = 255
+description = "Sets how long the envelope takes to fall back to nothing once the key is released."
 
 [[parameter]]
 offset = 66
@@ -544,6 +624,7 @@ group = "VCF Envelope"
 min = 0
 max = 4
 enum = "envelope_trigger"
+description = "Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer."
 
 [[parameter]]
 offset = 67
@@ -551,6 +632,7 @@ name = "VCF Envelope Attack Curve"
 group = "VCF Envelope"
 min = 0
 max = 255
+description = "Bends the attack segment away from a straight line, towards an exponential in either direction."
 
 [[parameter]]
 offset = 68
@@ -558,6 +640,7 @@ name = "VCF Envelope Decay Curve"
 group = "VCF Envelope"
 min = 0
 max = 255
+description = "Bends the decay segment away from a straight line, towards an exponential in either direction."
 
 [[parameter]]
 offset = 69
@@ -565,6 +648,7 @@ name = "VCF Envelope Sustain Curve"
 group = "VCF Envelope"
 min = 0
 max = 255
+description = "Bends the sustain segment away from a straight line, towards an exponential in either direction."
 
 [[parameter]]
 offset = 70
@@ -572,6 +656,7 @@ name = "VCF Envelope Release Curve"
 group = "VCF Envelope"
 min = 0
 max = 255
+description = "Bends the release segment away from a straight line, towards an exponential in either direction."
 correction = "Same repeated-name error as offset 61."
 
 [[parameter]]
@@ -580,6 +665,7 @@ name = "Mod Envelope Attack Time"
 group = "Mod Envelope"
 min = 0
 max = 255
+description = "Sets how long the envelope takes to rise to full level once it is triggered."
 
 [[parameter]]
 offset = 72
@@ -587,6 +673,7 @@ name = "Mod Envelope Decay Time"
 group = "Mod Envelope"
 min = 0
 max = 255
+description = "Sets how long the envelope takes to fall from full level to its sustain level."
 
 [[parameter]]
 offset = 73
@@ -594,6 +681,7 @@ name = "Mod Envelope Sustain Level"
 group = "Mod Envelope"
 min = 0
 max = 255
+description = "Sets the level the envelope holds at for as long as the note is held."
 
 [[parameter]]
 offset = 74
@@ -601,6 +689,7 @@ name = "Mod Envelope Release Time"
 group = "Mod Envelope"
 min = 0
 max = 255
+description = "Sets how long the envelope takes to fall back to nothing once the key is released."
 
 [[parameter]]
 offset = 75
@@ -609,6 +698,7 @@ group = "Mod Envelope"
 min = 0
 max = 4
 enum = "envelope_trigger"
+description = "Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer."
 
 [[parameter]]
 offset = 76
@@ -616,6 +706,7 @@ name = "Mod Envelope Attack Curve"
 group = "Mod Envelope"
 min = 0
 max = 255
+description = "Bends the attack segment away from a straight line, towards an exponential in either direction."
 
 [[parameter]]
 offset = 77
@@ -623,6 +714,7 @@ name = "Mod Envelope Decay Curve"
 group = "Mod Envelope"
 min = 0
 max = 255
+description = "Bends the decay segment away from a straight line, towards an exponential in either direction."
 
 [[parameter]]
 offset = 78
@@ -630,6 +722,7 @@ name = "Mod Envelope Sustain Curve"
 group = "Mod Envelope"
 min = 0
 max = 255
+description = "Bends the sustain segment away from a straight line, towards an exponential in either direction."
 
 [[parameter]]
 offset = 79
@@ -637,6 +730,7 @@ name = "Mod Envelope Release Curve"
 group = "Mod Envelope"
 min = 0
 max = 255
+description = "Bends the release segment away from a straight line, towards an exponential in either direction."
 correction = "Same repeated-name error as offset 61."
 
 [[parameter]]
@@ -645,6 +739,7 @@ name = "VCA Level"
 group = "VCA"
 min = 0
 max = 255
+description = "Sets the level the voice leaves the amplifier at, ahead of the high pass and the effects."
 display = "-12.0 dB to +6.0 dB"
 
 [[parameter]]
@@ -653,6 +748,7 @@ name = "VCA Envelope Depth"
 group = "VCA"
 min = 0
 max = 255
+description = "Sets how far the VCA envelope moves the voice's level, and so how much of the loudness is played by the envelope rather than held flat."
 
 [[parameter]]
 offset = 82
@@ -660,6 +756,7 @@ name = "VCA Envelope Velocity Sensitivity"
 group = "VCA"
 min = 0
 max = 255
+description = "Sets how much playing harder raises the voice's level."
 
 [[parameter]]
 offset = 83
@@ -667,7 +764,10 @@ name = "VCA Pan Spread"
 group = "VCA"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Spreads the voices across the stereo field, so that a chord is placed across it rather than stacked in the middle."
 
 [[parameter]]
 offset = 84
@@ -676,6 +776,7 @@ group = "Voicing"
 min = 0
 max = 2
 enum = "voice_priority"
+description = "Chooses which note keeps a voice when more are held than there are voices: the lowest, the highest, or the most recently played."
 
 [[parameter]]
 offset = 85
@@ -684,6 +785,7 @@ group = "Voicing"
 min = 0
 max = 12
 enum = "polyphony_mode"
+description = "Chooses how the voices are handed out: one to a note, several stacked on each note in unison, a limited number of them at a time, or the whole instrument reduced to one voice."
 
 [[parameter]]
 offset = 86
@@ -692,6 +794,7 @@ group = "Voicing"
 min = 0
 max = 3
 enum = "key_assign_mode"
+description = "Chooses whether the envelopes restart on each new note or run on from where they are when notes overlap, and whether they run once through however long the key is held."
 
 [[parameter]]
 offset = 87
@@ -700,6 +803,7 @@ group = "Voicing"
 min = 0
 max = 255
 note = "Sets the amount phatness!"
+description = "Sets how far the stacked voices of a unison mode are tuned apart from one another, which is what thickens the sound."
 display = "plus or minus 0.0 to 50.0 cents"
 
 [[parameter]]
@@ -708,6 +812,7 @@ name = "Voice Drift"
 group = "Voicing"
 min = 0
 max = 255
+description = "Sets how much drift is applied per voice, which is what keeps two voices playing the same note from being identical."
 
 [[parameter]]
 offset = 89
@@ -715,6 +820,7 @@ name = "Parameter Drift"
 group = "Voicing"
 min = 0
 max = 255
+description = "Sets how much drift is applied to parameter values, which is what keeps a setting from sounding exactly where it was left."
 
 [[parameter]]
 offset = 90
@@ -722,6 +828,7 @@ name = "Drift Rate"
 group = "Voicing"
 min = 0
 max = 255
+description = "Sets how quickly drift moves from one random value to the next."
 display = "Each drift step lasts a random time between 25-50 ms at 0 and 2.5-5.0 s at 255"
 
 [[parameter]]
@@ -730,7 +837,10 @@ name = "OSC Portamento Balance"
 group = "Voicing"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Sets how the portamento time is split between the two oscillators, so that one can arrive at the new note ahead of the other."
 
 [[parameter]]
 offset = 92
@@ -740,6 +850,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Restarts the oscillators' waveforms on each new note, so that every note begins from the same point in the cycle."
 
 [[parameter]]
 offset = 93
@@ -748,6 +859,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
+description = "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer."
 correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -757,6 +869,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
+description = "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together."
 correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -765,7 +878,10 @@ name = "Mod 1 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does."
 
 [[parameter]]
 offset = 96
@@ -774,6 +890,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
+description = "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer."
 correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -783,6 +900,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
+description = "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together."
 correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -791,7 +909,10 @@ name = "Mod 2 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does."
 
 [[parameter]]
 offset = 99
@@ -800,6 +921,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
+description = "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer."
 correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -809,6 +931,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
+description = "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together."
 correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -817,7 +940,10 @@ name = "Mod 3 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does."
 
 [[parameter]]
 offset = 102
@@ -826,6 +952,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
+description = "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer."
 correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -835,6 +962,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
+description = "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together."
 correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -843,7 +971,10 @@ name = "Mod 4 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does."
 
 [[parameter]]
 offset = 105
@@ -852,6 +983,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
+description = "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer."
 correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -861,6 +993,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
+description = "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together."
 correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -869,7 +1002,10 @@ name = "Mod 5 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does."
 
 [[parameter]]
 offset = 108
@@ -878,6 +1014,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
+description = "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer."
 correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -887,6 +1024,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
+description = "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together."
 correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -895,7 +1033,10 @@ name = "Mod 6 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does."
 
 [[parameter]]
 offset = 111
@@ -904,6 +1045,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
+description = "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer."
 correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -913,6 +1055,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
+description = "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together."
 correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -921,7 +1064,10 @@ name = "Mod 7 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does."
 
 [[parameter]]
 offset = 114
@@ -930,6 +1076,7 @@ group = "Mod Matrix"
 min = 0
 max = 24
 enum = "mod_source"
+description = "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer."
 correction = "Firmware 1.1 added two modulation sources, raising the range from 0-22 to 0-24. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -939,6 +1086,7 @@ group = "Mod Matrix"
 min = 0
 max = 132
 enum = "mod_destination"
+description = "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together."
 correction = "Firmware 1.1 added three modulation destinations, raising the range from 0-129 to 0-132. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -947,7 +1095,10 @@ name = "Mod 8 Depth"
 group = "Mod Matrix"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
 note = "-128 (0) to +127 (255)"
+description = "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does."
 
 [[parameter]]
 offset = 117
@@ -957,6 +1108,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Runs the control sequencer, the stepped modulation source the matrix can draw on."
 
 [[parameter]]
 offset = 118
@@ -965,6 +1117,7 @@ group = "Control Sequencer"
 min = 0
 max = 15
 enum = "sequencer_clock"
+description = "Sets how fast the sequencer steps, as a division of the master tempo."
 correction = "Section 8.1.8 lists twenty clock divisions against this range of 0-15. The range is left as printed and the value table is marked unconfirmed."
 
 [[parameter]]
@@ -974,6 +1127,7 @@ group = "Control Sequencer"
 min = 0
 max = 31
 note = "1 (0) to 32 (31) steps"
+description = "Sets how many of the 32 steps are played before the sequence returns to the first."
 correction = "The manual runs the range and the first note value together as \"0-311 (0) to 32 (31) steps\". The range is 0-31."
 
 [[parameter]]
@@ -983,6 +1137,7 @@ group = "Control Sequencer"
 min = 0
 max = 255
 note = "0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel."
+description = "Holds every second step back, which is what turns an even run of steps into a swung one."
 display = "50% to 75%"
 correction = "The NRPN note reads \"0% (0) to 75% (25)\". Sections 8.1.7 and 8.1.8 give the swing range as 50% to 75%, so 0 is 50% and 255 is 75%."
 
@@ -993,6 +1148,7 @@ group = "Control Sequencer"
 min = 0
 max = 2
 enum = "sequencer_sync"
+description = "Chooses whether the sequence restarts on a new note, whether it repeats when it reaches its end, or both."
 
 [[parameter]]
 offset = 122
@@ -1000,6 +1156,7 @@ name = "Slew Rate"
 group = "Control Sequencer"
 min = 0
 max = 255
+description = "Smooths the jump from one step's value to the next, which turns a staircase into a slope."
 
 [[parameter]]
 offset = 123
@@ -1007,7 +1164,12 @@ name = "Seq Step Value 1"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 124
@@ -1015,7 +1177,12 @@ name = "Seq Step Value 2"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 125
@@ -1023,7 +1190,12 @@ name = "Seq Step Value 3"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 126
@@ -1031,7 +1203,12 @@ name = "Seq Step Value 4"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 127
@@ -1039,7 +1216,12 @@ name = "Seq Step Value 5"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 128
@@ -1047,7 +1229,12 @@ name = "Seq Step Value 6"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 129
@@ -1055,7 +1242,12 @@ name = "Seq Step Value 7"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 130
@@ -1063,7 +1255,12 @@ name = "Seq Step Value 8"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 131
@@ -1071,8 +1268,13 @@ name = "Seq Step Value 9"
 group = "Control Sequencer"
 min = 0
 max = 255
-kind = "switch"
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
+correction = "The manual's table carries kind switch on this step alone, which its own range of 0-255 and its own note contradict. Read as the bipolar sweep every other step is."
 
 [[parameter]]
 offset = 132
@@ -1080,7 +1282,12 @@ name = "Seq Step Value 10"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 133
@@ -1088,8 +1295,13 @@ name = "Seq Step Value 11"
 group = "Control Sequencer"
 min = 0
 max = 255
-kind = "switch"
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
+correction = "The manual's table carries kind switch on this step alone, which its own range of 0-255 and its own note contradict. Read as the bipolar sweep every other step is."
 
 [[parameter]]
 offset = 134
@@ -1097,7 +1309,12 @@ name = "Seq Step Value 12"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 135
@@ -1105,7 +1322,12 @@ name = "Seq Step Value 13"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 136
@@ -1113,7 +1335,12 @@ name = "Seq Step Value 14"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 137
@@ -1121,7 +1348,12 @@ name = "Seq Step Value 15"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 138
@@ -1129,7 +1361,12 @@ name = "Seq Step Value 16"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 139
@@ -1137,7 +1374,12 @@ name = "Seq Step Value 17"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 140
@@ -1145,7 +1387,12 @@ name = "Seq Step Value 18"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 141
@@ -1153,7 +1400,12 @@ name = "Seq Step Value 19"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 142
@@ -1161,7 +1413,12 @@ name = "Seq Step Value 20"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 143
@@ -1169,7 +1426,12 @@ name = "Seq Step Value 21"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 144
@@ -1177,7 +1439,12 @@ name = "Seq Step Value 22"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 145
@@ -1185,7 +1452,12 @@ name = "Seq Step Value 23"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 146
@@ -1193,7 +1465,12 @@ name = "Seq Step Value 24"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 147
@@ -1201,7 +1478,12 @@ name = "Seq Step Value 25"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 148
@@ -1209,7 +1491,12 @@ name = "Seq Step Value 26"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 149
@@ -1217,7 +1504,12 @@ name = "Seq Step Value 27"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 150
@@ -1225,7 +1517,12 @@ name = "Seq Step Value 28"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 151
@@ -1233,7 +1530,12 @@ name = "Seq Step Value 29"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 152
@@ -1241,7 +1543,12 @@ name = "Seq Step Value 30"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 153
@@ -1249,7 +1556,12 @@ name = "Seq Step Value 31"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 154
@@ -1257,7 +1569,12 @@ name = "Seq Step Value 32"
 group = "Control Sequencer"
 min = 0
 max = 255
+shape = "bipolar"
+centre = 128
+inactive = 0
+bounded_by = "Sequence Length"
 note = "Bipolar step value -127 (1) to +127 (255). A value of 0 means \"skip step\"."
+description = "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing."
 
 [[parameter]]
 offset = 155
@@ -1267,6 +1584,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Runs the arpeggiator over the notes being held."
 
 [[parameter]]
 offset = 156
@@ -1275,6 +1593,7 @@ group = "Arpeggiator"
 min = 0
 max = 10
 enum = "arp_mode"
+description = "Chooses the order the held notes are played in: up, down, alternating, as they were played, at random, or all at once."
 
 [[parameter]]
 offset = 157
@@ -1283,6 +1602,7 @@ group = "Arpeggiator"
 min = 0
 max = 255
 note = "20 bpm (0) to 275 bpm (255)"
+description = "Sets the master tempo, in beats per minute. The arpeggiator, the control sequencer and a tempo-locked LFO all divide it."
 display = "20.0 to 275.0 BPM"
 
 [[parameter]]
@@ -1292,6 +1612,7 @@ group = "Arpeggiator"
 min = 0
 max = 12
 enum = "arp_clock"
+description = "Sets how fast the arpeggiator steps, as a division of the master tempo."
 
 [[parameter]]
 offset = 159
@@ -1301,6 +1622,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Restarts the arpeggiated pattern on each new note rather than letting it run on."
 
 [[parameter]]
 offset = 160
@@ -1308,6 +1630,7 @@ name = "Arp Gate Time"
 group = "Arpeggiator"
 min = 0
 max = 255
+description = "Sets how much of each step the note actually sounds for, from a short stab to a run that joins up."
 
 [[parameter]]
 offset = 161
@@ -1317,6 +1640,7 @@ min = 0
 max = 1
 kind = "switch"
 note = "Off (0), On (1)"
+description = "Keeps the arpeggio running after the keys are let go."
 
 [[parameter]]
 offset = 162
@@ -1325,6 +1649,7 @@ group = "Arpeggiator"
 min = 0
 max = 64
 enum = "arp_pattern"
+description = "Chooses the rhythm the arpeggiator plays: which of its steps sound and which are rests."
 
 [[parameter]]
 offset = 163
@@ -1333,6 +1658,7 @@ group = "Arpeggiator"
 min = 0
 max = 255
 note = "0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel."
+description = "Holds every second step of the arpeggio back, which is what turns an even run into a swung one."
 display = "50% to 75%"
 correction = "Same as offset 120."
 
@@ -1343,6 +1669,7 @@ group = "Arpeggiator"
 min = 0
 max = 5
 note = "1 to 6 octaves"
+description = "Sets how many octaves the arpeggio climbs through before it returns to the note it started on."
 correction = "The manual prints \"0-51 to 6 Octaves\". The range is 0-5."
 
 [[parameter]]
@@ -1352,6 +1679,7 @@ group = "Effects"
 min = 0
 max = 9
 enum = "fx_routing"
+description = "Chooses how the four effect engines are wired to each other: in a chain, side by side, or a mixture of the two, with two of the ten routings feeding a later engine back into an earlier one."
 
 [[parameter]]
 offset = 166
@@ -1360,6 +1688,7 @@ group = "Effects"
 min = 0
 max = 34
 enum = "fx_type"
+description = "Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean."
 correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -1369,6 +1698,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 168
@@ -1377,6 +1707,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 169
@@ -1385,6 +1716,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 170
@@ -1393,6 +1725,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 171
@@ -1401,6 +1734,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 172
@@ -1409,6 +1743,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 173
@@ -1417,6 +1752,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 174
@@ -1425,6 +1761,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 175
@@ -1433,6 +1770,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 176
@@ -1441,6 +1779,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 177
@@ -1449,6 +1788,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 178
@@ -1457,6 +1797,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 1 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 179
@@ -1465,6 +1806,7 @@ group = "Effects"
 min = 0
 max = 34
 enum = "fx_type"
+description = "Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean."
 correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -1474,6 +1816,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 181
@@ -1482,6 +1825,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 182
@@ -1490,6 +1834,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 183
@@ -1498,6 +1843,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 184
@@ -1506,6 +1852,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 185
@@ -1514,6 +1861,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 186
@@ -1522,6 +1870,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 187
@@ -1530,6 +1879,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 188
@@ -1538,6 +1888,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 189
@@ -1546,6 +1897,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 190
@@ -1554,6 +1906,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 191
@@ -1562,6 +1915,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 2 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 192
@@ -1570,6 +1924,7 @@ group = "Effects"
 min = 0
 max = 34
 enum = "fx_type"
+description = "Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean."
 correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -1579,6 +1934,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 194
@@ -1587,6 +1943,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 195
@@ -1595,6 +1952,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 196
@@ -1603,6 +1961,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 197
@@ -1611,6 +1970,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 198
@@ -1619,6 +1979,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 199
@@ -1627,6 +1988,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 200
@@ -1635,6 +1997,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 201
@@ -1643,6 +2006,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 202
@@ -1651,6 +2015,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 203
@@ -1659,6 +2024,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 204
@@ -1667,6 +2033,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 3 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 205
@@ -1675,6 +2042,7 @@ group = "Effects"
 min = 0
 max = 34
 enum = "fx_type"
+description = "Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean."
 correction = "Firmware 1.1 added the Vintage Pitch algorithm, raising the range from 0-33 to 0-34. The manual's NRPN table still prints the firmware 1.0 range."
 
 [[parameter]]
@@ -1684,6 +2052,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 207
@@ -1692,6 +2061,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 208
@@ -1700,6 +2070,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 209
@@ -1708,6 +2079,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 210
@@ -1716,6 +2088,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 211
@@ -1724,6 +2097,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 212
@@ -1732,6 +2106,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 213
@@ -1740,6 +2115,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 214
@@ -1748,6 +2124,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 215
@@ -1756,6 +2133,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 216
@@ -1764,6 +2142,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 217
@@ -1772,6 +2151,7 @@ group = "Effects"
 min = 0
 max = 255
 note = "Meaning depends on FX 4 Type"
+description = "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show."
 
 [[parameter]]
 offset = 218
@@ -1779,6 +2159,7 @@ name = "FX 1 Output Gain"
 group = "Effects"
 min = 0
 max = 150
+description = "Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output."
 
 [[parameter]]
 offset = 219
@@ -1786,6 +2167,7 @@ name = "FX 2 Output Gain"
 group = "Effects"
 min = 0
 max = 150
+description = "Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output."
 
 [[parameter]]
 offset = 220
@@ -1793,6 +2175,7 @@ name = "FX 3 Output Gain"
 group = "Effects"
 min = 0
 max = 150
+description = "Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output."
 
 [[parameter]]
 offset = 221
@@ -1800,6 +2183,7 @@ name = "FX 4 Output Gain"
 group = "Effects"
 min = 0
 max = 150
+description = "Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output."
 
 [[parameter]]
 offset = 222
@@ -1808,6 +2192,7 @@ group = "Effects"
 min = 0
 max = 2
 enum = "fx_mode"
+description = "Chooses what the effects do to the two signal paths: sit in the chain, be fed from a send alongside it, or be bypassed."
 
 [[parameter]]
 offset = 223
@@ -1816,6 +2201,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 224
@@ -1824,6 +2210,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 225
@@ -1832,6 +2219,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 226
@@ -1840,6 +2228,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 227
@@ -1848,6 +2237,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 228
@@ -1856,6 +2246,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 229
@@ -1864,6 +2255,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 230
@@ -1872,6 +2264,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 231
@@ -1880,6 +2273,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 232
@@ -1888,6 +2282,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 233
@@ -1896,6 +2291,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 234
@@ -1904,6 +2300,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 235
@@ -1912,6 +2309,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 236
@@ -1920,6 +2318,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 237
@@ -1928,6 +2327,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 238
@@ -1936,6 +2336,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 239
@@ -1944,6 +2345,7 @@ group = "Program"
 min = 0
 max = 127
 note = "Null-terminated 16 char ASCII string"
+description = "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends."
 
 [[parameter]]
 offset = 240
@@ -1952,6 +2354,7 @@ group = "Program"
 min = 0
 max = 16
 enum = "program_category"
+description = "Tags the program with the kind of sound it is, which is what the instrument's own browser sorts and filters on."
 
 [[parameter]]
 offset = 241
@@ -1959,5 +2362,7 @@ name = "Program Transpose"
 group = "Program"
 min = 80
 max = 176
+shape = "bipolar"
+centre = 128
 note = "-48 (80) ... 0 (128) ... +48 (176)"
-
+description = "Shifts the whole program in semitones, either side of its centre."

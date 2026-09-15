@@ -18,6 +18,7 @@
 //! | [`sysex`]     | `DeepMind` framing, the packed MS-bit codec, typed messages        |
 //! | [`param`]     | The 242 program parameters: names, ranges, value tables, NRPN      |
 //! | [`effect`]    | What an effect engine's twelve bytes are, per algorithm            |
+//! | [`front`]     | What the instrument's own front panel puts a control under         |
 //! | [`program`]   | A program: the 242 bytes, typed accessors, names, value types      |
 //! | [`syx`]       | `.syx` files: the programs a preset pack carries, and building one |
 //! | [`device`]    | The state machine: what the synthesizer holds, and what to send    |
@@ -59,6 +60,10 @@
 //! - `transport`: the blocking adapter, which is the one part of this crate that
 //!   knows what IO is. Needs neither `std` nor an allocator.
 //! - `sim`: a synthesizer to talk to, for testing a host without one plugged in.
+//! - `descriptions`: what a parameter or an effect slot *does*, in a sentence.
+//!   [`param::ParamId::description`] and [`effect::FxSlot::description`] answer
+//!   `None` without it and a sentence with it, so a host writes one code path
+//!   and an embedded build carries no prose.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
@@ -75,6 +80,7 @@ extern crate alloc;
 pub mod device;
 pub mod effect;
 pub mod error;
+pub mod front;
 pub mod ids;
 mod nrpn;
 pub mod param;

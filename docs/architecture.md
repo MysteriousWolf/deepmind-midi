@@ -191,6 +191,7 @@ lets NRPN edits, dump parsing and dump building share a single table.
 | `spec/effects.toml` | 371 effect parameters across 35 algorithms |
 | `spec/panels.toml` | how those 371 slots present themselves |
 | `spec/layout.toml` | where each slot sits on the FX page, and the panel colours |
+| `spec/front.toml` | which parameters the instrument's own front panel puts a control under |
 | `spec/mapping.toml` | how an address and a value become bytes |
 | `spec/routing.toml` | how the four FX engines can be wired together |
 | `spec/measurements.toml` | 29 raw values with what the synthesizer displayed |
@@ -201,7 +202,7 @@ Two commands generate from these files:
 | Command | Output |
 |---|---|
 | `cargo xtask docs` | The tables in [`midi-spec.md`](midi-spec.md), the algorithms in [`effects.md`](effects.md), and everything under `docs/diagrams/`: the Mermaid sources, the envelope figure and a panel drawing per effect |
-| `cargo xtask codegen` | `deepmind-midi/src/param/generated.rs`, the 242 parameters as an enum whose discriminant is the NRPN number, with their groups, ranges, value tables per firmware, the parameters each modulation destination moves, and the controller map; `deepmind-midi/src/program/generated.rs`, one Rust type per value table and a getter and setter for each of the 225 parameters that are not the program's name; and `deepmind-midi/src/effect/generated.rs`, the 35 algorithms and what each of their slots is |
+| `cargo xtask codegen` | `deepmind-midi/src/param/generated.rs`, the 242 parameters as an enum whose discriminant is the NRPN number, with their groups, ranges, value tables per firmware, the parameters each modulation destination moves, what a raw value means beyond its range, the manual's own prose, and the controller map; `deepmind-midi/src/program/generated.rs`, one Rust type per value table and a getter and setter for each of the 225 parameters that are not the program's name; `deepmind-midi/src/effect/generated.rs`, the 35 algorithms, what each of their slots is, the grid and colours each panel is drawn from, and the ten routings; and `deepmind-midi/src/front/generated.rs`, the instrument's own front panel |
 
 The library is compiled for targets with no filesystem and no allocator, so
 the specification is compiled in rather than parsed at runtime.
@@ -229,10 +230,18 @@ parameter's maximum must match its table, no controller number may repeat, no
 two controllers may claim the same parameter, every value table id must
 resolve to exactly one table per firmware version, every parameter a value
 table entry names must exist and must be the same one in both firmware
-versions of that table, every routing graph must be connected and its feedback
-flag must match the graph, the engine offsets `effects.toml` declares must be
-where `parameters.toml` puts the slots, and the slot count measured off each FX
-page must match `effects.toml`.
+versions of that table, every value table's entries must ascend by value,
+every routing graph must be connected and its feedback flag must match the
+graph, the engine offsets `effects.toml` declares must be where
+`parameters.toml` puts the slots, the slot count measured off each FX page must
+match `effects.toml`, a bipolar parameter's centre must be inside its range and
+not at either end, and every control the front panel names must be a parameter
+of the group its plate claims, carried once.
+
+Two of those checks exist to let the library stop searching. The value tables
+ascend so that a label is a binary search over as many as 133 entries rather
+than a scan, and no two controllers claim the same parameter so that the way
+from a parameter to its controller is one byte indexed by offset.
 
 These checks have caught real errors: the parameter table carrying firmware
 1.0 ranges against firmware 1.1 value tables, and a twelfth slot on
@@ -333,6 +342,16 @@ effect actually is. A host that wants to look like the synthesizer reads
 `grid.shape`; one that wants to look like the effect reads `control`. Both
 are in the file, labelled with their source.
 
+All of it reaches a host as data rather than as the drawing: `effect::grid()`
+is the grid, `FxSlot::position` is where a slot lands on it, and
+`Algorithm::panel` is the control shape and the four colours. The SVGs under
+`docs/diagrams/fx/` are the right output for a document and the wrong input for
+an editor — a host cannot theme, rescale or hit-test a picture it did not lay
+out, and a desktop window and a plugin window want the same panel at two sizes.
+The colours are three components rather than `#5d6379`, because three
+components are what a host wants and every host writing the same six-character
+parse is the transcription this split exists to prevent.
+
 Derived and measured stay in separate files because a derived field can be
 argued with and a measured one can only be re-measured.
 
@@ -352,6 +371,54 @@ diagrams in section 7.2.2. Loading checks each graph: every slot must be
 reachable from the input and reach the output, and a declared feedback flag
 must match whether the graph contains a loop.
 
+`effect::Routing` is that graph in the crate, with `Source::Input` standing for
+the file's `0` so that no host has to remember which engine number means "not
+an engine". `Routing::output` is what decides whether an engine's output gain
+reaches the output at all. `effect::Mode` is the same question one level up:
+`Bypass` takes the DSP out of circuit rather than muting it, which is a fact
+about the instrument and not something to be recovered by matching on the
+value table's name.
+
+## The front panel is a fact, not a layout
+
+`spec/front.toml` says which of the 242 parameters the instrument puts a
+physical control under, what is silkscreened over each one, and which of the
+panel's two rows its plate is in. It is the one part of this specification that
+is not in the MIDI appendix at all — a person can read it off a photograph, and
+no host can derive it.
+
+Three things make it belong here rather than in each editor. The legend is not
+the parameter's name: a silkscreen has room for `KYBD` where the table says
+`VCF Keyboard Tracking`, and every host inventing that abbreviation invents a
+different one. The shape is not derivable: `Arp On/Off` is a button and `Arp
+Rate (tempo)` is a fader, and to the parameter table they are a switch and a
+sweep, which says how a byte is read rather than what a hand touches. And a
+renamed parameter should be a failed build rather than a wrong legend, which is
+what naming them rather than numbering them buys.
+
+It is held to the rest of the specification rather than to the manual, since
+there is no manual table to check it against: every parameter it names has to
+exist, may carry one control and not two, and has to be in the group its plate
+claims. That last check is what would catch a parameter moved between groups by
+a later reading.
+
+Three controls of the instrument are deliberately missing, because none of them
+addresses a program byte: the `DATA ENTRY` fader, which edits whatever the
+display is showing; the encoder that selects programs; and the row of twelve
+lamps over `POLY`, which counts sounding voices. The buttons that open a
+section on the display are missing for the same reason. A table that carried
+them would be describing a workflow rather than a sound.
+
+What it does not carry is pixels. Which row, which order within a plate, and
+what is printed over each control are facts off the instrument; how wide a lane
+is and how long a fader runs are the host's, exactly as `layout.toml` splits the
+grid from the drawing.
+
+One instrument is described, a DeepMind 12. The 6 has the same 242 parameters
+and its own front, and a variant gets its own table when somebody has one in
+front of them — the way a value table gets its own firmware range. One
+documented panel is worth more than three inferred ones.
+
 ## Strings are reachable by key
 
 Every user-visible string in `spec/` is addressed by a stable path: a parameter
@@ -362,6 +429,58 @@ That is all a translation would need: an overlay file keyed the same way,
 merged at load. None exists yet, and adding one later is not a refactor.
 Ranges are stored as two ends and a unit rather than as `"0.1 to 6.0 s"` for
 the same reason.
+
+The manual's own prose about a parameter — its note, its displayed range, the
+reason a row departs from what the manual prints — reaches a host through
+`ParamId::note`, `display` and `correction`. Each is a function over its own
+strings and nothing else refers to them, so the 11 kB between them is dropped
+by any linker collecting unreachable sections: a host that never asks carries
+none of it. That is the whole reason they are three accessors rather than three
+fields on `Parameter`, which every caller of `info()` would carry.
+
+What a control has to *act* on is typed instead, because prose a host
+pattern-matched would go stale silently the next time somebody reworded it:
+`shape()` is the point a bipolar value is read about, `inactive()` the value
+that means "not set" rather than the smallest one, and `bounded_by()` the
+parameter saying how much of a run is played.
+
+### What a parameter does is behind a feature
+
+The linker argument above stops working at a certain size. `ParamId::note`,
+`display` and `correction` are 11 kB between them because most parameters have
+no note; a sentence for *every* parameter is 30 kB, and the effect slots'
+sentences are another 40 kB. Unreachable-section collection still drops them,
+but only for a host that calls none of the three — and the host that wants one
+sentence would pull in all of them. On a microcontroller that is the difference
+between fitting and not, for a string nobody on that target is going to draw.
+
+So `ParamId::description` and `FxSlot::description` are behind the
+`descriptions` feature, which is off by default:
+
+- **The signature does not change with the feature.** Both return
+  `Option<&'static str>` either way, `None` throughout with the feature off.
+  A host writes one code path; a caller handed `None` draws the name and the
+  range it already has, which it has to be able to do regardless, because a
+  parameter can lack a sentence with the feature on.
+- **The cost lands on whoever asked for it.** No existing build grows by a
+  byte. `FxSlot`'s description is a `#[cfg]` field rather than a table beside
+  the slots, so a build without the feature carries neither the prose nor a
+  pointer to where the prose would have been.
+- **Both are generated from `spec/`**, like every other table, so a parameter
+  that gains a sentence gains it in one place and `cargo xtask codegen --check`
+  fails when the library and the specification disagree.
+
+The two differ in where their words come from, and the distinction is the same
+one the rest of the specification draws between what is transcribed and what is
+this project's reading. `FxSlot::description` is the manual's own text from
+section 9.3, credited in NOTICE and reproduced verbatim down to its typos.
+`ParamId::description` is not: the manual's program parameter descriptions have
+not been transcribed, and these sentences are written against what the rest of
+the specification records — the signal path, the value tables, the notes and the
+ranges. A parameter whose behaviour the specification does not establish gets
+none rather than a guessed one, and a description says what the control does and
+never what a value decodes to, which is what `note()` and the value tables are
+for.
 
 ## Raw values stay raw
 
@@ -386,6 +505,14 @@ assuming the family costs.
 So `Frequency::hz()` will exist only for parameters whose curve has been
 measured; `raw()` always works. A plausible wrong number in front of a
 musician is worse than an honest raw one.
+
+The two ends are a different matter: they are printed in the manual and are not
+invented, so `ParamId::display` hands them over as the sentence the manual
+prints — 26 parameters have one — and `FxSlot::min` and `max` do the same for
+an effect slot. A panel can say what the ends of a control mean while its
+reading stays raw. One string rather than a parsed range, because not all 26
+are ranges: one has a discrete value before a range in it, and another is a
+sentence about two different behaviours.
 
 ## State is a set of claims
 
@@ -559,6 +686,12 @@ fuzz/            the fuzz targets, a workspace of their own
 One library crate. A workspace split would buy version churn and nothing else
 at this size. Features: `std` (default), `alloc`, `serde`, `transport`, `sim`.
 
+Its modules are layered: `wire` under `sysex` under `param`, `effect`, `front`,
+`program`, `syx` and `device`. The three that describe the instrument rather
+than the protocol — `effect`'s panels, `front`, and the prose accessors on
+`param` — are reached only by the host that asks for them, so a firmware
+loader that speaks NRPN and nothing else does not carry them.
+
 `fuzz/` is outside the workspace because `cargo fuzz` builds it on nightly
 with sanitizer instrumentation, and the library's own build must not inherit
 that.
@@ -627,6 +760,19 @@ release is a minor one: a host depending on `"26"` follows every release of
 the year. So a release within a year must not break the public API, and a
 breaking change is a new year. CI checks the claim with `cargo-semver-checks`
 against the newest release tag, once there is one.
+
+`26.3.0` breaks that rule once, deliberately, and this is the record of it.
+`Seq Step Value 9` and `11` carried `kind = "switch"` in the manual's table
+while accepting 0 to 255, so `26.2.0` published `Program::seq_step_value9() ->
+bool` for a parameter that is a 256-value sweep. Correcting the specification
+changes those two getters and their setters to `u8`. `cargo-semver-checks`
+passes it, but only because it does not yet lint an inherent method's return
+type, so the tool agreeing is not the claim being true. The break was taken
+rather than deferred to 2027 because the accessors it removes could not be used
+correctly: a `bool` over a bipolar step reads every value but zero as `true`.
+Two days of a crate with no known caller of those four methods is the whole
+exposure, and the alternative was shipping a knowingly wrong reading for a
+year.
 
 A human edits that one line. CI fails when the version is not ahead of the
 newest release tag, so the first pull request merged after a release has to
