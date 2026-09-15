@@ -511,6 +511,17 @@ sends an NRPN edit and wants confirmation has to re-request the edit buffer.
 
 242 parameters, offsets 0 through 241.
 
+The `Raw` column is the range on the wire. For 197 of them the value counts up
+from that range's floor; for the other 45 it is read about a centre, which the
+manual states and the `Values` column carries. The eight modulation depths, the
+pan spread and the portamento balance run -128 to +127 about 128; the 32
+sequencer steps run -127 to +127 about the same point, with 0 meaning "skip
+this step" rather than the smallest modulation; `Program Transpose` runs -48 to
++48 about 128; and the two pitch bend depths run -24 to +24 about 24. A control
+drawn from the floor of one of those ranges is a bar that is half full at no
+modulation, which is why the crate publishes the centre rather than leaving it
+in the prose.
+
 <!-- generated:parameters -->
 
 ### LFO 1
