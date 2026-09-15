@@ -84,8 +84,12 @@ has not replied yet, which is how a host's timeout path gets tested.
 cargo test --workspace --all-features
 cargo clippy --workspace --all-targets --all-features
 cargo fmt --all --check
+RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-features   # the MSRV, which CI also checks
 ```
+
+The rustdoc line is there because a broken or redundant intra-doc link is an
+error in CI and nothing else catches one.
 
 Documentation, diagrams, the effect panel drawings and the library's parameter
 tables are generated from `spec/`. Edit the spec, then:
