@@ -35,7 +35,7 @@
 //!
 //! Three value tables were renumbered by firmware 1.1, and nothing in a stored
 //! program says which firmware wrote it. The generated accessors assume
-//! [`DEFAULT_FIRMWARE`](crate::param::DEFAULT_FIRMWARE); where the host knows
+//! [`DEFAULT_FIRMWARE`]; where the host knows
 //! better, [`ModSource::from_raw_for`] and its neighbours take the version a
 //! device inquiry reported and [`Program::get`] hands them the byte.
 //!
@@ -260,7 +260,7 @@ impl Program {
     }
 
     /// Returns the algorithm an effect engine is running, on
-    /// [`DEFAULT_FIRMWARE`](crate::param::DEFAULT_FIRMWARE).
+    /// [`DEFAULT_FIRMWARE`].
     ///
     /// The join between the twelve raw bytes the engine holds and what they
     /// mean: [`Algorithm::slots`] says what each of them is, and
