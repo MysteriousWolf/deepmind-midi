@@ -21,7 +21,12 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+      # The prefix was moved past the caches written before the cleanup step at
+      # the end of this job existed. Those caches carry the source trees it
+      # deletes, and restoring one brings the error annotations back with it.
       - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: v1-rust
 
       - name: Format
         run: cargo fmt --all --check
@@ -84,6 +89,24 @@ jobs:
             exit 1
           fi
           echo "$current is ahead of the last release, v$latest"
+
+      # `cargo publish --dry-run` unpacks the crate under `target/package`, and
+      # `cargo semver-checks` checks the baseline out under
+      # `target/semver-checks/git-<tag>`. Both are source trees, and the cache
+      # action walks everything under `target` twice: once on a restore that
+      # was not an exact hit, and once before saving. Every directory named
+      # `tests` it meets there it reads as a build profile and looks inside for
+      # `tests/target` and `tests/trybuild`, which a source tree does not have.
+      # It opens those without awaiting the result, so the failure escapes its
+      # own error handling and lands on the job as an error annotation.
+      #
+      # Neither tree is worth carrying in the cache: one is written from the
+      # working tree on every run, the other is a checkout of a tag. The
+      # rustdoc caches beside the checkout, `target/semver-checks/local-*`, are
+      # what makes the baseline cheap, and they hold no source, so they stay.
+      - name: Drop the unpacked source trees from the target directory
+        if: always()
+        run: rm -rf target/package target/semver-checks/git-*
 
   features:
     name: feature combinations
