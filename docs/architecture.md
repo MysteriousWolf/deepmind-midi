@@ -444,6 +444,44 @@ pattern-matched would go stale silently the next time somebody reworded it:
 that means "not set" rather than the smallest one, and `bounded_by()` the
 parameter saying how much of a run is played.
 
+### What a parameter does is behind a feature
+
+The linker argument above stops working at a certain size. `ParamId::note`,
+`display` and `correction` are 11 kB between them because most parameters have
+no note; a sentence for *every* parameter is 30 kB, and the effect slots'
+sentences are another 40 kB. Unreachable-section collection still drops them,
+but only for a host that calls none of the three — and the host that wants one
+sentence would pull in all of them. On a microcontroller that is the difference
+between fitting and not, for a string nobody on that target is going to draw.
+
+So `ParamId::description` and `FxSlot::description` are behind the
+`descriptions` feature, which is off by default:
+
+- **The signature does not change with the feature.** Both return
+  `Option<&'static str>` either way, `None` throughout with the feature off.
+  A host writes one code path; a caller handed `None` draws the name and the
+  range it already has, which it has to be able to do regardless, because a
+  parameter can lack a sentence with the feature on.
+- **The cost lands on whoever asked for it.** No existing build grows by a
+  byte. `FxSlot`'s description is a `#[cfg]` field rather than a table beside
+  the slots, so a build without the feature carries neither the prose nor a
+  pointer to where the prose would have been.
+- **Both are generated from `spec/`**, like every other table, so a parameter
+  that gains a sentence gains it in one place and `cargo xtask codegen --check`
+  fails when the library and the specification disagree.
+
+The two differ in where their words come from, and the distinction is the same
+one the rest of the specification draws between what is transcribed and what is
+this project's reading. `FxSlot::description` is the manual's own text from
+section 9.3, credited in NOTICE and reproduced verbatim down to its typos.
+`ParamId::description` is not: the manual's program parameter descriptions have
+not been transcribed, and these sentences are written against what the rest of
+the specification records — the signal path, the value tables, the notes and the
+ranges. A parameter whose behaviour the specification does not establish gets
+none rather than a guessed one, and a description says what the control does and
+never what a value decodes to, which is what `note()` and the value tables are
+for.
+
 ## Raw values stay raw
 
 A parameter is one byte on the wire. The manual gives the displayed value at

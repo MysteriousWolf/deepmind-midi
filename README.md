@@ -37,7 +37,9 @@ It also answers the questions an editor has to ask before it can draw anything:
 what the instrument prints over each of its own faders, where an effect's
 controls sit and what colour its panel is, how the four effect engines are
 wired, and which parameters are read about a centre rather than from the bottom
-of their range.
+of their range. With the `descriptions` feature on, it answers the one somebody
+points at a control to ask - what does this do? - in a sentence per parameter
+and per effect slot, which an embedded build leaves out by not turning it on.
 
 **Status: early.** Every layer is implemented and tested against the manual:
 MIDI decoding, SysEx, the 242-parameter table, the 35 effect panels, the

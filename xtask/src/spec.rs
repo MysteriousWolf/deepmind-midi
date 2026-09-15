@@ -52,6 +52,14 @@ pub struct Parameter {
     /// Free-form note carried through from the manual.
     #[serde(default)]
     pub note: Option<String>,
+    /// One sentence saying what the parameter does, for a host with room to
+    /// print it.
+    ///
+    /// Written here rather than transcribed: see the `descriptions` key in this
+    /// file's `[meta]` for where these come from and what they are not. Absent
+    /// where nothing can be said without guessing.
+    #[serde(default)]
+    pub description: Option<String>,
     /// The physical range the synthesizer shows for the same raw value, where the
     /// manual states one. Hz, dB, seconds and so on.
     #[serde(default)]

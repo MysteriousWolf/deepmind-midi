@@ -52,6 +52,15 @@
 //! carry names and not descriptions, which is the same trade made the other
 //! way — a description would sit inside a table every host already reaches.
 //!
+//! What a parameter *does* is [`ParamId::description`], and that one is behind
+//! the `descriptions` feature rather than only behind a linker: every parameter
+//! has a sentence, which is 30 kB, and the host that wants one would pull in
+//! all of them. It answers `None` with the feature off and keeps its signature
+//! either way, so a host writes one code path. Those sentences are written for
+//! this specification rather than transcribed — unlike
+//! [`FxSlot::description`](crate::effect::FxSlot::description), which is the
+//! manual's own words about an effect slot and is behind the same feature.
+//!
 //! Nor does it carry conversions from a raw value to the number the synthesizer
 //! displays. The manual publishes the two ends of a range and almost never the
 //! curve between them, so [`ParamId::display`] hands over the ends as the
@@ -1240,6 +1249,52 @@ mod tests {
         assert_eq!(counted(ParamId::display), 26);
         assert_eq!(counted(ParamId::note), 129);
         assert_eq!(counted(ParamId::correction), 37);
+    }
+
+    /// The description answers the same way for every parameter, whichever way
+    /// the feature is set: the point of the `Option` is that a host writes one
+    /// code path and not two.
+    #[test]
+    fn a_description_is_there_exactly_when_the_feature_is() {
+        let described = ParamId::ALL
+            .iter()
+            .copied()
+            .filter(|parameter| parameter.description().is_some())
+            .count();
+        assert_eq!(
+            described,
+            if cfg!(feature = "descriptions") {
+                PARAMETER_COUNT
+            } else {
+                0
+            }
+        );
+    }
+
+    /// A description says what the control does. What a value decodes to is the
+    /// note and the value table, and duplicating it here would be two places to
+    /// correct the day one of them is wrong.
+    #[cfg(feature = "descriptions")]
+    #[test]
+    fn a_description_says_what_the_control_does() {
+        assert!(
+            ParamId::VcfFrequency
+                .description()
+                .is_some_and(|text| text.contains("cutoff")),
+        );
+        for parameter in ParamId::ALL.iter().copied() {
+            let text = parameter.description().expect("every parameter has one");
+            assert!(text.ends_with('.'), "{parameter}: not a sentence");
+            assert!(
+                !text.is_empty() && text.starts_with(char::is_uppercase),
+                "{parameter}: {text:?}"
+            );
+            assert_ne!(
+                Some(text),
+                parameter.note(),
+                "{parameter}: repeats its note"
+            );
+        }
     }
 
     /// An unconfirmed reading says so, and says why in the same breath.

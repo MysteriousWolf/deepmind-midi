@@ -10,11 +10,18 @@ owners and are used here only to say which hardware this software talks to.
 Third-party content
 -------------------
 
-The parameter descriptions in `spec/effects.toml`, and the tables generated from
-them in `docs/effects.md`, are taken from section 9.3 of the DeepMind 12 User
+The effect parameter descriptions in `spec/effects.toml`, the tables generated
+from them in `docs/effects.md`, and `FxSlot::description` under the crate's
+`descriptions` feature, are taken from section 9.3 of the DeepMind 12 User
 Manual, published by Music Tribe. They are reproduced so that a program can tell
 a musician what a parameter does, which is what the protocol data on its own
 cannot convey.
+
+The program parameter descriptions in `spec/parameters.toml`, which reach
+`docs/midi-spec.md` and `ParamId::description`, are not from the manual. They
+are written for this project against what the rest of the specification records,
+and a parameter whose behaviour it does not establish has none rather than a
+guessed one.
 
 The colours in `spec/layout.toml` were measured from the effect panels pictured
 in the same section: four colours per effect, taken by where they sit in the
@@ -30,7 +37,8 @@ display puts a control. Facts about how a device behaves are not themselves
 creative work, and recording them is what makes an independent implementation
 possible.
 
-If Music Tribe or Behringer would prefer the descriptions or the sampled colours
-were not reproduced here, open an issue and they will be removed. Nothing else in
-this repository depends on either: both are optional fields, and the library
-works without them.
+If Music Tribe or Behringer would prefer the effect descriptions or the sampled
+colours were not reproduced here, open an issue and they will be removed.
+Nothing else in this repository depends on either: both are optional fields, the
+descriptions are behind a feature that is off by default, and the library works
+without them.

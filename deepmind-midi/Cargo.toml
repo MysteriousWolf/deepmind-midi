@@ -26,6 +26,11 @@ transport = []
 ## Enables a simulated synthesizer to drive a host against, for tests that have
 ## no `DeepMind` plugged in. Needs neither `std` nor an allocator.
 sim = []
+## Adds the sentence saying what a parameter or an effect slot does, which the
+## `description` accessors answer `None` for without it. Off by default: prose
+## is what a host with somewhere to print it wants and a microcontroller does
+## not, and the signature is the same either way.
+descriptions = []
 
 [dependencies]
 serde = { version = "1", optional = true, default-features = false, features = ["derive"] }

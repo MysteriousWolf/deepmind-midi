@@ -96,10 +96,11 @@ jobs:
         with:
           tool: cargo-hack
 
-      # Every combination of the five features, which is what keeps the
+      # Every combination of the six features, which is what keeps the
       # promises in the manifest true: the blocking adapter and the simulated
       # synthesizer need neither std nor an allocator, serde works without
-      # std, and the library builds with nothing on at all.
+      # std, the description tables compile in and out without changing a
+      # signature, and the library builds with nothing on at all.
       - name: Every feature combination builds
         run: cargo hack check --package deepmind-midi --feature-powerset --no-dev-deps
 

@@ -286,8 +286,9 @@ fn render_parameters(spec: &Spec) -> String {
             group = &parameter.group;
             let _ = write!(
                 out,
-                "\n### {group}\n\n| Offset | Parameter | Raw | Values | Shows as |\n\
-                 |---|---|---|---|---|\n"
+                "\n### {group}\n\n\
+                 | Offset | Parameter | Raw | Values | Shows as | What it does |\n\
+                 |---|---|---|---|---|---|\n"
             );
         }
         let values = match (&parameter.kind, &parameter.value_table, &parameter.note) {
@@ -306,12 +307,13 @@ fn render_parameters(spec: &Spec) -> String {
         };
         let _ = writeln!(
             out,
-            "| {} | {} | {}-{} | {values} | {} |",
+            "| {} | {} | {}-{} | {values} | {} | {} |",
             parameter.offset,
             cell(&parameter.name),
             parameter.min,
             parameter.max,
-            cell(parameter.display.as_deref().unwrap_or(""))
+            cell(parameter.display.as_deref().unwrap_or("")),
+            cell(parameter.description.as_deref().unwrap_or("")),
         );
     }
     out

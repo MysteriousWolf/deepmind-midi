@@ -412,6 +412,15 @@ pub struct FxSlot {
     /// Row of the FX page's grid this slot is drawn in, counting from 0.
     #[cfg_attr(feature = "serde", serde(skip))]
     pub(crate) row: u8,
+    /// What the manual says this slot does, where it says anything.
+    ///
+    /// Present only under the `descriptions` feature, so that a build without
+    /// it carries neither the prose nor a pointer to it.
+    /// [`FxSlot::description`](Self::description) is how it is read, and
+    /// answers `None` when the feature is off.
+    #[cfg(feature = "descriptions")]
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) description: Option<&'static str>,
 }
 
 impl FxSlot {
@@ -436,6 +445,42 @@ impl FxSlot {
     #[must_use]
     pub const fn is_selector(&self) -> bool {
         !self.values.is_empty()
+    }
+
+    /// Returns what this slot does, in the manual's own words.
+    ///
+    /// [`title`](Self::title) says a slot is called `Damping` and this says
+    /// what damping it, which is the question somebody points at a control to
+    /// ask. The answer is transcribed from section 9.3 of the manual rather
+    /// than written here, so it says what the engine's designers say it does;
+    /// see NOTICE.
+    ///
+    /// # Behind a feature
+    ///
+    /// `None` unless the `descriptions` feature is on, and `None` with it on
+    /// for a slot the manual describes no further. The signature is the same
+    /// either way, so a host writes one code path and an embedded build carries
+    /// none of the prose.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::Algorithm;
+    /// use deepmind_midi::param::DEFAULT_FIRMWARE;
+    ///
+    /// let room = Algorithm::for_value(2, DEFAULT_FIRMWARE).expect("a Room Reverb");
+    /// let decay = room.slot(2).expect("a Decay slot");
+    /// assert_eq!(decay.title, "Decay");
+    /// assert_eq!(decay.description().is_some(), cfg!(feature = "descriptions"));
+    /// ```
+    #[must_use]
+    pub const fn description(&self) -> Option<&'static str> {
+        #[cfg(feature = "descriptions")]
+        {
+            self.description
+        }
+        #[cfg(not(feature = "descriptions"))]
+        {
+            None
+        }
     }
 }
 
@@ -1318,5 +1363,42 @@ mod tests {
                 assert_eq!(algorithm.slot(number).map(|s| s.title), Some(slot.title));
             }
         }
+    }
+
+    /// Without the feature there is no prose to reach, and the accessor says so
+    /// rather than the caller having to ask whether it was compiled in.
+    #[cfg(not(feature = "descriptions"))]
+    #[test]
+    fn a_slot_describes_nothing_without_the_feature() {
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots {
+                assert_eq!(slot.description(), None, "{algorithm}");
+            }
+        }
+    }
+
+    /// The manual describes all but a couple of the slots, and the exceptions
+    /// are `None` rather than a sentence this project wrote for it.
+    #[cfg(feature = "descriptions")]
+    #[test]
+    fn a_slot_carries_the_manuals_own_words() {
+        let room = Algorithm::for_value(2, DEFAULT_FIRMWARE).expect("a Room Reverb");
+        assert_eq!(
+            room.slot(3).and_then(super::FxSlot::description),
+            Some("Controls the perceived size of the space being created by the reverb."),
+        );
+
+        let (slots, described) = Algorithm::all().iter().fold((0, 0), |(all, some), a| {
+            (
+                all + a.slots.len(),
+                some + a
+                    .slots
+                    .iter()
+                    .filter(|slot| slot.description().is_some())
+                    .count(),
+            )
+        });
+        assert_eq!(slots, 371);
+        assert_eq!(described, 369);
     }
 }

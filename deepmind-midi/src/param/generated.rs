@@ -3034,6 +3034,495 @@ impl ParamId {
     }
 }
 
+impl ParamId {
+    /// Returns what this parameter does, in a sentence.
+    ///
+    /// The answer to the question somebody points at a control to ask, which
+    /// the name and the range on their own do not give: [`ParamId::name`] says
+    /// `VCF Keyboard Tracking` and this says what happens when it is turned up.
+    ///
+    /// # Behind a feature
+    ///
+    /// `None` for every parameter unless the `descriptions` feature is on.
+    /// With it on, every parameter has one.
+    /// The signature does not change with the feature, so a host writes one
+    /// code path: a caller given `None` draws the name and the range it already
+    /// has.
+    ///
+    /// The feature is off by default because these 242 sentences are 31 kB
+    /// of prose: free on a desktop host, real money on the microcontrollers
+    /// this crate is also meant for, and so a cost that should land on whoever
+    /// asked for it.
+    ///
+    /// # Where these come from
+    ///
+    /// Written for this specification against what the rest of it records, and
+    /// *not* transcribed from the manual — unlike
+    /// [`FxSlot::description`](crate::effect::FxSlot::description), which is the
+    /// manual's own words. A parameter whose behaviour this specification does
+    /// not establish has no sentence rather than a guessed one. See the
+    /// `descriptions` key in `spec/parameters.toml`.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// let described = ParamId::VcfFrequency.description().is_some();
+    /// assert_eq!(described, cfg!(feature = "descriptions"));
+    /// ```
+    #[must_use]
+    pub const fn description(self) -> Option<&'static str> {
+        #[cfg(feature = "descriptions")]
+        {
+            match self {
+                Self::Lfo1Rate => Some(
+                    "Sets how fast LFO 1 runs, which is what the modulation depths elsewhere in the program are a depth of.",
+                ),
+                Self::Lfo1DelayFade => Some(
+                    "Sets how long LFO 1 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack.",
+                ),
+                Self::Lfo1Shape => Some(
+                    "Chooses the waveform LFO 1 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle.",
+                ),
+                Self::Lfo1KeySync => Some(
+                    "Restarts LFO 1 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to.",
+                ),
+                Self::Lfo1ArpSync => Some(
+                    "Locks LFO 1 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed.",
+                ),
+                Self::Lfo1MonoMode => Some(
+                    "Chooses whether each voice gets its own copy of LFO 1, whether all voices share one, or whether the voices' copies are spread apart in phase.",
+                ),
+                Self::Lfo1SlewRate => Some(
+                    "Rounds the corners off LFO 1's waveform, which turns a square into something that ramps between its two levels rather than jumping.",
+                ),
+                Self::Lfo2Rate => Some(
+                    "Sets how fast LFO 2 runs, which is what the modulation depths elsewhere in the program are a depth of.",
+                ),
+                Self::Lfo2DelayFade => Some(
+                    "Sets how long LFO 2 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack.",
+                ),
+                Self::Lfo2Shape => Some(
+                    "Chooses the waveform LFO 2 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle.",
+                ),
+                Self::Lfo2KeySync => Some(
+                    "Restarts LFO 2 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to.",
+                ),
+                Self::Lfo2ArpSync => Some(
+                    "Locks LFO 2 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed.",
+                ),
+                Self::Lfo2MonoMode => Some(
+                    "Chooses whether each voice gets its own copy of LFO 2, whether all voices share one, or whether the voices' copies are spread apart in phase.",
+                ),
+                Self::Lfo2SlewRate => Some(
+                    "Rounds the corners off LFO 2's waveform, which turns a square into something that ramps between its two levels rather than jumping.",
+                ),
+                Self::Osc1Range => Some(
+                    "Sets the octave OSC 1 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest.",
+                ),
+                Self::Osc2Range => Some(
+                    "Sets the octave OSC 2 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest.",
+                ),
+                Self::Osc1PwmSource => Some(
+                    "Chooses what moves OSC 1's pulse width: a fixed setting, either LFO, or one of the three envelopes.",
+                ),
+                Self::Osc2ToneModSource => Some(
+                    "Chooses what moves OSC 2's tone modulation: a fixed setting, either LFO, or one of the three envelopes.",
+                ),
+                Self::Osc1PulseEnable => Some(
+                    "Adds OSC 1's pulse wave to the mix. It and the saw are independent, so either, both or neither can sound.",
+                ),
+                Self::Osc1SawEnable => Some(
+                    "Adds OSC 1's sawtooth wave to the mix. It and the pulse are independent, so either, both or neither can sound.",
+                ),
+                Self::OscSyncEnable => Some(
+                    "Hard-syncs the oscillators, so that one restarts each time the other completes a cycle and its own pitch becomes a timbre control rather than a note.",
+                ),
+                Self::Osc1PitchModDepth => Some(
+                    "Sets how far the source chosen by OSC 1 Pitch Mod Select moves OSC 1's pitch.",
+                ),
+                Self::Osc1PitchModSelect => Some(
+                    "Chooses what moves OSC 1's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way.",
+                ),
+                Self::Osc1AftertouchToPitchModDepth => Some(
+                    "Sets how much aftertouch adds to OSC 1's pitch modulation depth, so that leaning on a held key deepens the vibrato.",
+                ),
+                Self::Osc1ModWheelToPitchModDepth => Some(
+                    "Sets how much the modulation wheel adds to OSC 1's pitch modulation depth.",
+                ),
+                Self::Osc1PwmDepth => Some(
+                    "Sets how far OSC 1's pulse width moves. With a fixed source this is the width itself; with an LFO or an envelope it is how far that source sweeps it.",
+                ),
+                Self::Osc2Level => Some("Sets how much of OSC 2 reaches the filter."),
+                Self::Osc2Pitch => Some(
+                    "Tunes OSC 2 away from OSC 1, up to an octave either way, which is what a detune or an interval between the two is set with.",
+                ),
+                Self::Osc2ToneModDepth => Some(
+                    "Sets how far OSC 2's tone modulation moves. With a fixed source this is the setting itself; with an LFO or an envelope it is how far that source sweeps it.",
+                ),
+                Self::Osc2PitchModDepth => Some(
+                    "Sets how far the source chosen by OSC 2 Pitch Mod Select moves OSC 2's pitch.",
+                ),
+                Self::Osc2AftertouchToPitchModDepth => Some(
+                    "Sets how much aftertouch adds to OSC 2's pitch modulation depth, so that leaning on a held key deepens the vibrato.",
+                ),
+                Self::Osc2ModWheelToPitchModDepth => Some(
+                    "Sets how much the modulation wheel adds to OSC 2's pitch modulation depth.",
+                ),
+                Self::Osc2PitchModSelect => Some(
+                    "Chooses what moves OSC 2's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way.",
+                ),
+                Self::NoiseLevel => Some(
+                    "Sets how much of the noise generator is mixed in with the oscillators ahead of the filter.",
+                ),
+                Self::PortamentoTime => Some(
+                    "Sets how long a new note takes to slide to its pitch from the note before it.",
+                ),
+                Self::PortamentoMode => Some(
+                    "Chooses how the slide behaves: whether it happens on every note or only where two overlap, whether its time or its rate is what stays fixed, and whether it is a fixed interval away rather than a slide at all.",
+                ),
+                Self::PitchBendUpDepth => {
+                    Some("Sets how far the pitch bender bends when it is pushed up.")
+                }
+                Self::PitchBendDownDepth => {
+                    Some("Sets how far the pitch bender bends when it is pulled down.")
+                }
+                Self::Osc1PitchModMode => Some(
+                    "Chooses whether OSC 1's pitch modulation moves both oscillators together or OSC 1 alone.",
+                ),
+                Self::VcfFrequency => Some(
+                    "Sets the cutoff frequency of the low pass filter, the point above which the oscillators' harmonics are removed. Turning it down darkens the sound.",
+                ),
+                Self::VcfHighPassFrequency => Some(
+                    "Sets the cutoff of the high pass filter, which removes what is below it. The manual's block diagram places this after the VCA, so it acts on the mixed voices rather than on one.",
+                ),
+                Self::VcfResonance => Some(
+                    "Emphasises the frequencies around the low pass cutoff, which sharpens the filter's peak and thins out what sits below it.",
+                ),
+                Self::VcfEnvelopeDepth => Some(
+                    "Sets how far the VCF envelope moves the low pass cutoff, and so how much of the filter's sweep is played by the envelope rather than set by hand.",
+                ),
+                Self::VcfEnvelopeVelocitySensitivity => Some(
+                    "Sets how much playing harder deepens the VCF envelope's effect on the cutoff.",
+                ),
+                Self::VcfPitchBendToFreqDepth => Some(
+                    "Sets how much the pitch bender moves the low pass cutoff along with the pitch.",
+                ),
+                Self::VcfLfoDepth => {
+                    Some("Sets how far the LFO chosen by VCF LFO Select moves the low pass cutoff.")
+                }
+                Self::VcfLfoSelect => {
+                    Some("Chooses which of the two LFOs moves the low pass cutoff.")
+                }
+                Self::VcfAftertouchToLfoDepth => Some(
+                    "Sets how much aftertouch adds to the LFO's effect on the cutoff, so that leaning on a held key opens up the filter's wobble.",
+                ),
+                Self::VcfModWheelToLfoDepth => Some(
+                    "Sets how much the modulation wheel adds to the LFO's effect on the cutoff.",
+                ),
+                Self::VcfKeyboardTracking => Some(
+                    "Sets how far the low pass cutoff follows the note played, so that high notes keep the brightness low ones have instead of being filtered away.",
+                ),
+                Self::VcfEnvelopePolarity => {
+                    Some("Chooses whether the VCF envelope opens the filter or closes it.")
+                }
+                Self::Vcf2PoleMode => Some(
+                    "Chooses the low pass filter's slope: four poles for the steeper, darker response, two for the gentler one.",
+                ),
+                Self::VcfBassBoost => Some(
+                    "Lifts the low end after the filter, putting back the weight a resonant low pass takes out.",
+                ),
+                Self::VcaEnvelopeAttackTime
+                | Self::VcfEnvelopeAttackTime
+                | Self::ModEnvelopeAttackTime => Some(
+                    "Sets how long the envelope takes to rise to full level once it is triggered.",
+                ),
+                Self::VcaEnvelopeDecayTime
+                | Self::VcfEnvelopeDecayTime
+                | Self::ModEnvelopeDecayTime => Some(
+                    "Sets how long the envelope takes to fall from full level to its sustain level.",
+                ),
+                Self::VcaEnvelopeSustainLevel
+                | Self::VcfEnvelopeSustainLevel
+                | Self::ModEnvelopeSustainLevel => {
+                    Some("Sets the level the envelope holds at for as long as the note is held.")
+                }
+                Self::VcaEnvelopeReleaseTime
+                | Self::VcfEnvelopeReleaseTime
+                | Self::ModEnvelopeReleaseTime => Some(
+                    "Sets how long the envelope takes to fall back to nothing once the key is released.",
+                ),
+                Self::VcaEnvelopeTriggerMode
+                | Self::VcfEnvelopeTriggerMode
+                | Self::ModEnvelopeTriggerMode => Some(
+                    "Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer.",
+                ),
+                Self::VcaEnvelopeAttackCurve
+                | Self::VcfEnvelopeAttackCurve
+                | Self::ModEnvelopeAttackCurve => Some(
+                    "Bends the attack segment away from a straight line, towards an exponential in either direction.",
+                ),
+                Self::VcaEnvelopeDecayCurve
+                | Self::VcfEnvelopeDecayCurve
+                | Self::ModEnvelopeDecayCurve => Some(
+                    "Bends the decay segment away from a straight line, towards an exponential in either direction.",
+                ),
+                Self::VcaEnvelopeSustainCurve
+                | Self::VcfEnvelopeSustainCurve
+                | Self::ModEnvelopeSustainCurve => Some(
+                    "Bends the sustain segment away from a straight line, towards an exponential in either direction.",
+                ),
+                Self::VcaEnvelopeReleaseCurve
+                | Self::VcfEnvelopeReleaseCurve
+                | Self::ModEnvelopeReleaseCurve => Some(
+                    "Bends the release segment away from a straight line, towards an exponential in either direction.",
+                ),
+                Self::VcaLevel => Some(
+                    "Sets the level the voice leaves the amplifier at, ahead of the high pass and the effects.",
+                ),
+                Self::VcaEnvelopeDepth => Some(
+                    "Sets how far the VCA envelope moves the voice's level, and so how much of the loudness is played by the envelope rather than held flat.",
+                ),
+                Self::VcaEnvelopeVelocitySensitivity => {
+                    Some("Sets how much playing harder raises the voice's level.")
+                }
+                Self::VcaPanSpread => Some(
+                    "Spreads the voices across the stereo field, so that a chord is placed across it rather than stacked in the middle.",
+                ),
+                Self::VoicePriorityMode => Some(
+                    "Chooses which note keeps a voice when more are held than there are voices: the lowest, the highest, or the most recently played.",
+                ),
+                Self::PolyphonyMode => Some(
+                    "Chooses how the voices are handed out: one to a note, several stacked on each note in unison, a limited number of them at a time, or the whole instrument reduced to one voice.",
+                ),
+                Self::EnvelopeTriggerMode => Some(
+                    "Chooses whether the envelopes restart on each new note or run on from where they are when notes overlap, and whether they run once through however long the key is held.",
+                ),
+                Self::UnisonDetune => Some(
+                    "Sets how far the stacked voices of a unison mode are tuned apart from one another, which is what thickens the sound.",
+                ),
+                Self::VoiceDrift => Some(
+                    "Sets how much drift is applied per voice, which is what keeps two voices playing the same note from being identical.",
+                ),
+                Self::ParameterDrift => Some(
+                    "Sets how much drift is applied to parameter values, which is what keeps a setting from sounding exactly where it was left.",
+                ),
+                Self::DriftRate => {
+                    Some("Sets how quickly drift moves from one random value to the next.")
+                }
+                Self::OscPortamentoBalance => Some(
+                    "Sets how the portamento time is split between the two oscillators, so that one can arrive at the new note ahead of the other.",
+                ),
+                Self::OscKeyDownReset => Some(
+                    "Restarts the oscillators' waveforms on each new note, so that every note begins from the same point in the cycle.",
+                ),
+                Self::Mod1Source
+                | Self::Mod2Source
+                | Self::Mod3Source
+                | Self::Mod4Source
+                | Self::Mod5Source
+                | Self::Mod6Source
+                | Self::Mod7Source
+                | Self::Mod8Source => Some(
+                    "Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer.",
+                ),
+                Self::Mod1Destination
+                | Self::Mod2Destination
+                | Self::Mod3Destination
+                | Self::Mod4Destination
+                | Self::Mod5Destination
+                | Self::Mod6Destination
+                | Self::Mod7Destination
+                | Self::Mod8Destination => Some(
+                    "Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together.",
+                ),
+                Self::Mod1Depth
+                | Self::Mod2Depth
+                | Self::Mod3Depth
+                | Self::Mod4Depth
+                | Self::Mod5Depth
+                | Self::Mod6Depth
+                | Self::Mod7Depth
+                | Self::Mod8Depth => Some(
+                    "Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does.",
+                ),
+                Self::CtrlSequencerEnable => Some(
+                    "Runs the control sequencer, the stepped modulation source the matrix can draw on.",
+                ),
+                Self::CtrlSequencerClockDivider => {
+                    Some("Sets how fast the sequencer steps, as a division of the master tempo.")
+                }
+                Self::SequenceLength => Some(
+                    "Sets how many of the 32 steps are played before the sequence returns to the first.",
+                ),
+                Self::SequencerSwingTiming => Some(
+                    "Holds every second step back, which is what turns an even run of steps into a swung one.",
+                ),
+                Self::KeySyncAndLoop => Some(
+                    "Chooses whether the sequence restarts on a new note, whether it repeats when it reaches its end, or both.",
+                ),
+                Self::SlewRate => Some(
+                    "Smooths the jump from one step's value to the next, which turns a staircase into a slope.",
+                ),
+                Self::SeqStepValue1
+                | Self::SeqStepValue2
+                | Self::SeqStepValue3
+                | Self::SeqStepValue4
+                | Self::SeqStepValue5
+                | Self::SeqStepValue6
+                | Self::SeqStepValue7
+                | Self::SeqStepValue8
+                | Self::SeqStepValue9
+                | Self::SeqStepValue10
+                | Self::SeqStepValue11
+                | Self::SeqStepValue12
+                | Self::SeqStepValue13
+                | Self::SeqStepValue14
+                | Self::SeqStepValue15
+                | Self::SeqStepValue16
+                | Self::SeqStepValue17
+                | Self::SeqStepValue18
+                | Self::SeqStepValue19
+                | Self::SeqStepValue20
+                | Self::SeqStepValue21
+                | Self::SeqStepValue22
+                | Self::SeqStepValue23
+                | Self::SeqStepValue24
+                | Self::SeqStepValue25
+                | Self::SeqStepValue26
+                | Self::SeqStepValue27
+                | Self::SeqStepValue28
+                | Self::SeqStepValue29
+                | Self::SeqStepValue30
+                | Self::SeqStepValue31
+                | Self::SeqStepValue32 => Some(
+                    "Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing.",
+                ),
+                Self::ArpOnOff => Some("Runs the arpeggiator over the notes being held."),
+                Self::ArpMode => Some(
+                    "Chooses the order the held notes are played in: up, down, alternating, as they were played, at random, or all at once.",
+                ),
+                Self::ArpRateTempo => Some(
+                    "Sets the master tempo, in beats per minute. The arpeggiator, the control sequencer and a tempo-locked LFO all divide it.",
+                ),
+                Self::ArpClock => {
+                    Some("Sets how fast the arpeggiator steps, as a division of the master tempo.")
+                }
+                Self::ArpKeySync => Some(
+                    "Restarts the arpeggiated pattern on each new note rather than letting it run on.",
+                ),
+                Self::ArpGateTime => Some(
+                    "Sets how much of each step the note actually sounds for, from a short stab to a run that joins up.",
+                ),
+                Self::ArpHold => Some("Keeps the arpeggio running after the keys are let go."),
+                Self::ArpPattern => Some(
+                    "Chooses the rhythm the arpeggiator plays: which of its steps sound and which are rests.",
+                ),
+                Self::ArpSwing => Some(
+                    "Holds every second step of the arpeggio back, which is what turns an even run into a swung one.",
+                ),
+                Self::ArpOctaves => Some(
+                    "Sets how many octaves the arpeggio climbs through before it returns to the note it started on.",
+                ),
+                Self::FxRouting => Some(
+                    "Chooses how the four effect engines are wired to each other: in a chain, side by side, or a mixture of the two, with two of the ten routings feeding a later engine back into an earlier one.",
+                ),
+                Self::Fx1Type | Self::Fx2Type | Self::Fx3Type | Self::Fx4Type => Some(
+                    "Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean.",
+                ),
+                Self::Fx1Param1
+                | Self::Fx1Param2
+                | Self::Fx1Param3
+                | Self::Fx1Param4
+                | Self::Fx1Param5
+                | Self::Fx1Param6
+                | Self::Fx1Param7
+                | Self::Fx1Param8
+                | Self::Fx1Param9
+                | Self::Fx1Param10
+                | Self::Fx1Param11
+                | Self::Fx1Param12
+                | Self::Fx2Param1
+                | Self::Fx2Param2
+                | Self::Fx2Param3
+                | Self::Fx2Param4
+                | Self::Fx2Param5
+                | Self::Fx2Param6
+                | Self::Fx2Param7
+                | Self::Fx2Param8
+                | Self::Fx2Param9
+                | Self::Fx2Param10
+                | Self::Fx2Param11
+                | Self::Fx2Param12
+                | Self::Fx3Param1
+                | Self::Fx3Param2
+                | Self::Fx3Param3
+                | Self::Fx3Param4
+                | Self::Fx3Param5
+                | Self::Fx3Param6
+                | Self::Fx3Param7
+                | Self::Fx3Param8
+                | Self::Fx3Param9
+                | Self::Fx3Param10
+                | Self::Fx3Param11
+                | Self::Fx3Param12
+                | Self::Fx4Param1
+                | Self::Fx4Param2
+                | Self::Fx4Param3
+                | Self::Fx4Param4
+                | Self::Fx4Param5
+                | Self::Fx4Param6
+                | Self::Fx4Param7
+                | Self::Fx4Param8
+                | Self::Fx4Param9
+                | Self::Fx4Param10
+                | Self::Fx4Param11
+                | Self::Fx4Param12 => Some(
+                    "One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show.",
+                ),
+                Self::Fx1OutputGain
+                | Self::Fx2OutputGain
+                | Self::Fx3OutputGain
+                | Self::Fx4OutputGain => Some(
+                    "Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output.",
+                ),
+                Self::FxMode => Some(
+                    "Chooses what the effects do to the two signal paths: sit in the chain, be fed from a send alongside it, or be bypassed.",
+                ),
+                Self::ProgramNameChar1
+                | Self::ProgramNameChar2
+                | Self::ProgramNameChar3
+                | Self::ProgramNameChar4
+                | Self::ProgramNameChar5
+                | Self::ProgramNameChar6
+                | Self::ProgramNameChar7
+                | Self::ProgramNameChar8
+                | Self::ProgramNameChar9
+                | Self::ProgramNameChar10
+                | Self::ProgramNameChar11
+                | Self::ProgramNameChar12
+                | Self::ProgramNameChar13
+                | Self::ProgramNameChar14
+                | Self::ProgramNameChar15
+                | Self::ProgramNameChar16
+                | Self::ProgramNameChar17 => Some(
+                    "One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends.",
+                ),
+                Self::ProgramCategory => Some(
+                    "Tags the program with the kind of sound it is, which is what the instrument's own browser sorts and filters on.",
+                ),
+                Self::ProgramTranspose => {
+                    Some("Shifts the whole program in semitones, either side of its centre.")
+                }
+            }
+        }
+        #[cfg(not(feature = "descriptions"))]
+        {
+            let _ = self;
+            None
+        }
+    }
+}
+
 /// A named set of parameter values.
 ///
 /// Three of these were renumbered by firmware 1.1 rather than extended, so an

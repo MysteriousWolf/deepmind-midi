@@ -159,6 +159,7 @@ fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     render_parameters(spec, idents, &mut out)?;
     render_readings(spec, idents, &mut out)?;
     render_prose(spec, idents, &mut out);
+    render_descriptions(spec, idents, &mut out);
     render_tables(spec, idents, &mut out)?;
     render_controllers(spec, idents, &mut out)?;
     Ok(out)
@@ -597,6 +598,120 @@ fn render_prose(spec: &Spec, idents: &Identifiers, out: &mut String) {
         let _ = writeln!(out, "        !matches!(self, {})", arm(&unconfirmed));
     }
     out.push_str("    }\n}\n\n");
+}
+
+/// Renders the sentence saying what each parameter does, behind the
+/// `descriptions` feature.
+///
+/// Its own function over its own strings, like the prose above, and behind a
+/// feature on top of that: prose is the one thing in this table a host wants and
+/// a microcontroller has no room for. The accessor exists either way and answers
+/// `None` with the feature off, so a caller writes one code path.
+fn render_descriptions(spec: &Spec, idents: &Identifiers, out: &mut String) {
+    let idents = &idents.parameters;
+    let described: Vec<(&str, &str)> = spec
+        .parameters
+        .iter()
+        .zip(idents)
+        .filter_map(|(parameter, ident)| Some((parameter.description.as_deref()?, ident.as_str())))
+        .collect();
+    let described_all = described.len() == spec.parameters.len();
+
+    let _ = writeln!(
+        out,
+        "\
+impl ParamId {{
+    /// Returns what this parameter does, in a sentence.
+    ///
+    /// The answer to the question somebody points at a control to ask, which
+    /// the name and the range on their own do not give: [`ParamId::name`] says
+    /// `VCF Keyboard Tracking` and this says what happens when it is turned up.
+    ///
+    /// # Behind a feature
+    ///
+    /// `None` for every parameter unless the `descriptions` feature is on.
+    /// {coverage}
+    /// The signature does not change with the feature, so a host writes one
+    /// code path: a caller given `None` draws the name and the range it already
+    /// has.
+    ///
+    /// The feature is off by default because these {present} sentences are {kib} kB
+    /// of prose: free on a desktop host, real money on the microcontrollers
+    /// this crate is also meant for, and so a cost that should land on whoever
+    /// asked for it.
+    ///
+    /// # Where these come from
+    ///
+    /// Written for this specification against what the rest of it records, and
+    /// *not* transcribed from the manual — unlike
+    /// [`FxSlot::description`](crate::effect::FxSlot::description), which is the
+    /// manual's own words. A parameter whose behaviour this specification does
+    /// not establish has no sentence rather than a guessed one. See the
+    /// `descriptions` key in `spec/parameters.toml`.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// let described = ParamId::VcfFrequency.description().is_some();
+    /// assert_eq!(described, cfg!(feature = \"descriptions\"));
+    /// ```
+    #[must_use]
+    pub const fn description(self) -> Option<&'static str> {{
+        #[cfg(feature = \"descriptions\")]
+        {{
+            match self {{",
+        coverage = if described_all {
+            "With it on, every parameter has one."
+        } else {
+            "Still `None`, with it on, for the ones this specification has\n\
+             /// nothing trustworthy to say about."
+        },
+        present = described.len(),
+        kib = described
+            .iter()
+            .map(|(text, _)| text.len())
+            .sum::<usize>()
+            .div_ceil(1000),
+    );
+
+    // Grouped by the text itself, as the prose above is: the three envelopes
+    // and the eight modulation slots say the same thing about the same control,
+    // so one string serves every parameter that carries it.
+    let mut texts: Vec<(&str, Vec<&str>)> = Vec::new();
+    for (text, ident) in described {
+        match texts.iter_mut().find(|(seen, _)| *seen == text) {
+            Some((_, members)) => members.push(ident),
+            None => texts.push((text, vec![ident])),
+        }
+    }
+    for (text, members) in &texts {
+        let _ = writeln!(out, "                {} => Some({text:?}),", arm(members));
+    }
+    // Only where one is reachable: every parameter carrying a description makes
+    // the match exhaustive, and a wildcard after it is a warning, which this
+    // repository builds as an error.
+    if described_all {
+        out.push_str("            }\n");
+    } else {
+        out.push_str(
+            "                _ => None,
+            }
+",
+        );
+    }
+
+    out.push_str(
+        "        }
+        #[cfg(not(feature = \"descriptions\"))]
+        {
+            let _ = self;
+            None
+        }
+    }
+}
+
+",
+    );
 }
 
 /// Renders one match arm's patterns: `Self::A | Self::B | Self::C`.

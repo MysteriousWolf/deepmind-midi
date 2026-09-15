@@ -378,6 +378,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: None,
     },
     FxSlot {
         slot: 2,
@@ -392,6 +394,10 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time it takes for the reverb to dissipate (range is preset dependant).",
+        ),
     },
     FxSlot {
         slot: 3,
@@ -406,6 +412,10 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Enhances high frequencies/low frequencies for positive/negative settings respectivly.",
+        ),
     },
     FxSlot {
         slot: 4,
@@ -420,6 +430,10 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: false,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 5,
@@ -434,6 +448,10 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
 ];
 
@@ -452,6 +470,10 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -466,6 +488,8 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 3,
@@ -480,6 +504,8 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the perceived size of the space being created by the reverb."),
     },
     FxSlot {
         slot: 4,
@@ -494,6 +520,8 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the decay of the high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 5,
@@ -508,6 +536,8 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the initial reflection density."),
     },
     FxSlot {
         slot: 6,
@@ -522,6 +552,10 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -536,6 +570,8 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -550,6 +586,8 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the high frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 9,
@@ -564,6 +602,8 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the reverb tail modulation depth."),
     },
     FxSlot {
         slot: 10,
@@ -578,6 +618,8 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the volume of the reverb tail."),
     },
 ];
 
@@ -596,6 +638,10 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -610,6 +656,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 3,
@@ -624,6 +672,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the perceived size of the space being created by the reverb."),
     },
     FxSlot {
         slot: 4,
@@ -638,6 +688,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the decay of the high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 5,
@@ -652,6 +704,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the initial reflection density."),
     },
     FxSlot {
         slot: 6,
@@ -666,6 +720,10 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -680,6 +738,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -694,6 +754,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the high frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 9,
@@ -708,6 +770,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the low frequency build-up."),
     },
     FxSlot {
         slot: 10,
@@ -722,6 +786,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Emphasizes the stereo effect of the reverb."),
     },
     FxSlot {
         slot: 11,
@@ -736,6 +802,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the contour of the reverberation envelope."),
     },
     FxSlot {
         slot: 12,
@@ -750,6 +818,8 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls randomization / modulation effects within the reverb."),
     },
 ];
 
@@ -768,6 +838,10 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -782,6 +856,10 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the perceived size of the space being created by the reverb. Affects DECAY range.",
+        ),
     },
     FxSlot {
         slot: 3,
@@ -796,6 +874,10 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time it takes for the reverb to dissipate. Range dependant on SIZE.",
+        ),
     },
     FxSlot {
         slot: 4,
@@ -810,6 +892,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the low frequency build-up."),
     },
     FxSlot {
         slot: 5,
@@ -824,6 +908,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the high frequency build-up."),
     },
     FxSlot {
         slot: 6,
@@ -838,6 +924,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Manipulates the reflection density in the simulated room."),
     },
     FxSlot {
         slot: 7,
@@ -852,6 +940,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -866,6 +956,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the high frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 9,
@@ -880,6 +972,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Set the early reflection times."),
     },
     FxSlot {
         slot: 10,
@@ -894,6 +988,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the loudness of the early reflection level."),
     },
     FxSlot {
         slot: 11,
@@ -908,6 +1004,10 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 12,
@@ -922,6 +1022,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Applies freeze mode and blends signals into a continuous response."),
     },
 ];
 
@@ -940,6 +1042,10 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -954,6 +1060,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 3,
@@ -968,6 +1076,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the perceived size of the space being created by the reverb."),
     },
     FxSlot {
         slot: 4,
@@ -982,6 +1092,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the decay of the high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 5,
@@ -996,6 +1108,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the initial reflection density."),
     },
     FxSlot {
         slot: 6,
@@ -1010,6 +1124,10 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -1024,6 +1142,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -1038,6 +1158,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the high frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 9,
@@ -1052,6 +1174,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the low frequency build-up."),
     },
     FxSlot {
         slot: 10,
@@ -1066,6 +1190,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Emphasizes the stereo effect of the reverb."),
     },
     FxSlot {
         slot: 11,
@@ -1080,6 +1206,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the contour of the reverberation envelope."),
     },
     FxSlot {
         slot: 12,
@@ -1094,6 +1222,8 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the reverb tail modulation rate ."),
     },
 ];
 
@@ -1112,6 +1242,10 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -1126,6 +1260,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 3,
@@ -1140,6 +1276,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the perceived size of the space being created by the reverb."),
     },
     FxSlot {
         slot: 4,
@@ -1154,6 +1292,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the decay of the high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 5,
@@ -1168,6 +1308,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the initial reflection density."),
     },
     FxSlot {
         slot: 6,
@@ -1182,6 +1324,10 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -1196,6 +1342,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -1210,6 +1358,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the high frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 9,
@@ -1224,6 +1374,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the low frequency build-up."),
     },
     FxSlot {
         slot: 10,
@@ -1238,6 +1390,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Emphasizes the stereo effect of the reverb."),
     },
     FxSlot {
         slot: 11,
@@ -1252,6 +1406,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the contour of the reverberation envelope."),
     },
     FxSlot {
         slot: 12,
@@ -1266,6 +1422,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls randomization / modulation effects within the reverb."),
     },
 ];
 
@@ -1284,6 +1442,10 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -1298,6 +1460,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 3,
@@ -1312,6 +1476,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the perceived size of the space being created by the reverb."),
     },
     FxSlot {
         slot: 4,
@@ -1326,6 +1492,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the decay of the high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 5,
@@ -1340,6 +1508,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the initial reflection density."),
     },
     FxSlot {
         slot: 6,
@@ -1354,6 +1524,10 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -1368,6 +1542,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -1382,6 +1558,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the high frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 9,
@@ -1396,6 +1574,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the low frequency build-up."),
     },
     FxSlot {
         slot: 10,
@@ -1410,6 +1590,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the crossover point for bass multiplier."),
     },
     FxSlot {
         slot: 11,
@@ -1424,6 +1606,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the reverb tail modulation depth."),
     },
     FxSlot {
         slot: 12,
@@ -1438,6 +1622,8 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the reverb tail modulation rate."),
     },
 ];
 
@@ -1456,6 +1642,10 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -1470,6 +1660,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 3,
@@ -1484,6 +1676,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the perceived size of the space being created by the reverb."),
     },
     FxSlot {
         slot: 4,
@@ -1498,6 +1692,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the decay of the high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 5,
@@ -1512,6 +1708,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the initial reflection density."),
     },
     FxSlot {
         slot: 6,
@@ -1526,6 +1724,10 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -1540,6 +1742,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -1554,6 +1758,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the high frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 9,
@@ -1568,6 +1774,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the low frequency build-up."),
     },
     FxSlot {
         slot: 10,
@@ -1582,6 +1790,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Emphasizes the stereo effect of the reverb."),
     },
     FxSlot {
         slot: 11,
@@ -1596,6 +1806,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the contour of the reverberation envelope."),
     },
     FxSlot {
         slot: 12,
@@ -1610,6 +1822,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls randomization / modulation effects within the reverb."),
     },
 ];
 
@@ -1628,6 +1842,10 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -1642,6 +1860,8 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 3,
@@ -1656,6 +1876,8 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the contour of the reverberation envelope ."),
     },
     FxSlot {
         slot: 4,
@@ -1670,6 +1892,8 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Manipulates the reflection density in the simulated room."),
     },
     FxSlot {
         slot: 5,
@@ -1684,6 +1908,8 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Emphasizes the stereo effect of the reverb."),
     },
     FxSlot {
         slot: 6,
@@ -1698,6 +1924,10 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -1712,6 +1942,8 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -1726,6 +1958,10 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the frequency of a Hi-Shelving filter at the input of the reverb effect.",
+        ),
     },
     FxSlot {
         slot: 9,
@@ -1740,6 +1976,10 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the gain of a Hi-Shelving filter at the input of the reverb effect.",
+        ),
     },
     FxSlot {
         slot: 10,
@@ -1754,6 +1994,8 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: false,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the initial reflection density ."),
     },
 ];
 
@@ -1772,6 +2014,10 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -1786,6 +2032,8 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 3,
@@ -1800,6 +2048,8 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls how quickly the effect builds up."),
     },
     FxSlot {
         slot: 4,
@@ -1814,6 +2064,8 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: false,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the initial reflection density."),
     },
     FxSlot {
         slot: 5,
@@ -1828,6 +2080,10 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls how the reflection is distributed through the envelope of the reverb.",
+        ),
     },
     FxSlot {
         slot: 6,
@@ -1842,6 +2098,10 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -1856,6 +2116,8 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies affected by the reverb to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -1870,6 +2132,10 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the frequency of a Hi-Shelving filter at the input of the reverb effect.",
+        ),
     },
     FxSlot {
         slot: 9,
@@ -1884,6 +2150,10 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the gain of a Hi-Shelving filter at the input of the reverb effect.",
+        ),
     },
 ];
 
@@ -1902,6 +2172,10 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the rate of the chorus. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -1916,6 +2190,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the modulation depth of the chorus."),
     },
     FxSlot {
         slot: 3,
@@ -1930,6 +2206,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the delay of the chorus."),
     },
     FxSlot {
         slot: 4,
@@ -1944,6 +2222,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Offsets the phase between the left and right channels."),
     },
     FxSlot {
         slot: 5,
@@ -1958,6 +2238,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the LFO waveform from a sine wave to triangular wave."),
     },
     FxSlot {
         slot: 6,
@@ -1972,6 +2254,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the balance between chorus and reverb."),
     },
     FxSlot {
         slot: 7,
@@ -1986,6 +2270,10 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 8,
@@ -2000,6 +2288,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 9,
@@ -2014,6 +2304,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls how large or small the simulated space is."),
     },
     FxSlot {
         slot: 10,
@@ -2028,6 +2320,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Determines the decay of high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 11,
@@ -2042,6 +2336,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Excludes low frequencies below the value ."),
     },
     FxSlot {
         slot: 12,
@@ -2056,6 +2352,10 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
 ];
 
@@ -2074,6 +2374,10 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the delay time for the left channel delay. Time sync options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -2088,6 +2392,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the delay ratio for the right channel delay."),
     },
     FxSlot {
         slot: 3,
@@ -2102,6 +2408,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Trims high frequencies from the feedback."),
     },
     FxSlot {
         slot: 4,
@@ -2116,6 +2424,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the percentage of feedback."),
     },
     FxSlot {
         slot: 5,
@@ -2130,6 +2440,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Control the amount of delay sound sent to the reverb effect."),
     },
     FxSlot {
         slot: 6,
@@ -2144,6 +2456,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the ratio between delay and reverb."),
     },
     FxSlot {
         slot: 7,
@@ -2158,6 +2472,10 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 8,
@@ -2172,6 +2490,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 9,
@@ -2186,6 +2506,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls how large or small the simulated space is."),
     },
     FxSlot {
         slot: 10,
@@ -2200,6 +2522,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Determines the decay of high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 11,
@@ -2214,6 +2538,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Excludes low frequencies below the value ."),
     },
     FxSlot {
         slot: 12,
@@ -2228,6 +2554,10 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
 ];
 
@@ -2246,6 +2576,10 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the rate of the flanger. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -2260,6 +2594,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the modulation depth of the flanger."),
     },
     FxSlot {
         slot: 3,
@@ -2274,6 +2610,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the delay of the flanger."),
     },
     FxSlot {
         slot: 4,
@@ -2288,6 +2626,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Offsets the phase between the left and right channels."),
     },
     FxSlot {
         slot: 5,
@@ -2302,6 +2642,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the percentage of positive or negative feedback."),
     },
     FxSlot {
         slot: 6,
@@ -2316,6 +2658,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the balance between flanger and reverb."),
     },
     FxSlot {
         slot: 7,
@@ -2330,6 +2674,10 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the amount of time before the reverb is heard following the source signal.",
+        ),
     },
     FxSlot {
         slot: 8,
@@ -2344,6 +2692,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 9,
@@ -2358,6 +2708,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls how large or small the simulated space is."),
     },
     FxSlot {
         slot: 10,
@@ -2372,6 +2724,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Determines the decay of high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 11,
@@ -2386,6 +2740,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Excludes low frequencies below the value ."),
     },
     FxSlot {
         slot: 12,
@@ -2400,6 +2756,10 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
 ];
 
@@ -2418,6 +2778,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the gain of the low band."),
     },
     FxSlot {
         slot: 2,
@@ -2432,6 +2794,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the frequency of the low band."),
     },
     FxSlot {
         slot: 3,
@@ -2446,6 +2810,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the gain of the low-mid band."),
     },
     FxSlot {
         slot: 4,
@@ -2460,6 +2826,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the frequency of the low-mid band."),
     },
     FxSlot {
         slot: 5,
@@ -2474,6 +2842,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the Q-factor of the low-mid band."),
     },
     FxSlot {
         slot: 6,
@@ -2488,6 +2858,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the gain of the high-mid band."),
     },
     FxSlot {
         slot: 7,
@@ -2502,6 +2874,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the frequency of the high- mid band."),
     },
     FxSlot {
         slot: 8,
@@ -2516,6 +2890,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the Q-factor of the high-mid band."),
     },
     FxSlot {
         slot: 9,
@@ -2530,6 +2906,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the gain of the high band."),
     },
     FxSlot {
         slot: 10,
@@ -2544,6 +2922,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the frequency of the high band."),
     },
     FxSlot {
         slot: 11,
@@ -2558,6 +2938,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("INOUTAdjusts the frequency of the high band."),
     },
 ];
 
@@ -2576,6 +2958,8 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Compensates for changes in level resulting from the effect."),
     },
     FxSlot {
         slot: 2,
@@ -2590,6 +2974,8 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Emphasizes the stereo content for a wider mix ."),
     },
     FxSlot {
         slot: 3,
@@ -2604,6 +2990,8 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the gain of the bass band."),
     },
     FxSlot {
         slot: 4,
@@ -2618,6 +3006,8 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the frequency of the bass band."),
     },
     FxSlot {
         slot: 5,
@@ -2632,6 +3022,8 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the gain of the mid band."),
     },
     FxSlot {
         slot: 6,
@@ -2646,6 +3038,8 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the Q-factor of the mid band."),
     },
     FxSlot {
         slot: 7,
@@ -2660,6 +3054,8 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the gain of the high band."),
     },
     FxSlot {
         slot: 8,
@@ -2674,6 +3070,8 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the frequency of the high band."),
     },
     FxSlot {
         slot: 9,
@@ -2688,6 +3086,8 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Solo mode - used to isolate only the audio resulting from the effect."),
     },
 ];
 
@@ -2706,6 +3106,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Mode of operation: Off, Stereo, Dual, M/S (Mid/Side)."),
     },
     FxSlot {
         slot: 2,
@@ -2720,6 +3122,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the input gain for the Left/Mid signal."),
     },
     FxSlot {
         slot: 3,
@@ -2734,6 +3138,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the threshold for the Left/Mid signal."),
     },
     FxSlot {
         slot: 4,
@@ -2748,6 +3154,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the attack and release time for the Left/Mid channel."),
     },
     FxSlot {
         slot: 5,
@@ -2762,6 +3170,10 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjust the ratio and knee of the compression curve for the Left/Mid signal.",
+        ),
     },
     FxSlot {
         slot: 6,
@@ -2776,6 +3188,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the output gain for the Left/Mid signal."),
     },
     FxSlot {
         slot: 7,
@@ -2790,6 +3204,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjust the bias current, creating accentuation of attacks"),
     },
     FxSlot {
         slot: 8,
@@ -2804,6 +3220,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the input gain for the Right/Side signal."),
     },
     FxSlot {
         slot: 9,
@@ -2818,6 +3236,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the threshold for the Right/Side signal."),
     },
     FxSlot {
         slot: 10,
@@ -2832,6 +3252,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the attack and release time for the Right/Side channel."),
     },
     FxSlot {
         slot: 11,
@@ -2846,6 +3268,10 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjust the ratio and knee of the compression curve for the Right/Side signal.",
+        ),
     },
     FxSlot {
         slot: 12,
@@ -2860,6 +3286,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the output gain for the Right/Side signal."),
     },
 ];
 
@@ -2878,6 +3306,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of input gain applied to the signal."),
     },
     FxSlot {
         slot: 2,
@@ -2892,6 +3322,10 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Distortion Type: VAL(Valve), SAT(Saturation), TUB (Tube), & Post Filter variants (PFV/PFS/PFT).",
+        ),
     },
     FxSlot {
         slot: 3,
@@ -2906,6 +3340,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the level of the frequencies below XoverFreq 1."),
     },
     FxSlot {
         slot: 4,
@@ -2920,6 +3356,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the percentage of distortion introduced below XoverFreq 1."),
     },
     FxSlot {
         slot: 5,
@@ -2934,6 +3372,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the lower cross over frequency."),
     },
     FxSlot {
         slot: 6,
@@ -2948,6 +3388,10 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the level of the frequencies between Xover1 Freq and Xover2 Freq.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -2962,6 +3406,10 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the percentage of distortion introduced between Xover1 Freq and Xover2 Freq.",
+        ),
     },
     FxSlot {
         slot: 8,
@@ -2976,6 +3424,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the upper cross over frequency."),
     },
     FxSlot {
         slot: 9,
@@ -2990,6 +3440,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the level of the frequencies below XoverFreq 2."),
     },
     FxSlot {
         slot: 10,
@@ -3004,6 +3456,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the percentage of distortion introduced above XoverFreq 2."),
     },
     FxSlot {
         slot: 11,
@@ -3020,6 +3474,10 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Cabinet Type: OFF, VTw, VBs, A10, Mid, BFC, B60, V30, S78, Oax, A12, Rck. (See Table Above).",
+        ),
     },
     FxSlot {
         slot: 12,
@@ -3034,6 +3492,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of output gain applied to the signal."),
     },
 ];
 
@@ -3052,6 +3512,10 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the amount of input gain prior to the band-specific distortion adjustment.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -3066,6 +3530,8 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the amount of low-end breakup."),
     },
     FxSlot {
         slot: 3,
@@ -3080,6 +3546,8 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the amount of midrange distortion."),
     },
     FxSlot {
         slot: 4,
@@ -3094,6 +3562,10 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Tailors the high-frequency content and distortion for smooth or cutting notes.",
+        ),
     },
     FxSlot {
         slot: 5,
@@ -3108,6 +3580,8 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Emulates the amount of power amp distortion from a tube amp."),
     },
     FxSlot {
         slot: 6,
@@ -3122,6 +3596,8 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the overall output level."),
     },
     FxSlot {
         slot: 7,
@@ -3136,6 +3612,10 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "EQ adjustment of the low frequencies, independent of distortion content.",
+        ),
     },
     FxSlot {
         slot: 8,
@@ -3150,6 +3630,10 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "EQ adjustment of the high frequencies, independent of distortion content.",
+        ),
     },
     FxSlot {
         slot: 9,
@@ -3164,6 +3648,8 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Turns the cabinet simulation on or off."),
     },
 ];
 
@@ -3182,6 +3668,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the effect to be turned On or Off."),
     },
     FxSlot {
         slot: 2,
@@ -3196,6 +3684,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("STM/SControls the input mode (Stereo or Mid/Side)."),
     },
     FxSlot {
         slot: 3,
@@ -3210,6 +3700,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("STM/SControls the output mode (Stereo or Mid/Side)."),
     },
     FxSlot {
         slot: 4,
@@ -3224,6 +3716,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the spread of the stereo field."),
     },
     FxSlot {
         slot: 5,
@@ -3238,6 +3732,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the spread of the stereo field for low/mid frequencies only."),
     },
     FxSlot {
         slot: 6,
@@ -3252,6 +3748,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the ratio of mono to stereo content."),
     },
     FxSlot {
         slot: 7,
@@ -3266,6 +3764,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the mono content to be panned."),
     },
     FxSlot {
         slot: 8,
@@ -3280,6 +3780,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of output gain applied to the signal."),
     },
 ];
 
@@ -3298,6 +3800,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the LFO rate. Time synchronised options from 4 to 1/64 bars."),
     },
     FxSlot {
         slot: 2,
@@ -3312,6 +3816,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the LFO phase difference between the left and right channels."),
     },
     FxSlot {
         slot: 3,
@@ -3326,6 +3832,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Blends the LFO waveform between triangular and square shape."),
     },
     FxSlot {
         slot: 4,
@@ -3340,6 +3848,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the depth (amount) of modulation."),
     },
     FxSlot {
         slot: 5,
@@ -3354,6 +3864,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts how much the LFO speed is modulated by the envelope."),
     },
     FxSlot {
         slot: 6,
@@ -3368,6 +3880,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the depth of the envelope modulation."),
     },
     FxSlot {
         slot: 7,
@@ -3382,6 +3896,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the envelope attack stage time."),
     },
     FxSlot {
         slot: 8,
@@ -3396,6 +3912,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the envelope hold stage time."),
     },
     FxSlot {
         slot: 9,
@@ -3410,6 +3928,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the envelope release stage time."),
     },
 ];
 
@@ -3428,6 +3948,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets signal level at which gate opens."),
     },
     FxSlot {
         slot: 2,
@@ -3442,6 +3964,10 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Control adjusts the amount of gain reduction applied to the signal below threshold.",
+        ),
     },
     FxSlot {
         slot: 3,
@@ -3456,6 +3982,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts time taken for gate to open after an over-threshold signal."),
     },
     FxSlot {
         slot: 4,
@@ -3470,6 +3998,10 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts time taken for gate to close after programme material falls back below threshold.",
+        ),
     },
     FxSlot {
         slot: 5,
@@ -3484,6 +4016,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("This defines a waiting period before the gate starts to close."),
     },
     FxSlot {
         slot: 6,
@@ -3498,6 +4032,10 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Used to increase tonal shaping or reduce gated breathing/delay/resonant howl-round.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -3512,6 +4050,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: false,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("GAT (Gate), TRN (Transient Gate), DUC (Ducker)."),
     },
     FxSlot {
         slot: 8,
@@ -3526,6 +4066,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: false,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Enables gate in the signal path. When switched off, gate is bypassed."),
     },
 ];
 
@@ -3544,6 +4086,10 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -3558,6 +4104,10 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the master delay time. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 3,
@@ -3572,6 +4122,10 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "ST- Stereo feedback, X - crosses feedback between channels, M - Mono mix in feedback chain. P-P - Ping Pong (Note that Feedback-R (FBR) is disabled in this mode.",
+        ),
     },
     FxSlot {
         slot: 4,
@@ -3588,6 +4142,8 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets left delay to rhythmic fractions of the master delay."),
     },
     FxSlot {
         slot: 5,
@@ -3604,6 +4160,8 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets right delay to rhythmic fractions of the master delay."),
     },
     FxSlot {
         slot: 6,
@@ -3618,6 +4176,8 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adds a delay difference between the left and right delayed signals."),
     },
     FxSlot {
         slot: 7,
@@ -3632,6 +4192,10 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the low frequency cut, allowing lower frequencies to remain unaffected by the delay.",
+        ),
     },
     FxSlot {
         slot: 8,
@@ -3646,6 +4210,10 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the high frequency cut, allowing higher frequencies to remain unaffected by the delay.",
+        ),
     },
     FxSlot {
         slot: 9,
@@ -3660,6 +4228,8 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the low cut filter frequency in the feedback paths."),
     },
     FxSlot {
         slot: 10,
@@ -3674,6 +4244,8 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Control the amount of feedback for the left channel."),
     },
     FxSlot {
         slot: 11,
@@ -3688,6 +4260,8 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Control the amount of feedback for the right channel."),
     },
     FxSlot {
         slot: 12,
@@ -3702,6 +4276,8 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the high cut filter frequency in the feedback paths."),
     },
 ];
 
@@ -3720,6 +4296,10 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Sets the master delay time, and the first stage. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -3734,6 +4314,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the gain level of the first stage of the delay."),
     },
     FxSlot {
         slot: 3,
@@ -3748,6 +4330,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the position of the first delay stage in the stereo field."),
     },
     FxSlot {
         slot: 4,
@@ -3762,6 +4346,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the amount of feedback."),
     },
     FxSlot {
         slot: 5,
@@ -3778,6 +4364,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the delay time in the second stage of the delay."),
     },
     FxSlot {
         slot: 6,
@@ -3792,6 +4380,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the gain level of the second delay stage."),
     },
     FxSlot {
         slot: 7,
@@ -3806,6 +4396,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the position of the second delay stage in the stereo field."),
     },
     FxSlot {
         slot: 8,
@@ -3822,6 +4414,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the delay time in the third stage of the delay."),
     },
     FxSlot {
         slot: 9,
@@ -3836,6 +4430,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the gain level of the third delay stage."),
     },
     FxSlot {
         slot: 10,
@@ -3850,6 +4446,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the position of the third gain stage in the stereo field."),
     },
     FxSlot {
         slot: 11,
@@ -3864,6 +4462,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Turns the stereo cross-feedback of the delays On or Off ."),
     },
     FxSlot {
         slot: 12,
@@ -3878,6 +4478,10 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
 ];
 
@@ -3896,6 +4500,10 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Sets the master delay time, and the first stage. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -3910,6 +4518,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the gain level of the first stage of the delay."),
     },
     FxSlot {
         slot: 3,
@@ -3924,6 +4534,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the amount of feedback."),
     },
     FxSlot {
         slot: 4,
@@ -3938,6 +4550,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Positions the first delay stage in the stereo field."),
     },
     FxSlot {
         slot: 5,
@@ -3954,6 +4568,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the delay time in the second stage of the delay."),
     },
     FxSlot {
         slot: 6,
@@ -3968,6 +4584,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the gain level of the second delay stage."),
     },
     FxSlot {
         slot: 7,
@@ -3984,6 +4602,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the delay time in the third stage of the delay."),
     },
     FxSlot {
         slot: 8,
@@ -3998,6 +4618,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the gain level of the third delay stage."),
     },
     FxSlot {
         slot: 9,
@@ -4014,6 +4636,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the delay time in the fourth stage of the delay."),
     },
     FxSlot {
         slot: 10,
@@ -4028,6 +4652,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the gain level of the fourth delay stage ."),
     },
     FxSlot {
         slot: 11,
@@ -4042,6 +4668,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Turns the stereo cross-feedback of the delays On or Off."),
     },
     FxSlot {
         slot: 12,
@@ -4056,6 +4684,10 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
 ];
 
@@ -4074,6 +4706,10 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -4088,6 +4724,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the master delay time."),
     },
     FxSlot {
         slot: 3,
@@ -4102,6 +4740,10 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls how long the delay is sustained for. Warning at 100% build up will occur.",
+        ),
     },
     FxSlot {
         slot: 4,
@@ -4116,6 +4758,10 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the amount of wobble caused by age and quality of build/materials.",
+        ),
     },
     FxSlot {
         slot: 5,
@@ -4130,6 +4776,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the tone of the delays."),
     },
 ];
 
@@ -4148,6 +4796,10 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -4162,6 +4814,10 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the master delay time. Time synchronized options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 3,
@@ -4176,6 +4832,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Decimates the signal by reducing the sampling frequency."),
     },
     FxSlot {
         slot: 4,
@@ -4192,6 +4850,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets left delay to rhythmic fractions of the master delay."),
     },
     FxSlot {
         slot: 5,
@@ -4208,6 +4868,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets right delay to rhythmic fractions of the master delay."),
     },
     FxSlot {
         slot: 6,
@@ -4222,6 +4884,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Decimates the signal by reducing the bit-depth."),
     },
     FxSlot {
         slot: 7,
@@ -4236,6 +4900,10 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjust the cutoff frequency of the filter, allowing specific frequencies to be affected by the delay.",
+        ),
     },
     FxSlot {
         slot: 8,
@@ -4250,6 +4918,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the resonance of the filter."),
     },
     FxSlot {
         slot: 9,
@@ -4264,6 +4934,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: None,
     },
     FxSlot {
         slot: 10,
@@ -4278,6 +4950,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of feedback for the left channel."),
     },
     FxSlot {
         slot: 11,
@@ -4292,6 +4966,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of feedback for the right channel."),
     },
     FxSlot {
         slot: 12,
@@ -4306,6 +4982,10 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "It sets the decimation on the input signal (PRE) or only on the delay (POST).",
+        ),
     },
 ];
 
@@ -4324,6 +5004,10 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Sets the master delay time. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -4340,6 +5024,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the delay to rhythmic fractions."),
     },
     FxSlot {
         slot: 3,
@@ -4354,6 +5040,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the percentage of positive feedback."),
     },
     FxSlot {
         slot: 4,
@@ -4368,6 +5056,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the high cut filter frequency in the feedback path."),
     },
     FxSlot {
         slot: 5,
@@ -4382,6 +5072,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the depth (amount) of modulation."),
     },
     FxSlot {
         slot: 6,
@@ -4396,6 +5088,10 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the rate of the modulation. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -4410,6 +5106,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("PARSERControls the processor chain routing (Serial/Parallel)"),
     },
     FxSlot {
         slot: 8,
@@ -4424,6 +5122,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: false,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Reverb Type can be set to AMB (Ambience), CLUB, or HALL."),
     },
     FxSlot {
         slot: 9,
@@ -4438,6 +5138,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the amount of time it takes for the reverb to dissipate."),
     },
     FxSlot {
         slot: 10,
@@ -4452,6 +5154,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Determines the decay of high frequencies within the reverb tail."),
     },
     FxSlot {
         slot: 11,
@@ -4466,6 +5170,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts ratio of the delay signal to the reverb signal."),
     },
     FxSlot {
         slot: 12,
@@ -4480,6 +5186,10 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals",
+        ),
     },
 ];
 
@@ -4498,6 +5208,10 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Sets the modulation speed. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -4512,6 +5226,8 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Determines the amount of modulated delay in the left channel."),
     },
     FxSlot {
         slot: 3,
@@ -4526,6 +5242,8 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Determines the amount of modulated delay in the right channel."),
     },
     FxSlot {
         slot: 4,
@@ -4540,6 +5258,8 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: false,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the total amount of delay for the left channel."),
     },
     FxSlot {
         slot: 5,
@@ -4554,6 +5274,8 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the total amount of delay for the right channel."),
     },
     FxSlot {
         slot: 6,
@@ -4568,6 +5290,10 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -4582,6 +5308,8 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies in the signal to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -4596,6 +5324,8 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the high frequencies in the signal to be reduced."),
     },
     FxSlot {
         slot: 9,
@@ -4610,6 +5340,8 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the phase offset of the LFO between left and right channel."),
     },
     FxSlot {
         slot: 10,
@@ -4624,6 +5356,10 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: false,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Blends between the digital triangular chorus sound and the classic analog sine wave.",
+        ),
     },
     FxSlot {
         slot: 11,
@@ -4638,6 +5374,10 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts how much of the left channel is mixed into the right and vice versa.",
+        ),
     },
 ];
 
@@ -4656,6 +5396,8 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the effect to be turned On or Off."),
     },
     FxSlot {
         slot: 2,
@@ -4670,6 +5412,8 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("MSTSwitches the operation between Mono and Stereo modes."),
     },
     FxSlot {
         slot: 3,
@@ -4684,6 +5428,10 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 4,
@@ -4698,6 +5446,8 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Engages level one intensity (minimum)."),
     },
     FxSlot {
         slot: 5,
@@ -4712,6 +5462,8 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Engages level two intensity."),
     },
     FxSlot {
         slot: 6,
@@ -4726,6 +5478,8 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Engages level three intensity."),
     },
     FxSlot {
         slot: 7,
@@ -4740,6 +5494,8 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Engages level four intensity (maximum)."),
     },
 ];
 
@@ -4758,6 +5514,10 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Sets the modulation speed. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -4772,6 +5532,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Determines the amount of modulated delay in the left channel."),
     },
     FxSlot {
         slot: 3,
@@ -4786,6 +5548,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Determines the amount of modulated delay in the right channel."),
     },
     FxSlot {
         slot: 4,
@@ -4800,6 +5564,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: false,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the total amount of delay for the left channel."),
     },
     FxSlot {
         slot: 5,
@@ -4814,6 +5580,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Sets the total amount of delay for the right channel."),
     },
     FxSlot {
         slot: 6,
@@ -4828,6 +5596,10 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -4842,6 +5614,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the low frequencies in the signal to be reduced."),
     },
     FxSlot {
         slot: 8,
@@ -4856,6 +5630,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the high frequencies in the signal to be reduced."),
     },
     FxSlot {
         slot: 9,
@@ -4870,6 +5646,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the phase offset of the LFO between left and right channel."),
     },
     FxSlot {
         slot: 10,
@@ -4884,6 +5662,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the low cut filter frequency in the feedback path."),
     },
     FxSlot {
         slot: 11,
@@ -4898,6 +5678,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the high cut filter frequency in the feedback path."),
     },
     FxSlot {
         slot: 12,
@@ -4912,6 +5694,8 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the percentage of positive or negative feedback."),
     },
 ];
 
@@ -4930,6 +5714,10 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Sets the modulation speed. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -4944,6 +5732,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the depth (amount) of modulation."),
     },
     FxSlot {
         slot: 3,
@@ -4958,6 +5748,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the resonance of the multiple filter stages."),
     },
     FxSlot {
         slot: 4,
@@ -4972,6 +5764,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the frequency range of the modulated filters."),
     },
     FxSlot {
         slot: 5,
@@ -4986,6 +5780,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls how many filter stages are used."),
     },
     FxSlot {
         slot: 6,
@@ -5000,6 +5796,10 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -5014,6 +5814,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Shapes the symmetry of the LFO waveform."),
     },
     FxSlot {
         slot: 8,
@@ -5028,6 +5830,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: false,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the LFO phase difference between the left and right channel"),
     },
     FxSlot {
         slot: 9,
@@ -5042,6 +5846,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the level of positive or negative envelope modulation."),
     },
     FxSlot {
         slot: 10,
@@ -5056,6 +5862,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the envelope attack stage time ."),
     },
     FxSlot {
         slot: 11,
@@ -5070,6 +5878,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the envelope hold stage time."),
     },
     FxSlot {
         slot: 12,
@@ -5084,6 +5894,8 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the envelope release stage time."),
     },
 ];
 
@@ -5102,6 +5914,10 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Sets the modulation speed. Time synchronised options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 2,
@@ -5116,6 +5932,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the depth (amount) of modulation."),
     },
     FxSlot {
         slot: 3,
@@ -5130,6 +5948,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the resonance of the filter."),
     },
     FxSlot {
         slot: 4,
@@ -5144,6 +5964,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the level of positive or negative envelope modulation."),
     },
     FxSlot {
         slot: 5,
@@ -5158,6 +5980,10 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: false,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Selects between low pass (LP), high-pass (HP), band- pass (BP) and Notch (NOT).",
+        ),
     },
     FxSlot {
         slot: 6,
@@ -5172,6 +5998,10 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -5188,6 +6018,10 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: false,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Selects modulation waveform Triangular, Sine, Saw Up, Saw Down, Ramp, Square or Random.",
+        ),
     },
     FxSlot {
         slot: 8,
@@ -5202,6 +6036,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the level of positive or negative envelope modulation."),
     },
     FxSlot {
         slot: 9,
@@ -5216,6 +6052,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the filter attack time."),
     },
     FxSlot {
         slot: 10,
@@ -5230,6 +6068,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Controls the filter release time."),
     },
     FxSlot {
         slot: 11,
@@ -5244,6 +6084,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the level, also introduces an overdrive effect if pushed hard."),
     },
     FxSlot {
         slot: 12,
@@ -5258,6 +6100,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: false,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the slope of the filter from 2-pole to 4-pole (steeper)."),
     },
 ];
 
@@ -5276,6 +6120,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the pitch of the first channel in semi-tones."),
     },
     FxSlot {
         slot: 2,
@@ -5290,6 +6136,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the pitch of the first channel in cents."),
     },
     FxSlot {
         slot: 3,
@@ -5304,6 +6152,10 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 4,
@@ -5318,6 +6170,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows gain compensation to be applied to the first channel."),
     },
     FxSlot {
         slot: 5,
@@ -5332,6 +6186,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows panning of the first channel."),
     },
     FxSlot {
         slot: 6,
@@ -5346,6 +6202,10 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -5360,6 +6220,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the pitch of the second channel in semi-tones."),
     },
     FxSlot {
         slot: 8,
@@ -5374,6 +6236,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the pitch of the second channel in cents ."),
     },
     FxSlot {
         slot: 9,
@@ -5388,6 +6252,10 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 10,
@@ -5402,6 +6270,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows gain compensation to be applied to the second channel."),
     },
     FxSlot {
         slot: 11,
@@ -5416,6 +6286,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows panning of the second channel."),
     },
     FxSlot {
         slot: 12,
@@ -5430,6 +6302,10 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Allows the high frequencies affected by the pitch shifting to be reduced.",
+        ),
     },
 ];
 
@@ -5448,6 +6324,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the pitch of the first channel in semi-tones."),
     },
     FxSlot {
         slot: 2,
@@ -5462,6 +6340,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the pitch of the first channel in cents."),
     },
     FxSlot {
         slot: 3,
@@ -5476,6 +6356,10 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 4,
@@ -5490,6 +6374,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows feedback to be applied to the first channel."),
     },
     FxSlot {
         slot: 5,
@@ -5504,6 +6390,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows panning of the first channel."),
     },
     FxSlot {
         slot: 6,
@@ -5518,6 +6406,10 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -5532,6 +6424,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the pitch of the second channel in semi-tones."),
     },
     FxSlot {
         slot: 8,
@@ -5546,6 +6440,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the pitch of the second channel in cents ."),
     },
     FxSlot {
         slot: 9,
@@ -5560,6 +6456,10 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: false,
         column: 2,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the time difference between the wet and dry signals. Sync options from 4 to 1/64 bars.",
+        ),
     },
     FxSlot {
         slot: 10,
@@ -5574,6 +6474,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 3,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows feedback to be applied to the second channel."),
     },
     FxSlot {
         slot: 11,
@@ -5588,6 +6490,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 4,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows panning of the second channel."),
     },
     FxSlot {
         slot: 12,
@@ -5602,6 +6506,10 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         column: 5,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Allows the high frequencies affected by the pitch shifting to be reduced.",
+        ),
     },
 ];
 
@@ -5620,6 +6528,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         column: 0,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some("Adjusts the rotational speed when the Low Speed operation is selected."),
     },
     FxSlot {
         slot: 2,
@@ -5634,6 +6544,10 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         column: 1,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the rotational speed when the High Speed operation is selected.",
+        ),
     },
     FxSlot {
         slot: 3,
@@ -5648,6 +6562,10 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         column: 2,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts how quickly the speed increases and decreases from the Slow mode to the Fast mode.",
+        ),
     },
     FxSlot {
         slot: 4,
@@ -5662,6 +6580,10 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         column: 3,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the distance between the Rotary speakers and the virtual microphone.",
+        ),
     },
     FxSlot {
         slot: 5,
@@ -5676,6 +6598,10 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         column: 4,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Adjusts the balance between the virtual horn and virtual drum controlling the signal tone.",
+        ),
     },
     FxSlot {
         slot: 6,
@@ -5690,6 +6616,10 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         column: 5,
         row: 0,
+        #[cfg(feature = "descriptions")]
+        description: Some(
+            "Controls the mix (or ratio) of wet (processed) and dry (unprocessed) signals.",
+        ),
     },
     FxSlot {
         slot: 7,
@@ -5704,6 +6634,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         column: 0,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("Allows the rotation effect of the motor to be disengaged (STOP)."),
     },
     FxSlot {
         slot: 8,
@@ -5718,6 +6650,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         column: 1,
         row: 1,
+        #[cfg(feature = "descriptions")]
+        description: Some("SLOWFASTSelects either the slow or fast speeds for rotation."),
     },
 ];
 
