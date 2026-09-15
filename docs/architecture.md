@@ -723,6 +723,19 @@ the year. So a release within a year must not break the public API, and a
 breaking change is a new year. CI checks the claim with `cargo-semver-checks`
 against the newest release tag, once there is one.
 
+`26.3.0` breaks that rule once, deliberately, and this is the record of it.
+`Seq Step Value 9` and `11` carried `kind = "switch"` in the manual's table
+while accepting 0 to 255, so `26.2.0` published `Program::seq_step_value9() ->
+bool` for a parameter that is a 256-value sweep. Correcting the specification
+changes those two getters and their setters to `u8`. `cargo-semver-checks`
+passes it, but only because it does not yet lint an inherent method's return
+type, so the tool agreeing is not the claim being true. The break was taken
+rather than deferred to 2027 because the accessors it removes could not be used
+correctly: a `bool` over a bipolar step reads every value but zero as `true`.
+Two days of a crate with no known caller of those four methods is the whole
+exposure, and the alternative was shipping a knowingly wrong reading for a
+year.
+
 A human edits that one line. CI fails when the version is not ahead of the
 newest release tag, so the first pull request merged after a release has to
 move it. That check is eight lines of shell in the workflow.
