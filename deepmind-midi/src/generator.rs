@@ -119,9 +119,10 @@ pub enum Scale {
 
 /// A shape a set of parameters makes, sampled by the host.
 ///
-/// Built by [`envelope`], [`lfo`] and [`filter_response`]. Copy it, keep it,
-/// sample it as many times as the picture needs: it holds the parameters it was
-/// built from and reads nothing else.
+/// Built by [`envelope`], [`lfo`] and [`filter_response`], and by
+/// [`effect::response`](crate::effect::response) for the effects that have one.
+/// Copy it, keep it, sample it as many times as the picture needs: it holds the
+/// parameters it was built from and reads nothing else.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Generator {
     shape: Shape,
@@ -140,6 +141,13 @@ enum Shape {
         shape: LfoShape,
         /// Cycles the horizontal covers.
         turns: f32,
+    },
+    /// The taps of a delay, as an impulse train.
+    Taps {
+        /// Where each tap falls along the horizontal, and how tall it is.
+        taps: [(f32, f32); MAX_TAPS],
+        /// How many of `taps` are used.
+        used: usize,
     },
     /// A low-pass response about its own corner.
     Filter {
@@ -192,6 +200,7 @@ impl Generator {
         let value = match self.shape {
             Shape::Envelope(envelope) => envelope.at(t),
             Shape::Lfo { shape, turns } => lfo_at(shape, t * turns),
+            Shape::Taps { taps, used } => taps_at(&taps, used, t),
             Shape::Filter {
                 slope,
                 resonance,
@@ -613,6 +622,44 @@ pub fn arpeggiator_gates(program: &Program) -> impl Iterator<Item = Gate> {
 /// than with an `as` so that a larger count could not silently lose precision.
 fn step_start(step: usize) -> f32 {
     f32::from(u8::try_from(step).unwrap_or(u8::MAX))
+}
+
+/// Most taps any delay on this instrument enumerates, which is the four-tap
+/// delay's.
+pub(crate) const MAX_TAPS: usize = 4;
+
+/// Builds the impulse train a delay's taps make.
+///
+/// Used by [`effect::response`](crate::effect::response), which works the taps
+/// out where the algorithm's slots are known. Each pair is where a tap falls
+/// along `0..=1` and how tall it is.
+pub(crate) fn taps(taps: [(f32, f32); MAX_TAPS], used: usize) -> Generator {
+    Generator {
+        shape: Shape::Taps {
+            taps,
+            used: used.min(MAX_TAPS),
+        },
+        scale: Scale::Normalised,
+    }
+}
+
+/// Returns the height of a delay's impulse train at `t`.
+///
+/// Each tap is a spike of its own height. A host sampling at a sensible
+/// resolution lands on every one of them, because the spikes are given a width
+/// rather than being a single point that a sample could step over.
+fn taps_at(taps: &[(f32, f32); MAX_TAPS], used: usize, t: f32) -> f32 {
+    /// Half-width of a tap, as a fraction of the whole.
+    const WIDTH: f32 = 0.014;
+
+    let mut height = 0.0_f32;
+    for &(at, tall) in taps.iter().take(used) {
+        let distance = (t - at).abs();
+        if distance < WIDTH {
+            height = height.max(tall * (1.0 - distance / WIDTH));
+        }
+    }
+    height
 }
 
 /// Returns a raw byte as `0..=1`.

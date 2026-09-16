@@ -269,6 +269,12 @@ pub struct PanelSlot {
     pub title: String,
     /// `continuous`, `switch` or `selector`.
     pub kind: String,
+    /// What the slot does to a signal, as against what it is called.
+    ///
+    /// One of `meta.quantities`. A different question from `kind`, which is
+    /// what control to draw: a delay's `Factor` is drawn as a selector and is a
+    /// time.
+    pub quantity: String,
     /// Slots sharing a label belong together, such as one side of a dual engine.
     #[serde(default)]
     pub group: Option<String>,
@@ -673,7 +679,13 @@ struct Controllers {
 
 #[derive(Debug, Deserialize)]
 struct Panels {
+    meta: PanelMeta,
     panel: Vec<Panel>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PanelMeta {
+    quantities: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -783,6 +795,8 @@ pub struct Spec {
     pub controls: Vec<String>,
     /// How each effect presents its slots, ordered by `FX Type` value.
     pub panels: Vec<Panel>,
+    /// The quantities a slot may declare.
+    pub quantities: Vec<String>,
     /// What each effect does to a signal, with the mark it is drawn with.
     pub families: Vec<Family>,
     /// How the four engines can be wired, ordered by `FX Routing` value.
@@ -841,6 +855,7 @@ impl Spec {
             aligns: layouts.meta.aligns,
             controls: layouts.meta.controls,
             panels: panels.panel,
+            quantities: panels.meta.quantities,
             families: marks.family,
             routings: routings.routing,
             fx_modes: routings.mode,
@@ -1827,6 +1842,12 @@ impl Spec {
                     return Err(format!(
                         "panels.toml: {} slot {} has no title",
                         panel.name, slot.slot
+                    ));
+                }
+                if !self.quantities.contains(&slot.quantity) {
+                    return Err(format!(
+                        "panels.toml: {} slot {} has unknown quantity {:?}",
+                        panel.name, slot.slot, slot.quantity
                     ));
                 }
                 if !KINDS.contains(&slot.kind.as_str()) {

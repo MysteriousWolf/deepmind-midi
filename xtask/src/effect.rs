@@ -30,7 +30,7 @@ const HEADER: &str = "\
 
 use super::{
     Algorithm, Align, Colour, Control, Engine, EngineParameters, Family, FxSlot, Grid, Mark, Mode,
-    Panel, Point, Routing, Row, Source, Stroke,
+    Panel, Point, Quantity, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
 
@@ -220,6 +220,7 @@ fn render_slots(
             let group = panel.and_then(|slot| slot.group.as_deref());
             let switch = panel.is_some_and(|slot| slot.kind == "switch");
             let enable = panel.is_some_and(|slot| slot.enable);
+            let quantity = quantity(panel.map_or("shape", |slot| slot.quantity.as_str()))?;
             // The description is a field behind a `cfg`, not a table beside
             // the slots: with the feature off it is not in the struct at all,
             // so a build without it carries neither the prose nor a pointer to
@@ -230,7 +231,7 @@ fn render_slots(
             );
             let _ = writeln!(
                 out,
-                "    FxSlot {{ slot: {}, reference: {:?}, title: {title:?}, kind: {}, values: {}, unit: {}, min: {}, max: {}, group: {}, modulatable: {}, enable: {enable}, column: {column}, row: {row}, {description} }},",
+                "    FxSlot {{ slot: {}, reference: {:?}, title: {title:?}, kind: {}, values: {}, unit: {}, min: {}, max: {}, group: {}, modulatable: {}, enable: {enable}, quantity: {quantity}, column: {column}, row: {row}, {description} }},",
                 parameter.slot,
                 parameter.r#ref,
                 if switch {
@@ -507,6 +508,23 @@ fn colour(hex: &str) -> Result<String, String> {
         );
     }
     Ok(format!("Colour::new({})", parts.join(", ")))
+}
+
+/// Renders what a slot does to a signal.
+fn quantity(name: &str) -> Result<String, String> {
+    Ok(match name {
+        "time" => "Quantity::Time",
+        "frequency" => "Quantity::Frequency",
+        "gain" => "Quantity::Gain",
+        "feedback" => "Quantity::Feedback",
+        "depth" => "Quantity::Depth",
+        "position" => "Quantity::Position",
+        "shape" => "Quantity::Shape",
+        "switch" => "Quantity::Switch",
+        "selection" => "Quantity::Selection",
+        other => return Err(format!("panels.toml: unknown quantity {other:?}")),
+    }
+    .to_owned())
 }
 
 /// Renders what an effect's own editor panel draws for a sweeping parameter.

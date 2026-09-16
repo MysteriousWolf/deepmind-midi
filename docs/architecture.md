@@ -558,6 +558,15 @@ use.
 Nothing in `generator` renders, runs a clock or touches a sample buffer, for the
 reasons the effect panels give.
 
+`effect::response` is the same machinery pointed at the effects, and it answers
+`None` for 33 of the 35. A reverb's impulse response is its designer's and is
+not published; a plausible one drawn here would look like information and not be
+any. The two tap delays are `Some`, because their panels are a time and a gain
+per tap and the times are ratios of the master delay that the manual prints as
+fractions. One thing in that is a reading rather than a transcription — which
+byte selects which of the ten printed fractions is not published, so the byte's
+range is divided evenly among them — and it is marked where it happens.
+
 ## State is a set of claims
 
 The synthesizer answers no per-parameter reads. Dumps can be requested; edits

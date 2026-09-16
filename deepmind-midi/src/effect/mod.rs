@@ -77,7 +77,9 @@ use generated::{ALGORITHMS, ENGINES, FAMILY_NAMES, GRID, MARKS, MODES, PANELS, R
 use core::fmt;
 
 use crate::error::{Error, Result};
-use crate::param::{Kind, ParamId, TableId};
+use crate::generator::{Generator, MAX_TAPS};
+use crate::param::{DEFAULT_FIRMWARE, Kind, ParamId, TableId};
+use crate::program::Program;
 use crate::sysex::inquiry::Version;
 
 /// One of the four effect engines.
@@ -464,6 +466,11 @@ pub struct FxSlot {
     /// there are only three.
     #[cfg_attr(feature = "serde", serde(skip))]
     pub(crate) enable: bool,
+    /// What this slot does to a signal.
+    ///
+    /// [`FxSlot::quantity`](Self::quantity) is how it is read.
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) quantity: Quantity,
     /// Column of the FX page's grid this slot is drawn in, counting from 0.
     #[cfg_attr(feature = "serde", serde(skip))]
     pub(crate) column: u8,
@@ -502,6 +509,32 @@ impl FxSlot {
     #[must_use]
     pub const fn is_selector(&self) -> bool {
         !self.values.is_empty()
+    }
+
+    /// Returns what this slot does to a signal, as against what it is called.
+    ///
+    /// [`kind`](Self::kind) says what control to draw. This says what picture
+    /// the slot belongs in, which is a different question with a different
+    /// answer: a `Mix`, a `Feedback` and a `Pre-Delay` are all a byte `0..=255`
+    /// and they do three unrelated things to a drawing.
+    ///
+    /// It is what lets a host group an algorithm's slots without matching on
+    /// titles across 35 algorithms.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::{Algorithm, Quantity};
+    ///
+    /// let delay = Algorithm::by_name("3TapDelay").expect("a 3-Tap Delay");
+    ///
+    /// // Drawn as a selector, because it picks from ten printed fractions.
+    /// let factor = delay.slot(5).expect("a FactorA slot");
+    /// assert!(factor.is_selector());
+    /// // And it is a time, because what it sets is when the tap lands.
+    /// assert_eq!(factor.quantity(), Quantity::Time);
+    /// ```
+    #[must_use]
+    pub const fn quantity(&self) -> Quantity {
+        self.quantity
     }
 
     /// Returns whether this slot switches the whole effect in and out of
@@ -1023,6 +1056,60 @@ pub enum Control {
     Display,
 }
 
+/// What an effect slot does to a signal, as against what it is called.
+///
+/// Reached through [`FxSlot::quantity`]. [`Kind`] is what control to draw; this
+/// is what picture the slot belongs in. The two are separate because they
+/// disagree: a delay's `Factor` is drawn as a selector, because it picks from
+/// ten printed fractions, and what it sets is when a tap lands.
+///
+/// Derived from the parameter rather than stated by the manual, the same way
+/// [`FxSlot::title`] and [`FxSlot::group`] are, so it is a convention this
+/// project chose. `spec/panels.toml` records how, and names the slots where the
+/// manual's own description decided it against what the name suggests.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum Quantity {
+    /// When something happens: a pre-delay, an envelope stage, a tap's place in
+    /// a pattern.
+    Time,
+    /// Where in the spectrum: a cut, a corner, a rate, an interval.
+    Frequency,
+    /// How loud: an input, an output, a threshold, a band's level.
+    Gain,
+    /// How much of the output goes back in.
+    Feedback,
+    /// How much effect there is: a mix, a drive, a density.
+    Depth,
+    /// Where in the stereo field: a pan, a width, a spread, a phase offset.
+    Position,
+    /// What the response looks like: a Q, a damping, a size, a wave morph.
+    Shape,
+    /// In or out.
+    Switch,
+    /// One of a list of named kinds: a preset, a cabinet, a distortion type.
+    ///
+    /// Not a quantity at all, which is why it is last. A slot that picks from a
+    /// list still has to answer, and `Shape` would have been a lie.
+    Selection,
+}
+
+impl Quantity {
+    /// Every quantity, in the order they are declared.
+    pub const ALL: [Self; 9] = [
+        Self::Time,
+        Self::Frequency,
+        Self::Gain,
+        Self::Feedback,
+        Self::Depth,
+        Self::Position,
+        Self::Shape,
+        Self::Switch,
+        Self::Selection,
+    ];
+}
+
 /// What a row that is not full does with the space left over.
 ///
 /// [`Align::Left`] on every row of every algorithm as measured. The rest of the
@@ -1301,18 +1388,144 @@ impl fmt::Display for Mode {
     }
 }
 
+/// The ten fractions a delay's `Factor` slot picks from, in the order the manual
+/// prints them.
+///
+/// The same ten on every `Factor` slot of both tap delays, which
+/// `every_factor_slot_offers_the_same_ten_fractions` holds against
+/// [`FxSlot::values`] so that this table cannot drift from the specification.
+const FACTORS: [(f32, &str); 10] = [
+    (0.25, "1/4"),
+    (1.0 / 3.0, "1/3"),
+    (0.5, "1/2"),
+    (2.0 / 3.0, "2/3"),
+    (0.75, "3/4"),
+    (1.0, "1"),
+    (4.0 / 3.0, "4/3"),
+    (1.5, "3/2"),
+    (2.0, "2"),
+    (3.0, "3"),
+];
+
+/// Returns what this engine is doing to a signal, where that follows from
+/// published parameters.
+///
+/// [`None`] for most of the 35, and that is the answer rather than a gap. A
+/// reverb's impulse response is its designer's and is not published; a library
+/// that invented a plausible one would be drawing something that looks like
+/// information and is not. The same goes for a compressor's exact knee and a
+/// phaser's comb.
+///
+/// [`Some`] for the 3-Tap and 4-Tap delays. Their panels are literally a time
+/// and a gain per tap, and the times are ratios of the master delay that the
+/// manual prints as fractions, so the picture follows from the parameters
+/// rather than from anybody's DSP. The horizontal is [`Scale::Normalised`](crate::generator::Scale::Normalised), from
+/// zero to the furthest tap: the ratios between the taps are published, and the
+/// master delay time they are ratios *of* is a byte with no published curve, so
+/// there is no axis to label.
+///
+/// Read on [`DEFAULT_FIRMWARE`], as the program's own `fx1_type` and its
+/// siblings are, so an engine running Vintage Pitch on firmware 1.0 is read as
+/// the algorithm 1.1 numbers there.
+///
+/// # Why not the other four delays
+///
+/// The Stereo Delay and the Tel-Ray have a master time and a feedback rather
+/// than enumerated taps, so what they make is an endless train whose count
+/// depends on where a host decides the repeats have died away. That is the
+/// host's decision about its own picture, not a fact this library holds. The
+/// Decimator Delay is the same with a decimator in front of it, and Mod, Delay
+/// and Reverb has a reverb across the end of it.
+///
+/// ```
+/// use deepmind_midi::ProtocolVersion;
+/// use deepmind_midi::effect::{self, Engine};
+/// use deepmind_midi::program::{FxType, Program};
+///
+/// let mut program = Program::new(ProtocolVersion::V6);
+/// program.set_fx1_type(FxType::ThreeTapDelay);
+/// program.set_fx1_param2(255);    // the first tap, at full gain
+///
+/// // The master tap is the furthest out here, so it lands at the end.
+/// let response = effect::response(&program, Engine::One).expect("a 3-Tap Delay");
+/// assert!(response.at(1.0) > 0.9);
+/// assert_eq!(response.at(0.6), 0.0);
+///
+/// // And a reverb has none, which is an answer rather than a failure.
+/// program.set_fx1_type(FxType::RoomRev);
+/// assert!(effect::response(&program, Engine::One).is_none());
+/// ```
+#[must_use]
+pub fn response(program: &Program, engine: Engine) -> Option<Generator> {
+    let algorithm =
+        Algorithm::for_value(program.get(engine.algorithm_parameter()), DEFAULT_FIRMWARE)?;
+
+    // Slot numbers of the gain and the factor for each tap, in tap order. The
+    // first tap runs at the master time and so has no factor of its own.
+    let layout: &[(u8, Option<u8>)] = match algorithm.name {
+        "3TapDelay" => &[(2, None), (6, Some(5)), (9, Some(8))],
+        "4TapDelay" => &[(2, None), (6, Some(5)), (8, Some(7)), (10, Some(9))],
+        _ => return None,
+    };
+
+    let mut taps = [(0.0, 0.0); MAX_TAPS];
+    let mut used = 0;
+    let mut furthest = 0.0_f32;
+    for &(gain, factor) in layout {
+        let at = match factor {
+            None => 1.0,
+            Some(slot) => fraction(program, engine, slot)?,
+        };
+        let height = engine
+            .slot_parameter(gain)
+            .map_or(0.0, |parameter| f32::from(program.get(parameter)) / 255.0);
+        *taps.get_mut(used)? = (at, height);
+        furthest = furthest.max(at);
+        used += 1;
+    }
+
+    // Normalised to the furthest tap, since the master time the ratios are
+    // ratios of has no published curve to put an axis in.
+    if furthest > 0.0 {
+        for tap in taps.iter_mut().take(used) {
+            tap.0 /= furthest;
+        }
+    }
+    Some(crate::generator::taps(taps, used))
+}
+
+/// Returns the fraction of the master delay time a `Factor` slot selects.
+///
+/// # A reading, not a published mapping
+///
+/// The ten fractions are printed in the manual and are in [`FxSlot::values`].
+/// Which byte shows which of them is not, for the reason
+/// [`FxSlot::values`] gives, so this divides the byte's range evenly among them.
+/// That is the only mapping a `0..=255` byte and ten named options admit, and it
+/// is the one thing in this function that is not off the page.
+fn fraction(program: &Program, engine: Engine, slot: u8) -> Option<f32> {
+    let raw = program.get(engine.slot_parameter(slot)?);
+    let index = usize::from(raw) * FACTORS.len() / 256;
+    FACTORS.get(index).map(|&(fraction, _)| fraction)
+}
+
 #[cfg(test)]
 #[expect(
     clippy::expect_used,
     clippy::panic,
-    reason = "a failed expectation is the test failure"
+    clippy::indexing_slicing,
+    clippy::float_cmp,
+    reason = "a failed expectation is the test failure, and a tap that is drawn \
+              at nothing is drawn at exactly nothing"
 )]
 mod tests {
     use super::{
-        ALGORITHM_COUNT, Algorithm, Align, Engine, Family, MODE_COUNT, Mode, ROUTING_COUNT,
-        Routing, SLOTS_PER_ENGINE, Source, Stroke, grid,
+        ALGORITHM_COUNT, Algorithm, Align, Engine, Family, MODE_COUNT, Mode, Quantity,
+        ROUTING_COUNT, Routing, SLOTS_PER_ENGINE, Source, Stroke, grid,
     };
+    use crate::ids::ProtocolVersion;
     use crate::param::{DEFAULT_FIRMWARE, Group, Kind, ParamId, TableId};
+    use crate::program::{FxType, Program};
     use crate::sysex::inquiry::Version;
 
     /// Firmware 1.0, which numbers the algorithms differently.
@@ -1834,6 +2047,150 @@ mod tests {
         assert!(creative.contains(&Family::Filter));
         assert!(creative.contains(&Family::Pitch));
         assert!(creative.contains(&Family::Rotary));
+    }
+
+    /// Every slot answers what it does to a signal, and the answer is not just
+    /// a rewording of what control to draw. A `Factor` is the case that proves
+    /// it: drawn as a selector, and a time.
+    #[test]
+    fn a_quantity_is_a_different_question_from_a_control_kind() {
+        let mut counts = [0_usize; 9];
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots {
+                counts[index_of(slot.quantity())] += 1;
+            }
+        }
+        // Every one of the nine is used, or it should not be in the enum.
+        for (quantity, count) in Quantity::ALL.into_iter().zip(counts) {
+            assert!(count > 0, "{quantity:?} is in the enum and on no slot");
+        }
+        assert_eq!(counts.iter().sum::<usize>(), 371);
+
+        let delay = Algorithm::by_name("3TapDelay").expect("a 3-Tap Delay");
+        let factor = delay.slot(5).expect("a FactorA slot");
+        assert!(factor.is_selector());
+        assert_eq!(factor.quantity(), Quantity::Time);
+
+        // And a switch is a switch both ways round, which is the easy case.
+        let gate = Algorithm::by_name("NoiseGate").expect("a Noise Gate");
+        let power = gate.slot(8).expect("a Power slot");
+        assert_eq!(power.kind, Kind::Switch);
+        assert_eq!(power.quantity(), Quantity::Switch);
+    }
+
+    /// Returns a quantity's position in `Quantity::ALL`.
+    fn index_of(quantity: Quantity) -> usize {
+        Quantity::ALL
+            .into_iter()
+            .position(|other| other == quantity)
+            .unwrap_or(0)
+    }
+
+    /// A unit decides a quantity wherever the manual gives one, so every slot
+    /// measured in the same unit answers the same way. A disagreement here is a
+    /// hand edit that got out of step with the rest of the column.
+    #[test]
+    fn a_unit_decides_the_quantity_wherever_there_is_one() {
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots {
+                let expected = match slot.unit {
+                    Some("ms" | "s") => Some(Quantity::Time),
+                    Some("Hz") => Some(Quantity::Frequency),
+                    Some("deg") => Some(Quantity::Position),
+                    _ => None,
+                };
+                if let Some(expected) = expected {
+                    assert_eq!(
+                        slot.quantity(),
+                        expected,
+                        "{algorithm} {} is in {:?}",
+                        slot.title,
+                        slot.unit
+                    );
+                }
+            }
+        }
+    }
+
+    /// The fractions `response` places taps with are the ones the manual prints,
+    /// held against the slot's own values so the table cannot drift from the
+    /// specification it was copied out of.
+    #[test]
+    fn every_factor_slot_offers_the_same_ten_fractions() {
+        let printed: Vec<&str> = super::FACTORS.iter().map(|&(_, name)| name).collect();
+        let mut found = 0;
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots {
+                if !slot.title.contains("Factor") {
+                    continue;
+                }
+                assert_eq!(
+                    slot.values,
+                    printed.as_slice(),
+                    "{algorithm} {}",
+                    slot.title
+                );
+                assert_eq!(slot.quantity(), Quantity::Time);
+                found += 1;
+            }
+        }
+        // Every algorithm that divides a master delay time offers the same ten,
+        // which is what makes one table right for all of them.
+        assert_eq!(found, 10);
+    }
+
+    /// The two tap delays have a response and the other 33 do not, which is the
+    /// answer rather than a gap.
+    #[test]
+    fn only_the_tap_delays_have_a_published_response() {
+        let mut program = Program::new(ProtocolVersion::V6);
+        for algorithm in Algorithm::all() {
+            let Some(value) = algorithm.value_for(DEFAULT_FIRMWARE) else {
+                continue;
+            };
+            program.set_clamped(Engine::One.algorithm_parameter(), value);
+            let response = super::response(&program, Engine::One);
+            let expected = matches!(algorithm.name, "3TapDelay" | "4TapDelay");
+            assert_eq!(response.is_some(), expected, "{algorithm}");
+        }
+    }
+
+    /// A tap lands where its factor puts it, against the master tap, and stands
+    /// as tall as its gain byte. That is the whole of what a tap delay's
+    /// picture is, and all of it comes off the manual's page bar the byte that
+    /// picks the fraction.
+    #[test]
+    fn a_tap_lands_where_its_factor_and_gain_put_it() {
+        let mut program = Program::new(ProtocolVersion::V6);
+        program.set_fx1_type(FxType::FourTapDelay);
+        // Every gain up, so each tap is there to be found.
+        for slot in [2, 6, 8, 10] {
+            program.set_clamped(Engine::One.slot_parameter(slot).expect("a gain slot"), 255);
+        }
+        // The last of the ten fractions is 3, the largest, so the fourth tap is
+        // the furthest out and the picture is normalised to it.
+        program.set_clamped(Engine::One.slot_parameter(9).expect("FactorC"), 255);
+        // And the first two at 1/4, the smallest.
+        for slot in [5, 7] {
+            program.set_clamped(Engine::One.slot_parameter(slot).expect("a factor"), 0);
+        }
+
+        let response = super::response(&program, Engine::One).expect("a 4-Tap Delay");
+        // Taps at 1, 1/4, 1/4 and 3 master times, over a furthest of 3.
+        assert!(
+            response.at(1.0) > 0.9,
+            "the furthest tap: {}",
+            response.at(1.0)
+        );
+        assert!(response.at(1.0 / 3.0) > 0.9, "the master tap");
+        assert!(response.at(0.25 / 3.0) > 0.9, "the two quarter taps");
+        // And nothing between them.
+        assert_eq!(response.at(0.6), 0.0);
+
+        // A tap with its gain at nothing is drawn at nothing.
+        program.set_clamped(Engine::One.slot_parameter(2).expect("the master gain"), 0);
+        let quiet = super::response(&program, Engine::One).expect("a 4-Tap Delay");
+        assert_eq!(quiet.at(1.0 / 3.0), 0.0);
     }
 
     /// The `FX Type` table is 35 effects and nothing else, on both firmwares.

@@ -6,7 +6,7 @@
 
 use super::{
     Algorithm, Align, Colour, Control, Engine, EngineParameters, Family, FxSlot, Grid, Mark, Mode,
-    Panel, Point, Routing, Row, Source, Stroke,
+    Panel, Point, Quantity, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
 
@@ -412,6 +412,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -429,6 +430,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -448,6 +450,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -467,6 +470,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -486,6 +490,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -509,6 +514,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -528,6 +534,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -545,6 +552,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -562,6 +570,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -579,6 +588,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -596,6 +606,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -615,6 +626,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -632,6 +644,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -649,6 +662,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -666,6 +680,7 @@ static AMB_VERB: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -687,6 +702,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -706,6 +722,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -723,6 +740,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -740,6 +758,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -757,6 +776,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -774,6 +794,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -793,6 +814,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -810,6 +832,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -827,6 +850,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -844,6 +868,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -861,6 +886,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -878,6 +904,7 @@ static ROOM_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -899,6 +926,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -918,6 +946,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -937,6 +966,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -956,6 +986,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -973,6 +1004,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -990,6 +1022,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1007,6 +1040,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1024,6 +1058,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1041,6 +1076,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1058,6 +1094,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1075,6 +1112,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1094,6 +1132,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Switch,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1115,6 +1154,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1134,6 +1174,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1151,6 +1192,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1168,6 +1210,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1185,6 +1228,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1202,6 +1246,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1221,6 +1266,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1238,6 +1284,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1255,6 +1302,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1272,6 +1320,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1289,6 +1338,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1306,6 +1356,7 @@ static HALL_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1327,6 +1378,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1346,6 +1398,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1363,6 +1416,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1380,6 +1434,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1397,6 +1452,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1414,6 +1470,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1433,6 +1490,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1450,6 +1508,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1467,6 +1526,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1484,6 +1544,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1501,6 +1562,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1518,6 +1580,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1539,6 +1602,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1558,6 +1622,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1575,6 +1640,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1592,6 +1658,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1609,6 +1676,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1626,6 +1694,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1645,6 +1714,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1662,6 +1732,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1679,6 +1750,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1696,6 +1768,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1713,6 +1786,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1730,6 +1804,7 @@ static PLATE_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1751,6 +1826,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1770,6 +1846,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1787,6 +1864,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1804,6 +1882,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1821,6 +1900,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1838,6 +1918,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1857,6 +1938,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1874,6 +1956,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1891,6 +1974,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1908,6 +1992,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1925,6 +2010,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1942,6 +2028,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1963,6 +2050,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1982,6 +2070,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1999,6 +2088,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2016,6 +2106,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2033,6 +2124,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2050,6 +2142,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2069,6 +2162,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2086,6 +2180,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2105,6 +2200,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2124,6 +2220,7 @@ static GATED_REV: [FxSlot; 10] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2145,6 +2242,7 @@ static REVERSE: [FxSlot; 9] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2164,6 +2262,7 @@ static REVERSE: [FxSlot; 9] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2181,6 +2280,7 @@ static REVERSE: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2198,6 +2298,7 @@ static REVERSE: [FxSlot; 9] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2215,6 +2316,7 @@ static REVERSE: [FxSlot; 9] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2234,6 +2336,7 @@ static REVERSE: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2253,6 +2356,7 @@ static REVERSE: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2270,6 +2374,7 @@ static REVERSE: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2289,6 +2394,7 @@ static REVERSE: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2312,6 +2418,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2331,6 +2438,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2348,6 +2456,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2365,6 +2474,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2382,6 +2492,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2399,6 +2510,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2416,6 +2528,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2435,6 +2548,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2452,6 +2566,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2469,6 +2584,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2486,6 +2602,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2503,6 +2620,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2526,6 +2644,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2545,6 +2664,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2562,6 +2682,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2579,6 +2700,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2596,6 +2718,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2613,6 +2736,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2630,6 +2754,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2649,6 +2774,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2666,6 +2792,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2683,6 +2810,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2700,6 +2828,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2717,6 +2846,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2740,6 +2870,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2759,6 +2890,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2776,6 +2908,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2793,6 +2926,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2810,6 +2944,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2827,6 +2962,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2844,6 +2980,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2863,6 +3000,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2880,6 +3018,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2897,6 +3036,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2914,6 +3054,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2931,6 +3072,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2954,6 +3096,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("low"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2971,6 +3114,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("low"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2988,6 +3132,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("low-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3005,6 +3150,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("low-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3022,6 +3168,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("low-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3039,6 +3186,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("high-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3056,6 +3204,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("high-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3073,6 +3222,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("high-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3090,6 +3240,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("high"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3107,6 +3258,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: Some("high"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3124,6 +3276,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Selection,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3145,6 +3298,7 @@ static ENHANCER: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3162,6 +3316,7 @@ static ENHANCER: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3179,6 +3334,7 @@ static ENHANCER: [FxSlot; 9] = [
         group: Some("low"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3196,6 +3352,7 @@ static ENHANCER: [FxSlot; 9] = [
         group: Some("low"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3213,6 +3370,7 @@ static ENHANCER: [FxSlot; 9] = [
         group: Some("mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3230,6 +3388,7 @@ static ENHANCER: [FxSlot; 9] = [
         group: Some("mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3247,6 +3406,7 @@ static ENHANCER: [FxSlot; 9] = [
         group: Some("high"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3264,6 +3424,7 @@ static ENHANCER: [FxSlot; 9] = [
         group: Some("high"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3281,6 +3442,7 @@ static ENHANCER: [FxSlot; 9] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Switch,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3302,6 +3464,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3319,6 +3482,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("left-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3336,6 +3500,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("left-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3353,6 +3518,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("left-mid"),
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3370,6 +3536,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("left-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3389,6 +3556,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("left-mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3406,6 +3574,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3423,6 +3592,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("right-side"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3440,6 +3610,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("right-side"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3457,6 +3628,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("right-side"),
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3474,6 +3646,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("right-side"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3493,6 +3666,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         group: Some("right-side"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3514,6 +3688,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3531,6 +3706,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3550,6 +3726,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: Some("low"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3567,6 +3744,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: Some("low"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3584,6 +3762,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3601,6 +3780,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: Some("mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3620,6 +3800,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: Some("mid"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3639,6 +3820,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3656,6 +3838,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: Some("high"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3673,6 +3856,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: Some("high"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3692,6 +3876,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3711,6 +3896,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3732,6 +3918,7 @@ static RACK_AMP: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3751,6 +3938,7 @@ static RACK_AMP: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3768,6 +3956,7 @@ static RACK_AMP: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3785,6 +3974,7 @@ static RACK_AMP: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3804,6 +3994,7 @@ static RACK_AMP: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3821,6 +4012,7 @@ static RACK_AMP: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3838,6 +4030,7 @@ static RACK_AMP: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3857,6 +4050,7 @@ static RACK_AMP: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3876,6 +4070,7 @@ static RACK_AMP: [FxSlot; 9] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3897,6 +4092,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         group: None,
         modulatable: false,
         enable: true,
+        quantity: Quantity::Switch,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3914,6 +4110,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3931,6 +4128,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3948,6 +4146,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3965,6 +4164,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3982,6 +4182,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3999,6 +4200,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4016,6 +4218,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4037,6 +4240,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4054,6 +4258,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4071,6 +4276,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4088,6 +4294,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4105,6 +4312,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4122,6 +4330,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4139,6 +4348,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4156,6 +4366,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4173,6 +4384,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4194,6 +4406,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4211,6 +4424,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4230,6 +4444,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4247,6 +4462,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4266,6 +4482,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4283,6 +4500,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4302,6 +4520,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4319,6 +4538,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         group: None,
         modulatable: false,
         enable: true,
+        quantity: Quantity::Switch,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4340,6 +4560,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4359,6 +4580,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4378,6 +4600,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4399,6 +4622,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4418,6 +4642,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4435,6 +4660,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4452,6 +4678,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4471,6 +4698,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4490,6 +4718,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4507,6 +4736,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4524,6 +4754,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4541,6 +4772,7 @@ static DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4562,6 +4794,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4581,6 +4814,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4598,6 +4832,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4615,6 +4850,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4634,6 +4870,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4651,6 +4888,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4668,6 +4906,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4687,6 +4926,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4704,6 +4944,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4721,6 +4962,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4738,6 +4980,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4755,6 +4998,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4778,6 +5022,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4797,6 +5042,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4814,6 +5060,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4831,6 +5078,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4850,6 +5098,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4867,6 +5116,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4886,6 +5136,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4903,6 +5154,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4922,6 +5174,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4939,6 +5192,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4956,6 +5210,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4973,6 +5228,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4996,6 +5252,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5015,6 +5272,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5032,6 +5290,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5051,6 +5310,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5070,6 +5330,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5091,6 +5352,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5110,6 +5372,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5129,6 +5392,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5148,6 +5412,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5167,6 +5432,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5184,6 +5450,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5201,6 +5468,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5220,6 +5488,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5237,6 +5506,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5254,6 +5524,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5271,6 +5542,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5288,6 +5560,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5311,6 +5584,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5332,6 +5606,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5349,6 +5624,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5366,6 +5642,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5383,6 +5660,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5400,6 +5678,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5419,6 +5698,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5436,6 +5716,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5453,6 +5734,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5470,6 +5752,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5487,6 +5770,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5504,6 +5788,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5527,6 +5812,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5546,6 +5832,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5563,6 +5850,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5580,6 +5868,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5597,6 +5886,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5614,6 +5904,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5633,6 +5924,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5650,6 +5942,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5667,6 +5960,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5684,6 +5978,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5703,6 +5998,7 @@ static CHORUS: [FxSlot; 11] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5726,6 +6022,7 @@ static CHORUS_D: [FxSlot; 7] = [
         group: None,
         modulatable: false,
         enable: true,
+        quantity: Quantity::Switch,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5743,6 +6040,7 @@ static CHORUS_D: [FxSlot; 7] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5760,6 +6058,7 @@ static CHORUS_D: [FxSlot; 7] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5779,6 +6078,7 @@ static CHORUS_D: [FxSlot; 7] = [
         group: Some("channel-1"),
         modulatable: false,
         enable: false,
+        quantity: Quantity::Switch,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5796,6 +6096,7 @@ static CHORUS_D: [FxSlot; 7] = [
         group: Some("channel-2"),
         modulatable: false,
         enable: false,
+        quantity: Quantity::Switch,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5813,6 +6114,7 @@ static CHORUS_D: [FxSlot; 7] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Switch,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5830,6 +6132,7 @@ static CHORUS_D: [FxSlot; 7] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Switch,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5851,6 +6154,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5870,6 +6174,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5887,6 +6192,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5904,6 +6210,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5921,6 +6228,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5938,6 +6246,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5957,6 +6266,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5974,6 +6284,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5991,6 +6302,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6008,6 +6320,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6025,6 +6338,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6042,6 +6356,7 @@ static FLANGER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6063,6 +6378,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6082,6 +6398,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6099,6 +6416,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6116,6 +6434,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6133,6 +6452,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6150,6 +6470,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6169,6 +6490,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Shape,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6186,6 +6508,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6203,6 +6526,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6220,6 +6544,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6237,6 +6562,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6254,6 +6580,7 @@ static PHASER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6275,6 +6602,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6294,6 +6622,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6311,6 +6640,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6328,6 +6658,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6345,6 +6676,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6364,6 +6696,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6385,6 +6718,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6404,6 +6738,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6421,6 +6756,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6438,6 +6774,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6455,6 +6792,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6472,6 +6810,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         group: None,
         modulatable: false,
         enable: false,
+        quantity: Quantity::Switch,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6493,6 +6832,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6510,6 +6850,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6527,6 +6868,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6546,6 +6888,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6563,6 +6906,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6580,6 +6924,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6599,6 +6944,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6616,6 +6962,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6633,6 +6980,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6652,6 +7000,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Gain,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6669,6 +7018,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6686,6 +7036,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6709,6 +7060,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6726,6 +7078,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6743,6 +7096,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6762,6 +7116,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6779,6 +7134,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-1"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6796,6 +7152,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6815,6 +7172,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6832,6 +7190,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6849,6 +7208,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: false,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6868,6 +7228,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6885,6 +7246,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: Some("channel-2"),
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6902,6 +7264,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6925,6 +7288,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6942,6 +7306,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6961,6 +7326,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6980,6 +7346,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6999,6 +7366,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7018,6 +7386,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7037,6 +7406,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Switch,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7054,6 +7424,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         group: None,
         modulatable: true,
         enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]

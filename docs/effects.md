@@ -18,6 +18,7 @@ are wired to each other, what `FX Type` and `FX Routing` hold) see
 - [Ranges](#ranges)
 - [Which parameters respond to modulation](#which-parameters-respond-to-modulation)
 - [Reading a panel](#reading-a-panel)
+- [What a slot does](#what-a-slot-does)
 - [Marks](#marks)
 - [Algorithms](#algorithms)
 - [Corrections to the manual](#corrections-to-the-manual)
@@ -82,6 +83,34 @@ The specification holds no default value for an effect parameter, so there is
 no position to draw, and the middle is the same for every slot on every page.
 Leaving the handle off was tried first and read badly: a fader without a cap is
 a line with ticks beside it.
+
+## What a slot does
+
+Every slot has a `Control` column below saying what to draw for it. It also has
+a quantity, through `FxSlot::quantity`, saying what it does to a signal, and the
+two are different questions:
+
+| | |
+|---|---|
+| `kind` | what control to draw: a knob, a button, a list |
+| `quantity` | what picture the slot belongs in |
+
+A `Mix`, a `Feedback` and a `Pre-Delay` are all a byte 0-255 and they do three
+unrelated things to a drawing. Nine quantities — time, frequency, gain,
+feedback, depth, position, shape, switch, selection — let a host group an
+algorithm's slots without matching on titles across 35 algorithms.
+
+Where the two disagree is the point. A delay's `Factor` is drawn as a selector,
+because it picks from ten fractions the manual prints, and it is a *time*: what
+it sets is when the tap lands.
+
+Like the titles and the groupings, the quantity is derived from the parameter
+rather than transcribed, so it is a convention this project chose.
+[`spec/panels.toml`](../spec/panels.toml) records how: the unit decides it
+wherever the manual gives one, the name decides otherwise, and where the name
+reads the other way from the manual's own description the description wins. A
+reverb's `Attack` is a shape, not a time, because the manual calls it the
+contour of the reverberation envelope.
 
 ## Marks
 
