@@ -853,14 +853,11 @@ mod tests {
     }
 
     /// Samples a generator across its whole range, which is what a host does.
-    fn walk(generator: &Generator, steps: usize) -> Vec<f32> {
-        (0..=steps)
-            .map(|step| {
-                let at = u8::try_from(step).unwrap_or(u8::MAX);
-                let of = u8::try_from(steps).unwrap_or(u8::MAX);
-                generator.at(f32::from(at) / f32::from(of))
-            })
-            .collect()
+    ///
+    /// An iterator rather than a collection, because the crate's own tests
+    /// build with no features on and there is no allocator there.
+    fn walk(generator: &Generator, steps: u8) -> impl Iterator<Item = f32> + '_ {
+        (0..=steps).map(move |step| generator.at(f32::from(step) / f32::from(steps)))
     }
 
     /// Nothing a host samples can leave the box it is drawing into, whatever it
@@ -964,9 +961,8 @@ mod tests {
             };
             assert_eq!(generator.scale(), Scale::Turns(expected), "{shape}");
 
-            let walked = walk(&generator, 64);
-            let high = walked.iter().copied().fold(f32::MIN, f32::max);
-            let low = walked.iter().copied().fold(f32::MAX, f32::min);
+            let high = walk(&generator, 64).fold(f32::MIN, f32::max);
+            let low = walk(&generator, 64).fold(f32::MAX, f32::min);
             // A shape that does not move is a shape that is not drawn.
             assert!(high - low > 0.3, "{shape} spans {low} to {high}");
         }
@@ -1002,11 +998,10 @@ mod tests {
             held.at(cycle * 0.9),
             "a cycle of the hold",
         );
-        let steps: Vec<f32> = (0..6)
-            .map(|cycle| {
-                held.at((f32::from(u8::try_from(cycle).expect("six")) + 0.5) / SAMPLED_TURNS)
-            })
-            .collect();
+        let steps: [f32; 6] = core::array::from_fn(|cycle| {
+            let cycle = f32::from(u8::try_from(cycle).unwrap_or(u8::MAX));
+            held.at((cycle + 0.5) / SAMPLED_TURNS)
+        });
         assert!(
             steps
                 .windows(2)
@@ -1015,7 +1010,7 @@ mod tests {
         );
 
         // And the same sequence every time, so a picture does not flicker.
-        assert_eq!(walk(&held, 64), walk(&lfo(&program, LfoId::One), 64));
+        assert!(walk(&held, 64).eq(walk(&lfo(&program, LfoId::One), 64)));
 
         // The glide lands on the same values, by sliding rather than stepping,
         // so it moves within a cycle where the hold does not and the two meet
@@ -1124,21 +1119,22 @@ mod tests {
         // "255 being a full note": the gate fills its step and the next one
         // starts where it ends.
         program.set_arp_gate_time(255);
-        let full: Vec<_> = arpeggiator_gates(&program).collect();
-        assert_eq!(full.len(), GATES_DRAWN);
-        let first = full.first().expect("four gates");
-        let second = full.get(1).expect("four gates");
-        close(first.length(), 1.0, "a full gate");
-        close(first.end(), second.start(), "the next step");
+        assert_eq!(arpeggiator_gates(&program).count(), GATES_DRAWN);
+        {
+            let mut full = arpeggiator_gates(&program);
+            let first = full.next().expect("four gates");
+            let second = full.next().expect("four gates");
+            close(first.length(), 1.0, "a full gate");
+            close(first.end(), second.start(), "the next step");
+        }
 
         // "128 ... represents half of a step".
         program.set_arp_gate_time(128);
-        let half: Vec<_> = arpeggiator_gates(&program).collect();
-        let first = half.first().expect("four gates");
+        let first = arpeggiator_gates(&program).next().expect("four gates");
         close(first.length(), 128.0 / 255.0, "half a step");
 
         // Every gate opens on its own step and closes before the next one.
-        for (step, gate) in half.iter().enumerate() {
+        for (step, gate) in arpeggiator_gates(&program).enumerate() {
             let start = f32::from(u8::try_from(step).expect("four steps"));
             close(gate.start(), start, "the step a gate opens on");
             assert!(gate.end() <= start + 1.0);

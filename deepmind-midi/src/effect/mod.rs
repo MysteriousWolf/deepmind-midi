@@ -1914,24 +1914,25 @@ mod tests {
     /// the specification grew one or `enable` has been read too widely.
     #[test]
     fn three_slots_switch_their_effect_out_of_circuit() {
-        let found: Vec<(&str, u8)> = Algorithm::all()
-            .iter()
-            .flat_map(|algorithm| {
-                algorithm
-                    .slots
-                    .iter()
-                    .filter(|slot| slot.is_enable())
-                    .map(move |slot| (algorithm.name, slot.slot))
-            })
-            .collect();
-        assert_eq!(
-            found,
-            [("RackAmp", 0); 0]
-                .iter()
-                .copied()
-                .chain([("EdisonEX1", 1), ("NoiseGate", 8), ("Chorus-D", 1)])
-                .collect::<Vec<_>>(),
-        );
+        const EXPECTED: [(&str, u8); 3] = [("EdisonEX1", 1), ("NoiseGate", 8), ("Chorus-D", 1)];
+
+        let mut found = [("", 0_u8); EXPECTED.len()];
+        let mut count = 0_usize;
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots.iter().filter(|slot| slot.is_enable()) {
+                assert!(
+                    count < EXPECTED.len(),
+                    "a fourth enable: {algorithm} slot {}",
+                    slot.slot
+                );
+                if let Some(entry) = found.get_mut(count) {
+                    *entry = (algorithm.name, slot.slot);
+                }
+                count += 1;
+            }
+        }
+        assert_eq!(count, EXPECTED.len());
+        assert_eq!(found, EXPECTED);
     }
 
     /// An enable is a switch, because an effect is in circuit or it is not.
@@ -1973,9 +1974,8 @@ mod tests {
     /// renamed in marks.toml fails here rather than handing out the wrong mark.
     #[test]
     fn the_families_are_in_the_order_the_specification_declares() {
-        let names: Vec<&str> = Family::ALL.into_iter().map(Family::name).collect();
         assert_eq!(
-            names,
+            Family::ALL.map(Family::name),
             [
                 "Reverb",
                 "Delay",
@@ -2035,15 +2035,15 @@ mod tests {
     /// `Creative` is where that shows: it holds three families at once.
     #[test]
     fn a_family_is_finer_than_the_manuals_category() {
-        let creative: Vec<Family> = Algorithm::all()
-            .iter()
-            .filter(|algorithm| algorithm.category == "Creative")
-            .map(Algorithm::family)
-            .collect();
-        assert!(creative.contains(&Family::Modulation));
-        assert!(creative.contains(&Family::Filter));
-        assert!(creative.contains(&Family::Pitch));
-        assert!(creative.contains(&Family::Rotary));
+        let creative = |family: Family| {
+            Algorithm::all()
+                .iter()
+                .any(|algorithm| algorithm.category == "Creative" && algorithm.family() == family)
+        };
+        assert!(creative(Family::Modulation));
+        assert!(creative(Family::Filter));
+        assert!(creative(Family::Pitch));
+        assert!(creative(Family::Rotary));
     }
 
     /// Every slot answers what it does to a signal, and the answer is not just
@@ -2117,7 +2117,7 @@ mod tests {
     /// specification it was copied out of.
     #[test]
     fn every_factor_slot_offers_the_same_ten_fractions() {
-        let printed: Vec<&str> = super::FACTORS.iter().map(|&(_, name)| name).collect();
+        let printed = super::FACTORS.map(|(_, name)| name);
         let mut found = 0;
         for algorithm in Algorithm::all() {
             for slot in algorithm.slots {
