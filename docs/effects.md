@@ -613,7 +613,7 @@ The drawings below space their rows further apart than 18.6 pixels, because the 
 | 5 | `HLD` | Hold | Hold | continuous |  | 2.0 to 1999.9 ms | yes | This defines a waiting period before the gate starts to close. |
 | 6 | `PUN` | Punch | Punch | continuous |  | -6.0 to 6.0 | yes | Used to increase tonal shaping or reduce gated breathing/delay/resonant howl-round. |
 | 7 | `MOD` | Mode | Mode | selector |  | GAT, TRN, DUC |  | GAT (Gate), TRN (Transient Gate), DUC (Ducker). |
-| 8 | `PWR` | Power | Power | continuous |  | ON to OFF |  | Enables gate in the signal path. When switched off, gate is bypassed. |
+| 8 | `PWR` | Power | Power | switch |  | ON to OFF |  | Enables gate in the signal path. When switched off, gate is bypassed. |
 
 <a id="21-stereo-delay"></a>
 

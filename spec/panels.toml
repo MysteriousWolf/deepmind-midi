@@ -24,6 +24,23 @@ and 2 on the pitch shifters) or the band of an equaliser. Both are derived \
 from effects.toml rather than transcribed, so they are conventions this \
 project chose, not facts about the hardware."""
 kinds = ["continuous", "switch", "selector"]
+enable = """
+Three algorithms carry their own bypass in one of their twelve bytes: the \
+Stereo Imaging and Chorus D `ON` slots, whose manual entry reads "Allows the \
+effect to be turned On or Off", and the Noise Gate `PWR` slot, "Enables gate in \
+the signal path. When switched off, gate is bypassed". `enable` marks those \
+three, so a host can grey a slot it knows is doing nothing without matching on \
+`ON` and `PWR` as strings.
+
+It marks a switch that takes the whole effect out of circuit, and nothing \
+weaker. The Rack Amplifier `CAB` slot switches only its cabinet simulation, \
+which is a stage within the effect, so it is a plain switch here.
+
+Note that the Noise Gate reads the other way round: effects.toml records its \
+`min` as ON and its `max` as OFF, which is the manual's own ordering.
+
+There is no slot-level off outside these three; see the note on the fx_type \
+table in enums.toml."""
 
 [[panel]]
 type = 0
@@ -332,7 +349,7 @@ slots = [
 type = 18
 name = "EdisonEX1"
 slots = [
-    { slot = 1, title = "On or Off", kind = "switch" },
+    { slot = 1, title = "On or Off", kind = "switch", enable = true },
     { slot = 2, title = "Input Mode", kind = "selector" },
     { slot = 3, title = "Output Mode", kind = "selector" },
     { slot = 4, title = "Stereo Spread", kind = "continuous", modulatable = true },
@@ -368,7 +385,7 @@ slots = [
     { slot = 5, title = "Hold", kind = "continuous", modulatable = true },
     { slot = 6, title = "Punch", kind = "continuous", modulatable = true },
     { slot = 7, title = "Mode", kind = "selector" },
-    { slot = 8, title = "Power", kind = "continuous" },
+    { slot = 8, title = "Power", kind = "switch", enable = true },
 ]
 
 [[panel]]
@@ -493,7 +510,7 @@ slots = [
 type = 28
 name = "Chorus-D"
 slots = [
-    { slot = 1, title = "On or Off", kind = "switch" },
+    { slot = 1, title = "On or Off", kind = "switch", enable = true },
     { slot = 2, title = "Mode", kind = "selector" },
     { slot = 3, title = "Mix", kind = "continuous", modulatable = true },
     { slot = 4, title = "Switch 1", kind = "switch", group = "channel-1" },

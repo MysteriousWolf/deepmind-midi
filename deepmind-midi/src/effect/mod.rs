@@ -216,6 +216,24 @@ impl fmt::Display for Engine {
 ///
 /// Reached through [`Algorithm::for_value`], which takes the byte `FX n Type`
 /// holds and the firmware that byte is to be read against.
+///
+/// # Every value is an effect
+///
+/// There is no `Off`, `None` or `Thru`, and no engine that is running nothing.
+/// Section 7.2.4 of the manual — *"To load an effect into a slot ... select
+/// from one of the following effects"* — lists these 35 and stops, and the
+/// effects table in section 9.1 gives the same 35. `FX n Type` is declared
+/// `0..=34` to match, so there is no value outside the table either.
+///
+/// What takes effects out of circuit is [`Mode::Bypass`], and that is the whole
+/// block of four rather than one engine. Three algorithms carry their own
+/// bypass in one of their twelve bytes instead, which is
+/// [`FxSlot::is_enable`].
+///
+/// A host looking for the parameter that silences one engine will not find one.
+/// `FX n Output Gain` is not it: the manual defines a slot's level as the level
+/// of an effect that is in parallel or last before the output stage, so on six
+/// of the ten [`Routing`]s an engine at zero gain still feeds the next engine.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[non_exhaustive]
@@ -395,6 +413,12 @@ pub struct FxSlot {
     /// Every slot is addressable from the modulation matrix regardless, as
     /// `Fx n Param m`; this says the engine does something with what arrives.
     pub modulatable: bool,
+    /// `true` when this switch takes the whole effect out of circuit.
+    ///
+    /// [`FxSlot::is_enable`](Self::is_enable) is how it is read, and says why
+    /// there are only three.
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) enable: bool,
     /// Column of the FX page's grid this slot is drawn in, counting from 0.
     #[cfg_attr(feature = "serde", serde(skip))]
     pub(crate) column: u8,
@@ -433,6 +457,38 @@ impl FxSlot {
     #[must_use]
     pub const fn is_selector(&self) -> bool {
         !self.values.is_empty()
+    }
+
+    /// Returns whether this slot switches the whole effect in and out of
+    /// circuit.
+    ///
+    /// True for three slots of the 35 algorithms, and it is the only
+    /// slot-level off the instrument has: Stereo Imaging and Chorus D each
+    /// spend their first slot on an `ON`, and the Noise Gate its eighth on a
+    /// `PWR`. Nothing outside those three takes one engine out on its own; see
+    /// [`Algorithm`] for what the instrument does instead.
+    ///
+    /// A host that would otherwise match on `ON` and `PWR` as strings asks
+    /// this. Which way round the switch reads is
+    /// [`min`](Self::min) and [`max`](Self::max), and the Noise Gate is the one
+    /// that reads `ON` at the bottom and `OFF` at the top.
+    ///
+    /// Not the Rack Amplifier's `CAB`, which switches its cabinet simulation
+    /// and leaves the amplifier running. That is a stage within the effect, so
+    /// it is a plain [`Kind::Switch`].
+    ///
+    /// ```
+    /// use deepmind_midi::effect::Algorithm;
+    ///
+    /// let gate = Algorithm::by_name("NoiseGate").expect("a Noise Gate");
+    /// assert!(gate.slot(8).expect("a Power slot").is_enable());
+    ///
+    /// let amp = Algorithm::by_name("RackAmp").expect("a Rack Amplifier");
+    /// assert!(!amp.slot(9).expect("a Cabinet slot").is_enable());
+    /// ```
+    #[must_use]
+    pub const fn is_enable(&self) -> bool {
+        self.enable
     }
 
     /// Returns what this slot does, in the manual's own words.
@@ -1384,5 +1440,74 @@ mod tests {
         });
         assert_eq!(slots, 371);
         assert_eq!(described, 369);
+    }
+
+    /// Exactly three slots take an effect out of circuit, and they are the only
+    /// slot-level off the instrument has. A fourth appearing here means either
+    /// the specification grew one or `enable` has been read too widely.
+    #[test]
+    fn three_slots_switch_their_effect_out_of_circuit() {
+        let found: Vec<(&str, u8)> = Algorithm::all()
+            .iter()
+            .flat_map(|algorithm| {
+                algorithm
+                    .slots
+                    .iter()
+                    .filter(|slot| slot.is_enable())
+                    .map(move |slot| (algorithm.name, slot.slot))
+            })
+            .collect();
+        assert_eq!(
+            found,
+            [("RackAmp", 0); 0]
+                .iter()
+                .copied()
+                .chain([("EdisonEX1", 1), ("NoiseGate", 8), ("Chorus-D", 1)])
+                .collect::<Vec<_>>(),
+        );
+    }
+
+    /// An enable is a switch, because an effect is in circuit or it is not.
+    /// The Noise Gate is the one that reads `ON` at the bottom of its range.
+    #[test]
+    fn an_enable_is_a_switch_and_may_read_either_way_round() {
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots.iter().filter(|slot| slot.is_enable()) {
+                assert_eq!(slot.kind, Kind::Switch, "{algorithm} {}", slot.title);
+            }
+        }
+
+        let gate = Algorithm::by_name("NoiseGate").expect("a Noise Gate");
+        let power = gate.slot(8).expect("a Power slot");
+        assert_eq!((power.min, power.max), (Some("ON"), Some("OFF")));
+    }
+
+    /// The `FX Type` table is 35 effects and nothing else, on both firmwares.
+    /// This is the absence issue #30 asked to have stated somewhere a test can
+    /// keep true: a value that stops naming an effect fails here.
+    #[test]
+    fn every_fx_type_value_is_an_effect() {
+        for firmware in [FIRMWARE_1_0, DEFAULT_FIRMWARE] {
+            let table = TableId::FxType.table_for(firmware);
+            for (value, entry) in table.entries.iter().enumerate() {
+                assert!(
+                    Algorithm::by_name(entry.name).is_some(),
+                    "{:?} names no algorithm",
+                    entry.name
+                );
+                // Consecutive from zero, so there is no spare value sitting
+                // beside the effects for an off to have been given.
+                assert_eq!(u16::try_from(value), Ok(entry.value));
+            }
+        }
+
+        // Firmware 1.1 offers every algorithm; 1.0 is the same table without
+        // the Vintage Pitch it had not gained yet.
+        let newest = TableId::FxType.table_for(DEFAULT_FIRMWARE);
+        assert_eq!(newest.entries.len(), ALGORITHM_COUNT);
+        assert_eq!(
+            TableId::FxType.table_for(FIRMWARE_1_0).entries.len(),
+            ALGORITHM_COUNT - 1
+        );
     }
 }

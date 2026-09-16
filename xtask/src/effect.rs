@@ -206,6 +206,7 @@ fn render_slots(
             let title = panel.map_or(parameter.name.as_str(), |slot| slot.title.as_str());
             let group = panel.and_then(|slot| slot.group.as_deref());
             let switch = panel.is_some_and(|slot| slot.kind == "switch");
+            let enable = panel.is_some_and(|slot| slot.enable);
             // The description is a field behind a `cfg`, not a table beside
             // the slots: with the feature off it is not in the struct at all,
             // so a build without it carries neither the prose nor a pointer to
@@ -216,7 +217,7 @@ fn render_slots(
             );
             let _ = writeln!(
                 out,
-                "    FxSlot {{ slot: {}, reference: {:?}, title: {title:?}, kind: {}, values: {}, unit: {}, min: {}, max: {}, group: {}, modulatable: {}, column: {column}, row: {row}, {description} }},",
+                "    FxSlot {{ slot: {}, reference: {:?}, title: {title:?}, kind: {}, values: {}, unit: {}, min: {}, max: {}, group: {}, modulatable: {}, enable: {enable}, column: {column}, row: {row}, {description} }},",
                 parameter.slot,
                 parameter.r#ref,
                 if switch {

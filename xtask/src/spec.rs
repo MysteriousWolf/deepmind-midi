@@ -274,6 +274,12 @@ pub struct PanelSlot {
     /// `true` when the engine acts on modulation reaching this slot.
     #[serde(default)]
     pub modulatable: bool,
+    /// `true` when this switch takes the whole effect out of circuit.
+    ///
+    /// Three of the 35 have one, which is the only slot-level off the
+    /// instrument has; see the note on the `fx_type` table in `enums.toml`.
+    #[serde(default)]
+    pub enable: bool,
 }
 
 /// The grid the synthesizer draws its FX page on, in display pixels.
@@ -1651,6 +1657,28 @@ impl Spec {
                         "panels.toml: {} slot {} disagrees with effects.toml about modulation",
                         panel.name, slot.slot
                     ));
+                }
+                if slot.enable && slot.kind != "switch" {
+                    return Err(format!(
+                        "panels.toml: {} slot {} is an enable but has kind {:?}, \
+                         and an effect is switched out of circuit or not",
+                        panel.name, slot.slot, slot.kind
+                    ));
+                }
+                // An enable is the manual's own claim that the slot bypasses the
+                // effect, so it is tied to the wording rather than left to a
+                // reading of the parameter's name. `bypass` catches the Noise
+                // Gate, whose entry says the gate is bypassed rather than off.
+                if let Some(description) = &parameter.description {
+                    let says_bypass = description.contains("turned On or Off")
+                        || description.contains("is bypassed");
+                    if slot.enable != says_bypass {
+                        return Err(format!(
+                            "panels.toml: {} slot {} is marked enable = {} but effects.toml \
+                             describes it as {description:?}",
+                            panel.name, slot.slot, slot.enable
+                        ));
+                    }
                 }
             }
         }
