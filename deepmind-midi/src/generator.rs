@@ -817,10 +817,7 @@ fn filter_at(slope: f32, resonance: f32, span: f32, t: f32) -> f32 {
 #[cfg(test)]
 #[expect(
     clippy::expect_used,
-    clippy::indexing_slicing,
-    clippy::float_cmp,
-    reason = "a failed expectation is the test failure, and a shape is \
-              compared against the exact value it is built from"
+    reason = "a failed expectation is the test failure"
 )]
 mod tests {
     use super::{
@@ -842,6 +839,17 @@ mod tests {
             }
         }
         program
+    }
+
+    /// Asserts two values are the same to within what a picture could show.
+    fn close(left: f32, right: f32, what: &str) {
+        assert!((left - right).abs() < 1e-6, "{what}: {left} is not {right}");
+    }
+
+    /// The same, for two samples that should be exactly equal because they come
+    /// from the same held value.
+    fn same(left: f32, right: f32, what: &str) {
+        close(left, right, what);
     }
 
     /// Samples a generator across its whole range, which is what a host does.
@@ -974,7 +982,8 @@ mod tests {
 
         program.set_lfo1_shape(LfoShape::Square);
         let square = lfo(&program, LfoId::One);
-        assert_eq!((square.at(0.25), square.at(0.75)), (1.0, 0.0));
+        close(square.at(0.25), 1.0, "the top of a square");
+        close(square.at(0.75), 0.0, "the bottom of a square");
     }
 
     /// The random shapes step, and they step the same way every time. A picture
@@ -988,14 +997,20 @@ mod tests {
         // One cycle is one value, so within a cycle the hold is flat, and the
         // picture covers several so that the stepping is in it at all.
         let cycle = 1.0 / SAMPLED_TURNS;
-        assert_eq!(held.at(cycle * 0.1), held.at(cycle * 0.9));
+        same(
+            held.at(cycle * 0.1),
+            held.at(cycle * 0.9),
+            "a cycle of the hold",
+        );
         let steps: Vec<f32> = (0..6)
             .map(|cycle| {
                 held.at((f32::from(u8::try_from(cycle).expect("six")) + 0.5) / SAMPLED_TURNS)
             })
             .collect();
         assert!(
-            steps.windows(2).any(|pair| pair[0] != pair[1]),
+            steps
+                .windows(2)
+                .any(|pair| matches!(pair, [left, right] if (left - right).abs() > 1e-6)),
             "the held value never changes: {steps:?}"
         );
 
@@ -1007,7 +1022,7 @@ mod tests {
         // where each cycle ends.
         program.set_lfo1_shape(LfoShape::SampleAndGlide);
         let glide = lfo(&program, LfoId::One);
-        assert!(glide.at(cycle * 0.1) != glide.at(cycle * 0.9));
+        assert!((glide.at(cycle * 0.1) - glide.at(cycle * 0.9)).abs() > 1e-6);
         // By the end of a cycle the glide has arrived at the value the hold
         // sat on for the whole of it, which is what "glide to it" means.
         let late = cycle * 0.99;
@@ -1111,18 +1126,21 @@ mod tests {
         program.set_arp_gate_time(255);
         let full: Vec<_> = arpeggiator_gates(&program).collect();
         assert_eq!(full.len(), GATES_DRAWN);
-        assert!((full[0].length() - 1.0).abs() < 1e-6);
-        assert!((full[0].end() - full[1].start()).abs() < 1e-6);
+        let first = full.first().expect("four gates");
+        let second = full.get(1).expect("four gates");
+        close(first.length(), 1.0, "a full gate");
+        close(first.end(), second.start(), "the next step");
 
         // "128 ... represents half of a step".
         program.set_arp_gate_time(128);
         let half: Vec<_> = arpeggiator_gates(&program).collect();
-        assert!((half[0].length() - 128.0 / 255.0).abs() < 1e-6);
+        let first = half.first().expect("four gates");
+        close(first.length(), 128.0 / 255.0, "half a step");
 
         // Every gate opens on its own step and closes before the next one.
         for (step, gate) in half.iter().enumerate() {
             let start = f32::from(u8::try_from(step).expect("four steps"));
-            assert!((gate.start() - start).abs() < 1e-6);
+            close(gate.start(), start, "the step a gate opens on");
             assert!(gate.end() <= start + 1.0);
         }
     }

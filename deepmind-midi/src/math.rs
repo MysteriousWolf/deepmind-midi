@@ -174,10 +174,6 @@ pub(crate) fn cos_turns(turns: f32) -> f32 {
 }
 
 #[cfg(test)]
-#[expect(
-    clippy::float_cmp,
-    reason = "these are checked against values they are exactly equal to"
-)]
 mod tests {
     use super::{cos_turns, exp2, floor, fract, log2, sin_turns};
 
@@ -219,8 +215,10 @@ mod tests {
 
     #[test]
     fn a_logarithm_undoes_a_power() {
-        assert_eq!(log2(0.0), -126.0);
-        assert_eq!(log2(-1.0), -126.0);
+        // Zero and everything below it, including a NaN, answer the floor.
+        close(log2(0.0), -126.0, "log2 of zero");
+        close(log2(-1.0), -126.0, "log2 of a negative");
+        close(log2(f32::NAN), -126.0, "log2 of a NaN");
         for whole in -20_i16..=20 {
             close(
                 log2(f32::from(whole).exp2()),

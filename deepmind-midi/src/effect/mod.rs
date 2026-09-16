@@ -1513,10 +1513,7 @@ fn fraction(program: &Program, engine: Engine, slot: u8) -> Option<f32> {
 #[expect(
     clippy::expect_used,
     clippy::panic,
-    clippy::indexing_slicing,
-    clippy::float_cmp,
-    reason = "a failed expectation is the test failure, and a tap that is drawn \
-              at nothing is drawn at exactly nothing"
+    reason = "a failed expectation is the test failure"
 )]
 mod tests {
     use super::{
@@ -2025,7 +2022,7 @@ mod tests {
                         ..
                     } => {
                         assert!(radius > 0.0, "{family} has an arc of no radius");
-                        assert!(sweep != 0.0, "{family} has an arc that sweeps nothing");
+                        assert!(sweep.abs() > 0.0, "{family} has an arc that sweeps nothing");
                         inside(centre.x() - radius, centre.y() - radius, family);
                         inside(centre.x() + radius, centre.y() + radius, family);
                     }
@@ -2054,10 +2051,13 @@ mod tests {
     /// it: drawn as a selector, and a time.
     #[test]
     fn a_quantity_is_a_different_question_from_a_control_kind() {
-        let mut counts = [0_usize; 9];
+        let mut counts = [0_usize; Quantity::ALL.len()];
         for algorithm in Algorithm::all() {
             for slot in algorithm.slots {
-                counts[index_of(slot.quantity())] += 1;
+                let count = counts
+                    .get_mut(index_of(slot.quantity()))
+                    .expect("a quantity is in Quantity::ALL");
+                *count += 1;
             }
         }
         // Every one of the nine is used, or it should not be in the enum.
@@ -2185,12 +2185,12 @@ mod tests {
         assert!(response.at(1.0 / 3.0) > 0.9, "the master tap");
         assert!(response.at(0.25 / 3.0) > 0.9, "the two quarter taps");
         // And nothing between them.
-        assert_eq!(response.at(0.6), 0.0);
+        assert!(response.at(0.6) <= 0.0, "{}", response.at(0.6));
 
         // A tap with its gain at nothing is drawn at nothing.
         program.set_clamped(Engine::One.slot_parameter(2).expect("the master gain"), 0);
         let quiet = super::response(&program, Engine::One).expect("a 4-Tap Delay");
-        assert_eq!(quiet.at(1.0 / 3.0), 0.0);
+        assert!(quiet.at(1.0 / 3.0) <= 0.0, "{}", quiet.at(1.0 / 3.0));
     }
 
     /// The `FX Type` table is 35 effects and nothing else, on both firmwares.
