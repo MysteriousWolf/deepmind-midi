@@ -660,7 +660,11 @@ pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
                     .filter(|&(_, pixel)| pixel == '#')
                     .map(|(x, _)| 1_u8 << x)
                     .sum();
-                format!("0b{bits:07b}")
+                // Grouped from the right, because a seven-digit binary
+                // literal without a separator is unreadable to clippy and to a
+                // reader. The picture is still legible in the bits, which is
+                // the whole reason these are binary and not hexadecimal.
+                format!("0b{:03b}_{:04b}", bits >> 4, bits & 0xf)
             })
             .collect();
         let _ = writeln!(
