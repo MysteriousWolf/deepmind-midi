@@ -728,6 +728,13 @@ some, so there are five kinds of test:
   `Transport` against a `sim::Synth`. They are the only tests that cross the
   seam between layers.
 
+The unit tests run with no features on as well as with all of them, and CI
+checks both. `cargo hack` proves the library compiles with nothing enabled, but
+that runs with `--no-dev-deps` and so says nothing about the tests, which are
+where a `Vec` or a `to_string` gets reached for without thinking. `testing.rs`
+holds the one helper that needs: an assertion about a `Display` implementation
+that formats into a fixed buffer rather than a `String`.
+
 **A generator that stops reaching the parser is a test that stopped testing.**
 Random bytes are rejected at the manufacturer ID and never reach the code that
 decides what a payload means, so the randomised tests mutate frames this

@@ -46,6 +46,12 @@ jobs:
       - name: Test
         run: cargo test --workspace --all-features
 
+      # The `features` job proves the library builds with nothing on. This is
+      # the same claim for the library's own tests, which are the easy place to
+      # reach for `Vec` or `to_string` without noticing.
+      - name: Test with no features
+        run: cargo test --package deepmind-midi --no-default-features
+
       - name: Generated documentation is current
         run: cargo xtask docs --check
 

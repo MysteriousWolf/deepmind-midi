@@ -960,14 +960,14 @@ mod tests {
     #[test]
     fn every_effect_slot_is_reachable_from_the_matrix() {
         let table = TableId::ModDestination.table();
-        let slots: Vec<ParamId> = table
+        let slots = table
             .entries
             .iter()
             .flat_map(|entry| entry.parameters.iter().copied())
             .filter(|parameter| parameter.group() == Group::Effects)
-            .collect();
+            .count();
         // Four engines of twelve slots, and the four output gains.
-        assert_eq!(slots.len(), 4 * 12 + 4);
+        assert_eq!(slots, 4 * 12 + 4);
     }
 
     /// A destination naming a parameter twice, or naming one that does not
@@ -997,19 +997,14 @@ mod tests {
             assert!(Group::ORDER.contains(group), "{group} is not laid out");
         }
 
-        let starts: Vec<u8> = Group::ORDER
-            .iter()
-            .map(|group| {
-                group
-                    .parameters()
-                    .next()
-                    .expect("a group in the table has a parameter")
-                    .offset()
-            })
-            .collect();
-        let mut sorted = starts.clone();
-        sorted.sort_unstable();
-        assert_eq!(starts, sorted, "the order is not the instrument's own");
+        let starts = Group::ORDER.iter().map(|group| {
+            group
+                .parameters()
+                .next()
+                .expect("a group in the table has a parameter")
+                .offset()
+        });
+        assert!(starts.is_sorted(), "the order is not the instrument's own");
         assert_eq!(Group::ORDER.first(), Some(&Group::Lfo1));
         assert_eq!(Group::ORDER.last(), Some(&Group::Program));
     }
@@ -1180,13 +1175,14 @@ mod tests {
         assert_eq!(step.bounded_by(), Some(ParamId::SequenceLength));
 
         // All 32 of them, and nothing else in the table.
-        let steps: Vec<ParamId> = ParamId::ALL
-            .iter()
-            .copied()
-            .filter(|parameter| parameter.bounded_by().is_some())
-            .collect();
-        assert_eq!(steps.len(), 32);
-        for step in steps {
+        let steps = || {
+            ParamId::ALL
+                .iter()
+                .copied()
+                .filter(|parameter| parameter.bounded_by().is_some())
+        };
+        assert_eq!(steps().count(), 32);
+        for step in steps() {
             assert_eq!(step.group(), Group::ControlSequencer);
             assert_eq!(step.inactive(), Some(0));
             assert!(step.name().starts_with("Seq Step Value"));

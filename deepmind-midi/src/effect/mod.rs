@@ -1268,12 +1268,14 @@ mod tests {
     /// where each one taps.
     #[test]
     fn the_two_feedback_topologies_say_so() {
-        let looped: Vec<&str> = Routing::all()
-            .iter()
-            .filter(|routing| routing.is_feedback())
-            .map(Routing::label)
-            .collect();
-        assert_eq!(looped, ["M-9", "M-10"]);
+        assert!(
+            Routing::all()
+                .iter()
+                .filter(|routing| routing.is_feedback())
+                .map(Routing::label)
+                .eq(["M-9", "M-10"]),
+            "the feedback topologies are M-9 and M-10"
+        );
         for routing in Routing::all() {
             assert_eq!(
                 routing.is_feedback(),

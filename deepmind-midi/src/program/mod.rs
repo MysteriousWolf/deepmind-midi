@@ -594,12 +594,16 @@ mod tests {
         let mut renamed = program.clone();
         renamed.set_name(ProgramName::new("Bassy").expect("a name the display can write"));
 
-        let moved: Vec<(ParamId, u8)> = program.changes(&renamed).collect();
-        assert_eq!(moved, [(ParamId::ProgramNameChar5, b'y')]);
         assert!(
-            moved
-                .iter()
-                .all(|(parameter, _)| NAME_PARAMETERS.contains(parameter))
+            program
+                .changes(&renamed)
+                .eq([(ParamId::ProgramNameChar5, b'y')]),
+            "one character moved"
+        );
+        assert!(
+            program
+                .changes(&renamed)
+                .all(|(parameter, _)| NAME_PARAMETERS.contains(&parameter))
         );
     }
 
@@ -742,9 +746,11 @@ mod tests {
 
         assert_eq!(program.get(ParamId::Lfo1Shape), 9);
         assert_eq!(program.lfo1_shape(), None);
-        assert_eq!(
-            program.invalid().collect::<Vec<_>>(),
-            [(ParamId::Lfo1Shape, 9), (ParamId::ProgramTranspose, 0)]
+        assert!(
+            program
+                .invalid()
+                .eq([(ParamId::Lfo1Shape, 9), (ParamId::ProgramTranspose, 0)]),
+            "both out-of-range bytes are reported, in offset order"
         );
     }
 
@@ -858,8 +864,12 @@ mod tests {
         after.set_lfo1_rate(64);
         after.set_lfo1_shape(LfoShape::Square);
 
-        let changed: Vec<_> = before.changes(&after).collect();
-        assert_eq!(changed, [(ParamId::Lfo1Rate, 64), (ParamId::Lfo1Shape, 2)]);
+        assert!(
+            before
+                .changes(&after)
+                .eq([(ParamId::Lfo1Rate, 64), (ParamId::Lfo1Shape, 2)]),
+            "both edits are reported, in offset order"
+        );
 
         let mut applied = before.clone();
         for (parameter, value) in before.changes(&after) {

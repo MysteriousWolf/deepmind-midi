@@ -297,15 +297,14 @@ mod tests {
     /// why the row is worth publishing.
     #[test]
     fn the_rows_are_the_instruments_own() {
-        let row = |wanted: u8| -> Vec<&'static str> {
+        let row = |wanted: u8| {
             sections()
                 .iter()
-                .filter(|section| section.row() == wanted)
+                .filter(move |section| section.row() == wanted)
                 .map(super::Section::name)
-                .collect()
         };
-        assert_eq!(row(0), ["ARP / SEQ", "LFO 1", "LFO 2", "POLY"]);
-        assert_eq!(row(1), ["DCO 1 & 2", "VCF", "VCA", "HPF", "ENVELOPES"]);
+        assert!(row(0).eq(["ARP / SEQ", "LFO 1", "LFO 2", "POLY"]));
+        assert!(row(1).eq(["DCO 1 & 2", "VCF", "VCA", "HPF", "ENVELOPES"]));
     }
 
     /// The panel is drawn from the parameter table, so every control it carries
@@ -321,11 +320,12 @@ mod tests {
         }
         // The two the instrument gives a plate of its own and the table keeps
         // together: both `VCF` and `HPF` answer the filter's group.
-        let filters: Vec<&str> = sections()
-            .iter()
-            .filter(|section| section.group() == Group::Vcf)
-            .map(super::Section::name)
-            .collect();
-        assert_eq!(filters, ["VCF", "HPF"]);
+        assert!(
+            sections()
+                .iter()
+                .filter(|section| section.group() == Group::Vcf)
+                .map(super::Section::name)
+                .eq(["VCF", "HPF"])
+        );
     }
 }

@@ -91,6 +91,8 @@ mod queue;
 pub mod sim;
 pub mod sysex;
 pub mod syx;
+#[cfg(test)]
+mod testing;
 #[cfg(feature = "transport")]
 #[cfg_attr(docsrs, doc(cfg(feature = "transport")))]
 pub mod transport;

@@ -863,6 +863,7 @@ mod tests {
     use crate::param::{DATA_ENTRY_LSB, DATA_ENTRY_MSB, NRPN_NUMBER_LSB, NRPN_NUMBER_MSB};
     use crate::program::ProgramName;
     use crate::sysex::{Command, Interface, inquiry};
+    use crate::testing::assert_display;
 
     /// Room for the longest frame these tests build, which is a program dump.
     const FRAME: usize = 320;
@@ -1381,7 +1382,7 @@ mod tests {
         let Some(Event::ControlApp(answer)) = device.poll_event() else {
             panic!("the only message that names the selected program was dropped");
         };
-        assert_eq!(answer.slot().to_string(), "C41");
+        assert_display(answer.slot(), "C41");
         assert_eq!(answer.interface, Interface::Usb);
         assert_eq!(answer.receive_channel(), Some(Channel::ONE));
         assert_eq!(answer.transmit_channel(), Some(Channel::ONE));
