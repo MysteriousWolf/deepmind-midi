@@ -550,27 +550,15 @@ fn align(name: &str) -> Result<String, String> {
     .to_owned())
 }
 
-/// Renders the mark each family is drawn with, as strokes in a unit box.
+/// Renders each family's strokes as a static the `MARKS` table points at.
 ///
-/// One table for the nine families rather than one per algorithm: every reverb
-/// is the same decaying tail, so the 35 algorithms reach nine marks. The
-/// per-algorithm half is the `family` field rendered beside each one.
+/// Split out of [`render_marks`] so that neither is long enough to lose the
+/// reader: this one is the geometry, that one is the tables it goes into.
 ///
 /// # Errors
 ///
-/// Returns a message when a family's name makes no Rust variant. The strokes
-/// themselves are checked when the spec loads, so by here every one of them is
-/// a polyline of at least two points or an arc with a radius and a sweep.
-fn render_marks(spec: &Spec, out: &mut String) -> Result<(), String> {
-    let _ = writeln!(
-        out,
-        "\
-/// Number of families the 35 algorithms fall into.
-pub const FAMILY_COUNT: usize = {};
-",
-        spec.families.len()
-    );
-
+/// As [`render_marks`], when a family's name makes no Rust variant.
+fn render_mark_strokes(spec: &Spec, out: &mut String) -> Result<(), String> {
     for family in &spec.families {
         let _ = writeln!(
             out,
@@ -634,6 +622,31 @@ pub const FAMILY_COUNT: usize = {};
         }
         out.push_str("];\n\n");
     }
+    Ok(())
+}
+
+/// Renders the mark each family is drawn with, as strokes in a unit box.
+///
+/// One table for the nine families rather than one per algorithm: every reverb
+/// is the same decaying tail, so the 35 algorithms reach nine marks. The
+/// per-algorithm half is the `family` field rendered beside each one.
+///
+/// # Errors
+///
+/// Returns a message when a family's name makes no Rust variant. The strokes
+/// themselves are checked when the spec loads, so by here every one of them is
+/// a polyline of at least two points or an arc with a radius and a sweep.
+fn render_marks(spec: &Spec, out: &mut String) -> Result<(), String> {
+    let _ = writeln!(
+        out,
+        "\
+/// Number of families the 35 algorithms fall into.
+pub const FAMILY_COUNT: usize = {};
+",
+        spec.families.len()
+    );
+
+    render_mark_strokes(spec, out)?;
 
     let _ = writeln!(
         out,

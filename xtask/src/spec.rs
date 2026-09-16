@@ -524,6 +524,24 @@ impl Family {
                     dot.centre[1] + dot.radius,
                 )?;
             }
+
+            if let Some(wave) = &stroke.wave {
+                if wave.amplitude <= 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is a wave of amplitude {}",
+                        self.name, wave.amplitude
+                    ));
+                }
+                if wave.cycles <= 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is a wave of {} cycles",
+                        self.name, wave.cycles
+                    ));
+                }
+                for (x, y) in wave.extent() {
+                    inside("wave", x, y)?;
+                }
+            }
         }
         Ok(())
     }

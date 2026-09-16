@@ -517,13 +517,16 @@ fn draw_mark(family: &crate::spec::Family, left: f32, top: f32, side: f32) -> St
             // Sampled, because that is what the published curve is for. The
             // count is this drawing's business and nobody else's: enough that
             // the segments are shorter than a stroke width at the size drawn.
-            let samples = (side * 2.0).clamp(24.0, 240.0) as usize;
+            // A step count, not a step size, so that the same curve is drawn
+            // at whatever resolution this size deserves. Kept in a byte so
+            // there is no cast between a count and a length.
+            let samples: u8 = if side > 32.0 { 192 } else { 64 };
             let (dx, dy) = (wave.end[0] - wave.start[0], wave.end[1] - wave.start[1]);
             let length = dx.hypot(dy).max(f32::EPSILON);
             let (nx, ny) = (dy / length, -dx / length);
             let drawn: Vec<String> = (0..=samples)
                 .map(|step| {
-                    let u = step as f32 / samples as f32;
+                    let u = f32::from(step) / f32::from(samples);
                     let offset = wave.amplitude * (u * wave.cycles * core::f32::consts::TAU).sin();
                     let (x, y) = at(
                         wave.start[0] + dx * u + nx * offset,
