@@ -18,9 +18,8 @@ pub const MAX_OUTBOUND_LEN: usize = 16;
 /// Something asked of the synthesizer that an answer is expected for.
 ///
 /// A request is outstanding from the moment its bytes leave
-/// [`drain_tx`](super::Device::drain_tx) until the answer arrives or the
-/// timeout passes. Queuing one does not start the clock, because queued bytes
-/// are not sent bytes.
+/// [`drain_tx`](super::Device::drain_tx) until the answer arrives or the timeout
+/// passes. Queuing one does not start the clock.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[non_exhaustive]

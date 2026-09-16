@@ -1,11 +1,10 @@
 //! The effect panels: what an engine's twelve bytes mean, and which algorithm
 //! decides.
 //!
-//! Four engines, twelve raw parameter bytes each, and what those bytes are
-//! depends on which of the 35 algorithms the engine is running. The parameter
-//! table can only call them `FX 1 Param 3`, which is the truth and is unusable
-//! in an editor. This is the table that says `FX 1 Param 3` is `Size` on a Room
-//! Reverb and `Depth` on a Phaser.
+//! Four engines, twelve raw parameter bytes each. What those bytes mean depends
+//! on which of the 35 algorithms the engine is running. The parameter table can
+//! only call them `FX 1 Param 3`. This table says `FX 1 Param 3` is `Size` on a
+//! Room Reverb and `Depth` on a Phaser.
 //!
 //! ```
 //! use deepmind_midi::effect::{Algorithm, Engine};
@@ -25,53 +24,47 @@
 //!
 //! # Fewer than twelve
 //!
-//! [`Algorithm::slots`] is as long as the algorithm has parameters, which is
-//! five for TC Deep Reverb and ten for Gated Reverb. A host that drew twelve
-//! controls would be drawing seven that do nothing, so the length is the
-//! answer to how many to draw.
+//! [`Algorithm::slots`] is as long as the algorithm has parameters: five for TC
+//! Deep Reverb, ten for Gated Reverb. Its length is how many controls to draw.
 //!
 //! # Firmware decides the numbering
 //!
 //! Firmware 1.1 added Vintage Pitch and moved Rotary Speaker, so the byte that
-//! selects an algorithm is not the same byte on 1.0.
-//! [`Algorithm::for_value`] goes through the `FX Type` value table for the
-//! firmware a device inquiry reported, and [`Algorithm::value_for`] is the way
-//! back. There is deliberately no `value` field: a number that was right on one
-//! firmware sitting beside a lookup that takes a version is the bug the whole
-//! `_for` convention exists to prevent.
+//! selects an algorithm is not the same byte on 1.0. [`Algorithm::for_value`]
+//! looks it up in the `FX Type` value table for the firmware a device inquiry
+//! reported, and [`Algorithm::value_for`] goes the other way. There is no
+//! `value` field, because a stored number would be right for one firmware only.
 //!
 //! # What this does not carry
 //!
-//! The manual's prose, for the reason [`param`](crate::param) gives: the
-//! descriptions are in `docs/effects.md`, addressed by the same algorithm and
-//! slot numbers, and keeping them out of the binary is worth more to the
-//! targets this crate is meant for than having them here.
+//! The manual's prose, for the reason [`param`](crate::param) gives. The
+//! descriptions are in `docs/effects.md`, under the same algorithm and slot
+//! numbers.
 //!
 //! Nor the raw values a selector's names sit at, which the manual does not
 //! publish; see [`FxSlot::values`].
 //!
 //! # Drawing one
 //!
-//! [`Algorithm::panel`] is what the effect's own editor panel is made of — the
-//! control it draws for a sweep and the four colours measured off the manual's
-//! figure — and [`FxSlot::position`] is where the synthesizer's own FX page puts
-//! a slot on the one [`grid`] every algorithm shares. Between them a host draws
-//! the panel rather than inventing one; what it draws it *in*, and how big, stay
-//! the host's, which is why the grid is given in the display's own pixels with
-//! the display's dimensions beside it.
+//! [`Algorithm::panel`] is what the effect's own editor panel is made of: the
+//! control to draw for a sweep, and the four colours measured off the manual's
+//! figure. [`FxSlot::position`] is where the synthesizer's FX page puts a slot
+//! on the one [`grid`] every algorithm shares. The grid is given in the
+//! display's own pixels with the display's dimensions beside it, so a host can
+//! scale it to whatever it draws in.
 //!
-//! None of it is needed to talk to a synthesizer, and nothing in the algorithm
-//! table points at it, so a host that draws its own panels does not carry it.
+//! Nothing in the algorithm table points at any of this, so a host that draws
+//! its own panels does not carry it.
 //!
 //! # How the four are wired
 //!
 //! [`Routing`] is the ten topologies as edge lists: what reaches each engine,
-//! which engines are summed to leave the block, and which two put engines in a
-//! feedback loop. It is what decides whether `FX 2 Output Gain` reaches the
-//! output at all, since the manual defines a slot's level as the level of an
-//! effect that is in parallel or last before the output stage. [`Mode`] is the
-//! same question one level up: what `Insert`, `Send` and `Bypass` do to the
-//! analog and digital paths.
+//! which engines are summed on the way out, and which two put engines in a
+//! feedback loop. It decides whether `FX 2 Output Gain` reaches the output at
+//! all, since the manual defines a slot's level as the level of an effect that
+//! is in parallel or last before the output stage. [`Mode`] is the same question
+//! one level up: what `Insert`, `Send` and `Bypass` do to the analog and digital
+//! paths.
 
 mod generated;
 
@@ -118,7 +111,7 @@ impl Engine {
     ///
     /// Declared as [`ENGINE_COUNT`] long, which the specification generates, so
     /// a synthesizer with a fifth engine fails to compile here rather than
-    /// quietly losing one.
+    /// losing one.
     pub const ALL: [Self; ENGINE_COUNT] = [Self::One, Self::Two, Self::Three, Self::Four];
 
     /// Returns the engine's zero-based index.
@@ -205,7 +198,7 @@ impl Engine {
     ///
     /// The fallback is unreachable: [`Engine::ALL`] is [`ENGINE_COUNT`] long by
     /// declaration and `ENGINES` is the same length, so the index is always in
-    /// range. It costs one line and keeps this layer free of a panic.
+    /// range. It is there so this layer holds no panic.
     fn table(self) -> &'static EngineParameters {
         ENGINES
             .get(usize::from(self.index()))
@@ -308,9 +301,8 @@ impl Algorithm {
     /// Returns what this algorithm's own editor panel is made of.
     ///
     /// Measured off the figure the manual prints beside each algorithm's FX
-    /// page in section 9.3. A Room Reverb and a Phaser are different objects
-    /// there, and a host drawing both the same way is drawing an opinion where
-    /// a measurement exists.
+    /// page in section 9.3. A Room Reverb and a Phaser are drawn differently
+    /// there, so this says which.
     ///
     /// ```
     /// use deepmind_midi::effect::{Algorithm, Control};
@@ -373,16 +365,13 @@ pub struct FxSlot {
     ///
     /// Never [`Kind::Enumerated`]. A slot that picks from a list picks from
     /// [`values`](Self::values), and the manual prints those names without the
-    /// bytes they sit at, so there is no value table to point at and this
-    /// library will not invent one.
+    /// bytes they sit at, so there is no value table to point at.
     pub kind: Kind,
     /// The names the display shows, where it shows names rather than a number.
     ///
-    /// In the order the manual prints them, which is not the same as knowing
-    /// which byte shows which: the manual gives no raw-to-display mapping for
-    /// an effect parameter. So these are a reading and not an address, and a
-    /// control that sent one of them would be sending a guess. Empty for a slot
-    /// the display shows a number on.
+    /// In the order the manual prints them. Which byte shows which name is not
+    /// published, so these are a reading rather than an address and none of them
+    /// is something to send. Empty for a slot the display shows a number on.
     pub values: &'static [&'static str],
     /// Unit of the displayed value, where the manual gives one.
     pub unit: Option<&'static str>,
@@ -439,9 +428,8 @@ impl FxSlot {
 
     /// Returns whether the display shows a name here rather than a number.
     ///
-    /// Which is [`values`](Self::values) not being empty. Worth asking before
-    /// drawing a control: the names are what to print, and none of them is
-    /// something to send.
+    /// Which is [`values`](Self::values) not being empty. Ask before drawing a
+    /// control: the names are what to print, not what to send.
     #[must_use]
     pub const fn is_selector(&self) -> bool {
         !self.values.is_empty()
@@ -449,11 +437,9 @@ impl FxSlot {
 
     /// Returns what this slot does, in the manual's own words.
     ///
-    /// [`title`](Self::title) says a slot is called `Damping` and this says
-    /// what damping it, which is the question somebody points at a control to
-    /// ask. The answer is transcribed from section 9.3 of the manual rather
-    /// than written here, so it says what the engine's designers say it does;
-    /// see NOTICE.
+    /// [`title`](Self::title) says a slot is called `Damping`; this says what it
+    /// damps. Transcribed from section 9.3 of the manual rather than written
+    /// here, so it says what the engine's designers say it does. See NOTICE.
     ///
     /// # Behind a feature
     ///
@@ -493,16 +479,14 @@ impl fmt::Display for FxSlot {
 /// Returns the grid the synthesizer draws its own FX page on.
 ///
 /// Six columns and two rows, in the pixels of the 128x64 display the 35
-/// screenshots in the manual were measured on. Given in that display's own
-/// pixels, with its dimensions beside them, so that a host scales a proportion
-/// rather than adopting a size: a desktop window and a plugin window want the
-/// same panel twice.
+/// screenshots in the manual were measured on. The dimensions come with it, so a
+/// host scales a proportion rather than adopting a size.
 ///
 /// The page itself draws every slot as a circle, switches and selectors
 /// included, with the slot's short name above it and its value below. What an
-/// algorithm's *own* editor panel draws instead is [`Panel::control`], and the
-/// two disagree for five effects; both are worth having, because one is where a
-/// slot sits and the other is what it looks like.
+/// algorithm's own editor panel draws instead is [`Panel::control`], and the two
+/// disagree for five effects: this is where a slot sits, that is what it looks
+/// like.
 ///
 /// ```
 /// use deepmind_midi::effect::grid;
@@ -748,10 +732,9 @@ pub enum Align {
 
 /// One colour measured off a printed panel.
 ///
-/// Three components rather than a string, because three components are what a
-/// host wants and every host writing the same six-character parse is the
-/// transcription this library exists to prevent. Whether the specification keeps
-/// hex stays the library's business.
+/// Three components rather than a string, so that no host has to parse the same
+/// six hex characters. How the specification stores it is this library's
+/// business.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Colour {
@@ -802,9 +785,9 @@ impl fmt::Display for Colour {
 /// One of the ten ways the four engines can be wired.
 ///
 /// The `FX Routing` byte picks one. [`enums`](crate::param::TableId) names them
-/// the way the manual does — `Parallel 1/2, parallel 3/4` — which is for a
-/// person to read; this is the same ten topologies as edge lists, which is what
-/// a host draws a chain from.
+/// the way the manual does, `Parallel 1/2, parallel 3/4`, which is for a person
+/// to read. This is the same ten topologies as edge lists, which is what a host
+/// draws a chain from.
 ///
 /// ```
 /// use deepmind_midi::effect::{Engine, Routing, Source};
@@ -844,9 +827,9 @@ impl Routing {
 
     /// Returns the topology the `FX Routing` byte selects.
     ///
-    /// `None` for a value the parameter does not accept. A lookup rather than
-    /// an index, so that a firmware which ever renumbers these has somewhere to
-    /// say so, the way the value tables already do.
+    /// `None` for a value the parameter does not accept. A lookup rather than an
+    /// index, so a firmware that renumbers these has somewhere to say so, the way
+    /// the value tables already do.
     #[must_use]
     pub fn for_value(value: u8) -> Option<&'static Self> {
         ROUTINGS.iter().find(|routing| routing.value == value)
@@ -917,9 +900,8 @@ impl fmt::Display for Routing {
 
 /// What a signal reaching an engine came from.
 ///
-/// An enum rather than the specification's `0` for the block input, because a
-/// host that has to remember which engine number means "not an engine" is a
-/// host with an off-by-one waiting in it.
+/// An enum rather than the specification's `0` for the block input, so that no
+/// host has to remember which engine number means "not an engine".
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[non_exhaustive]

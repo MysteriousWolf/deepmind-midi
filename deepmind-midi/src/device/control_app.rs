@@ -13,12 +13,11 @@ use crate::wire::Channel;
 /// else a host learns about the instrument's state it either asked for by slot
 /// or inferred.
 ///
-/// This is reported and not tracked. Whether the reported program is the sound
-/// in the edit buffer, or only the last one recalled, is not something the
-/// manual settles, and whether a unit announces a later change is not known
-/// either. So [`Device`](super::Device) hands the answer over as it arrived and
-/// leaves the host to put it beside the edit buffer it read, rather than
-/// keeping a claim that would go stale without saying so.
+/// This is reported and not tracked. The manual does not settle whether the
+/// reported program is the sound in the edit buffer or only the last one
+/// recalled, nor whether a unit announces a later change. So
+/// [`Device`](super::Device) hands the answer over as it arrived and leaves the
+/// host to put it beside the edit buffer it read.
 ///
 /// # Channels
 ///

@@ -6,9 +6,8 @@ use crate::device::Request;
 
 /// Everything a [`Transport`](super::Transport) call can fail with.
 ///
-/// Generic over the port's own error, which travels through unchanged. A host
-/// that wants to know whether its USB cable fell out still gets to ask its own
-/// backend, rather than reading it out of a string this library built.
+/// Generic over the port's own error, which travels through unchanged, so a host
+/// asks its own backend what went wrong rather than parsing a string from here.
 ///
 /// Waiting ends without an answer two ways: [`Timeout`](Error::Timeout) is the
 /// synthesizer's silence, and [`Elapsed`](Error::Elapsed) is the caller's own

@@ -1,13 +1,14 @@
 //! The front of the synthesizer: which parameters have a physical control, what
 //! is printed over them, and which of the panel's two rows they are in.
 //!
-//! [`param`](crate::param) says what exists, [`Controller`](crate::param::Controller)
-//! says what has a CC, and [`effect`](crate::effect) says where an *effect's*
-//! slots sit on its own editor panel. None of the three says that
-//! [`ParamId::VcfFrequency`] has a fader on the instrument with `FREQ`
-//! silkscreened over it, that [`ParamId::UnisonDetune`] is under `POLY`, or that
-//! the arpeggiator's two faders are `RATE` and `GATE TIME`. This is that table:
-//! the one fact about this synthesizer a person can see in a photograph.
+//! [`param`](crate::param) says what exists,
+//! [`Controller`](crate::param::Controller) says what has a CC, and
+//! [`effect`](crate::effect) says where an effect's slots sit on its own editor
+//! panel. None of them says that [`ParamId::VcfFrequency`] has a fader with
+//! `FREQ` silkscreened over it, that [`ParamId::UnisonDetune`] is under `POLY`,
+//! or that the arpeggiator's two faders are `RATE` and `GATE TIME`. This is that
+//! table, and it is the one fact about this synthesizer you can read off a
+//! photograph.
 //!
 //! ```
 //! use deepmind_midi::front::{PanelShape, sections};
@@ -25,42 +26,35 @@
 //!
 //! # Why it is here rather than in each host
 //!
-//! Three things, and each of them is something every host would otherwise
-//! invent separately and differently.
-//!
 //! **The legend is not the parameter's name.** A silkscreen has room for `KYBD`
 //! and `RES`; the parameter table says `VCF Keyboard Tracking` and `VCF
-//! Resonance`, which is right for a rack slot and does not fit over a fader.
+//! Resonance`, which is right for a rack slot and too long for a fader.
 //!
 //! **The shape is not derivable.** The instrument puts [`ParamId::ArpOnOff`] in
-//! a row of buttons and [`ParamId::ArpRateTempo`] under a fader, and both are a
-//! [`Kind`](crate::param::Kind) to the parameter table — which says how a byte
-//! is read, not what a hand touches.
+//! a row of buttons and [`ParamId::ArpRateTempo`] under a fader. The parameter
+//! table knows only their [`Kind`](crate::param::Kind), which says how a byte is
+//! read rather than what a hand touches.
 //!
-//! **A renamed parameter is a compile error.** The table is [`ParamId`]s, so a
-//! later reading of the manual that moves a parameter between groups fails the
-//! specification's own checks rather than mislabelling somebody's fader.
+//! **A renamed parameter is a compile error.** The table holds [`ParamId`]s, so
+//! a later reading of the manual that moves a parameter between groups fails the
+//! specification's own checks instead of mislabelling somebody's fader.
 //!
 //! # What it does not carry
 //!
 //! No pixels. Which row, which order within a section, and what is printed over
-//! each control are facts off the instrument; how wide a lane is and how long a
-//! fader runs are the host's, exactly as [`effect::grid`](crate::effect::grid)
-//! splits the grid from the drawing.
+//! each control are facts off the instrument; lane widths and fader lengths are
+//! the host's, the same split [`effect::grid`](crate::effect::grid) makes.
 //!
-//! Not the controls that are not parameters. The panel's `DATA ENTRY` fader
-//! edits whatever the display is showing, the large encoder selects programs,
-//! the row of twelve lamps over `POLY` counts the voices that are sounding, and
-//! the `EDIT` buttons open a section on the display. None of them addresses a
-//! program byte, and a table that carried them would be describing a workflow
-//! rather than a sound.
+//! Not the controls that are not parameters. `DATA ENTRY` edits whatever the
+//! display is showing, the large encoder selects programs, the twelve lamps over
+//! `POLY` count the voices that are sounding, and the `EDIT` buttons open a
+//! section on the display. None of them addresses a program byte.
 //!
 //! # One instrument
 //!
 //! Read off a `DeepMind` 12. The 6 has the same 242 parameters and its own
-//! front, and a variant gets its own table when somebody has one in front of
-//! them — the way a value table gets its own firmware range. One documented
-//! panel is worth more than three inferred ones.
+//! front; a variant gets its own table once somebody has one in front of them,
+//! the way a value table gets its own firmware range.
 
 mod generated;
 
