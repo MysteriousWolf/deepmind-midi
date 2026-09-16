@@ -29,8 +29,8 @@ const HEADER: &str = "\
 //! fill, and everything that reads them, are in the parent module.
 
 use super::{
-    Algorithm, Align, Colour, Control, Engine, EngineParameters, FxSlot, Grid, Mode, Panel, Routing,
-    Row, Source,
+    Algorithm, Align, Colour, Control, Engine, EngineParameters, Family, FxSlot, Grid, Mark, Mode,
+    Panel, Point, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
 
@@ -49,11 +49,12 @@ pub fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     out.push_str(HEADER);
     render_counts(spec, &mut out);
     render_engines(spec, idents, &mut out)?;
-    render_algorithms(spec, &statics, &mut out);
+    render_algorithms(spec, &statics, &mut out)?;
     render_slots(spec, &statics, &mut out)?;
     render_grid(spec, &mut out);
     render_panels(spec, &statics, &mut out)?;
     render_routings(spec, &mut out)?;
+    render_marks(spec, &mut out)?;
     Ok(out)
 }
 
@@ -143,7 +144,11 @@ pub(super) static ENGINES: [EngineParameters; ENGINE_COUNT] = [
     Ok(())
 }
 
-fn render_algorithms(spec: &Spec, statics: &BTreeMap<u16, String>, out: &mut String) {
+fn render_algorithms(
+    spec: &Spec,
+    statics: &BTreeMap<u16, String>,
+    out: &mut String,
+) -> Result<(), String> {
     out.push_str(
         "\
 /// Every algorithm, in the order the newest firmware numbers them.
@@ -156,14 +161,22 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
             .iter()
             .find(|layout| layout.r#type == effect.r#type)
             .map_or("", |layout| layout.category.as_str());
+        // The spec loader has already checked every algorithm is in exactly one
+        // family, so the fallback here is unreachable rather than a default.
+        let family = spec
+            .families
+            .iter()
+            .find(|family| family.algorithms.iter().any(|a| a == &effect.name))
+            .map_or(Ok("Reverb"), |family| variant(&family.name))?;
         let name = statics.get(&effect.r#type).map_or("", String::as_str);
         let _ = writeln!(
             out,
-            "    Algorithm {{ index: {}, name: {:?}, full_name: {:?}, category: {category:?}, slots: &{name} }},",
+            "    Algorithm {{ index: {}, name: {:?}, full_name: {:?}, category: {category:?}, family: Family::{family}, slots: &{name} }},",
             effect.r#type, effect.name, effect.full_name,
         );
     }
     out.push_str("];\n\n");
+    Ok(())
 }
 
 /// Renders each algorithm's slots, including where the FX page draws them.
@@ -517,4 +530,111 @@ fn align(name: &str) -> Result<String, String> {
         other => return Err(format!("layout.toml: unknown alignment {other:?}")),
     }
     .to_owned())
+}
+
+/// Renders the mark each family is drawn with, as strokes in a unit box.
+///
+/// One table for the nine families rather than one per algorithm: every reverb
+/// is the same decaying tail, so the 35 algorithms reach nine marks. The
+/// per-algorithm half is the `family` field rendered beside each one.
+///
+/// # Errors
+///
+/// Returns a message when a family's name makes no Rust variant. The strokes
+/// themselves are checked when the spec loads, so by here every one of them is
+/// a polyline of at least two points or an arc with a radius and a sweep.
+fn render_marks(spec: &Spec, out: &mut String) -> Result<(), String> {
+    let _ = writeln!(
+        out,
+        "\
+/// Number of families the 35 algorithms fall into.
+pub const FAMILY_COUNT: usize = {};
+",
+        spec.families.len()
+    );
+
+    for family in &spec.families {
+        let _ = writeln!(
+            out,
+            "/// {}\nstatic MARK_{}: [Stroke; {}] = [",
+            doc(&family.description),
+            variant(&family.name)?.to_ascii_uppercase(),
+            family.strokes.len(),
+        );
+        for stroke in &family.strokes {
+            match (&stroke.line, &stroke.arc) {
+                (Some(points), _) => {
+                    let points: Vec<String> = points
+                        .iter()
+                        .map(|&[x, y]| format!("Point::new({x:?}, {y:?})"))
+                        .collect();
+                    let _ = writeln!(
+                        out,
+                        "    Stroke::Line {{ points: &[{}] }},",
+                        points.join(", ")
+                    );
+                }
+                (_, Some(arc)) => {
+                    let _ = writeln!(
+                        out,
+                        "    Stroke::Arc {{ centre: Point::new({:?}, {:?}), radius: {:?}, start: {:?}, sweep: {:?} }},",
+                        arc.centre[0], arc.centre[1], arc.radius, arc.start, arc.sweep,
+                    );
+                }
+                // Unreachable: the spec loader rejects a stroke that is neither.
+                (None, None) => {
+                    return Err(format!("marks.toml: {} has an empty stroke", family.name));
+                }
+            }
+        }
+        out.push_str("];\n\n");
+    }
+
+    out.push_str(
+        "\
+/// Each family's name, in the order `Family::ALL` gives them.
+pub(super) static FAMILY_NAMES: [&str; FAMILY_COUNT] = [
+",
+    );
+    for family in &spec.families {
+        let _ = writeln!(out, "    {:?},", family.name);
+    }
+    out.push_str("];\n\n");
+
+    out.push_str(
+        "\
+/// The mark for each family, in the order `Family::ALL` gives them.
+pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
+",
+    );
+    for family in &spec.families {
+        let _ = writeln!(
+            out,
+            "    Mark {{ strokes: &MARK_{} }},",
+            variant(&family.name)?.to_ascii_uppercase()
+        );
+    }
+    out.push_str("];\n");
+    Ok(())
+}
+
+/// Returns a family's name as the `Family` variant of the same name.
+///
+/// The names in marks.toml are single words chosen to be variants, so this
+/// checks that they still are rather than transforming them. A name that is
+/// not is a codegen error here, rather than a generated file that does not
+/// compile with a message about the spec nowhere in it.
+fn variant(name: &str) -> Result<&str, String> {
+    let usable = name
+        .chars()
+        .next()
+        .is_some_and(|first| first.is_ascii_uppercase())
+        && name.chars().all(|c| c.is_ascii_alphanumeric());
+    if usable {
+        Ok(name)
+    } else {
+        Err(format!(
+            "marks.toml: family {name:?} is not one capitalised word, so it makes no Family variant"
+        ))
+    }
 }

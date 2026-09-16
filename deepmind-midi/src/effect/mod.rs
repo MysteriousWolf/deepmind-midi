@@ -68,9 +68,11 @@
 
 mod generated;
 
-pub use generated::{ALGORITHM_COUNT, ENGINE_COUNT, MODE_COUNT, ROUTING_COUNT, SLOTS_PER_ENGINE};
+pub use generated::{
+    ALGORITHM_COUNT, ENGINE_COUNT, FAMILY_COUNT, MODE_COUNT, ROUTING_COUNT, SLOTS_PER_ENGINE,
+};
 
-use generated::{ALGORITHMS, ENGINES, GRID, MODES, PANELS, ROUTINGS};
+use generated::{ALGORITHMS, ENGINES, FAMILY_NAMES, GRID, MARKS, MODES, PANELS, ROUTINGS};
 
 use core::fmt;
 
@@ -225,7 +227,7 @@ impl fmt::Display for Engine {
 /// effects table in section 9.1 gives the same 35. `FX n Type` is declared
 /// `0..=34` to match, so there is no value outside the table either.
 ///
-/// What takes effects out of circuit is [`Mode::Bypass`], and that is the whole
+/// What takes effects out of circuit is the `Bypass` [`Mode`], and that is the whole
 /// block of four rather than one engine. Three algorithms carry their own
 /// bypass in one of their twelve bytes instead, which is
 /// [`FxSlot::is_enable`].
@@ -254,7 +256,16 @@ pub struct Algorithm {
     pub full_name: &'static str,
     /// The family the manual groups it with: `Reverb`, `Delay`, `Processing`
     /// or `Creative`.
+    ///
+    /// The manual's own table of contents. [`Algorithm::family`] is what an
+    /// effect does to a signal, which is the finer question and the one a mark
+    /// is chosen by.
     pub category: &'static str,
+    /// What this effect does to a signal.
+    ///
+    /// [`Algorithm::family`](Self::family) is how it is read.
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) family: Family,
     /// The slots it uses, in slot order.
     ///
     /// Shorter than [`SLOTS_PER_ENGINE`] where the algorithm has fewer
@@ -335,6 +346,40 @@ impl Algorithm {
         // Unreachable fallback: the index is generated beside the algorithm and
         // the two tables are declared the same length.
         PANELS.get(usize::from(self.index)).unwrap_or(&PANELS[0])
+    }
+
+    /// Returns what this effect does to a signal.
+    ///
+    /// [`category`](Self::category) is the four buckets the manual's table of
+    /// contents uses, and `Creative` holds the phaser, the pitch shifter and
+    /// the rotary speaker, which do three unrelated things. This is the same
+    /// kind of published fact at the resolution a symbol needs.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::{Algorithm, Family};
+    ///
+    /// let phaser = Algorithm::by_name("Phaser").expect("a Phaser");
+    /// assert_eq!(phaser.category, "Creative");
+    /// assert_eq!(phaser.family(), Family::Modulation);
+    ///
+    /// let rotary = Algorithm::by_name("RotarySpkr").expect("a Rotary Speaker");
+    /// assert_eq!(rotary.category, "Creative");
+    /// assert_eq!(rotary.family(), Family::Rotary);
+    /// ```
+    #[must_use]
+    pub const fn family(&self) -> Family {
+        self.family
+    }
+
+    /// Returns the mark to draw for this effect.
+    ///
+    /// Its [`family`](Self::family)'s mark: nine marks across the 35, because
+    /// the difference between a Hall Reverb and a Plate Reverb is not something
+    /// a symbol carries and a drawing that implied it would be inventing one.
+    /// The name is what tells those two apart.
+    #[must_use]
+    pub fn mark(&self) -> &'static Mark {
+        self.family.mark()
     }
 
     /// Returns the slot an engine's `parameter` is, under this algorithm.
@@ -660,6 +705,218 @@ impl Position {
     #[must_use]
     pub fn centre(&self) -> (f32, f32) {
         GRID.centre(self.column, self.row)
+    }
+}
+
+/// What an effect does to a signal, as a closed set.
+///
+/// [`Algorithm::category`] is the manual's own four buckets, chosen for a table
+/// of contents: `Creative` holds the phaser, the pitch shifter and the rotary
+/// speaker. This is the finer question, and the one [`Algorithm::mark`] is
+/// chosen by.
+///
+/// Where the two disagree is the point of having both. A host that wants to
+/// reproduce the manual's grouping reads the category; one that wants to draw a
+/// symbol, or to put the four delays together whatever page they are printed
+/// on, reads this.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum Family {
+    /// A decaying tail. Thirteen of the 35, including the three that pair a
+    /// reverb with something else.
+    Reverb,
+    /// Discrete repeats. The six the manual files under `Delay`.
+    Delay,
+    /// A swept delay: the chorus, the flanger and the phaser.
+    Modulation,
+    /// A response with a corner in it: the two equalisers and the Mood Filter.
+    Filter,
+    /// Level against level: the compressor and the noise gate.
+    Dynamics,
+    /// Harmonics added by driving a stage: the multi-band distortion and the
+    /// rack amplifier.
+    Distortion,
+    /// The stereo field: the Stereo Imaging and Auto-Panning.
+    Imaging,
+    /// An interval put beside the note: the two pitch shifters.
+    Pitch,
+    /// A horn going round: the Rotary Speaker, which is its own family because
+    /// it is its own thing.
+    Rotary,
+}
+
+impl Family {
+    /// Every family, in the order the specification declares them.
+    ///
+    /// Declared as [`FAMILY_COUNT`] long, which the specification generates, so
+    /// a family added to `spec/marks.toml` fails to compile here rather than
+    /// being left without a variant.
+    pub const ALL: [Self; FAMILY_COUNT] = [
+        Self::Reverb,
+        Self::Delay,
+        Self::Modulation,
+        Self::Filter,
+        Self::Dynamics,
+        Self::Distortion,
+        Self::Imaging,
+        Self::Pitch,
+        Self::Rotary,
+    ];
+
+    /// Returns this family's zero-based index, which is where its mark is.
+    #[must_use]
+    pub const fn index(self) -> usize {
+        match self {
+            Self::Reverb => 0,
+            Self::Delay => 1,
+            Self::Modulation => 2,
+            Self::Filter => 3,
+            Self::Dynamics => 4,
+            Self::Distortion => 5,
+            Self::Imaging => 6,
+            Self::Pitch => 7,
+            Self::Rotary => 8,
+        }
+    }
+
+    /// Returns the family's name, as the specification writes it.
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        // Unreachable fallback: `ALL` and the generated table are declared the
+        // same length and this indexes by the position in `ALL`.
+        FAMILY_NAMES.get(self.index()).copied().unwrap_or("Reverb")
+    }
+
+    /// Returns the mark this family is drawn with.
+    #[must_use]
+    pub fn mark(self) -> &'static Mark {
+        // Unreachable fallback, for the same reason as [`Family::name`].
+        MARKS.get(self.index()).unwrap_or(&MARKS[0])
+    }
+
+    /// Returns every algorithm in this family, in `FX Type` order.
+    pub fn algorithms(self) -> impl Iterator<Item = &'static Algorithm> {
+        ALGORITHMS
+            .iter()
+            .filter(move |algorithm| algorithm.family == self)
+    }
+}
+
+impl fmt::Display for Family {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.name())
+    }
+}
+
+/// A mark for an effect, drawn in the host's own materials.
+///
+/// Reached through [`Algorithm::mark`] or [`Family::mark`]. The data a drawing
+/// is generated from, not the drawing: a host cannot theme, rescale, hit-test
+/// or animate an SVG it did not lay out, and the same mark is wanted in a dark
+/// panel at twelve points and at forty.
+///
+/// [`strokes`](Self::strokes) is what to draw, in a unit box with the origin at
+/// the top left and y increasing downward. The host provides the size, the
+/// stroke width and the colour. Nothing here is filled and no path closes.
+///
+/// ```
+/// use deepmind_midi::effect::{Algorithm, Stroke};
+///
+/// let delay = Algorithm::by_name("3TapDelay").expect("a 3-Tap Delay");
+/// let strokes = delay.mark().strokes();
+///
+/// // A baseline and the taps standing on it, all inside the unit box.
+/// assert!(!strokes.is_empty());
+/// for stroke in strokes {
+///     if let Stroke::Line { points } = stroke {
+///         assert!(points.iter().all(|p| (0.0..=1.0).contains(&p.x())));
+///     }
+/// }
+/// ```
+///
+/// # What it is not
+///
+/// Not measured off the manual, unlike [`Panel`]'s colours. These are drawn by
+/// this project: a reading of what each family does, rather than a
+/// reproduction of anything the manufacturer prints. No font, no raster and no
+/// licensed symbol set.
+///
+/// Not a layout. Whether the mark goes beside the name, in the corner of a
+/// panel or on a tab is the host's question, the same way the [`grid`] is data
+/// and the pixel size is not.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+pub struct Mark {
+    strokes: &'static [Stroke],
+}
+
+impl Mark {
+    /// Returns the strokes that make the mark up, in drawing order.
+    #[must_use]
+    pub const fn strokes(&self) -> &'static [Stroke] {
+        self.strokes
+    }
+}
+
+/// One stroke of a [`Mark`], in a unit box with the origin top left.
+///
+/// Two kinds, because a rotary speaker wants a circle and everything else wants
+/// a polyline, and approximating the circle with one would put the number of
+/// segments in this library rather than in the host that knows how big it is
+/// drawing.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[non_exhaustive]
+pub enum Stroke {
+    /// A polyline through two or more points, stroked and not closed.
+    Line {
+        /// The points, in order.
+        points: &'static [Point],
+    },
+    /// An arc of a circle.
+    Arc {
+        /// Centre of the circle it is taken from.
+        centre: Point,
+        /// Radius of that circle.
+        radius: f32,
+        /// Where the arc begins, in turns clockwise from three o'clock.
+        ///
+        /// Clockwise because the box has y increasing downward, so a positive
+        /// sweep turns the way a reader expects on screen.
+        start: f32,
+        /// How far it goes, in turns.
+        sweep: f32,
+    },
+}
+
+/// A point of a [`Mark`], in a unit box with the origin top left.
+///
+/// Unitless, so a host multiplies by whatever it is drawing into.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Point {
+    x: f32,
+    y: f32,
+}
+
+impl Point {
+    /// Builds a point from its two coordinates.
+    #[must_use]
+    pub const fn new(x: f32, y: f32) -> Self {
+        Self { x, y }
+    }
+
+    /// Returns the distance from the left of the box, 0 to 1.
+    #[must_use]
+    pub const fn x(self) -> f32 {
+        self.x
+    }
+
+    /// Returns the distance from the top of the box, 0 to 1.
+    #[must_use]
+    pub const fn y(self) -> f32 {
+        self.y
     }
 }
 
@@ -1052,8 +1309,8 @@ impl fmt::Display for Mode {
 )]
 mod tests {
     use super::{
-        ALGORITHM_COUNT, Algorithm, Align, Engine, MODE_COUNT, Mode, ROUTING_COUNT, Routing,
-        SLOTS_PER_ENGINE, Source, grid,
+        ALGORITHM_COUNT, Algorithm, Align, Engine, Family, MODE_COUNT, Mode, ROUTING_COUNT,
+        Routing, SLOTS_PER_ENGINE, Source, Stroke, grid,
     };
     use crate::param::{DEFAULT_FIRMWARE, Group, Kind, ParamId, TableId};
     use crate::sysex::inquiry::Version;
@@ -1480,6 +1737,103 @@ mod tests {
         let gate = Algorithm::by_name("NoiseGate").expect("a Noise Gate");
         let power = gate.slot(8).expect("a Power slot");
         assert_eq!((power.min, power.max), (Some("ON"), Some("OFF")));
+    }
+
+    /// Every algorithm reaches a mark, and the nine families between them
+    /// account for all 35 with none left over.
+    #[test]
+    fn every_algorithm_has_a_family_and_a_mark() {
+        for algorithm in Algorithm::all() {
+            assert!(
+                !algorithm.mark().strokes().is_empty(),
+                "{algorithm} has an empty mark"
+            );
+            assert_eq!(algorithm.mark(), algorithm.family().mark());
+        }
+
+        let counted: usize = Family::ALL
+            .into_iter()
+            .map(|family| family.algorithms().count())
+            .sum();
+        assert_eq!(counted, ALGORITHM_COUNT);
+    }
+
+    /// `Family::ALL` is hand-written and the marks beside it are generated, so
+    /// the two agree only as long as the order does. A family reordered or
+    /// renamed in marks.toml fails here rather than handing out the wrong mark.
+    #[test]
+    fn the_families_are_in_the_order_the_specification_declares() {
+        let names: Vec<&str> = Family::ALL.into_iter().map(Family::name).collect();
+        assert_eq!(
+            names,
+            [
+                "Reverb",
+                "Delay",
+                "Modulation",
+                "Filter",
+                "Dynamics",
+                "Distortion",
+                "Imaging",
+                "Pitch",
+                "Rotary",
+            ]
+        );
+        for (index, family) in Family::ALL.into_iter().enumerate() {
+            assert_eq!(family.index(), index);
+        }
+    }
+
+    /// A mark is drawn in a unit box, and a host that scales it by its own size
+    /// expects nothing to land outside. The margin is what leaves room for a
+    /// stroke width; `spec/marks.toml` states it and this holds it.
+    #[test]
+    fn a_mark_stays_inside_the_unit_box() {
+        const MARGIN: f32 = 0.08;
+        let inside = |x: f32, y: f32, family: Family| {
+            assert!(
+                (MARGIN..=1.0 - MARGIN).contains(&x) && (MARGIN..=1.0 - MARGIN).contains(&y),
+                "{family} reaches ({x}, {y})"
+            );
+        };
+
+        for family in Family::ALL {
+            for stroke in family.mark().strokes() {
+                match *stroke {
+                    Stroke::Line { points } => {
+                        assert!(points.len() >= 2, "{family} has a line of one point");
+                        for point in points {
+                            inside(point.x(), point.y(), family);
+                        }
+                    }
+                    Stroke::Arc {
+                        centre,
+                        radius,
+                        sweep,
+                        ..
+                    } => {
+                        assert!(radius > 0.0, "{family} has an arc of no radius");
+                        assert!(sweep != 0.0, "{family} has an arc that sweeps nothing");
+                        inside(centre.x() - radius, centre.y() - radius, family);
+                        inside(centre.x() + radius, centre.y() + radius, family);
+                    }
+                }
+            }
+        }
+    }
+
+    /// The four buckets the manual prints are not the nine a symbol needs, and
+    /// `Creative` is where that shows: it holds three families at once.
+    #[test]
+    fn a_family_is_finer_than_the_manuals_category() {
+        let creative: Vec<Family> = Algorithm::all()
+            .iter()
+            .filter(|algorithm| algorithm.category == "Creative")
+            .map(Algorithm::family)
+            .collect();
+        assert!(creative.contains(&Family::Modulation));
+        assert!(creative.contains(&Family::Filter));
+        assert!(creative.contains(&Family::Pitch));
+        assert!(creative.contains(&Family::Rotary));
     }
 
     /// The `FX Type` table is 35 effects and nothing else, on both firmwares.

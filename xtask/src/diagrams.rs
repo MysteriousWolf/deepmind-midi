@@ -91,6 +91,12 @@ pub fn all(spec: &Spec) -> Result<Vec<Diagram>, String> {
             kind: Kind::Svg,
             source: envelope(),
         },
+        Diagram {
+            id: "marks",
+            title: "Effect family marks",
+            kind: Kind::Svg,
+            source: marks(spec),
+        },
     ])
 }
 
@@ -377,4 +383,115 @@ fn envelope_legend(out: &mut String, p: &EnvelopePlot) {
             y + 2.5,
         );
     }
+}
+
+/// One row of the nine family marks, drawn at the size a host would use them.
+///
+/// A proof rather than an illustration: the strokes drawn here are the ones the
+/// library publishes, straight out of `spec/marks.toml` with nothing added, so
+/// a mark that reads badly at this size reads badly in a host too. Two sizes
+/// are shown because the whole point of geometry over a raster is that the same
+/// mark serves both.
+fn marks(spec: &Spec) -> String {
+    /// Side of the large box, in the SVG's own units.
+    const LARGE: f32 = 56.0;
+    /// Side of the small box, which is about what an LCD gives a mark.
+    const SMALL: f32 = 16.0;
+    /// Space around each column.
+    const PAD: f32 = 16.0;
+    /// Room under the marks for the family's name.
+    const LABEL: f32 = 18.0;
+
+    let pitch = LARGE + PAD;
+    let width = pitch * count(spec.families.len()) + PAD;
+    let height = PAD + LARGE + 10.0 + SMALL + LABEL + PAD;
+
+    let mut out = format!(
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width} {height}\" \
+         width=\"{width}\" height=\"{height}\" role=\"img\" \
+         aria-label=\"The nine effect family marks, at two sizes\">\n\
+         <style>\n\
+         .mark {{ fill: none; stroke: #2b2f38; stroke-width: 2; stroke-linecap: round; \
+         stroke-linejoin: round; }}\n\
+         .small {{ stroke-width: 1.4; }}\n\
+         .name {{ font: 500 9px system-ui, sans-serif; fill: #6b7280; text-anchor: middle; }}\n\
+         @media (prefers-color-scheme: dark) {{\n\
+         .mark {{ stroke: #d8dbe2; }}\n\
+         .name {{ fill: #9aa2b1; }}\n\
+         }}\n\
+         </style>\n"
+    );
+
+    for (index, family) in spec.families.iter().enumerate() {
+        let left = PAD + pitch * count(index);
+        let _ = write!(
+            out,
+            "  <g class=\"mark\">\n{}  </g>\n",
+            draw_mark(family, left, PAD, LARGE, "")
+        );
+        let _ = write!(
+            out,
+            "  <g class=\"mark small\">\n{}  </g>\n",
+            draw_mark(
+                family,
+                left + (LARGE - SMALL) / 2.0,
+                PAD + LARGE + 10.0,
+                SMALL,
+                " small"
+            )
+        );
+        let _ = writeln!(
+            out,
+            "  <text class=\"name\" x=\"{:.1}\" y=\"{:.1}\">{}</text>",
+            left + LARGE / 2.0,
+            PAD + LARGE + 10.0 + SMALL + 12.0,
+            family.name,
+        );
+    }
+    out.push_str("</svg>\n");
+    out
+}
+
+/// Returns a count as a length. There are nine families, so a byte holds every
+/// value this can take.
+fn count(of: usize) -> f32 {
+    f32::from(u8::try_from(of).unwrap_or(u8::MAX))
+}
+
+/// Draws one mark's strokes, scaling the unit box to `side` at `(left, top)`.
+fn draw_mark(family: &crate::spec::Family, left: f32, top: f32, side: f32, class: &str) -> String {
+    let _ = class;
+    let at = |x: f32, y: f32| (left + x * side, top + y * side);
+    let mut out = String::new();
+    for stroke in &family.strokes {
+        if let Some(points) = &stroke.line {
+            let drawn: Vec<String> = points
+                .iter()
+                .map(|&[x, y]| {
+                    let (x, y) = at(x, y);
+                    format!("{x:.2},{y:.2}")
+                })
+                .collect();
+            let _ = writeln!(out, "    <polyline points=\"{}\" />", drawn.join(" "));
+        } else if let Some(arc) = &stroke.arc {
+            let (cx, cy) = at(arc.centre[0], arc.centre[1]);
+            let radius = arc.radius * side;
+            // Turns clockwise from three o'clock, in a box with y downward, so
+            // the angle goes straight into cos/sin with no sign to flip.
+            let point = |turns: f32| {
+                let radians = turns * core::f32::consts::TAU;
+                (cx + radius * radians.cos(), cy + radius * radians.sin())
+            };
+            let (x0, y0) = point(arc.start);
+            let (x1, y1) = point(arc.start + arc.sweep);
+            let large = u8::from(arc.sweep.abs() > 0.5);
+            let sweep = u8::from(arc.sweep > 0.0);
+            let _ = writeln!(
+                out,
+                "    <path d=\"M {x0:.2} {y0:.2} A {radius:.2} {radius:.2} 0 {large} {sweep} \
+                 {x1:.2} {y1:.2}\" />"
+            );
+        }
+    }
+    out
 }

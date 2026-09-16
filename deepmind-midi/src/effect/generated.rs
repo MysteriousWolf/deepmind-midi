@@ -5,8 +5,8 @@
 //! fill, and everything that reads them, are in the parent module.
 
 use super::{
-    Algorithm, Align, Colour, Control, Engine, EngineParameters, FxSlot, Grid, Mode, Panel,
-    Routing, Row, Source,
+    Algorithm, Align, Colour, Control, Engine, EngineParameters, Family, FxSlot, Grid, Mark, Mode,
+    Panel, Point, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
 
@@ -109,6 +109,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "TC-DeepVRB",
         full_name: "TC Deep Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &TC_DEEP_VRB,
     },
     Algorithm {
@@ -116,6 +117,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "AmbVerb",
         full_name: "Ambient Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &AMB_VERB,
     },
     Algorithm {
@@ -123,6 +125,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "RoomRev",
         full_name: "Room Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &ROOM_REV,
     },
     Algorithm {
@@ -130,6 +133,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "VintageRev",
         full_name: "Vintage Room Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &VINTAGE_REV,
     },
     Algorithm {
@@ -137,6 +141,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "HallRev",
         full_name: "Hall Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &HALL_REV,
     },
     Algorithm {
@@ -144,6 +149,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "ChamberRev",
         full_name: "Chamber Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &CHAMBER_REV,
     },
     Algorithm {
@@ -151,6 +157,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "PlateRev",
         full_name: "Plate Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &PLATE_REV,
     },
     Algorithm {
@@ -158,6 +165,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "RichPltRev",
         full_name: "Rich Plate Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &RICH_PLT_REV,
     },
     Algorithm {
@@ -165,6 +173,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "GatedRev",
         full_name: "Gated Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &GATED_REV,
     },
     Algorithm {
@@ -172,6 +181,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Reverse",
         full_name: "Reverse Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &REVERSE,
     },
     Algorithm {
@@ -179,6 +189,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "ChorusVerb",
         full_name: "Chorus and Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &CHORUS_VERB,
     },
     Algorithm {
@@ -186,6 +197,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "DelayVerb",
         full_name: "Delay and Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &DELAY_VERB,
     },
     Algorithm {
@@ -193,6 +205,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "FlangVerb",
         full_name: "Flanger and Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &FLANG_VERB,
     },
     Algorithm {
@@ -200,6 +213,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "MidasEQ",
         full_name: "Midas Equaliser",
         category: "Processing",
+        family: Family::Filter,
         slots: &MIDAS_EQ,
     },
     Algorithm {
@@ -207,6 +221,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Enhancer",
         full_name: "Enhancing EQ",
         category: "Processing",
+        family: Family::Filter,
         slots: &ENHANCER,
     },
     Algorithm {
@@ -214,6 +229,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "FairComp",
         full_name: "Compressor",
         category: "Processing",
+        family: Family::Dynamics,
         slots: &FAIR_COMP,
     },
     Algorithm {
@@ -221,6 +237,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "MulBndDist",
         full_name: "Multiband Distortion",
         category: "Processing",
+        family: Family::Distortion,
         slots: &MUL_BND_DIST,
     },
     Algorithm {
@@ -228,6 +245,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "RackAmp",
         full_name: "Rack Amplifier",
         category: "Processing",
+        family: Family::Distortion,
         slots: &RACK_AMP,
     },
     Algorithm {
@@ -235,6 +253,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "EdisonEX1",
         full_name: "Stereo Imaging",
         category: "Processing",
+        family: Family::Imaging,
         slots: &EDISON_EX1,
     },
     Algorithm {
@@ -242,6 +261,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Auto Pan",
         full_name: "Auto Panning",
         category: "Processing",
+        family: Family::Imaging,
         slots: &AUTO_PAN,
     },
     Algorithm {
@@ -249,6 +269,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "NoiseGate",
         full_name: "Noise Gate",
         category: "Processing",
+        family: Family::Dynamics,
         slots: &NOISE_GATE,
     },
     Algorithm {
@@ -256,6 +277,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Delay",
         full_name: "Stereo Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &DELAY,
     },
     Algorithm {
@@ -263,6 +285,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "3TapDelay",
         full_name: "3-Tap Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &THREE_TAP_DELAY,
     },
     Algorithm {
@@ -270,6 +293,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "4TapDelay",
         full_name: "4-Tap Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &FOUR_TAP_DELAY,
     },
     Algorithm {
@@ -277,6 +301,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "T-RayDelay",
         full_name: "Tel-Ray Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &T_RAY_DELAY,
     },
     Algorithm {
@@ -284,6 +309,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "DecimDelay",
         full_name: "Decimator Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &DECIM_DELAY,
     },
     Algorithm {
@@ -291,6 +317,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "ModDlyRev",
         full_name: "Modulation, Delay and Reverb",
         category: "Delay",
+        family: Family::Delay,
         slots: &MOD_DLY_REV,
     },
     Algorithm {
@@ -298,6 +325,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Chorus",
         full_name: "Stereo Chorus",
         category: "Creative",
+        family: Family::Modulation,
         slots: &CHORUS,
     },
     Algorithm {
@@ -305,6 +333,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Chorus-D",
         full_name: "Dimensional Chorus",
         category: "Creative",
+        family: Family::Modulation,
         slots: &CHORUS_D,
     },
     Algorithm {
@@ -312,6 +341,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Flanger",
         full_name: "Stereo Flanger",
         category: "Creative",
+        family: Family::Modulation,
         slots: &FLANGER,
     },
     Algorithm {
@@ -319,6 +349,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Phaser",
         full_name: "Stereo Phaser",
         category: "Creative",
+        family: Family::Modulation,
         slots: &PHASER,
     },
     Algorithm {
@@ -326,6 +357,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "MoodFilter",
         full_name: "Moog-Type Filter",
         category: "Creative",
+        family: Family::Filter,
         slots: &MOOD_FILTER,
     },
     Algorithm {
@@ -333,6 +365,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "DualPitch",
         full_name: "Dual Pitch Shifter",
         category: "Creative",
+        family: Family::Pitch,
         slots: &DUAL_PITCH,
     },
     Algorithm {
@@ -340,6 +373,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Vintage Pitch",
         full_name: "Dual Pitch Shifter",
         category: "Creative",
+        family: Family::Pitch,
         slots: &VINTAGE_PITCH,
     },
     Algorithm {
@@ -347,6 +381,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "RotarySpkr",
         full_name: "Rotary Speaker",
         category: "Creative",
+        family: Family::Rotary,
         slots: &ROTARY_SPKR,
     },
 ];
@@ -7909,5 +7944,216 @@ pub(super) static MODES: [Mode; MODE_COUNT] = [
         name: "Bypass",
         analog_path: true,
         digital_path: false,
+    },
+];
+/// Number of families the 35 algorithms fall into.
+pub const FAMILY_COUNT: usize = 9;
+
+/// A decaying tail: one arrival, then a wash falling away to nothing.
+static MARK_REVERB: [Stroke; 3] = [
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.84), Point::new(0.92, 0.84)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.17, 0.12), Point::new(0.17, 0.84)],
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.17, 0.12),
+            Point::new(0.31, 0.45),
+            Point::new(0.46, 0.63),
+            Point::new(0.62, 0.74),
+            Point::new(0.78, 0.81),
+            Point::new(0.92, 0.84),
+        ],
+    },
+];
+
+/// Discrete repeats: a few taps, evenly spaced and each quieter than the last.
+static MARK_DELAY: [Stroke; 5] = [
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.84), Point::new(0.92, 0.84)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.14, 0.14), Point::new(0.14, 0.84)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.4, 0.38), Point::new(0.4, 0.84)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.66, 0.56), Point::new(0.66, 0.84)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.9, 0.7), Point::new(0.9, 0.84)],
+    },
+];
+
+/// A swept delay: one cycle of the wave that does the sweeping.
+static MARK_MODULATION: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.5),
+        Point::new(0.19, 0.22),
+        Point::new(0.29, 0.13),
+        Point::new(0.4, 0.22),
+        Point::new(0.5, 0.5),
+        Point::new(0.6, 0.78),
+        Point::new(0.71, 0.87),
+        Point::new(0.81, 0.78),
+        Point::new(0.92, 0.5),
+    ],
+}];
+
+/// A response with a corner in it: flat, then a knee, then a roll-off.
+static MARK_FILTER: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.34),
+        Point::new(0.4, 0.34),
+        Point::new(0.52, 0.28),
+        Point::new(0.62, 0.4),
+        Point::new(0.74, 0.62),
+        Point::new(0.92, 0.86),
+    ],
+}];
+
+/// A squeeze: the loud and the quiet pressed toward each other.
+static MARK_DYNAMICS: [Stroke; 4] = [
+    Stroke::Line {
+        points: &[Point::new(0.5, 0.1), Point::new(0.5, 0.4)],
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.34, 0.25),
+            Point::new(0.5, 0.41),
+            Point::new(0.66, 0.25),
+        ],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.5, 0.9), Point::new(0.5, 0.6)],
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.34, 0.75),
+            Point::new(0.5, 0.59),
+            Point::new(0.66, 0.75),
+        ],
+    },
+];
+
+/// A wave driven into its ceiling: the peaks flattened where the curve clips.
+static MARK_DISTORTION: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.5),
+        Point::new(0.17, 0.18),
+        Point::new(0.38, 0.18),
+        Point::new(0.47, 0.5),
+        Point::new(0.55, 0.82),
+        Point::new(0.76, 0.82),
+        Point::new(0.85, 0.5),
+        Point::new(0.92, 0.34),
+    ],
+}];
+
+/// Width: a span opening out to both sides of the centre.
+static MARK_IMAGING: [Stroke; 4] = [
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.5), Point::new(0.92, 0.5)],
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.26, 0.28),
+            Point::new(0.08, 0.5),
+            Point::new(0.26, 0.72),
+        ],
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.74, 0.28),
+            Point::new(0.92, 0.5),
+            Point::new(0.74, 0.72),
+        ],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.5, 0.2), Point::new(0.5, 0.8)],
+    },
+];
+
+/// A step to another pitch, held: the interval a shifter puts beside the note.
+static MARK_PITCH: [Stroke; 4] = [
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.74), Point::new(0.46, 0.74)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.46, 0.74), Point::new(0.46, 0.26)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.46, 0.26), Point::new(0.92, 0.26)],
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.34, 0.38),
+            Point::new(0.46, 0.26),
+            Point::new(0.58, 0.38),
+        ],
+    },
+];
+
+/// A horn going round: most of a turn, with the head showing which way.
+static MARK_ROTARY: [Stroke; 2] = [
+    Stroke::Arc {
+        centre: Point::new(0.5, 0.5),
+        radius: 0.34,
+        start: 0.06,
+        sweep: 0.8,
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.62, 0.12),
+            Point::new(0.8, 0.22),
+            Point::new(0.7, 0.4),
+        ],
+    },
+];
+
+/// Each family's name, in the order `Family::ALL` gives them.
+pub(super) static FAMILY_NAMES: [&str; FAMILY_COUNT] = [
+    "Reverb",
+    "Delay",
+    "Modulation",
+    "Filter",
+    "Dynamics",
+    "Distortion",
+    "Imaging",
+    "Pitch",
+    "Rotary",
+];
+
+/// The mark for each family, in the order `Family::ALL` gives them.
+pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
+    Mark {
+        strokes: &MARK_REVERB,
+    },
+    Mark {
+        strokes: &MARK_DELAY,
+    },
+    Mark {
+        strokes: &MARK_MODULATION,
+    },
+    Mark {
+        strokes: &MARK_FILTER,
+    },
+    Mark {
+        strokes: &MARK_DYNAMICS,
+    },
+    Mark {
+        strokes: &MARK_DISTORTION,
+    },
+    Mark {
+        strokes: &MARK_IMAGING,
+    },
+    Mark {
+        strokes: &MARK_PITCH,
+    },
+    Mark {
+        strokes: &MARK_ROTARY,
     },
 ];

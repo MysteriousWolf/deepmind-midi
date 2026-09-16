@@ -4,6 +4,7 @@
 //! generated from them, and the parameter tables the library will use are
 //! generated from the same data, so a correction only ever has to be made once.
 
+use std::collections::BTreeMap;
 use std::path::Path;
 
 use serde::Deserialize;
@@ -351,6 +352,128 @@ pub struct Layout {
     pub rows: Vec<LayoutRow>,
 }
 
+/// One family of effects and the mark it is drawn with.
+///
+/// `category` in layout.toml is the manual's own four buckets; a family is what
+/// an effect does to a signal, at the resolution a symbol needs.
+#[derive(Debug, Deserialize)]
+pub struct Family {
+    /// The family's name, which becomes a variant of `effect::Family`.
+    pub name: String,
+    /// What the mark is a picture of.
+    pub description: String,
+    /// The algorithms in this family, by their `effects.toml` name.
+    pub algorithms: Vec<String>,
+    /// The mark, as strokes in a unit box with the origin top left.
+    pub strokes: Vec<Stroke>,
+}
+
+impl Family {
+    /// Checks this family's strokes are drawable and inside the unit box.
+    ///
+    /// # Errors
+    ///
+    /// Returns a message when a stroke sets neither `line` nor `arc` or both,
+    /// when a polyline has fewer than two points, when an arc has no radius or
+    /// no sweep, or when any of it falls outside `margin..=1.0 - margin`.
+    fn validate_strokes(&self, margin: f32) -> Result<(), String> {
+        let inside = |what: &str, x: f32, y: f32| -> Result<(), String> {
+            if (margin..=1.0 - margin).contains(&x) && (margin..=1.0 - margin).contains(&y) {
+                return Ok(());
+            }
+            Err(format!(
+                "marks.toml: {}'s {what} reaches ({x}, {y}), outside {margin} to {}",
+                self.name,
+                1.0 - margin
+            ))
+        };
+
+        for (index, stroke) in self.strokes.iter().enumerate() {
+            match (&stroke.line, &stroke.arc) {
+                (Some(points), None) => {
+                    if points.len() < 2 {
+                        return Err(format!(
+                            "marks.toml: {} stroke {index} is a line of {} point(s)",
+                            self.name,
+                            points.len()
+                        ));
+                    }
+                    for &[x, y] in points {
+                        inside("line", x, y)?;
+                    }
+                }
+                (None, Some(arc)) => {
+                    if arc.radius <= 0.0 {
+                        return Err(format!(
+                            "marks.toml: {} stroke {index} is an arc of radius {}",
+                            self.name, arc.radius
+                        ));
+                    }
+                    if arc.sweep == 0.0 {
+                        return Err(format!(
+                            "marks.toml: {} stroke {index} is an arc that sweeps nothing",
+                            self.name
+                        ));
+                    }
+                    // The bounding box of the whole circle, because an arc of
+                    // more than a quarter turn reaches its extremes whatever
+                    // its endpoints are.
+                    inside(
+                        "arc",
+                        arc.centre[0] - arc.radius,
+                        arc.centre[1] - arc.radius,
+                    )?;
+                    inside(
+                        "arc",
+                        arc.centre[0] + arc.radius,
+                        arc.centre[1] + arc.radius,
+                    )?;
+                }
+                (Some(_), Some(_)) => {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} sets both line and arc",
+                        self.name
+                    ));
+                }
+                (None, None) => {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} sets neither line nor arc",
+                        self.name
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+/// One stroke of a mark: a polyline or a circular arc.
+///
+/// Exactly one of the two is set, which the loader checks; TOML has no tagged
+/// union, so this is how a stroke says which it is.
+#[derive(Debug, Deserialize)]
+pub struct Stroke {
+    /// Two or more points, in a unit box.
+    #[serde(default)]
+    pub line: Option<Vec<[f32; 2]>>,
+    /// A circular arc, in the same box.
+    #[serde(default)]
+    pub arc: Option<Arc>,
+}
+
+/// A circular arc of a mark, in a unit box with the origin top left.
+#[derive(Debug, Deserialize)]
+pub struct Arc {
+    /// Centre of the circle the arc is taken from.
+    pub centre: [f32; 2],
+    /// Radius of that circle.
+    pub radius: f32,
+    /// Where the arc starts, in turns clockwise from three o'clock.
+    pub start: f32,
+    /// How far it goes, in turns, clockwise.
+    pub sweep: f32,
+}
+
 /// The presentation of one effect algorithm's slots.
 #[derive(Debug, Deserialize)]
 pub struct Panel {
@@ -554,6 +677,11 @@ struct Panels {
 }
 
 #[derive(Debug, Deserialize)]
+struct Marks {
+    family: Vec<Family>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Layouts {
     meta: LayoutMeta,
     grid: Grid,
@@ -655,6 +783,8 @@ pub struct Spec {
     pub controls: Vec<String>,
     /// How each effect presents its slots, ordered by `FX Type` value.
     pub panels: Vec<Panel>,
+    /// What each effect does to a signal, with the mark it is drawn with.
+    pub families: Vec<Family>,
     /// How the four engines can be wired, ordered by `FX Routing` value.
     pub routings: Vec<Routing>,
     /// What each `FX Mode` setting does to the analog and digital paths.
@@ -689,6 +819,7 @@ impl Spec {
         let firmwares: Firmwares = read(&spec.join("firmware.toml"))?;
         let mapping: Mapping = read(&spec.join("mapping.toml"))?;
         let panels: Panels = read(&spec.join("panels.toml"))?;
+        let marks: Marks = read(&spec.join("marks.toml"))?;
         let layouts: Layouts = read(&spec.join("layout.toml"))?;
         let routings: Routings = read(&spec.join("routing.toml"))?;
         let measurements: Measurements = read(&spec.join("measurements.toml"))?;
@@ -710,6 +841,7 @@ impl Spec {
             aligns: layouts.meta.aligns,
             controls: layouts.meta.controls,
             panels: panels.panel,
+            families: marks.family,
             routings: routings.routing,
             fx_modes: routings.mode,
             measurements: measurements.measurement,
@@ -1602,7 +1734,58 @@ impl Spec {
                 }
             }
         }
-        self.validate_panels()
+        self.validate_panels()?;
+        self.validate_marks()
+    }
+
+    /// Checks that every algorithm has exactly one family and every mark is
+    /// geometry a host can draw.
+    ///
+    /// The first half is what stops an algorithm added to effects.toml from
+    /// being silently drawn as whatever the first family happens to be. The
+    /// second is that a stroke says which of the two kinds it is, and stays
+    /// inside the box the marks are declared to live in.
+    fn validate_marks(&self) -> Result<(), String> {
+        /// Coordinates are kept this far inside the unit box so that a host's
+        /// stroke width has somewhere to go; see `meta.geometry`.
+        const MARGIN: f32 = 0.08;
+
+        let mut claimed: BTreeMap<&str, &str> = BTreeMap::new();
+        for family in &self.families {
+            if family.name.trim().is_empty() {
+                return Err("marks.toml: a family has no name".to_owned());
+            }
+            if family.strokes.is_empty() {
+                return Err(format!("marks.toml: {} has no mark", family.name));
+            }
+            for name in &family.algorithms {
+                if !self.effects.iter().any(|effect| &effect.name == name) {
+                    return Err(format!(
+                        "marks.toml: {} claims {name:?}, which effects.toml does not list",
+                        family.name
+                    ));
+                }
+                if let Some(first) = claimed.insert(name, &family.name) {
+                    return Err(format!(
+                        "marks.toml: {name:?} is in both {first} and {}",
+                        family.name
+                    ));
+                }
+            }
+            family.validate_strokes(MARGIN)?;
+        }
+
+        if let Some(effect) = self
+            .effects
+            .iter()
+            .find(|effect| !claimed.contains_key(effect.name.as_str()))
+        {
+            return Err(format!(
+                "marks.toml: {} is in no family, so there is no mark to draw for it",
+                effect.name
+            ));
+        }
+        Ok(())
     }
 
     /// Checks that panels.toml lines up with effects.toml slot for slot.

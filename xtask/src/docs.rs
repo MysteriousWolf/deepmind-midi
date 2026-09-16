@@ -715,7 +715,7 @@ fn render_effects(spec: &Spec, drawings: &[fx::Drawing]) -> String {
         }
         let _ = write!(
             out,
-            "`FX Type` {}{}. {} slots{}.\n\n\
+            "`FX Type` {}{}{}. {} slots{}.\n\n\
              | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | \
              Description |\n|---|---|---|---|---|---|---|---|---|\n",
             effect.r#type,
@@ -723,6 +723,13 @@ fn render_effects(spec: &Spec, drawings: &[fx::Drawing]) -> String {
                 ", {}",
                 l.category.to_lowercase()
             )),
+            spec.families
+                .iter()
+                .find(|f| f.algorithms.iter().any(|a| a == &effect.name))
+                .map_or(String::new(), |f| format!(
+                    ", drawn with the {} mark",
+                    f.name.to_lowercase()
+                )),
             effect.parameters.len(),
             layout.map_or(String::new(), |l| format!(", drawn as {}s", l.control)),
         );
