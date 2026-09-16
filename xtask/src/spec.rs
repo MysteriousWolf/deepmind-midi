@@ -941,10 +941,9 @@ impl Spec {
     /// Three things, all of which are how this table stays maintained rather
     /// than transcribed: every name has to resolve, an entry must not name the
     /// same parameter twice, and the versions of a renumbered table have to
-    /// agree about what a name moves. The last one is the one that matters:
-    /// the firmware 1.0 destination table is derived from the 1.1 one, so a
-    /// mapping added to one and forgotten in the other is exactly the drift
-    /// nobody would notice.
+    /// agree about what a name moves. The last one matters most: the firmware
+    /// 1.0 destination table is derived from the 1.1 one, so a mapping added to
+    /// one and forgotten in the other would otherwise go unnoticed.
     fn validate_enum_parameters(&self) -> Result<(), String> {
         let named = |name: &str| self.parameters.iter().any(|p| p.name == name);
         for table in &self.tables {
@@ -1205,10 +1204,10 @@ impl Spec {
     /// Checks that the engine offsets `effects.toml` declares are where the
     /// parameter table actually puts the slots.
     ///
-    /// The offsets are written down in two places — as a base per engine here,
-    /// and as 52 named parameters in `parameters.toml` — and a host addressing
-    /// a slot has to be able to trust that they agree. Naming them rather than
-    /// counting from a base is what makes a renamed parameter a build error.
+    /// The offsets are written down twice: as a base per engine here, and as 52
+    /// named parameters in `parameters.toml`. A host addressing a slot has to be
+    /// able to trust that the two agree. Naming them rather than counting from a
+    /// base is what makes a renamed parameter a build error.
     fn validate_engines(&self) -> Result<(), String> {
         let named = |offset: u16, name: &str| -> Result<(), String> {
             let parameter = self

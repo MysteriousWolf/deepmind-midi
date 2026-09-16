@@ -2,9 +2,8 @@
 //!
 //! [`device`](crate::device) is the host's end of the conversation. This is the
 //! other end: something that answers requests, applies the edits it is sent and
-//! says what it heard. It exists because a host cannot be tested against a
-//! `DeepMind` that is not plugged in, and hand-assembling reply frames in every
-//! test is how that gap gets filled otherwise.
+//! says what it heard. It is here so that testing a host does not mean either
+//! plugging in a `DeepMind` or hand-assembling reply frames.
 //!
 //! ```
 //! use deepmind_midi::device::{Device, Event};
@@ -39,10 +38,10 @@
 //! code the library decodes with, so a round trip through it proves only that
 //! this library agrees with itself.
 //!
-//! What it does find is a host that drives the protocol wrongly: one that reads
-//! a dump it never asked for, mistakes a stored program for the edit buffer,
-//! never drains its queue, or assumes an answer arrives before the next request
-//! goes out. Those bugs are reachable without hardware.
+//! What it does find is a host that drives the protocol wrongly: one that reads a
+//! dump it never asked for, mistakes a stored program for the edit buffer, never
+//! drains its queue, or assumes an answer arrives before the next request goes
+//! out. Those bugs are reachable without hardware.
 //!
 //! # The loop
 //!
@@ -60,15 +59,15 @@
 //!
 //! # Stored programs come from a [`Library`]
 //!
-//! Eight banks are two hundred kilobytes, too much to hold inline on the target
-//! this crate is `no_std` for. So a [`Synth`] holds its edit buffer and nothing
-//! else, and stored programs come from whatever the caller supplies: [`Empty`]
-//! for a unit whose memory is not part of the test, or a [`syx::File`], which
-//! makes a preset pack the contents of a simulated unit.
+//! Eight banks are two hundred kilobytes, too much to hold inline on the targets
+//! this crate is `no_std` for. A [`Synth`] holds its edit buffer and nothing else,
+//! and stored programs come from whatever the caller supplies: [`Empty`] for a
+//! unit whose memory is not part of the test, or a [`syx::File`], which makes a
+//! preset pack the contents of a simulated unit.
 //!
-//! A slot the library does not hold is not answered. A real unit always has
-//! something in every slot, but an unanswered request is more useful to test
-//! than an invented program.
+//! A slot the library does not hold goes unanswered. A real unit always has
+//! something in every slot, but an unanswered request is the more useful thing to
+//! test against.
 //!
 //! # What it answers
 //!
@@ -85,11 +84,10 @@
 //! | Single program name dump | The name of the library's program for that slot |
 //!
 //! The globals, the patterns, the chord memories and the calibration data are
-//! requests it hears and does not answer, because the manual gives those
-//! payloads a length and never says what is in them. A bank of program names is
-//! decodable and is not answered either: two kilobytes of reply is more than
-//! this is for, and no request for one can be built by
-//! [`Device`](crate::device::Device).
+//! requests it hears and does not answer, because the manual gives those payloads
+//! a length and never says what is in them. A bank of program names is decodable
+//! and is not answered either: the reply is two kilobytes, and
+//! [`Device`](crate::device::Device) cannot build a request for one.
 //!
 //! [`Heard::Request`] reports both the command and whether an answer was queued,
 //! so a test can tell "asked and ignored" from "asked and answered".
@@ -167,10 +165,9 @@ impl<L: Library + ?Sized> Library for &L {
 /// A preset pack is a unit's memory: the slots the file names are the slots the
 /// synthesizer has.
 ///
-/// The file is walked per request rather than indexed, which is the right trade
-/// for something answering one request at a time and holding no allocator. A
-/// frame that does not parse is skipped, the same as everywhere else in
-/// [`syx`](crate::syx).
+/// The file is walked per request rather than indexed, since this answers one
+/// request at a time and holds no allocator. A frame that does not parse is
+/// skipped, the same as everywhere else in [`syx`](crate::syx).
 impl Library for syx::File<'_> {
     fn program(&self, slot: Slot) -> Option<Program> {
         self.programs()
@@ -468,10 +465,10 @@ impl<L: Library, const RX: usize, const TX: usize, const EV: usize> Synth<L, RX,
     /// Sets a parameter and queues the NRPN that says so, as turning a knob on
     /// the front panel does.
     ///
-    /// This is the inbound direction a host is easy to get wrong: the
-    /// synthesizer is not only answering, it is also volunteering. What goes out
-    /// is the four control changes of one [`NrpnEdit`], which is what a
-    /// `DeepMind` sends when a control application is attached.
+    /// This is the traffic a host is easiest to get wrong, because the
+    /// synthesizer is volunteering rather than answering. What goes out is the
+    /// four control changes of one [`NrpnEdit`], which is what a `DeepMind` sends
+    /// when a control application is attached.
     ///
     /// # Errors
     ///
@@ -533,9 +530,8 @@ impl<L: Library, const RX: usize, const TX: usize, const EV: usize> Synth<L, RX,
     /// refuses stays queued, and a run that was refused halfway resumes where it
     /// stopped rather than starting again.
     ///
-    /// Not draining is a unit that has not answered yet, which is the whole of
-    /// how a host's timeout path is tested. There is no clock here to do it
-    /// with.
+    /// Not draining is a unit that has not answered yet. With no clock here,
+    /// that is how a host's timeout path gets tested.
     ///
     /// # Errors
     ///

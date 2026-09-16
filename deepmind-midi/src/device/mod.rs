@@ -3,8 +3,8 @@
 //! This is where the layers below meet. Bytes off a port go in, a dump becomes a
 //! confirmed [`Program`], an edit becomes the NRPN messages that carry it, a
 //! request that goes unanswered becomes an [`Event::Timeout`], and bytes for the
-//! port come out. It is also the first layer with a clock, in the sense that the
-//! host supplies one.
+//! port come out. It is also the first layer that needs a clock, which the host
+//! supplies.
 //!
 //! ```
 //! use deepmind_midi::device::{Device, Event};
@@ -59,50 +59,49 @@
 //! while let Some(event) = device.poll_event() {} // results
 //! ```
 //!
-//! No IO, no threads, no blocking and no clock of its own, so a fake clock and
-//! a byte vector reproduce any timing bug exactly.
+//! No IO, no threads, no blocking and no clock of its own, so a fake clock and a
+//! byte vector reproduce any timing bug exactly.
 //!
 //! # Nothing is sent until it is drained
 //!
-//! [`request_edit_buffer`](Device::request_edit_buffer) and its neighbours put
-//! an item in the outbound queue and return. The bytes exist when
-//! [`drain_tx`](Device::drain_tx) hands them to the host, and a request's
-//! timeout starts then rather than when it was queued. A host that never drains
-//! never times out.
+//! [`request_edit_buffer`](Device::request_edit_buffer) and its neighbours put an
+//! item in the outbound queue and return. The bytes exist once
+//! [`drain_tx`](Device::drain_tx) hands them to the host, and a request's timeout
+//! starts then rather than when it was queued, so a host that never drains never
+//! times out.
 //!
-//! The queue holds items, not bytes: a request is a few bytes and a
-//! whole-program edit is 242 of them, so the cost is what is waiting rather
-//! than the worst case of what might be.
+//! The queue holds items rather than bytes. A request is a few bytes and a
+//! whole-program edit is 242, so its depth bounds what is waiting rather than the
+//! worst case of what might be.
 //!
 //! # State is a set of claims
 //!
-//! [`Known`] is what the synthesizer is believed to hold and how that belief
-//! was reached. The synthesizer answers no per-parameter reads, so there are
-//! two ways to believe something about it: it said so, or the host told it so
-//! and nothing has contradicted that. [`Device::program`] says which.
+//! [`Known`] is what the synthesizer is believed to hold and how that belief was
+//! reached. The synthesizer answers no per-parameter reads, so there are two ways
+//! to believe something about it: it said so, or the host told it so and nothing
+//! has contradicted that. [`Device::program`] says which.
 //!
-//! An edit makes the tracked program [`Known::Assumed`]. Only an edit buffer
-//! dump turns it back into [`Known::Confirmed`], and this layer never asks for
-//! one on its own: whether a resync is worth its latency is the host's call.
+//! An edit makes the tracked program [`Known::Assumed`]. Only an edit buffer dump
+//! turns it back into [`Known::Confirmed`], and this layer never asks for one on
+//! its own, since whether a resync is worth its latency is the host's call.
 //!
-//! Two answers are reported and deliberately not tracked. A stored program is
-//! not the sound the synthesizer is making, and a [`ControlApp`] reply names the
-//! slot the unit has selected at a moment nothing promises to repeat. Both
-//! arrive as events and are the host's to hold; a claim this layer could not
-//! keep honest is worse than no claim.
+//! Two answers are reported and deliberately not tracked. A stored program is not
+//! the sound the synthesizer is making, and a [`ControlApp`] reply names the slot
+//! the unit had selected at one moment. Both arrive as events for the host to
+//! hold.
 //!
 //! # What arrives from the synthesizer
 //!
-//! Turning a knob on the front panel sends the parameter out, so inbound
-//! traffic changes the tracked program too. An NRPN carries the parameter's
-//! whole value and the tracked program stays confirmed; a control change
-//! carries seven bits of it, less than most parameters have, so applying one
-//! leaves the program assumed. Either way [`Event::Parameter`] reports it.
+//! Turning a knob on the front panel sends the parameter out, so inbound traffic
+//! changes the tracked program too. An NRPN carries the parameter's whole value
+//! and the tracked program stays confirmed; a control change carries seven bits
+//! of it, less than most parameters have, so applying one leaves the program
+//! assumed. Either way [`Event::Parameter`] reports it.
 //!
 //! Real-time bytes are dropped rather than queued. A running MIDI clock is
 //! twenty-four messages a beat, none of which says anything about what the
-//! synthesizer holds, and queuing them would starve the queue of the events
-//! that do. A host that wants everything on the port drives [`Decoder`] itself.
+//! synthesizer holds, and queuing them would crowd out the events that do. A host
+//! that wants everything on the port drives [`Decoder`] itself.
 //!
 //! # Sizing
 //!
@@ -126,7 +125,7 @@
 //! ```
 //!
 //! An event that does not fit is dropped and counted, and the count arrives as
-//! [`Event::Lost`] once the queue has room again. Nothing is dropped quietly.
+//! [`Event::Lost`] once the queue has room again.
 
 mod control_app;
 mod event;
@@ -161,9 +160,9 @@ pub const DEFAULT_EVENT_DEPTH: usize = 8;
 
 /// Milliseconds a request waits for its answer before timing out.
 ///
-/// A dump crosses a MIDI port in a few tens of milliseconds; this is generous
-/// rather than tight, because a timeout that fires on a slow port is worse than
-/// one that fires late. [`Device::with_timeout`] sets another.
+/// A dump crosses a MIDI port in a few tens of milliseconds. This is generous
+/// rather than tight, so that a slow port does not time out.
+/// [`Device::with_timeout`] sets another.
 pub const DEFAULT_TIMEOUT_MS: u64 = 2_000;
 
 /// Requests that can be outstanding at once and still be timed.
@@ -281,8 +280,8 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
     /// Returns the firmware version to read value tables against.
     ///
     /// What the synthesizer reported, or [`DEFAULT_FIRMWARE`] where it has not
-    /// been asked. Three value tables were renumbered by firmware 1.1, so this
-    /// is the difference between naming a modulation source and misnaming it.
+    /// been asked. Firmware 1.1 renumbered three value tables, so reading them
+    /// against the wrong version misnames a modulation source.
     #[must_use]
     pub fn firmware(&self) -> Version {
         self.identity
@@ -467,9 +466,8 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
     /// which program the synthesizer has selected.
     ///
     /// The answer arrives as [`Event::ControlApp`] and is not tracked: see
-    /// [`ControlApp`] for why. Announcing the host and reading the reply are
-    /// one message here because the protocol makes them one message; whether a
-    /// unit changes what it sends afterwards is a question for a cable.
+    /// [`ControlApp`] for why. Announcing the host and reading the reply are one
+    /// message because the protocol makes them one message.
     ///
     /// # Errors
     ///
@@ -541,8 +539,8 @@ impl<const RX: usize, const TX: usize, const EV: usize> Device<RX, TX, EV> {
     /// Returns [`Error::ValueOutOfRange`] when the closure left a parameter
     /// holding something it does not accept, and [`Error::QueueFull`] when the
     /// change needs more room than the outbound queue has. Either way nothing is
-    /// queued and the tracked program is left as it was: a half-sent edit is a
-    /// sound nobody asked for.
+    /// queued and the tracked program is left as it was, so a failed edit never
+    /// half-lands.
     pub fn edit<F>(&mut self, edit: F) -> Result<usize>
     where
         F: FnOnce(&mut Program),
@@ -865,6 +863,7 @@ mod tests {
     use crate::param::{DATA_ENTRY_LSB, DATA_ENTRY_MSB, NRPN_NUMBER_LSB, NRPN_NUMBER_MSB};
     use crate::program::ProgramName;
     use crate::sysex::{Command, Interface, inquiry};
+    use crate::testing::assert_display;
 
     /// Room for the longest frame these tests build, which is a program dump.
     const FRAME: usize = 320;
@@ -1383,7 +1382,7 @@ mod tests {
         let Some(Event::ControlApp(answer)) = device.poll_event() else {
             panic!("the only message that names the selected program was dropped");
         };
-        assert_eq!(answer.slot().to_string(), "C41");
+        assert_display(answer.slot(), "C41");
         assert_eq!(answer.interface, Interface::Usb);
         assert_eq!(answer.receive_channel(), Some(Channel::ONE));
         assert_eq!(answer.transmit_channel(), Some(Channel::ONE));

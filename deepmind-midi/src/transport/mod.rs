@@ -1,9 +1,9 @@
 //! The blocking adapter: a port, a clock, and the loop between them.
 //!
 //! [`Device`] is a state machine with no idea what IO is. This is the one module
-//! that knows, and it knows as little as two traits can say: [`Port`] sends and
-//! receives bytes, [`Clock`] tells the time and waits. Everything else here is
-//! the loop a host would otherwise write itself.
+//! that knows, through two traits: [`Port`] sends and receives bytes, [`Clock`]
+//! tells the time and waits. The rest is the loop a host would otherwise write
+//! itself.
 //!
 //! ```
 //! use deepmind_midi::device::Device;
@@ -63,8 +63,8 @@
 //!
 //! # Why this is opt-in
 //!
-//! Blocking is a policy, not a protocol. An async host wants its own
-//! cancellation and backpressure, and gets both by writing the four calls in
+//! Blocking is a policy, not a protocol. An async host wants its own cancellation
+//! and backpressure, and gets both by writing the four calls in
 //! [`device`](crate::device) into its own loop, about thirty lines. This module
 //! is for hosts that would write the same thirty lines: a command-line tool, a
 //! test harness, a thread that owns the port.
@@ -75,9 +75,9 @@
 //! # The loop
 //!
 //! [`pump`](Transport::pump) is one pass: read what has arrived, feed it in,
-//! advance the clock, send whatever the device queued. A host that wants its
-//! own loop calls that and [`poll_event`](Transport::poll_event) and nothing
-//! else here.
+//! advance the clock, send whatever the device queued. A host that wants its own
+//! loop calls that and [`poll_event`](Transport::poll_event) and nothing else
+//! here.
 //!
 //! ```
 //! # use deepmind_midi::device::{Device, Event};
@@ -104,28 +104,27 @@
 //! The blocking calls each queue one request and wait for that request's answer.
 //! Three things end the wait: the answer arrives, the device raises
 //! [`Event::Timeout`] for it, or nothing has arrived for longer than
-//! [`Device::timeout`] allows. The second and third are both
-//! [`Error::Timeout`], because they are the same fact.
+//! [`Device::timeout`] allows. The last two are both [`Error::Timeout`].
 //!
-//! Nothing is retried. A bank half-read is not a thing to ask for again, and
-//! only the host knows whether anything else is.
+//! Nothing is retried. Only the host knows whether a request that failed is worth
+//! sending again.
 //!
 //! Progress is an event, not traffic. A bank transfer is one request and 128
-//! answers, and each answer is progress, so a long transfer never times out
-//! while it is still arriving, as [`Request::Bank`] promises. A port streaming
-//! clock bytes at a silent synthesizer is not progress and does not hold the
-//! wait open.
+//! answers, and each answer counts as progress, so a long transfer never times
+//! out while it is still arriving, as [`Request::Bank`] promises. A port
+//! streaming clock bytes at a silent synthesizer is not progress and does not
+//! hold the wait open.
 //!
 //! # Events a wait was not waiting for
 //!
 //! A blocking call has to look at every event to find the one it wants. The
-//! others go into a queue of this module's own, `EV` deep like the device's,
-//! and come back out of [`poll_event`](Transport::poll_event) in order. Turning
-//! a knob while a host reads a bank does not lose the knob.
+//! others go into a queue of this module's own, `EV` deep like the device's, and
+//! come back out of [`poll_event`](Transport::poll_event) in order, so turning a
+//! knob while a host reads a bank does not lose the knob.
 //!
 //! That queue is the transport's one cost: a second `EV` events held inline. An
-//! event that does not fit is counted and arrives as [`Event::Lost`], the same
-//! as in [`device`](crate::device).
+//! event that does not fit is counted and arrives as [`Event::Lost`], the same as
+//! in [`device`](crate::device).
 
 mod clock;
 mod error;
@@ -545,8 +544,7 @@ where
     ///
     /// The caller queues the request and this sends it: the first
     /// [`pump`](Transport::pump) drains it to the port, which is also when its
-    /// timeout starts. Waiting before the bytes went out would be measuring the
-    /// wrong thing.
+    /// timeout starts.
     ///
     /// `extract` is offered each event and says what it was: the answer,
     /// progress it consumed, or none of its business, in which case it gives

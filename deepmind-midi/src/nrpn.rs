@@ -209,12 +209,10 @@ mod tests {
     }
 
     /// Either half of a reselection has to clear the held value, or the next
-    /// edit is assembled out of the top of one and the bottom of another, which
-    /// is a parameter nobody set.
+    /// edit is assembled out of the top of one value and the bottom of another.
     ///
-    /// Sent one selector at a time on purpose: a reselection that sends both
-    /// overwrites the held half on the second byte and hides a missing clear on
-    /// the first.
+    /// Sent one selector at a time: a reselection that sends both overwrites the
+    /// held half on the second byte and hides a missing clear on the first.
     #[test]
     fn either_half_of_a_reselection_drops_a_half_written_value() {
         let offset = ParamId::Lfo1Rate.offset();

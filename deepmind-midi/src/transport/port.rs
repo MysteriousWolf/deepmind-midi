@@ -2,10 +2,9 @@
 
 /// A MIDI connection the driver loop can read from and write to.
 ///
-/// Two methods, because two is what driving the state machine takes. Everything
-/// else a real backend has (port enumeration, virtual ports, connection state,
-/// reconnection) stays on the host's side of this trait, since a library that
-/// opened ports would need an opinion about all of it.
+/// Two methods, which is what driving the state machine takes. Everything else a
+/// real backend has (port enumeration, virtual ports, connection state,
+/// reconnection) stays on the host's side of this trait.
 ///
 /// # Implementing it
 ///

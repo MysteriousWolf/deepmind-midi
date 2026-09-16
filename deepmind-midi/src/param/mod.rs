@@ -32,57 +32,56 @@
 //! values it decodes into. That is [`Parameter`], reached through
 //! [`ParamId::info`].
 //!
-//! It also carries what one parameter's value says about another, which the
-//! modulation matrix is the whole of: a `Mod n Destination` holds an
+//! It carries the modulation matrix as a join. A `Mod n Destination` holds an
 //! abbreviation the display prints, and [`ParamId::targets`] is which parameters
-//! that abbreviation moves. Empty where the destination names something no
-//! program parameter addresses, which the specification says beside the entry.
+//! that abbreviation moves. It is empty where the destination names something no
+//! program parameter addresses, which the specification records beside the entry.
 //!
-//! It carries what a raw value means beyond its range, where the manual says:
+//! It carries what a raw value means beyond its range, wherever the manual says:
 //! [`ParamId::shape`] is the point a bipolar parameter is read about,
-//! [`ParamId::inactive`] the value that means "not set" rather than the
-//! smallest one, and [`ParamId::bounded_by`] the parameter saying how many of a
-//! run are played. Those three decide what a control *is*, so they are typed.
+//! [`ParamId::inactive`] the value that means "not set" rather than the smallest
+//! one, and [`ParamId::bounded_by`] the parameter saying how many of a run are
+//! played. Those three decide what a control is, so they are typed.
 //!
 //! The manual's own prose is reachable and costs nothing to ignore.
-//! [`ParamId::note`], [`ParamId::display`] and [`ParamId::correction`] are each
-//! a function over its own strings, referenced by nothing else, so a host that
-//! never calls one does not carry it: the 11 kB of manual between them is
-//! dropped by any linker collecting unreachable sections. Value-table entries
-//! carry names and not descriptions, which is the same trade made the other
-//! way — a description would sit inside a table every host already reaches.
+//! [`ParamId::note`], [`ParamId::display`] and [`ParamId::correction`] are each a
+//! function over its own strings, referenced by nothing else, so a host that
+//! never calls one does not carry it: any linker collecting unreachable sections
+//! drops the 11 kB of manual between them. Value-table entries carry names and
+//! not descriptions for the same reason in reverse, since a description would sit
+//! inside a table every host already reaches.
 //!
-//! What a parameter *does* is [`ParamId::description`], and that one is behind
-//! the `descriptions` feature rather than only behind a linker: every parameter
-//! has a sentence, which is 30 kB, and the host that wants one would pull in
-//! all of them. It answers `None` with the feature off and keeps its signature
-//! either way, so a host writes one code path. Those sentences are written for
-//! this specification rather than transcribed — unlike
+//! What a parameter does is [`ParamId::description`], and that one is behind the
+//! `descriptions` feature rather than only behind a linker: every parameter has a
+//! sentence, which is 30 kB, and a host that wants one would reach all of them.
+//! It answers `None` with the feature off and keeps its signature either way, so
+//! a host writes one code path. Those sentences are written for this
+//! specification rather than transcribed, unlike
 //! [`FxSlot::description`](crate::effect::FxSlot::description), which is the
 //! manual's own words about an effect slot and is behind the same feature.
 //!
-//! Nor does it carry conversions from a raw value to the number the synthesizer
+//! It does not carry conversions from a raw value to the number the synthesizer
 //! displays. The manual publishes the two ends of a range and almost never the
-//! curve between them, so [`ParamId::display`] hands over the ends as the
-//! manual prints them and stops there: a reading invented between them would be
-//! wrong in every host at once, and invisibly. Conversions arrive per parameter
-//! as they are measured; see the scaling section of `docs/midi-spec.md`.
+//! curve between them, so [`ParamId::display`] hands over the ends as printed and
+//! stops there; an invented reading would be wrong in every host that trusted it.
+//! Conversions arrive per parameter as they are measured. See the scaling section
+//! of `docs/midi-spec.md`.
 //!
 //! # Firmware
 //!
-//! Firmware 1.1 renumbered three value tables rather than only appending to
-//! them, so 17 of 23 modulation sources and 120 of 130 modulation destinations
-//! mean something else on 1.0. Every lookup that touches a value table therefore
-//! comes in two forms: a plain one that assumes [`DEFAULT_FIRMWARE`], and a
-//! `_for` one that takes the [`Version`] a device inquiry reported. Nothing in a
-//! stored dump says which firmware wrote it, so the older tables are reachable
-//! only when the host knows the version another way.
+//! Firmware 1.1 renumbered three value tables rather than only appending to them,
+//! so 17 of 23 modulation sources and 120 of 130 modulation destinations mean
+//! something else on 1.0. Every lookup that touches a value table therefore comes
+//! in two forms: a plain one that assumes [`DEFAULT_FIRMWARE`], and a `_for` one
+//! that takes the [`Version`] a device inquiry reported. Nothing in a stored dump
+//! says which firmware wrote it, so the older tables are reachable only when the
+//! host knows the version another way.
 //!
 //! # Serde
 //!
 //! The tables are static: their strings are `&'static str` and their entries are
 //! `&'static [ValueEntry]`. Under the `serde` feature they serialize, which is
-//! what a host sending its parameter list somewhere needs, and they do not
+//! what a host sending its parameter list somewhere needs. They do not
 //! deserialize, which would only allocate names the library already holds.
 
 mod generated;
@@ -149,11 +148,11 @@ pub enum Kind {
 
 /// What a parameter's raw value means beyond the range it sits in.
 ///
-/// [`Kind`] says how a byte is read — a sweep, two states, or one of a named
-/// set. This says where the middle of a sweep is, which is a different question
-/// and the one that decides what a control looks like: a bipolar value drawn
-/// from the bottom of its range is a bar that is half full at no modulation, so
-/// a matrix of eight depths set to nothing reads as a matrix of half of it.
+/// [`Kind`] says how a byte is read: a sweep, two states, or one of a named set.
+/// This says where the middle of a sweep is, which is what decides how to draw
+/// it. A bipolar value drawn from the bottom of its range shows as half full at
+/// no modulation, so a matrix of eight depths set to nothing reads as a matrix
+/// of half of it.
 ///
 /// Reached through [`ParamId::shape`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -165,12 +164,11 @@ pub enum Shape {
     /// Signed about a centre: `centre` reads as zero, and the two ends of the
     /// range as the largest readings either side of it.
     ///
-    /// The ends are [`min`](ParamId::min) and [`max`](ParamId::max) as always,
-    /// so what a reading is comes out as `value - centre` and needs nothing
-    /// published here. They are deliberately not a single `±extent`: ten of the
-    /// forty-five bipolar parameters run -128 to +127 about 128, which is one
-    /// further below the centre than above it, and a symmetric extent would be
-    /// a wrong answer for most of the set.
+    /// The ends are [`min`](ParamId::min) and [`max`](ParamId::max), so a
+    /// reading is `value - centre` and nothing else need be published here.
+    /// There is no single `±extent` because the range is not always symmetric:
+    /// ten of the forty-five bipolar parameters run -128 to +127 about 128, one
+    /// further below the centre than above it.
     Bipolar {
         /// The raw value that reads as zero.
         centre: u16,
@@ -188,13 +186,13 @@ pub struct ValueEntry {
     pub name: &'static str,
     /// The program parameters this value names, where it names any.
     ///
-    /// The modulation matrix is what this is for: a destination is an
-    /// abbreviation the display prints, `VCF Freq` or `All Attack`, and this
-    /// is the parameter table's own answer to what the abbreviation moves. A
-    /// slice rather than one parameter because several destinations plainly
-    /// move more than one, and empty where the destination names something no
-    /// program parameter addresses — the pitch a key is playing, the amplitude
-    /// of a voice — which is more honest than a wrong single answer.
+    /// The modulation matrix is what this is for. A destination is an
+    /// abbreviation the display prints, `VCF Freq` or `All Attack`, and this is
+    /// the parameter table's answer to what that abbreviation moves. It is a
+    /// slice because several destinations move more than one parameter, and it
+    /// is empty where the destination names something no program parameter
+    /// addresses, such as the pitch a key is playing or the amplitude of a
+    /// voice.
     ///
     /// Empty for every other table, and for a mapping that has not been
     /// established. `docs/midi-spec.md` prints the reason beside the
@@ -386,11 +384,10 @@ impl ParamId {
 
     /// Returns the name without the group's, where the name starts with it.
     ///
-    /// `VCF Envelope Depth` is `Envelope Depth`, because a panel prints its
-    /// group once as a heading and repeating it in every slot costs the width
-    /// the rest of the name needs. A name that does not start with its group is
-    /// returned whole, which is every parameter of the modulation matrix and of
-    /// the arpeggiator.
+    /// `VCF Envelope Depth` is `Envelope Depth`, for a panel that prints its
+    /// group once as a heading. A name that does not start with its group comes
+    /// back whole, which is every parameter of the modulation matrix and of the
+    /// arpeggiator.
     ///
     /// ```
     /// use deepmind_midi::param::ParamId;
@@ -458,9 +455,9 @@ impl ParamId {
     /// Returns the name this parameter gives `value` on the firmware a device
     /// inquiry reported.
     ///
-    /// Worth reaching for whenever the value came from a stored program: the
-    /// three renumbered tables mean a 1.0 program read with 1.1 tables is
-    /// mislabelled almost throughout.
+    /// Use this whenever the value came from a stored program. The three
+    /// renumbered tables mean a 1.0 program read with 1.1 tables is mislabelled
+    /// almost throughout.
     #[must_use]
     pub fn label_for(self, value: u16, firmware: Version) -> Option<&'static str> {
         match self.kind() {
@@ -478,11 +475,10 @@ impl ParamId {
     /// [`DEFAULT_FIRMWARE`].
     ///
     /// `None` unless the parameter's table names **every** value it accepts,
-    /// which is the question a host has to answer before drawing a list.
-    /// A table that names some of them would make a control that silently
-    /// dropped the rest: opening the list on an unnamed value and picking the
-    /// nearest name is a control that moves the sound when somebody looks at
-    /// it. Where this answers `None` the raw value is the honest reading.
+    /// which is what a host has to know before drawing a list. A list built from
+    /// a table that names only some of them would drop the rest, and reopening it
+    /// on an unnamed value would move the sound. Where this answers `None`, show
+    /// the raw value.
     ///
     /// Also `None` for a switch, whose two values [`label`](ParamId::label)
     /// names and which a host draws as a light rather than a list.
@@ -507,8 +503,8 @@ impl ParamId {
     /// Returns the named values this parameter accepts, on the firmware a
     /// device inquiry reported.
     ///
-    /// Worth reaching for wherever [`label_for`](ParamId::label_for) is: a list
-    /// drawn from the wrong firmware's table is a list of the wrong names.
+    /// Use this wherever [`label_for`](ParamId::label_for) applies: a list drawn
+    /// from the wrong firmware's table is a list of the wrong names.
     #[must_use]
     pub fn choices_for(self, firmware: Version) -> Option<&'static [ValueEntry]> {
         let Kind::Enumerated(table) = self.kind() else {
@@ -542,8 +538,7 @@ impl ParamId {
     ///
     /// The modulation matrix is what has an answer: a `Mod n Destination`
     /// holding 20 reads `VCF Freq` on the display and moves
-    /// [`ParamId::VcfFrequency`], and a host drawing the matrix beside the
-    /// panels is the caller. Empty for every parameter whose values name no
+    /// [`ParamId::VcfFrequency`]. Empty for every parameter whose values name no
     /// other parameter, and for a destination that names something no program
     /// parameter addresses.
     ///
@@ -565,9 +560,9 @@ impl ParamId {
     /// Returns the program parameters this parameter's `value` names, on the
     /// firmware a device inquiry reported.
     ///
-    /// Worth reaching for wherever [`label_for`](ParamId::label_for) is, and
-    /// for the same reason: firmware 1.1 renumbered the destination table, so
-    /// 120 of its 130 entries mean something else on 1.0.
+    /// Use this wherever [`label_for`](ParamId::label_for) applies, and for the
+    /// same reason: firmware 1.1 renumbered the destination table, so 120 of its
+    /// 130 entries mean something else on 1.0.
     #[must_use]
     pub fn targets_for(self, value: u16, firmware: Version) -> &'static [ParamId] {
         match self.kind() {
@@ -965,14 +960,14 @@ mod tests {
     #[test]
     fn every_effect_slot_is_reachable_from_the_matrix() {
         let table = TableId::ModDestination.table();
-        let slots: Vec<ParamId> = table
+        let slots = table
             .entries
             .iter()
             .flat_map(|entry| entry.parameters.iter().copied())
             .filter(|parameter| parameter.group() == Group::Effects)
-            .collect();
+            .count();
         // Four engines of twelve slots, and the four output gains.
-        assert_eq!(slots.len(), 4 * 12 + 4);
+        assert_eq!(slots, 4 * 12 + 4);
     }
 
     /// A destination naming a parameter twice, or naming one that does not
@@ -1002,19 +997,14 @@ mod tests {
             assert!(Group::ORDER.contains(group), "{group} is not laid out");
         }
 
-        let starts: Vec<u8> = Group::ORDER
-            .iter()
-            .map(|group| {
-                group
-                    .parameters()
-                    .next()
-                    .expect("a group in the table has a parameter")
-                    .offset()
-            })
-            .collect();
-        let mut sorted = starts.clone();
-        sorted.sort_unstable();
-        assert_eq!(starts, sorted, "the order is not the instrument's own");
+        let starts = Group::ORDER.iter().map(|group| {
+            group
+                .parameters()
+                .next()
+                .expect("a group in the table has a parameter")
+                .offset()
+        });
+        assert!(starts.is_sorted(), "the order is not the instrument's own");
         assert_eq!(Group::ORDER.first(), Some(&Group::Lfo1));
         assert_eq!(Group::ORDER.last(), Some(&Group::Program));
     }
@@ -1185,13 +1175,14 @@ mod tests {
         assert_eq!(step.bounded_by(), Some(ParamId::SequenceLength));
 
         // All 32 of them, and nothing else in the table.
-        let steps: Vec<ParamId> = ParamId::ALL
-            .iter()
-            .copied()
-            .filter(|parameter| parameter.bounded_by().is_some())
-            .collect();
-        assert_eq!(steps.len(), 32);
-        for step in steps {
+        let steps = || {
+            ParamId::ALL
+                .iter()
+                .copied()
+                .filter(|parameter| parameter.bounded_by().is_some())
+        };
+        assert_eq!(steps().count(), 32);
+        for step in steps() {
             assert_eq!(step.group(), Group::ControlSequencer);
             assert_eq!(step.inactive(), Some(0));
             assert!(step.name().starts_with("Seq Step Value"));

@@ -3,10 +3,9 @@
 /// A monotonic millisecond clock, and a way to wait on it.
 ///
 /// [`Device`](crate::device::Device) takes the time as an argument and never
-/// asks for it; the blocking adapter is the layer that has to ask. Which is why
-/// this is a trait rather than a call into `std`: a host on bare metal has a
-/// timer and a `wfi`, not a `SystemTime`, and it should not have to give up the
-/// driver loop to use its own.
+/// asks for it; the blocking adapter is the layer that has to ask. It asks
+/// through a trait rather than through `std`, because a host on bare metal has a
+/// timer and a `wfi` rather than a `SystemTime`.
 ///
 /// # Implementing it
 ///

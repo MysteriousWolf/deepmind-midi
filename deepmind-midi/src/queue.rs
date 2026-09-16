@@ -2,9 +2,8 @@
 
 /// A first-in, first-out queue of `N` items, held inline.
 ///
-/// Nothing here grows. The capacity is the host's to choose and the overflow is
-/// the host's to see: [`push`](Queue::push) reports whether the item was taken,
-/// and the caller decides what saying no means.
+/// Nothing here grows. The host chooses the capacity and sees the overflow:
+/// [`push`](Queue::push) reports whether the item was taken.
 #[derive(Debug)]
 pub(crate) struct Queue<T, const N: usize> {
     slots: [Option<T>; N],

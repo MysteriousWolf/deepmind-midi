@@ -23,11 +23,11 @@
 //! # The bytes are what is stored
 //!
 //! A program is its dump, not a decoded copy of one. Reading is a lookup and
-//! writing is a byte, so a dump that goes in comes out unchanged, including the
-//! reserved bytes a comms protocol version 7 dump carries and any value no
+//! writing is a byte, so a dump that goes in comes out unchanged. That includes
+//! the reserved bytes a comms protocol version 7 dump carries, and any value no
 //! table lists, which hardware may send and a library must not lose.
 //!
-//! That is also why the typed accessors answer `Option` for a parameter with a
+//! It is also why the typed accessors answer `Option` for a parameter with a
 //! value table. `None` means the byte is not one the table names; the byte is
 //! still there, and [`Program::get`] returns it.
 //!
@@ -35,15 +35,15 @@
 //!
 //! Three value tables were renumbered by firmware 1.1, and nothing in a stored
 //! program says which firmware wrote it. The generated accessors assume
-//! [`DEFAULT_FIRMWARE`]; where the host knows
-//! better, [`ModSource::from_raw_for`] and its neighbours take the version a
-//! device inquiry reported and [`Program::get`] hands them the byte.
+//! [`DEFAULT_FIRMWARE`]. Where the host knows better,
+//! [`ModSource::from_raw_for`] and its neighbours take the version a device
+//! inquiry reported, and [`Program::get`] hands them the byte.
 //!
 //! # Getting one on and off the wire
 //!
 //! [`Program::from_dump`] takes the two messages that carry a program.
-//! [`Program::pack_into`] is the way back, into a buffer a
-//! [`Message`] can borrow:
+//! [`Program::pack_into`] is the way back, into a buffer a [`Message`] can
+//! borrow:
 //!
 //! ```
 //! use deepmind_midi::ids::{DeviceId, ProtocolVersion};
@@ -70,12 +70,12 @@
 //!
 //! # Serde
 //!
-//! [`Program`], [`ProgramName`] and the value types serialize under the `serde`
-//! feature: a program as its version and its bytes, a name as a string.
-//! [`Program`] does not: it is a byte string with a version, and
-//! [`Program::as_bytes`] with [`Program::from_bytes`] is that byte string, in
-//! the form the synthesizer itself uses. A host that wants a program inside a
-//! document of its own has the bytes to put there.
+//! Under the `serde` feature a [`Program`] is two fields: `version`, the comms
+//! protocol version, and `data`, the unpacked dump as a byte string.
+//! [`ProgramName`] is a string, and the value types are their variant names.
+//! Reading a program back goes through [`Program::from_bytes`], so the length
+//! rule holds for one that came out of a file. A host that would rather embed the
+//! raw dump has [`Program::as_bytes`] and [`Program::from_bytes`] directly.
 
 mod generated;
 mod name;
@@ -291,10 +291,10 @@ impl Program {
     /// Returns the algorithm an effect engine is running, on the firmware a
     /// device inquiry reported.
     ///
-    /// Worth reaching for wherever [`ParamId::label_for`] is: firmware 1.1
-    /// inserted an algorithm rather than appending one, so byte 33 is Rotary
-    /// Speaker on 1.0 and Vintage Pitch on 1.1, and every slot of the panel
-    /// follows from which of the two it is.
+    /// Use this wherever [`ParamId::label_for`] applies: firmware 1.1 inserted an
+    /// algorithm rather than appending one, so byte 33 is Rotary Speaker on 1.0
+    /// and Vintage Pitch on 1.1, and every slot of the panel follows from which
+    /// of the two it is.
     #[must_use]
     pub fn algorithm_for(&self, engine: Engine, firmware: Version) -> Option<&'static Algorithm> {
         Algorithm::for_value(self.get(engine.algorithm_parameter()), firmware)
@@ -594,12 +594,16 @@ mod tests {
         let mut renamed = program.clone();
         renamed.set_name(ProgramName::new("Bassy").expect("a name the display can write"));
 
-        let moved: Vec<(ParamId, u8)> = program.changes(&renamed).collect();
-        assert_eq!(moved, [(ParamId::ProgramNameChar5, b'y')]);
         assert!(
-            moved
-                .iter()
-                .all(|(parameter, _)| NAME_PARAMETERS.contains(parameter))
+            program
+                .changes(&renamed)
+                .eq([(ParamId::ProgramNameChar5, b'y')]),
+            "one character moved"
+        );
+        assert!(
+            program
+                .changes(&renamed)
+                .all(|(parameter, _)| NAME_PARAMETERS.contains(&parameter))
         );
     }
 
@@ -742,9 +746,11 @@ mod tests {
 
         assert_eq!(program.get(ParamId::Lfo1Shape), 9);
         assert_eq!(program.lfo1_shape(), None);
-        assert_eq!(
-            program.invalid().collect::<Vec<_>>(),
-            [(ParamId::Lfo1Shape, 9), (ParamId::ProgramTranspose, 0)]
+        assert!(
+            program
+                .invalid()
+                .eq([(ParamId::Lfo1Shape, 9), (ParamId::ProgramTranspose, 0)]),
+            "both out-of-range bytes are reported, in offset order"
         );
     }
 
@@ -858,8 +864,12 @@ mod tests {
         after.set_lfo1_rate(64);
         after.set_lfo1_shape(LfoShape::Square);
 
-        let changed: Vec<_> = before.changes(&after).collect();
-        assert_eq!(changed, [(ParamId::Lfo1Rate, 64), (ParamId::Lfo1Shape, 2)]);
+        assert!(
+            before
+                .changes(&after)
+                .eq([(ParamId::Lfo1Rate, 64), (ParamId::Lfo1Shape, 2)]),
+            "both edits are reported, in offset order"
+        );
 
         let mut applied = before.clone();
         for (parameter, value) in before.changes(&after) {

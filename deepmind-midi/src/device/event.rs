@@ -19,9 +19,7 @@ use super::{ControlApp, Request};
 /// [`feed`](super::Device::feed).
 ///
 /// A program-bearing event carries the program rather than pointing at the
-/// device's copy of it. A bank transfer overwrites that copy 128 times, and an
-/// event that meant "look at the current one" would be worth nothing by the
-/// time anyone looked.
+/// device's copy of it, because a bank transfer overwrites that copy 128 times.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Event {

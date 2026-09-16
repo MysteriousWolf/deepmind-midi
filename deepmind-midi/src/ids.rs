@@ -454,11 +454,12 @@ impl fmt::Display for PatternNumber {
 )]
 mod tests {
     use super::*;
+    use crate::testing::assert_display;
 
     #[test]
     fn a_slot_reads_as_the_front_panel_writes_it() {
-        assert_eq!(Slot::FIRST.to_string(), "A1");
-        assert_eq!(Slot::new(Bank::H, ProgramNumber::LAST).to_string(), "H128");
+        assert_display(Slot::FIRST, "A1");
+        assert_display(Slot::new(Bank::H, ProgramNumber::LAST), "H128");
     }
 
     #[test]
@@ -502,7 +503,7 @@ mod tests {
         }
         assert!(Bank::new(BANK_COUNT).is_err());
         assert_eq!(Bank::from_letter('I'), Err(Error::BankLetter('I')));
-        assert_eq!(Bank::H.to_string(), "H");
+        assert_display(Bank::H, "H");
     }
 
     #[test]

@@ -285,6 +285,7 @@ pub const fn models() -> &'static [Model] {
 )]
 mod tests {
     use super::*;
+    use crate::testing::assert_display;
 
     fn identity() -> Identity {
         Identity {
@@ -359,8 +360,8 @@ mod tests {
 
     #[test]
     fn firmware_versions_pack_the_minor_revision_above_the_major() {
-        assert_eq!(Version::from_packed(0x01).to_string(), "1.0");
-        assert_eq!(Version::from_packed(0x11).to_string(), "1.1");
+        assert_display(Version::from_packed(0x01), "1.0");
+        assert_display(Version::from_packed(0x11), "1.1");
         for minor in 0..=7 {
             for major in 0..=15 {
                 let version = Version { major, minor };
