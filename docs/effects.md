@@ -119,28 +119,63 @@ engine, not both. `Multiband Distortion` beside `Stereo Imaging` beside
 `Vintage Room Reverb` is three long words the eye reads one at a time.
 
 So each algorithm carries a mark, through `Algorithm::mark`. Like the grid and
-the colours it is data rather than a drawing: strokes in a unit box with the
-origin at the top left, which the host scales, strokes and colours itself. An
-SVG this project laid out could not be themed, rescaled, hit-tested or animated
-by the host that has to draw it at twelve points in one place and forty in
-another.
+the colours it is data rather than a drawing, and it comes two ways: `strokes`
+for any size a host can stroke a line at, and `pixels` for a display too small
+to stroke anything.
 
-<img src="diagrams/marks.svg" alt="The nine effect family marks, at two sizes" width="664">
+<img src="diagrams/marks.svg" alt="The nine effect family marks, as strokes and as pixels" width="646">
 
-There are nine marks for 35 algorithms, because the mark belongs to the family
-rather than to the effect. Every reverb is one decaying tail and the six delays
-are one set of taps: the difference between a Hall Reverb and a Plate Reverb is
-not something a symbol at twelve pixels can carry, and a drawing that implied it
-would be a guess about which reverb this is. The name tells those apart, and the
-crate already publishes that.
+### The marks are diagrams, not pictures
+
+Each one is a diagram of a single idea rather than of the effect. A reverb is
+not a drawing of a decaying tail; it is a source with two wavefronts leaving it.
+A compressor is not a transfer curve; it is a level with a ceiling and a floor
+around it. What a symbol has to do at twelve pixels is be told apart from the
+other eight, and a faithful small drawing loses that fight to a reduced one.
+
+The whole set is built from four things and nothing else: a straight run, a
+circular arc, a filled dot, and a corner between two runs. No mark uses a curve
+that is not an arc, none is filled except the dots, and none closes a path
+except the rotary ring. Line weight is the host's and is the same for every
+mark, which is what makes them read as one set rather than nine drawings.
+
+Two pairs are deliberately each other's transpose, because the things they
+describe are: Dynamics is a gap between two horizontal limits, Imaging a span
+between two vertical ones. Reverb and Rotary are the only marks with curves,
+and the ring being closed is what tells them apart.
+
+### The pixel grids
+
+`Mark::pixels` is the same nine marks drawn again on a seven by seven grid, one
+bit per pixel, for an LCD row beside an effect name or a hardware panel.
+`Pixels::is_lit` reads one, `Pixels::row` hands a host a row to blit.
+
+They are drawn by hand rather than rasterised from the strokes. At forty-nine
+pixels legibility is a question of which pixels, not of scale, and a one-pixel
+stroke put through a rasteriser at this size comes out as a grey smear with the
+idea gone. Seven is odd, so every mark has a true centre pixel to hang symmetry
+on, and it is the smallest grid that fits the ring with a middle in it.
+
+Both renderings are in the drawing above, the grids magnified and again at one
+pixel per pixel, which is the size they are actually for. Every one was checked
+there before it was written down, and three were redrawn because they did not
+survive it.
+
+### Nine marks, not thirty-five
+
+The mark belongs to the family rather than to the effect. Every reverb is one
+mark and the six delays are one mark: the difference between a Hall Reverb and
+a Plate Reverb is not something a symbol at twelve pixels can carry, and a
+drawing that implied it would be a guess about which reverb this is. The name
+tells those apart, and the crate already publishes that.
 
 The family is worth having on its own, through `Algorithm::family`, and is the
 half with no pixels in it. `category` is the manual's four buckets, chosen for a
 table of contents, and `Creative` holds the phaser, the pitch shifter and the
 rotary speaker, which do three unrelated things. A family is the same kind of
 published fact at the resolution a symbol needs, and it lets a host group the
-delays together whatever page the manual prints them on. Both are published: the
-two answer different questions.
+delays together whatever page the manual prints them on. Both are published:
+the two answer different questions.
 
 Nothing here is measured off the manual, unlike the panel colours. The marks are
 drawn by this project, and they are a reading of what each family does rather

@@ -30,7 +30,7 @@ const HEADER: &str = "\
 
 use super::{
     Algorithm, Align, Colour, Control, Engine, EngineParameters, Family, FxSlot, Grid, Mark, Mode,
-    Panel, Point, Quantity, Routing, Row, Source, Stroke,
+    Panel, Pixels, Point, Quantity, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
 
@@ -599,6 +599,17 @@ pub const FAMILY_COUNT: usize = {};
                         arc.centre[0], arc.centre[1], arc.radius, arc.start, arc.sweep,
                     );
                 }
+                (_, _) if stroke.dot.is_some() => {
+                    // Checked as present on the line above; the loader has
+                    // already rejected a stroke that is none of the three.
+                    if let Some(dot) = &stroke.dot {
+                        let _ = writeln!(
+                            out,
+                            "    Stroke::Dot {{ centre: Point::new({:?}, {:?}), radius: {:?} }},",
+                            dot.centre[0], dot.centre[1], dot.radius,
+                        );
+                    }
+                }
                 // Unreachable: the spec loader rejects a stroke that is neither.
                 (None, None) => {
                     return Err(format!("marks.toml: {} has an empty stroke", family.name));
@@ -607,6 +618,17 @@ pub const FAMILY_COUNT: usize = {};
         }
         out.push_str("];\n\n");
     }
+
+    let _ = writeln!(
+        out,
+        "\
+/// Side of the one-bit grid each family's mark is drawn again on.
+pub const MARK_PIXEL_SIDE: usize = {};
+",
+        spec.families
+            .first()
+            .map_or(0, |family| family.pixels.len())
+    );
 
     out.push_str(
         "\
@@ -626,10 +648,26 @@ pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
 ",
     );
     for family in &spec.families {
+        // A row of the grid is a bit per pixel, bit 0 leftmost, which is the
+        // order a host blitting left to right wants.
+        let rows: Vec<String> = family
+            .pixels
+            .iter()
+            .map(|row| {
+                let bits: u8 = row
+                    .chars()
+                    .enumerate()
+                    .filter(|&(_, pixel)| pixel == '#')
+                    .map(|(x, _)| 1_u8 << x)
+                    .sum();
+                format!("0b{bits:07b}")
+            })
+            .collect();
         let _ = writeln!(
             out,
-            "    Mark {{ strokes: &MARK_{} }},",
-            variant(&family.name)?.to_ascii_uppercase()
+            "    Mark {{ strokes: &MARK_{}, pixels: Pixels::new([{}]) }},",
+            variant(&family.name)?.to_ascii_uppercase(),
+            rows.join(", "),
         );
     }
     out.push_str("];\n");

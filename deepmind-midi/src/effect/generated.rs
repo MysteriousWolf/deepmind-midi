@@ -6,7 +6,7 @@
 
 use super::{
     Algorithm, Align, Colour, Control, Engine, EngineParameters, Family, FxSlot, Grid, Mark, Mode,
-    Panel, Point, Quantity, Routing, Row, Source, Stroke,
+    Panel, Pixels, Point, Quantity, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
 
@@ -8320,170 +8320,127 @@ pub(super) static MODES: [Mode; MODE_COUNT] = [
 /// Number of families the 35 algorithms fall into.
 pub const FAMILY_COUNT: usize = 9;
 
-/// A decaying tail: one arrival, then a wash falling away to nothing.
+/// One arrival and the room answering it, as a source with two wavefronts leaving.
 static MARK_REVERB: [Stroke; 3] = [
-    Stroke::Line {
-        points: &[Point::new(0.08, 0.84), Point::new(0.92, 0.84)],
+    Stroke::Dot {
+        centre: Point::new(0.15, 0.5),
+        radius: 0.06,
     },
-    Stroke::Line {
-        points: &[Point::new(0.17, 0.12), Point::new(0.17, 0.84)],
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.3,
+        start: -0.15,
+        sweep: 0.3,
     },
-    Stroke::Line {
-        points: &[
-            Point::new(0.17, 0.12),
-            Point::new(0.31, 0.45),
-            Point::new(0.46, 0.63),
-            Point::new(0.62, 0.74),
-            Point::new(0.78, 0.81),
-            Point::new(0.92, 0.84),
-        ],
-    },
-];
-
-/// Discrete repeats: a few taps, evenly spaced and each quieter than the last.
-static MARK_DELAY: [Stroke; 5] = [
-    Stroke::Line {
-        points: &[Point::new(0.08, 0.84), Point::new(0.92, 0.84)],
-    },
-    Stroke::Line {
-        points: &[Point::new(0.14, 0.14), Point::new(0.14, 0.84)],
-    },
-    Stroke::Line {
-        points: &[Point::new(0.4, 0.38), Point::new(0.4, 0.84)],
-    },
-    Stroke::Line {
-        points: &[Point::new(0.66, 0.56), Point::new(0.66, 0.84)],
-    },
-    Stroke::Line {
-        points: &[Point::new(0.9, 0.7), Point::new(0.9, 0.84)],
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.62,
+        start: -0.11,
+        sweep: 0.22,
     },
 ];
 
-/// A swept delay: one cycle of the wave that does the sweeping.
+/// The same sound three times and quieter each time, as three falling marks.
+static MARK_DELAY: [Stroke; 3] = [
+    Stroke::Line {
+        points: &[Point::new(0.14, 0.12), Point::new(0.14, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.5, 0.4), Point::new(0.5, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.86, 0.66), Point::new(0.86, 0.88)],
+    },
+];
+
+/// The wave that does the sweeping, one cycle of it.
 static MARK_MODULATION: [Stroke; 1] = [Stroke::Line {
     points: &[
         Point::new(0.08, 0.5),
-        Point::new(0.19, 0.22),
-        Point::new(0.29, 0.13),
-        Point::new(0.4, 0.22),
+        Point::new(0.18, 0.25),
+        Point::new(0.29, 0.14),
+        Point::new(0.4, 0.25),
         Point::new(0.5, 0.5),
-        Point::new(0.6, 0.78),
-        Point::new(0.71, 0.87),
-        Point::new(0.81, 0.78),
+        Point::new(0.6, 0.75),
+        Point::new(0.71, 0.86),
+        Point::new(0.81, 0.75),
         Point::new(0.92, 0.5),
     ],
 }];
 
-/// A response with a corner in it: flat, then a knee, then a roll-off.
+/// A corner: level up to a point, and falling away after it.
 static MARK_FILTER: [Stroke; 1] = [Stroke::Line {
     points: &[
-        Point::new(0.08, 0.34),
-        Point::new(0.4, 0.34),
-        Point::new(0.52, 0.28),
-        Point::new(0.62, 0.4),
-        Point::new(0.74, 0.62),
-        Point::new(0.92, 0.86),
+        Point::new(0.08, 0.24),
+        Point::new(0.46, 0.24),
+        Point::new(0.92, 0.82),
     ],
 }];
 
-/// A squeeze: the loud and the quiet pressed toward each other.
-static MARK_DYNAMICS: [Stroke; 4] = [
+/// A level held between a ceiling and a floor, and the room left between them.
+static MARK_DYNAMICS: [Stroke; 3] = [
     Stroke::Line {
-        points: &[Point::new(0.5, 0.1), Point::new(0.5, 0.4)],
+        points: &[Point::new(0.08, 0.12), Point::new(0.92, 0.12)],
     },
     Stroke::Line {
-        points: &[
-            Point::new(0.34, 0.25),
-            Point::new(0.5, 0.41),
-            Point::new(0.66, 0.25),
-        ],
+        points: &[Point::new(0.08, 0.88), Point::new(0.92, 0.88)],
     },
     Stroke::Line {
-        points: &[Point::new(0.5, 0.9), Point::new(0.5, 0.6)],
-    },
-    Stroke::Line {
-        points: &[
-            Point::new(0.34, 0.75),
-            Point::new(0.5, 0.59),
-            Point::new(0.66, 0.75),
-        ],
+        points: &[Point::new(0.5, 0.34), Point::new(0.5, 0.66)],
     },
 ];
 
-/// A wave driven into its ceiling: the peaks flattened where the curve clips.
+/// A wave with the curve driven out of it: two levels and hard corners.
 static MARK_DISTORTION: [Stroke; 1] = [Stroke::Line {
     points: &[
-        Point::new(0.08, 0.5),
-        Point::new(0.17, 0.18),
-        Point::new(0.38, 0.18),
-        Point::new(0.47, 0.5),
-        Point::new(0.55, 0.82),
-        Point::new(0.76, 0.82),
-        Point::new(0.85, 0.5),
-        Point::new(0.92, 0.34),
+        Point::new(0.08, 0.82),
+        Point::new(0.24, 0.82),
+        Point::new(0.24, 0.18),
+        Point::new(0.54, 0.18),
+        Point::new(0.54, 0.82),
+        Point::new(0.92, 0.82),
     ],
 }];
 
-/// Width: a span opening out to both sides of the centre.
-static MARK_IMAGING: [Stroke; 4] = [
+/// A width, measured: a span with a mark at each end of it.
+static MARK_IMAGING: [Stroke; 3] = [
     Stroke::Line {
         points: &[Point::new(0.08, 0.5), Point::new(0.92, 0.5)],
     },
     Stroke::Line {
-        points: &[
-            Point::new(0.26, 0.28),
-            Point::new(0.08, 0.5),
-            Point::new(0.26, 0.72),
-        ],
+        points: &[Point::new(0.08, 0.28), Point::new(0.08, 0.72)],
     },
     Stroke::Line {
-        points: &[
-            Point::new(0.74, 0.28),
-            Point::new(0.92, 0.5),
-            Point::new(0.74, 0.72),
-        ],
-    },
-    Stroke::Line {
-        points: &[Point::new(0.5, 0.2), Point::new(0.5, 0.8)],
+        points: &[Point::new(0.92, 0.28), Point::new(0.92, 0.72)],
     },
 ];
 
-/// A step to another pitch, held: the interval a shifter puts beside the note.
-static MARK_PITCH: [Stroke; 4] = [
-    Stroke::Line {
-        points: &[Point::new(0.08, 0.74), Point::new(0.46, 0.74)],
-    },
-    Stroke::Line {
-        points: &[Point::new(0.46, 0.74), Point::new(0.46, 0.26)],
-    },
-    Stroke::Line {
-        points: &[Point::new(0.46, 0.26), Point::new(0.92, 0.26)],
-    },
-    Stroke::Line {
-        points: &[
-            Point::new(0.34, 0.38),
-            Point::new(0.46, 0.26),
-            Point::new(0.58, 0.38),
-        ],
-    },
-];
+/// A step to another pitch and held there: one level, a riser, another level.
+static MARK_PITCH: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.74),
+        Point::new(0.5, 0.74),
+        Point::new(0.5, 0.26),
+        Point::new(0.92, 0.26),
+    ],
+}];
 
-/// A horn going round: most of a turn, with the head showing which way.
+/// A driver going round: a ring with its centre marked.
 static MARK_ROTARY: [Stroke; 2] = [
     Stroke::Arc {
         centre: Point::new(0.5, 0.5),
-        radius: 0.34,
-        start: 0.06,
-        sweep: 0.8,
+        radius: 0.38,
+        start: 0.0,
+        sweep: 1.0,
     },
-    Stroke::Line {
-        points: &[
-            Point::new(0.62, 0.12),
-            Point::new(0.8, 0.22),
-            Point::new(0.7, 0.4),
-        ],
+    Stroke::Dot {
+        centre: Point::new(0.5, 0.5),
+        radius: 0.07,
     },
 ];
+
+/// Side of the one-bit grid each family's mark is drawn again on.
+pub const MARK_PIXEL_SIDE: usize = 7;
 
 /// Each family's name, in the order `Family::ALL` gives them.
 pub(super) static FAMILY_NAMES: [&str; FAMILY_COUNT] = [
@@ -8502,29 +8459,56 @@ pub(super) static FAMILY_NAMES: [&str; FAMILY_COUNT] = [
 pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
     Mark {
         strokes: &MARK_REVERB,
+        pixels: Pixels::new([
+            0b0000000, 0b0010100, 0b0101000, 0b0101001, 0b0101000, 0b0010100, 0b0000000,
+        ]),
     },
     Mark {
         strokes: &MARK_DELAY,
+        pixels: Pixels::new([
+            0b0000000, 0b0000001, 0b0000001, 0b0001001, 0b0001001, 0b1001001, 0b1001001,
+        ]),
     },
     Mark {
         strokes: &MARK_MODULATION,
+        pixels: Pixels::new([
+            0b0000000, 0b0000110, 0b0001001, 0b1001001, 0b1001000, 0b0110000, 0b0000000,
+        ]),
     },
     Mark {
         strokes: &MARK_FILTER,
+        pixels: Pixels::new([
+            0b0000000, 0b0001111, 0b0010000, 0b0100000, 0b1000000, 0b0000000, 0b0000000,
+        ]),
     },
     Mark {
         strokes: &MARK_DYNAMICS,
+        pixels: Pixels::new([
+            0b1111111, 0b0000000, 0b0001000, 0b0001000, 0b0001000, 0b0000000, 0b1111111,
+        ]),
     },
     Mark {
         strokes: &MARK_DISTORTION,
+        pixels: Pixels::new([
+            0b0000000, 0b0001110, 0b0001010, 0b0001010, 0b0001010, 0b1111011, 0b0000000,
+        ]),
     },
     Mark {
         strokes: &MARK_IMAGING,
+        pixels: Pixels::new([
+            0b0000000, 0b0000000, 0b1000001, 0b1111111, 0b1000001, 0b0000000, 0b0000000,
+        ]),
     },
     Mark {
         strokes: &MARK_PITCH,
+        pixels: Pixels::new([
+            0b0000000, 0b1111000, 0b0001000, 0b0001000, 0b0001111, 0b0000000, 0b0000000,
+        ]),
     },
     Mark {
         strokes: &MARK_ROTARY,
+        pixels: Pixels::new([
+            0b0011100, 0b0100010, 0b1000001, 0b1001001, 0b1000001, 0b0100010, 0b0011100,
+        ]),
     },
 ];

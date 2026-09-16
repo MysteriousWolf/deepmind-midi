@@ -69,7 +69,8 @@
 mod generated;
 
 pub use generated::{
-    ALGORITHM_COUNT, ENGINE_COUNT, FAMILY_COUNT, MODE_COUNT, ROUTING_COUNT, SLOTS_PER_ENGINE,
+    ALGORITHM_COUNT, ENGINE_COUNT, FAMILY_COUNT, MARK_PIXEL_SIDE, MODE_COUNT, ROUTING_COUNT,
+    SLOTS_PER_ENGINE,
 };
 
 use generated::{ALGORITHMS, ENGINES, FAMILY_NAMES, GRID, MARKS, MODES, PANELS, ROUTINGS};
@@ -882,6 +883,7 @@ impl fmt::Display for Family {
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub struct Mark {
     strokes: &'static [Stroke],
+    pixels: Pixels,
 }
 
 impl Mark {
@@ -889,6 +891,100 @@ impl Mark {
     #[must_use]
     pub const fn strokes(&self) -> &'static [Stroke] {
         self.strokes
+    }
+
+    /// Returns the same mark on a [`MARK_PIXEL_SIDE`] square grid, one bit a
+    /// pixel.
+    ///
+    /// For a display with no room to stroke anything: an LCD row beside an
+    /// effect name, or a hardware panel. Above about sixteen pixels a host
+    /// wants [`strokes`](Self::strokes) instead, which has no size of its own.
+    ///
+    /// Drawn by hand rather than reduced from the strokes. At forty-nine pixels
+    /// which pixels are lit is the whole of the design, and a one-pixel stroke
+    /// put through a rasteriser at this size comes out as a smear with the idea
+    /// gone.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::{Algorithm, MARK_PIXEL_SIDE};
+    ///
+    /// let rotary = Algorithm::by_name("RotarySpkr").expect("a Rotary Speaker");
+    /// let pixels = rotary.mark().pixels();
+    ///
+    /// // A ring with its centre marked, so the middle pixel is lit and the
+    /// // ones either side of it are not.
+    /// let middle = (MARK_PIXEL_SIDE / 2) as u8;
+    /// assert!(pixels.is_lit(middle, middle));
+    /// assert!(!pixels.is_lit(middle - 1, middle));
+    /// ```
+    #[must_use]
+    pub const fn pixels(&self) -> &Pixels {
+        &self.pixels
+    }
+}
+
+/// A [`Mark`] drawn on a square one-bit grid, for a display too small to stroke.
+///
+/// Reached through [`Mark::pixels`]. [`MARK_PIXEL_SIDE`] is how wide and how
+/// tall, and the origin is the top left, matching the unit box the strokes are
+/// in.
+///
+/// ```
+/// use deepmind_midi::effect::{Algorithm, MARK_PIXEL_SIDE};
+///
+/// let filter = Algorithm::by_name("MoodFilter").expect("a Mood Filter");
+/// let pixels = filter.mark().pixels();
+///
+/// // Blitting it is a walk over the grid.
+/// let mut lit = 0;
+/// for y in 0..MARK_PIXEL_SIDE as u8 {
+///     for x in 0..MARK_PIXEL_SIDE as u8 {
+///         if pixels.is_lit(x, y) {
+///             lit += 1;
+///         }
+///     }
+/// }
+/// assert!(lit > 0);
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Pixels {
+    rows: [u8; MARK_PIXEL_SIDE],
+}
+
+impl Pixels {
+    /// Builds a grid from its rows, a bit a pixel and bit 0 leftmost.
+    #[must_use]
+    pub const fn new(rows: [u8; MARK_PIXEL_SIDE]) -> Self {
+        Self { rows }
+    }
+
+    /// Returns whether the pixel at `x`, `y` is lit, counting from the top
+    /// left.
+    ///
+    /// `false` outside the grid, so a host walking a larger box than the mark
+    /// gets blank rather than an answer it has to bounds-check itself.
+    #[must_use]
+    pub fn is_lit(&self, x: u8, y: u8) -> bool {
+        if usize::from(x) >= MARK_PIXEL_SIDE {
+            return false;
+        }
+        self.row(y) & (1 << x) != 0
+    }
+
+    /// Returns one row as its low [`MARK_PIXEL_SIDE`] bits, bit 0 leftmost.
+    ///
+    /// What a host blitting a row at a time wants. Zero past the bottom of the
+    /// grid.
+    #[must_use]
+    pub fn row(&self, y: u8) -> u8 {
+        self.rows.get(usize::from(y)).copied().unwrap_or(0)
+    }
+
+    /// Returns every row, top to bottom.
+    #[must_use]
+    pub const fn rows(&self) -> &[u8; MARK_PIXEL_SIDE] {
+        &self.rows
     }
 }
 
@@ -908,6 +1004,10 @@ pub enum Stroke {
         points: &'static [Point],
     },
     /// An arc of a circle.
+    ///
+    /// Only the swept part is inside the box; the circle it is taken from may
+    /// reach outside, which is what lets a shallow arc be drawn from a distant
+    /// centre.
     Arc {
         /// Centre of the circle it is taken from.
         centre: Point,
@@ -918,8 +1018,19 @@ pub enum Stroke {
         /// Clockwise because the box has y increasing downward, so a positive
         /// sweep turns the way a reader expects on screen.
         start: f32,
-        /// How far it goes, in turns.
+        /// How far it goes, in turns. A whole turn is a closed circle.
         sweep: f32,
+    },
+    /// A filled disc.
+    ///
+    /// The one thing in a mark that is filled rather than stroked, and the only
+    /// one whose size is not the host's stroke width. Two marks use it: the
+    /// source a reverb's wavefronts leave, and the centre of the rotary ring.
+    Dot {
+        /// Centre of the disc.
+        centre: Point,
+        /// Radius of the disc.
+        radius: f32,
     },
 }
 
@@ -1517,8 +1628,8 @@ fn fraction(program: &Program, engine: Engine, slot: u8) -> Option<f32> {
 )]
 mod tests {
     use super::{
-        ALGORITHM_COUNT, Algorithm, Align, Engine, Family, MODE_COUNT, Mode, Quantity,
-        ROUTING_COUNT, Routing, SLOTS_PER_ENGINE, Source, Stroke, grid,
+        ALGORITHM_COUNT, Algorithm, Align, Engine, Family, MARK_PIXEL_SIDE, MODE_COUNT, Mode,
+        Quantity, ROUTING_COUNT, Routing, SLOTS_PER_ENGINE, Source, Stroke, grid,
     };
     use crate::ids::ProtocolVersion;
     use crate::param::{DEFAULT_FIRMWARE, Group, Kind, ParamId, TableId};
@@ -1993,6 +2104,18 @@ mod tests {
         }
     }
 
+    /// Sine and cosine of an angle in radians, for the arc checks below.
+    ///
+    /// The crate's own `math` module takes turns rather than radians; these
+    /// wrap it so the test reads the way the geometry does.
+    fn sin(radians: f32) -> f32 {
+        crate::math::sin_turns(radians / core::f32::consts::TAU)
+    }
+
+    fn cos(radians: f32) -> f32 {
+        crate::math::cos_turns(radians / core::f32::consts::TAU)
+    }
+
     /// A mark is drawn in a unit box, and a host that scales it by its own size
     /// expects nothing to land outside. The margin is what leaves room for a
     /// stroke width; `spec/marks.toml` states it and this holds it.
@@ -2018,11 +2141,24 @@ mod tests {
                     Stroke::Arc {
                         centre,
                         radius,
+                        start,
                         sweep,
-                        ..
                     } => {
                         assert!(radius > 0.0, "{family} has an arc of no radius");
                         assert!(sweep.abs() > 0.0, "{family} has an arc that sweeps nothing");
+                        // Only the swept part, because the circle an arc is
+                        // taken from is allowed to reach outside the box.
+                        for turns in [start, start + sweep] {
+                            let radians = turns * core::f32::consts::TAU;
+                            inside(
+                                centre.x() + radius * cos(radians),
+                                centre.y() + radius * sin(radians),
+                                family,
+                            );
+                        }
+                    }
+                    Stroke::Dot { centre, radius } => {
+                        assert!(radius > 0.0, "{family} has a dot of no radius");
                         inside(centre.x() - radius, centre.y() - radius, family);
                         inside(centre.x() + radius, centre.y() + radius, family);
                     }
@@ -2031,7 +2167,60 @@ mod tests {
         }
     }
 
-    /// The four buckets the manual prints are not the nine a symbol needs, and
+    /// Every family has a pixel grid, it is the declared size, and it draws
+    /// something. A mark that lit nothing, or everything, would blit as a blank
+    /// or a block and tell a reader nothing.
+    #[test]
+    fn every_mark_has_a_pixel_grid_that_draws_something() {
+        let side = u8::try_from(MARK_PIXEL_SIDE).expect("a small grid");
+        for family in Family::ALL {
+            let pixels = family.mark().pixels();
+            assert_eq!(pixels.rows().len(), MARK_PIXEL_SIDE, "{family}");
+
+            let mut lit = 0;
+            for y in 0..side {
+                for x in 0..side {
+                    if pixels.is_lit(x, y) {
+                        lit += 1;
+                    }
+                }
+            }
+            assert!(lit > 0, "{family} lights nothing");
+            assert!(lit < MARK_PIXEL_SIDE * MARK_PIXEL_SIDE, "{family} is solid");
+
+            // Nothing outside the grid is lit, and no row carries a bit past
+            // its own width, which is what a host blitting a row relies on.
+            assert!(
+                !pixels.is_lit(side, 0),
+                "{family} lights a column past the grid"
+            );
+            assert_eq!(pixels.row(side), 0, "{family} has a row past the grid");
+            for y in 0..side {
+                assert_eq!(
+                    pixels.row(y) >> side,
+                    0,
+                    "{family} row {y} carries a bit past the grid"
+                );
+            }
+        }
+    }
+
+    /// The nine grids are nine different pictures. Two families blitting the
+    /// same pixels would be a symbol that cannot do its one job.
+    #[test]
+    fn no_two_families_blit_the_same_pixels() {
+        for (index, family) in Family::ALL.into_iter().enumerate() {
+            for other in Family::ALL.into_iter().skip(index + 1) {
+                assert_ne!(
+                    family.mark().pixels().rows(),
+                    other.mark().pixels().rows(),
+                    "{family} and {other} draw the same grid"
+                );
+            }
+        }
+    }
+
+    /// The four buckets the manual prints are not the nine a symbol needs, and    /// The four buckets the manual prints are not the nine a symbol needs, and
     /// `Creative` is where that shows: it holds three families at once.
     #[test]
     fn a_family_is_finer_than_the_manuals_category() {

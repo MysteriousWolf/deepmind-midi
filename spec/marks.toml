@@ -1,17 +1,17 @@
 # A mark per effect family, as geometry rather than as artwork.
 #
 # Generated documentation is built from this file. Edit it here, then run
-# `cargo xtask docs` to refresh docs/effects.md and docs/diagrams/marks/*.svg.
+# `cargo xtask docs` to refresh docs/effects.md and docs/diagrams/marks.svg.
 #
 # An effect already has a name, a full name, a category, twelve named slots, a
 # grid position, a control shape and four measured colours. What it did not have
 # is a small symbol that says *delay* or *filter* without being read, for a host
 # drawing four engines at once with room for a word or a symbol but not both.
 #
-# Two things live here. `family` is what an effect does to a signal, as a closed
-# set, which is the part with no pixels in it at all. `strokes` is the mark that
-# family is drawn with, in a unit box, so a host provides the size, the stroke
-# width and the colour and draws it in its own materials.
+# Three things live here. `family` is what an effect does to a signal, as a
+# closed set, which is the part with no pixels in it at all. `strokes` is the
+# mark drawn as geometry, for any size a host can stroke a line at. `pixels` is
+# the same mark drawn again by hand for a display too small to stroke anything.
 
 [meta]
 families = """
@@ -32,6 +32,24 @@ Reverb and Flange and Reverb are reverbs, and Mod, Delay and Reverb is a delay. 
 The Enhancing EQ is a filter and not a distortion: its nine slots are a gain, a \
 frequency and a Q per band. Auto-Panning is imaging and not modulation: what \
 its LFO moves is stereo position."""
+language = """
+The marks are diagrams rather than pictures, and they are diagrams of one idea \
+each rather than of the effect. A reverb is not a drawing of a decaying tail; \
+it is a source with two wavefronts leaving it. A compressor is not a transfer \
+curve; it is a level with a ceiling and a floor around it. What a symbol has to \
+do at twelve pixels is be told apart from the other eight, and a faithful small \
+drawing loses that fight to a reduced one.
+
+So the whole set is built from four things and nothing else: a straight run, a \
+circular arc, a filled dot, and a corner between two runs. No mark uses a \
+curve that is not an arc, none is filled except the dots, and none closes a \
+path except the rotary ring. Line weight is the host's and is the same for \
+every mark, which is what makes them read as one set.
+
+Two pairs are deliberately each other's transpose, because the things they \
+describe are: Dynamics is a gap between two horizontal limits, Imaging is a \
+span between two vertical ones. Reverb and Rotary are the only marks with \
+curves in them, and they are told apart by the ring being closed."""
 geometry = """
 A unit box with the origin at the top left and y increasing downward, which is \
 the convention every drawing API named here uses. Coordinates are kept inside \
@@ -40,14 +58,29 @@ box.
 
 `line` is a polyline of two or more points. `arc` is a circular arc, whose \
 `start` and `sweep` are in turns clockwise from three o'clock, matching the \
-y-down box. Both are outlines to be stroked, never filled, and no mark closes \
-a path."""
+y-down box; only the part actually swept has to be inside the box, so an arc \
+may be taken from a circle that is not. `dot` is a filled disc, and is the one \
+thing here that is filled rather than stroked."""
+pixels = """
+The same nine marks drawn again on a seven by seven grid, one bit per pixel, \
+for a display with no room to stroke anything: an LCD row beside an effect \
+name, or a hardware panel.
+
+Drawn by hand rather than rasterised from the strokes. At forty-nine pixels \
+legibility is a question of which pixels, not of scale, and a one-pixel stroke \
+put through a rasteriser at this size comes out as a grey smear with the idea \
+gone. Every mark here was checked at size before it was written down, and three \
+were redrawn because they did not survive it.
+
+Seven is odd, so every mark has a true centre pixel to hang symmetry on, and it \
+is the smallest grid that fits the ring with a middle in it. A host wanting a \
+bigger icon has the strokes; this is for where the strokes cannot go."""
 reuse = """
-Nine marks for 35 algorithms. Every reverb is one decaying tail and the six \
-delays are one set of taps, because the difference between a Hall Reverb and a \
-Plate Reverb is not something a symbol at twelve pixels can carry, and a \
-drawing that implied it would be a guess about which reverb this is. The name \
-is what tells them apart, and the library already publishes that."""
+Nine marks for 35 algorithms. Every reverb is one mark and the six delays are \
+one mark, because the difference between a Hall Reverb and a Plate Reverb is \
+not something a symbol at twelve pixels can carry, and a drawing that implied \
+it would be a guess about which reverb this is. The name is what tells them \
+apart, and the library already publishes that."""
 not_artwork = """
 No font, no raster and no licensed symbol set. Nothing here is measured off the \
 manual, unlike the panel colours: these are drawn by this project, and they are \
@@ -57,7 +90,7 @@ is data and the pixel size is not."""
 
 [[family]]
 name = "Reverb"
-description = "A decaying tail: one arrival, then a wash falling away to nothing."
+description = "One arrival and the room answering it, as a source with two wavefronts leaving."
 algorithms = [
     "TC-DeepVRB",
     "AmbVerb",
@@ -74,21 +107,23 @@ algorithms = [
     "FlangVerb",
 ]
 strokes = [
-    { line = [[0.08, 0.84], [0.92, 0.84]] },
-    { line = [[0.17, 0.12], [0.17, 0.84]] },
-    { line = [
-        [0.17, 0.12],
-        [0.31, 0.45],
-        [0.46, 0.63],
-        [0.62, 0.74],
-        [0.78, 0.81],
-        [0.92, 0.84],
-    ] },
+    { dot = { centre = [0.15, 0.50], radius = 0.06 } },
+    { arc = { centre = [0.10, 0.50], radius = 0.30, start = -0.15, sweep = 0.30 } },
+    { arc = { centre = [0.10, 0.50], radius = 0.62, start = -0.11, sweep = 0.22 } },
+]
+pixels = [
+    ".......",
+    "..#.#..",
+    "...#.#.",
+    "#..#.#.",
+    "...#.#.",
+    "..#.#..",
+    ".......",
 ]
 
 [[family]]
 name = "Delay"
-description = "Discrete repeats: a few taps, evenly spaced and each quieter than the last."
+description = "The same sound three times and quieter each time, as three falling marks."
 algorithms = [
     "Delay",
     "3TapDelay",
@@ -98,101 +133,157 @@ algorithms = [
     "ModDlyRev",
 ]
 strokes = [
-    { line = [[0.08, 0.84], [0.92, 0.84]] },
-    { line = [[0.14, 0.14], [0.14, 0.84]] },
-    { line = [[0.40, 0.38], [0.40, 0.84]] },
-    { line = [[0.66, 0.56], [0.66, 0.84]] },
-    { line = [[0.90, 0.70], [0.90, 0.84]] },
+    { line = [[0.14, 0.12], [0.14, 0.88]] },
+    { line = [[0.50, 0.40], [0.50, 0.88]] },
+    { line = [[0.86, 0.66], [0.86, 0.88]] },
+]
+pixels = [
+    ".......",
+    "#......",
+    "#......",
+    "#..#...",
+    "#..#...",
+    "#..#..#",
+    "#..#..#",
 ]
 
 [[family]]
 name = "Modulation"
-description = "A swept delay: one cycle of the wave that does the sweeping."
+description = "The wave that does the sweeping, one cycle of it."
 algorithms = ["Chorus", "Chorus-D", "Flanger", "Phaser"]
 strokes = [
     { line = [
         [0.08, 0.50],
-        [0.19, 0.22],
-        [0.29, 0.13],
-        [0.40, 0.22],
+        [0.18, 0.25],
+        [0.29, 0.14],
+        [0.40, 0.25],
         [0.50, 0.50],
-        [0.60, 0.78],
-        [0.71, 0.87],
-        [0.81, 0.78],
+        [0.60, 0.75],
+        [0.71, 0.86],
+        [0.81, 0.75],
         [0.92, 0.50],
     ] },
+]
+pixels = [
+    ".......",
+    ".##....",
+    "#..#...",
+    "#..#..#",
+    "...#..#",
+    "....##.",
+    ".......",
 ]
 
 [[family]]
 name = "Filter"
-description = "A response with a corner in it: flat, then a knee, then a roll-off."
+description = "A corner: level up to a point, and falling away after it."
 algorithms = ["MidasEQ", "Enhancer", "MoodFilter"]
 strokes = [
-    { line = [
-        [0.08, 0.34],
-        [0.40, 0.34],
-        [0.52, 0.28],
-        [0.62, 0.40],
-        [0.74, 0.62],
-        [0.92, 0.86],
-    ] },
+    { line = [[0.08, 0.24], [0.46, 0.24], [0.92, 0.82]] },
+]
+pixels = [
+    ".......",
+    "####...",
+    "....#..",
+    ".....#.",
+    "......#",
+    ".......",
+    ".......",
 ]
 
 [[family]]
 name = "Dynamics"
-description = "A squeeze: the loud and the quiet pressed toward each other."
+description = "A level held between a ceiling and a floor, and the room left between them."
 algorithms = ["FairComp", "NoiseGate"]
 strokes = [
-    { line = [[0.50, 0.10], [0.50, 0.40]] },
-    { line = [[0.34, 0.25], [0.50, 0.41], [0.66, 0.25]] },
-    { line = [[0.50, 0.90], [0.50, 0.60]] },
-    { line = [[0.34, 0.75], [0.50, 0.59], [0.66, 0.75]] },
+    { line = [[0.08, 0.12], [0.92, 0.12]] },
+    { line = [[0.08, 0.88], [0.92, 0.88]] },
+    { line = [[0.50, 0.34], [0.50, 0.66]] },
+]
+pixels = [
+    "#######",
+    ".......",
+    "...#...",
+    "...#...",
+    "...#...",
+    ".......",
+    "#######",
 ]
 
 [[family]]
 name = "Distortion"
-description = "A wave driven into its ceiling: the peaks flattened where the curve clips."
+description = "A wave with the curve driven out of it: two levels and hard corners."
 algorithms = ["MulBndDist", "RackAmp"]
 strokes = [
     { line = [
-        [0.08, 0.50],
-        [0.17, 0.18],
-        [0.38, 0.18],
-        [0.47, 0.50],
-        [0.55, 0.82],
-        [0.76, 0.82],
-        [0.85, 0.50],
-        [0.92, 0.34],
+        [0.08, 0.82],
+        [0.24, 0.82],
+        [0.24, 0.18],
+        [0.54, 0.18],
+        [0.54, 0.82],
+        [0.92, 0.82],
     ] },
+]
+pixels = [
+    ".......",
+    ".###...",
+    ".#.#...",
+    ".#.#...",
+    ".#.#...",
+    "##.####",
+    ".......",
 ]
 
 [[family]]
 name = "Imaging"
-description = "Width: a span opening out to both sides of the centre."
+description = "A width, measured: a span with a mark at each end of it."
 algorithms = ["EdisonEX1", "Auto Pan"]
 strokes = [
     { line = [[0.08, 0.50], [0.92, 0.50]] },
-    { line = [[0.26, 0.28], [0.08, 0.50], [0.26, 0.72]] },
-    { line = [[0.74, 0.28], [0.92, 0.50], [0.74, 0.72]] },
-    { line = [[0.50, 0.20], [0.50, 0.80]] },
+    { line = [[0.08, 0.28], [0.08, 0.72]] },
+    { line = [[0.92, 0.28], [0.92, 0.72]] },
+]
+pixels = [
+    ".......",
+    ".......",
+    "#.....#",
+    "#######",
+    "#.....#",
+    ".......",
+    ".......",
 ]
 
 [[family]]
 name = "Pitch"
-description = "A step to another pitch, held: the interval a shifter puts beside the note."
+description = "A step to another pitch and held there: one level, a riser, another level."
 algorithms = ["DualPitch", "Vintage Pitch"]
 strokes = [
-    { line = [[0.08, 0.74], [0.46, 0.74]] },
-    { line = [[0.46, 0.74], [0.46, 0.26]] },
-    { line = [[0.46, 0.26], [0.92, 0.26]] },
-    { line = [[0.34, 0.38], [0.46, 0.26], [0.58, 0.38]] },
+    { line = [[0.08, 0.74], [0.50, 0.74], [0.50, 0.26], [0.92, 0.26]] },
+]
+pixels = [
+    ".......",
+    "...####",
+    "...#...",
+    "...#...",
+    "####...",
+    ".......",
+    ".......",
 ]
 
 [[family]]
 name = "Rotary"
-description = "A horn going round: most of a turn, with the head showing which way."
+description = "A driver going round: a ring with its centre marked."
 algorithms = ["RotarySpkr"]
 strokes = [
-    { arc = { centre = [0.50, 0.50], radius = 0.34, start = 0.06, sweep = 0.80 } },
-    { line = [[0.62, 0.12], [0.80, 0.22], [0.70, 0.40]] },
+    { arc = { centre = [0.50, 0.50], radius = 0.38, start = 0.0, sweep = 1.0 } },
+    { dot = { centre = [0.50, 0.50], radius = 0.07 } },
+]
+pixels = [
+    "..###..",
+    ".#...#.",
+    "#.....#",
+    "#..#..#",
+    "#.....#",
+    ".#...#.",
+    "..###..",
 ]

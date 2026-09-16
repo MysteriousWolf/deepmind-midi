@@ -372,6 +372,42 @@ pub struct Family {
     pub algorithms: Vec<String>,
     /// The mark, as strokes in a unit box with the origin top left.
     pub strokes: Vec<Stroke>,
+    /// The same mark on a square one-bit grid, one string per row.
+    pub pixels: Vec<String>,
+}
+
+impl Arc {
+    /// Returns the points the swept part of the arc has to be checked against.
+    ///
+    /// Its two ends, plus each compass point the sweep actually passes through,
+    /// which is where a circle reaches its extremes. Checking the whole circle
+    /// instead would forbid a shallow arc drawn from a distant centre, which is
+    /// how the reverb's wavefronts are drawn.
+    fn extent(&self) -> Vec<(f32, f32)> {
+        let at = |turns: f32| {
+            let radians = turns * std::f32::consts::TAU;
+            (
+                self.centre[0] + self.radius * radians.cos(),
+                self.centre[1] + self.radius * radians.sin(),
+            )
+        };
+        let (from, to) = if self.sweep >= 0.0 {
+            (self.start, self.start + self.sweep)
+        } else {
+            (self.start + self.sweep, self.start)
+        };
+
+        let mut points = vec![at(from), at(to)];
+        // Every quarter turn inside the swept range, whichever turn it is in.
+        let first = (from * 4.0).ceil();
+        let last = (to * 4.0).floor();
+        let mut quarter = first;
+        while quarter <= last {
+            points.push(at(quarter / 4.0));
+            quarter += 1.0;
+        }
+        points
+    }
 }
 
 impl Family {
@@ -395,67 +431,124 @@ impl Family {
         };
 
         for (index, stroke) in self.strokes.iter().enumerate() {
-            match (&stroke.line, &stroke.arc) {
-                (Some(points), None) => {
-                    if points.len() < 2 {
-                        return Err(format!(
-                            "marks.toml: {} stroke {index} is a line of {} point(s)",
-                            self.name,
-                            points.len()
-                        ));
-                    }
-                    for &[x, y] in points {
-                        inside("line", x, y)?;
-                    }
+            let kinds = usize::from(stroke.line.is_some())
+                + usize::from(stroke.arc.is_some())
+                + usize::from(stroke.dot.is_some());
+            if kinds != 1 {
+                return Err(format!(
+                    "marks.toml: {} stroke {index} sets {kinds} of line, arc and dot, not 1",
+                    self.name
+                ));
+            }
+
+            if let Some(points) = &stroke.line {
+                if points.len() < 2 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is a line of {} point(s)",
+                        self.name,
+                        points.len()
+                    ));
                 }
-                (None, Some(arc)) => {
-                    if arc.radius <= 0.0 {
+                for &[x, y] in points {
+                    inside("line", x, y)?;
+                }
+            }
+
+            if let Some(arc) = &stroke.arc {
+                if arc.radius <= 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is an arc of radius {}",
+                        self.name, arc.radius
+                    ));
+                }
+                if arc.sweep == 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is an arc that sweeps nothing",
+                        self.name
+                    ));
+                }
+                // Only the part actually swept, so that an arc may be taken
+                // from a circle reaching outside the box. That is what lets a
+                // shallow wavefront be drawn from a distant centre.
+                for (x, y) in arc.extent() {
+                    inside("arc", x, y)?;
+                }
+            }
+
+            if let Some(dot) = &stroke.dot {
+                if dot.radius <= 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is a dot of radius {}",
+                        self.name, dot.radius
+                    ));
+                }
+                inside(
+                    "dot",
+                    dot.centre[0] - dot.radius,
+                    dot.centre[1] - dot.radius,
+                )?;
+                inside(
+                    "dot",
+                    dot.centre[0] + dot.radius,
+                    dot.centre[1] + dot.radius,
+                )?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks this family's pixel grid is square, one bit per character, and
+    /// draws something a reader could tell from anything else.
+    ///
+    /// # Errors
+    ///
+    /// Returns a message when the grid is not `side` rows of `side`
+    /// characters, when a character is neither `#` nor `.`, or when the grid is
+    /// empty or completely full, both of which draw nothing.
+    fn validate_pixels(&self, side: usize) -> Result<(), String> {
+        if self.pixels.len() != side {
+            return Err(format!(
+                "marks.toml: {} has {} pixel rows, not {side}",
+                self.name,
+                self.pixels.len()
+            ));
+        }
+        let mut lit = 0;
+        for (y, row) in self.pixels.iter().enumerate() {
+            if row.chars().count() != side {
+                return Err(format!(
+                    "marks.toml: {} pixel row {y} is {} characters, not {side}",
+                    self.name,
+                    row.chars().count()
+                ));
+            }
+            for (x, pixel) in row.chars().enumerate() {
+                match pixel {
+                    '#' => lit += 1,
+                    '.' => {}
+                    other => {
                         return Err(format!(
-                            "marks.toml: {} stroke {index} is an arc of radius {}",
-                            self.name, arc.radius
-                        ));
-                    }
-                    if arc.sweep == 0.0 {
-                        return Err(format!(
-                            "marks.toml: {} stroke {index} is an arc that sweeps nothing",
+                            "marks.toml: {} pixel ({x}, {y}) is {other:?}, not '#' or '.'",
                             self.name
                         ));
                     }
-                    // The bounding box of the whole circle, because an arc of
-                    // more than a quarter turn reaches its extremes whatever
-                    // its endpoints are.
-                    inside(
-                        "arc",
-                        arc.centre[0] - arc.radius,
-                        arc.centre[1] - arc.radius,
-                    )?;
-                    inside(
-                        "arc",
-                        arc.centre[0] + arc.radius,
-                        arc.centre[1] + arc.radius,
-                    )?;
-                }
-                (Some(_), Some(_)) => {
-                    return Err(format!(
-                        "marks.toml: {} stroke {index} sets both line and arc",
-                        self.name
-                    ));
-                }
-                (None, None) => {
-                    return Err(format!(
-                        "marks.toml: {} stroke {index} sets neither line nor arc",
-                        self.name
-                    ));
                 }
             }
+        }
+        if lit == 0 || lit == side * side {
+            return Err(format!(
+                "marks.toml: {} lights {lit} pixels of {}, which draws nothing",
+                self.name,
+                side * side
+            ));
         }
         Ok(())
     }
 }
 
-/// One stroke of a mark: a polyline or a circular arc.
+/// One stroke of a mark: a polyline, a circular arc or a filled dot.
 ///
-/// Exactly one of the two is set, which the loader checks; TOML has no tagged
+/// Exactly one of the three is set, which the loader checks; TOML has no tagged
 /// union, so this is how a stroke says which it is.
 #[derive(Debug, Deserialize)]
 pub struct Stroke {
@@ -465,6 +558,18 @@ pub struct Stroke {
     /// A circular arc, in the same box.
     #[serde(default)]
     pub arc: Option<Arc>,
+    /// A filled disc, in the same box.
+    #[serde(default)]
+    pub dot: Option<Dot>,
+}
+
+/// A filled dot of a mark, in a unit box with the origin top left.
+#[derive(Debug, Deserialize)]
+pub struct Dot {
+    /// Centre of the disc.
+    pub centre: [f32; 2],
+    /// Radius of the disc.
+    pub radius: f32,
 }
 
 /// A circular arc of a mark, in a unit box with the origin top left.
@@ -1765,6 +1870,9 @@ impl Spec {
         /// stroke width has somewhere to go; see `meta.geometry`.
         const MARGIN: f32 = 0.08;
 
+        /// Side of the grid each mark is drawn again on; see `meta.pixels`.
+        const PIXEL_SIDE: usize = 7;
+
         let mut claimed: BTreeMap<&str, &str> = BTreeMap::new();
         for family in &self.families {
             if family.name.trim().is_empty() {
@@ -1788,6 +1896,7 @@ impl Spec {
                 }
             }
             family.validate_strokes(MARGIN)?;
+            family.validate_pixels(PIXEL_SIDE)?;
         }
 
         if let Some(effect) = self
