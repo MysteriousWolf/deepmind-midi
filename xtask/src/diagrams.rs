@@ -513,6 +513,26 @@ fn draw_mark(family: &crate::spec::Family, left: f32, top: f32, side: f32) -> St
                 })
                 .collect();
             let _ = writeln!(out, "    <polyline points=\"{}\" />", drawn.join(" "));
+        } else if let Some(wave) = &stroke.wave {
+            // Sampled, because that is what the published curve is for. The
+            // count is this drawing's business and nobody else's: enough that
+            // the segments are shorter than a stroke width at the size drawn.
+            let samples = (side * 2.0).clamp(24.0, 240.0) as usize;
+            let (dx, dy) = (wave.end[0] - wave.start[0], wave.end[1] - wave.start[1]);
+            let length = dx.hypot(dy).max(f32::EPSILON);
+            let (nx, ny) = (dy / length, -dx / length);
+            let drawn: Vec<String> = (0..=samples)
+                .map(|step| {
+                    let u = step as f32 / samples as f32;
+                    let offset = wave.amplitude * (u * wave.cycles * core::f32::consts::TAU).sin();
+                    let (x, y) = at(
+                        wave.start[0] + dx * u + nx * offset,
+                        wave.start[1] + dy * u + ny * offset,
+                    );
+                    format!("{x:.2},{y:.2}")
+                })
+                .collect();
+            let _ = writeln!(out, "    <polyline points=\"{}\" />", drawn.join(" "));
         } else if let Some(dot) = &stroke.dot {
             let (cx, cy) = at(dot.centre[0], dot.centre[1]);
             let _ = writeln!(

@@ -1032,6 +1032,29 @@ pub enum Stroke {
         /// Radius of the disc.
         radius: f32,
     },
+    /// A sine along the line from `start` to `end`.
+    ///
+    /// A function rather than a set of points, so a host samples it as finely
+    /// as the size it is drawing at deserves. The alternative is a polyline,
+    /// and a polyline through a sine is a row of corners: how many corners is a
+    /// question about the host's pixels, which this library does not have and
+    /// the [`generator`](crate::generator) module refuses for the same reason.
+    ///
+    /// The value at `u` along `0..=1` of the centre line is that point,
+    /// displaced perpendicular by `amplitude * sin(TAU * cycles * u)`. The
+    /// perpendicular is the start-to-end direction turned a quarter turn
+    /// anticlockwise, which in a box with y downward points up the screen, so a
+    /// positive sine rises.
+    Wave {
+        /// Where the centre line begins.
+        start: Point,
+        /// Where the centre line ends.
+        end: Point,
+        /// Peak displacement from the centre line, perpendicular to it.
+        amplitude: f32,
+        /// Cycles between `start` and `end`.
+        cycles: f32,
+    },
 }
 
 /// A point of a [`Mark`], in a unit box with the origin top left.
@@ -1629,7 +1652,7 @@ fn fraction(program: &Program, engine: Engine, slot: u8) -> Option<f32> {
 mod tests {
     use super::{
         ALGORITHM_COUNT, Algorithm, Align, Engine, Family, MARK_PIXEL_SIDE, MODE_COUNT, Mode,
-        Quantity, ROUTING_COUNT, Routing, SLOTS_PER_ENGINE, Source, Stroke, grid,
+        Point, Quantity, ROUTING_COUNT, Routing, SLOTS_PER_ENGINE, Source, Stroke, grid,
     };
     use crate::ids::ProtocolVersion;
     use crate::param::{DEFAULT_FIRMWARE, Group, Kind, ParamId, TableId};
@@ -2104,6 +2127,21 @@ mod tests {
         }
     }
 
+    /// Returns the point `u` along a wave, the way a host drawing one would.
+    ///
+    /// The centre line displaced perpendicular by the sine, with the
+    /// perpendicular a quarter turn anticlockwise from the run.
+    fn wave_at(start: Point, end: Point, amplitude: f32, cycles: f32, u: f32) -> (f32, f32) {
+        let (dx, dy) = (end.x() - start.x(), end.y() - start.y());
+        let length = dx.hypot(dy).max(f32::EPSILON);
+        let (nx, ny) = (dy / length, -dx / length);
+        let offset = amplitude * crate::math::sin_turns(u * cycles);
+        (
+            start.x() + dx * u + nx * offset,
+            start.y() + dy * u + ny * offset,
+        )
+    }
+
     /// Sine and cosine of an angle in radians, for the arc checks below.
     ///
     /// The crate's own `math` module takes turns rather than radians; these
@@ -2161,6 +2199,22 @@ mod tests {
                         assert!(radius > 0.0, "{family} has a dot of no radius");
                         inside(centre.x() - radius, centre.y() - radius, family);
                         inside(centre.x() + radius, centre.y() + radius, family);
+                    }
+                    Stroke::Wave {
+                        start,
+                        end,
+                        amplitude,
+                        cycles,
+                    } => {
+                        assert!(amplitude > 0.0, "{family} has a wave of no amplitude");
+                        assert!(cycles > 0.0, "{family} has a wave of no cycles");
+                        // Sampled the way a host would, which is the only way
+                        // to know a published curve stays in its box.
+                        for step in 0..=64_u8 {
+                            let u = f32::from(step) / 64.0;
+                            let (x, y) = wave_at(start, end, amplitude, cycles, u);
+                            inside(x, y, family);
+                        }
                     }
                 }
             }

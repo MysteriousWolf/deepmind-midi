@@ -599,6 +599,22 @@ pub const FAMILY_COUNT: usize = {};
                         arc.centre[0], arc.centre[1], arc.radius, arc.start, arc.sweep,
                     );
                 }
+                (_, _) if stroke.wave.is_some() => {
+                    // Checked as present on the line above; the loader has
+                    // already rejected a stroke that is none of the four.
+                    if let Some(wave) = &stroke.wave {
+                        let _ = writeln!(
+                            out,
+                            "    Stroke::Wave {{ start: Point::new({:?}, {:?}), end: Point::new({:?}, {:?}), amplitude: {:?}, cycles: {:?} }},",
+                            wave.start[0],
+                            wave.start[1],
+                            wave.end[0],
+                            wave.end[1],
+                            wave.amplitude,
+                            wave.cycles,
+                        );
+                    }
+                }
                 (_, _) if stroke.dot.is_some() => {
                     // Checked as present on the line above; the loader has
                     // already rejected a stroke that is none of the three.

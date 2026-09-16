@@ -8354,18 +8354,11 @@ static MARK_DELAY: [Stroke; 3] = [
 ];
 
 /// The wave that does the sweeping, one cycle of it.
-static MARK_MODULATION: [Stroke; 1] = [Stroke::Line {
-    points: &[
-        Point::new(0.08, 0.5),
-        Point::new(0.18, 0.25),
-        Point::new(0.29, 0.14),
-        Point::new(0.4, 0.25),
-        Point::new(0.5, 0.5),
-        Point::new(0.6, 0.75),
-        Point::new(0.71, 0.86),
-        Point::new(0.81, 0.75),
-        Point::new(0.92, 0.5),
-    ],
+static MARK_MODULATION: [Stroke; 1] = [Stroke::Wave {
+    start: Point::new(0.08, 0.5),
+    end: Point::new(0.92, 0.5),
+    amplitude: 0.36,
+    cycles: 1.0,
 }];
 
 /// A corner: level up to a point, and falling away after it.

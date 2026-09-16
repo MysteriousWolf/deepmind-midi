@@ -410,6 +410,36 @@ impl Arc {
     }
 }
 
+impl Wave {
+    /// Returns the corners of the box the wave is drawn inside.
+    ///
+    /// The centre line's own ends, each pushed `amplitude` both ways along the
+    /// perpendicular. A sine reaches its amplitude somewhere whenever it runs a
+    /// half cycle or more, and every mark's wave does, so this is the box
+    /// rather than an over-estimate of it.
+    fn extent(&self) -> Vec<(f32, f32)> {
+        let (dx, dy) = (self.end[0] - self.start[0], self.end[1] - self.start[1]);
+        let length = dx.hypot(dy);
+        if length <= 0.0 {
+            return vec![(self.start[0], self.start[1])];
+        }
+        // The start-to-end direction turned a quarter turn anticlockwise, which
+        // in a y-down box points up the screen.
+        let (nx, ny) = (dy / length, -dx / length);
+
+        let mut points = Vec::new();
+        for end in [self.start, self.end] {
+            for side in [1.0, -1.0] {
+                points.push((
+                    end[0] + nx * self.amplitude * side,
+                    end[1] + ny * self.amplitude * side,
+                ));
+            }
+        }
+        points
+    }
+}
+
 impl Family {
     /// Checks this family's strokes are drawable and inside the unit box.
     ///
@@ -433,10 +463,11 @@ impl Family {
         for (index, stroke) in self.strokes.iter().enumerate() {
             let kinds = usize::from(stroke.line.is_some())
                 + usize::from(stroke.arc.is_some())
-                + usize::from(stroke.dot.is_some());
+                + usize::from(stroke.dot.is_some())
+                + usize::from(stroke.wave.is_some());
             if kinds != 1 {
                 return Err(format!(
-                    "marks.toml: {} stroke {index} sets {kinds} of line, arc and dot, not 1",
+                    "marks.toml: {} stroke {index} sets {kinds} of line, arc, dot and wave, not 1",
                     self.name
                 ));
             }
@@ -561,6 +592,25 @@ pub struct Stroke {
     /// A filled disc, in the same box.
     #[serde(default)]
     pub dot: Option<Dot>,
+    /// A sine along a line, in the same box.
+    #[serde(default)]
+    pub wave: Option<Wave>,
+}
+
+/// A sine of a mark, along the line from `start` to `end`.
+///
+/// A function rather than a set of points: how finely to sample it is a
+/// question about the size the host is drawing at.
+#[derive(Debug, Deserialize)]
+pub struct Wave {
+    /// Where the centre line begins.
+    pub start: [f32; 2],
+    /// Where the centre line ends.
+    pub end: [f32; 2],
+    /// Peak displacement from the centre line, perpendicular to it.
+    pub amplitude: f32,
+    /// Cycles between `start` and `end`.
+    pub cycles: f32,
 }
 
 /// A filled dot of a mark, in a unit box with the origin top left.

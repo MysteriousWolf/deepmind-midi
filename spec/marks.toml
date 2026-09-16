@@ -40,11 +40,11 @@ curve; it is a level with a ceiling and a floor around it. What a symbol has to 
 do at twelve pixels is be told apart from the other eight, and a faithful small \
 drawing loses that fight to a reduced one.
 
-So the whole set is built from four things and nothing else: a straight run, a \
-circular arc, a filled dot, and a corner between two runs. No mark uses a \
-curve that is not an arc, none is filled except the dots, and none closes a \
-path except the rotary ring. Line weight is the host's and is the same for \
-every mark, which is what makes them read as one set.
+So the whole set is built from five things and nothing else: a straight run, a \
+circular arc, a sine, a filled dot, and a corner between two runs. Nothing is \
+filled except the dots, and no path closes except the rotary ring. Line weight \
+is the host's and is the same for every mark, which is what makes them read as \
+one set.
 
 Two pairs are deliberately each other's transpose, because the things they \
 describe are: Dynamics is a gap between two horizontal limits, Imaging is a \
@@ -60,7 +60,15 @@ box.
 `start` and `sweep` are in turns clockwise from three o'clock, matching the \
 y-down box; only the part actually swept has to be inside the box, so an arc \
 may be taken from a circle that is not. `dot` is a filled disc, and is the one \
-thing here that is filled rather than stroked."""
+thing here that is filled rather than stroked.
+
+`wave` is a sine along the line from `start` to `end`, displaced \
+perpendicular to it by `amplitude` and repeating `cycles` times. It is a \
+function rather than a set of points on purpose: a modulation mark drawn as a \
+polyline is a row of corners, and how finely to sample a curve is a question \
+about the size the host is drawing at, which this file does not know. The \
+perpendicular is the start-to-end direction turned a quarter turn \
+anticlockwise, so a positive sine rises on screen."""
 pixels = """
 The same nine marks drawn again on a seven by seven grid, one bit per pixel, \
 for a display with no room to stroke anything: an LCD row beside an effect \
@@ -152,17 +160,7 @@ name = "Modulation"
 description = "The wave that does the sweeping, one cycle of it."
 algorithms = ["Chorus", "Chorus-D", "Flanger", "Phaser"]
 strokes = [
-    { line = [
-        [0.08, 0.50],
-        [0.18, 0.25],
-        [0.29, 0.14],
-        [0.40, 0.25],
-        [0.50, 0.50],
-        [0.60, 0.75],
-        [0.71, 0.86],
-        [0.81, 0.75],
-        [0.92, 0.50],
-    ] },
+    { wave = { start = [0.08, 0.50], end = [0.92, 0.50], amplitude = 0.36, cycles = 1.0 } },
 ]
 pixels = [
     ".......",

@@ -133,11 +133,18 @@ A compressor is not a transfer curve; it is a level with a ceiling and a floor
 around it. What a symbol has to do at twelve pixels is be told apart from the
 other eight, and a faithful small drawing loses that fight to a reduced one.
 
-The whole set is built from four things and nothing else: a straight run, a
-circular arc, a filled dot, and a corner between two runs. No mark uses a curve
-that is not an arc, none is filled except the dots, and none closes a path
-except the rotary ring. Line weight is the host's and is the same for every
-mark, which is what makes them read as one set rather than nine drawings.
+The whole set is built from five things and nothing else: a straight run, a
+circular arc, a sine, a filled dot, and a corner between two runs. Nothing is
+filled except the dots, and no path closes except the rotary ring. Line weight
+is the host's and is the same for every mark, which is what makes them read as
+one set rather than nine drawings.
+
+The sine is published as a curve rather than as points on one. A modulation
+mark drawn as a polyline is a row of corners, and how many corners is a question
+about the size the host is drawing at — which is the host's to answer, for the
+same reason `generator` hands back a function to sample rather than a picture.
+`Stroke::Wave` gives a centre line, an amplitude and a cycle count; the host
+samples it as finely as its pixels deserve.
 
 Two pairs are deliberately each other's transpose, because the things they
 describe are: Dynamics is a gap between two horizontal limits, Imaging a span
