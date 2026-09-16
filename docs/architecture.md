@@ -514,6 +514,50 @@ reading stays raw. One string rather than a parsed range, because not all 26
 are ranges: one has a discrete value before a range in it, and another is a
 sentence about two different behaviours.
 
+## Shapes, and where the honesty sits in the type
+
+Saying nothing about a curve is the right answer for a *number*. It is the wrong
+answer for a *picture*: a host that wants to show a player the envelope they are
+editing has to draw something, and if the library will not say what an envelope
+four bytes describe looks like, then ten windows work it out ten times and
+disagree.
+
+So `generator` publishes the shapes: `envelope`, `lfo`, `filter_response` and
+`arpeggiator_gates` over a `&Program`, each returning a `Generator` the host
+samples with `at(t)`. Taking the program rather than loose bytes keeps the host
+out of deciding which parameters feed which picture, the same reason
+`Algorithm::slot_of` takes an `Engine` rather than a slot number.
+
+The line between shape and axis is where the rule above still applies. A shape
+is a fact: a triangle is a triangle, a four-pole filter falls 24 dB an octave
+(section 8.5.3), gate time 128 is half a step (8.1.6). An axis in seconds is
+not, because it is the unmeasured curve again. `Generator::scale` is what says
+which of the two a caller has:
+
+| | |
+|---|---|
+| `Scale::Normalised` | an ordering, nothing more — the envelopes |
+| `Scale::Turns(n)` | a cycle is a cycle, whatever the rate byte does |
+| `Scale::Octaves(n)` | the slope is published in dB per octave |
+| `Scale::Steps(n)` | the manual gives gate time as a fraction of a step |
+
+There is no `Seconds` and no `Hertz`, because not one generator here has one.
+The enum is `non_exhaustive` so that a measured curve can add them.
+
+Two shapes are this library's reading rather than a number off the page, and
+both say so where they are used: the envelope curve law, which the manual prints
+as five pictures and describes as "linear, exponential and reverse exponential",
+and the values `Sample & Hold` steps through, which are random on the instrument
+and fixed here so that a picture does not flicker.
+
+The maths is in `math`: `floor`, `exp2`, `log2` and `sin` are not in `core`, and
+a hundred lines of them costs less than a dependency an embedded build would
+have to carry. They are checked against `std` across the range the generators
+use.
+
+Nothing in `generator` renders, runs a clock or touches a sample buffer, for the
+reasons the effect panels give.
+
 ## State is a set of claims
 
 The synthesizer answers no per-parameter reads. Dumps can be requested; edits
