@@ -37,7 +37,10 @@ It also answers the questions an editor has to ask before it can draw anything:
 what the instrument prints over each of its own faders, where an effect's
 controls sit and what colour its panel is, how the four effect engines are
 wired, and which parameters are read about a centre rather than from the bottom
-of their range. The `descriptions` feature adds a sentence per parameter and per
+of their range. `generator` goes one step further and publishes the shapes a
+set of parameters makes — the envelope, the LFO wave, the filter response, the
+arpeggiator's gates — as functions a host samples into its own screen, saying
+in the type where an axis is published and where it is only an ordering. The `descriptions` feature adds a sentence per parameter and per
 effect slot saying what the control does; leaving it off keeps that prose out of
 an embedded build.
 

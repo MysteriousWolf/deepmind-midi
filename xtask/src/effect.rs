@@ -29,8 +29,8 @@ const HEADER: &str = "\
 //! fill, and everything that reads them, are in the parent module.
 
 use super::{
-    Algorithm, Align, Colour, Control, Engine, EngineParameters, FxSlot, Grid, Mode, Panel, Routing,
-    Row, Source,
+    Algorithm, Align, Colour, Control, Engine, EngineParameters, Family, FxSlot, Grid, Mark, Mode,
+    Panel, Pixels, Point, Quantity, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
 
@@ -49,11 +49,12 @@ pub fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     out.push_str(HEADER);
     render_counts(spec, &mut out);
     render_engines(spec, idents, &mut out)?;
-    render_algorithms(spec, &statics, &mut out);
+    render_algorithms(spec, &statics, &mut out)?;
     render_slots(spec, &statics, &mut out)?;
     render_grid(spec, &mut out);
     render_panels(spec, &statics, &mut out)?;
     render_routings(spec, &mut out)?;
+    render_marks(spec, &mut out)?;
     Ok(out)
 }
 
@@ -143,7 +144,11 @@ pub(super) static ENGINES: [EngineParameters; ENGINE_COUNT] = [
     Ok(())
 }
 
-fn render_algorithms(spec: &Spec, statics: &BTreeMap<u16, String>, out: &mut String) {
+fn render_algorithms(
+    spec: &Spec,
+    statics: &BTreeMap<u16, String>,
+    out: &mut String,
+) -> Result<(), String> {
     out.push_str(
         "\
 /// Every algorithm, in the order the newest firmware numbers them.
@@ -156,14 +161,22 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
             .iter()
             .find(|layout| layout.r#type == effect.r#type)
             .map_or("", |layout| layout.category.as_str());
+        // The spec loader has already checked every algorithm is in exactly one
+        // family, so the fallback here is unreachable rather than a default.
+        let family = spec
+            .families
+            .iter()
+            .find(|family| family.algorithms.iter().any(|a| a == &effect.name))
+            .map_or(Ok("Reverb"), |family| variant(&family.name))?;
         let name = statics.get(&effect.r#type).map_or("", String::as_str);
         let _ = writeln!(
             out,
-            "    Algorithm {{ index: {}, name: {:?}, full_name: {:?}, category: {category:?}, slots: &{name} }},",
+            "    Algorithm {{ index: {}, name: {:?}, full_name: {:?}, category: {category:?}, family: Family::{family}, slots: &{name} }},",
             effect.r#type, effect.name, effect.full_name,
         );
     }
     out.push_str("];\n\n");
+    Ok(())
 }
 
 /// Renders each algorithm's slots, including where the FX page draws them.
@@ -206,6 +219,8 @@ fn render_slots(
             let title = panel.map_or(parameter.name.as_str(), |slot| slot.title.as_str());
             let group = panel.and_then(|slot| slot.group.as_deref());
             let switch = panel.is_some_and(|slot| slot.kind == "switch");
+            let enable = panel.is_some_and(|slot| slot.enable);
+            let quantity = quantity(panel.map_or("shape", |slot| slot.quantity.as_str()))?;
             // The description is a field behind a `cfg`, not a table beside
             // the slots: with the feature off it is not in the struct at all,
             // so a build without it carries neither the prose nor a pointer to
@@ -216,7 +231,7 @@ fn render_slots(
             );
             let _ = writeln!(
                 out,
-                "    FxSlot {{ slot: {}, reference: {:?}, title: {title:?}, kind: {}, values: {}, unit: {}, min: {}, max: {}, group: {}, modulatable: {}, column: {column}, row: {row}, {description} }},",
+                "    FxSlot {{ slot: {}, reference: {:?}, title: {title:?}, kind: {}, values: {}, unit: {}, min: {}, max: {}, group: {}, modulatable: {}, enable: {enable}, quantity: {quantity}, column: {column}, row: {row}, {description} }},",
                 parameter.slot,
                 parameter.r#ref,
                 if switch {
@@ -495,6 +510,23 @@ fn colour(hex: &str) -> Result<String, String> {
     Ok(format!("Colour::new({})", parts.join(", ")))
 }
 
+/// Renders what a slot does to a signal.
+fn quantity(name: &str) -> Result<String, String> {
+    Ok(match name {
+        "time" => "Quantity::Time",
+        "frequency" => "Quantity::Frequency",
+        "gain" => "Quantity::Gain",
+        "feedback" => "Quantity::Feedback",
+        "depth" => "Quantity::Depth",
+        "position" => "Quantity::Position",
+        "shape" => "Quantity::Shape",
+        "switch" => "Quantity::Switch",
+        "selection" => "Quantity::Selection",
+        other => return Err(format!("panels.toml: unknown quantity {other:?}")),
+    }
+    .to_owned())
+}
+
 /// Renders what an effect's own editor panel draws for a sweeping parameter.
 fn control(name: &str) -> Result<String, String> {
     Ok(match name {
@@ -516,4 +548,182 @@ fn align(name: &str) -> Result<String, String> {
         other => return Err(format!("layout.toml: unknown alignment {other:?}")),
     }
     .to_owned())
+}
+
+/// Renders each family's strokes as a static the `MARKS` table points at.
+///
+/// Split out of [`render_marks`] so that neither is long enough to lose the
+/// reader: this one is the geometry, that one is the tables it goes into.
+///
+/// # Errors
+///
+/// As [`render_marks`], when a family's name makes no Rust variant.
+fn render_mark_strokes(spec: &Spec, out: &mut String) -> Result<(), String> {
+    for family in &spec.families {
+        let _ = writeln!(
+            out,
+            "/// {}\nstatic MARK_{}: [Stroke; {}] = [",
+            doc(&family.description),
+            variant(&family.name)?.to_ascii_uppercase(),
+            family.strokes.len(),
+        );
+        for stroke in &family.strokes {
+            match (&stroke.line, &stroke.arc) {
+                (Some(points), _) => {
+                    let points: Vec<String> = points
+                        .iter()
+                        .map(|&[x, y]| format!("Point::new({x:?}, {y:?})"))
+                        .collect();
+                    let _ = writeln!(
+                        out,
+                        "    Stroke::Line {{ points: &[{}] }},",
+                        points.join(", ")
+                    );
+                }
+                (_, Some(arc)) => {
+                    let _ = writeln!(
+                        out,
+                        "    Stroke::Arc {{ centre: Point::new({:?}, {:?}), radius: {:?}, start: {:?}, sweep: {:?} }},",
+                        arc.centre[0], arc.centre[1], arc.radius, arc.start, arc.sweep,
+                    );
+                }
+                (_, _) if stroke.wave.is_some() => {
+                    // Checked as present on the line above; the loader has
+                    // already rejected a stroke that is none of the four.
+                    if let Some(wave) = &stroke.wave {
+                        let _ = writeln!(
+                            out,
+                            "    Stroke::Wave {{ start: Point::new({:?}, {:?}), end: Point::new({:?}, {:?}), amplitude: {:?}, cycles: {:?} }},",
+                            wave.start[0],
+                            wave.start[1],
+                            wave.end[0],
+                            wave.end[1],
+                            wave.amplitude,
+                            wave.cycles,
+                        );
+                    }
+                }
+                (_, _) if stroke.dot.is_some() => {
+                    // Checked as present on the line above; the loader has
+                    // already rejected a stroke that is none of the three.
+                    if let Some(dot) = &stroke.dot {
+                        let _ = writeln!(
+                            out,
+                            "    Stroke::Dot {{ centre: Point::new({:?}, {:?}), radius: {:?} }},",
+                            dot.centre[0], dot.centre[1], dot.radius,
+                        );
+                    }
+                }
+                // Unreachable: the spec loader rejects a stroke that is neither.
+                (None, None) => {
+                    return Err(format!("marks.toml: {} has an empty stroke", family.name));
+                }
+            }
+        }
+        out.push_str("];\n\n");
+    }
+    Ok(())
+}
+
+/// Renders the mark each family is drawn with, as strokes in a unit box.
+///
+/// One table for the nine families rather than one per algorithm: every reverb
+/// is the same decaying tail, so the 35 algorithms reach nine marks. The
+/// per-algorithm half is the `family` field rendered beside each one.
+///
+/// # Errors
+///
+/// Returns a message when a family's name makes no Rust variant. The strokes
+/// themselves are checked when the spec loads, so by here every one of them is
+/// a polyline of at least two points or an arc with a radius and a sweep.
+fn render_marks(spec: &Spec, out: &mut String) -> Result<(), String> {
+    let _ = writeln!(
+        out,
+        "\
+/// Number of families the 35 algorithms fall into.
+pub const FAMILY_COUNT: usize = {};
+",
+        spec.families.len()
+    );
+
+    render_mark_strokes(spec, out)?;
+
+    let _ = writeln!(
+        out,
+        "\
+/// Side of the one-bit grid each family's mark is drawn again on.
+pub const MARK_PIXEL_SIDE: usize = {};
+",
+        spec.families
+            .first()
+            .map_or(0, |family| family.pixels.len())
+    );
+
+    out.push_str(
+        "\
+/// Each family's name, in the order `Family::ALL` gives them.
+pub(super) static FAMILY_NAMES: [&str; FAMILY_COUNT] = [
+",
+    );
+    for family in &spec.families {
+        let _ = writeln!(out, "    {:?},", family.name);
+    }
+    out.push_str("];\n\n");
+
+    out.push_str(
+        "\
+/// The mark for each family, in the order `Family::ALL` gives them.
+pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
+",
+    );
+    for family in &spec.families {
+        // A row of the grid is a bit per pixel, bit 0 leftmost, which is the
+        // order a host blitting left to right wants.
+        let rows: Vec<String> = family
+            .pixels
+            .iter()
+            .map(|row| {
+                let bits: u8 = row
+                    .chars()
+                    .enumerate()
+                    .filter(|&(_, pixel)| pixel == '#')
+                    .map(|(x, _)| 1_u8 << x)
+                    .sum();
+                // Grouped from the right, because a seven-digit binary
+                // literal without a separator is unreadable to clippy and to a
+                // reader. The picture is still legible in the bits, which is
+                // the whole reason these are binary and not hexadecimal.
+                format!("0b{:03b}_{:04b}", bits >> 4, bits & 0xf)
+            })
+            .collect();
+        let _ = writeln!(
+            out,
+            "    Mark {{ strokes: &MARK_{}, pixels: Pixels::new([{}]) }},",
+            variant(&family.name)?.to_ascii_uppercase(),
+            rows.join(", "),
+        );
+    }
+    out.push_str("];\n");
+    Ok(())
+}
+
+/// Returns a family's name as the `Family` variant of the same name.
+///
+/// The names in marks.toml are single words chosen to be variants, so this
+/// checks that they still are rather than transforming them. A name that is
+/// not is a codegen error here, rather than a generated file that does not
+/// compile with a message about the spec nowhere in it.
+fn variant(name: &str) -> Result<&str, String> {
+    let usable = name
+        .chars()
+        .next()
+        .is_some_and(|first| first.is_ascii_uppercase())
+        && name.chars().all(|c| c.is_ascii_alphanumeric());
+    if usable {
+        Ok(name)
+    } else {
+        Err(format!(
+            "marks.toml: family {name:?} is not one capitalised word, so it makes no Family variant"
+        ))
+    }
 }

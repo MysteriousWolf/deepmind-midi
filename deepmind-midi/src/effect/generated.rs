@@ -5,8 +5,8 @@
 //! fill, and everything that reads them, are in the parent module.
 
 use super::{
-    Algorithm, Align, Colour, Control, Engine, EngineParameters, FxSlot, Grid, Mode, Panel,
-    Routing, Row, Source,
+    Algorithm, Align, Colour, Control, Engine, EngineParameters, Family, FxSlot, Grid, Mark, Mode,
+    Panel, Pixels, Point, Quantity, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
 
@@ -109,6 +109,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "TC-DeepVRB",
         full_name: "TC Deep Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &TC_DEEP_VRB,
     },
     Algorithm {
@@ -116,6 +117,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "AmbVerb",
         full_name: "Ambient Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &AMB_VERB,
     },
     Algorithm {
@@ -123,6 +125,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "RoomRev",
         full_name: "Room Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &ROOM_REV,
     },
     Algorithm {
@@ -130,6 +133,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "VintageRev",
         full_name: "Vintage Room Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &VINTAGE_REV,
     },
     Algorithm {
@@ -137,6 +141,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "HallRev",
         full_name: "Hall Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &HALL_REV,
     },
     Algorithm {
@@ -144,6 +149,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "ChamberRev",
         full_name: "Chamber Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &CHAMBER_REV,
     },
     Algorithm {
@@ -151,6 +157,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "PlateRev",
         full_name: "Plate Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &PLATE_REV,
     },
     Algorithm {
@@ -158,6 +165,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "RichPltRev",
         full_name: "Rich Plate Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &RICH_PLT_REV,
     },
     Algorithm {
@@ -165,6 +173,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "GatedRev",
         full_name: "Gated Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &GATED_REV,
     },
     Algorithm {
@@ -172,6 +181,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Reverse",
         full_name: "Reverse Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &REVERSE,
     },
     Algorithm {
@@ -179,6 +189,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "ChorusVerb",
         full_name: "Chorus and Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &CHORUS_VERB,
     },
     Algorithm {
@@ -186,6 +197,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "DelayVerb",
         full_name: "Delay and Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &DELAY_VERB,
     },
     Algorithm {
@@ -193,6 +205,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "FlangVerb",
         full_name: "Flanger and Reverb",
         category: "Reverb",
+        family: Family::Reverb,
         slots: &FLANG_VERB,
     },
     Algorithm {
@@ -200,6 +213,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "MidasEQ",
         full_name: "Midas Equaliser",
         category: "Processing",
+        family: Family::Filter,
         slots: &MIDAS_EQ,
     },
     Algorithm {
@@ -207,6 +221,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Enhancer",
         full_name: "Enhancing EQ",
         category: "Processing",
+        family: Family::Filter,
         slots: &ENHANCER,
     },
     Algorithm {
@@ -214,6 +229,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "FairComp",
         full_name: "Compressor",
         category: "Processing",
+        family: Family::Dynamics,
         slots: &FAIR_COMP,
     },
     Algorithm {
@@ -221,6 +237,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "MulBndDist",
         full_name: "Multiband Distortion",
         category: "Processing",
+        family: Family::Distortion,
         slots: &MUL_BND_DIST,
     },
     Algorithm {
@@ -228,6 +245,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "RackAmp",
         full_name: "Rack Amplifier",
         category: "Processing",
+        family: Family::Distortion,
         slots: &RACK_AMP,
     },
     Algorithm {
@@ -235,6 +253,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "EdisonEX1",
         full_name: "Stereo Imaging",
         category: "Processing",
+        family: Family::Imaging,
         slots: &EDISON_EX1,
     },
     Algorithm {
@@ -242,6 +261,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Auto Pan",
         full_name: "Auto Panning",
         category: "Processing",
+        family: Family::Imaging,
         slots: &AUTO_PAN,
     },
     Algorithm {
@@ -249,6 +269,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "NoiseGate",
         full_name: "Noise Gate",
         category: "Processing",
+        family: Family::Dynamics,
         slots: &NOISE_GATE,
     },
     Algorithm {
@@ -256,6 +277,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Delay",
         full_name: "Stereo Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &DELAY,
     },
     Algorithm {
@@ -263,6 +285,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "3TapDelay",
         full_name: "3-Tap Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &THREE_TAP_DELAY,
     },
     Algorithm {
@@ -270,6 +293,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "4TapDelay",
         full_name: "4-Tap Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &FOUR_TAP_DELAY,
     },
     Algorithm {
@@ -277,6 +301,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "T-RayDelay",
         full_name: "Tel-Ray Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &T_RAY_DELAY,
     },
     Algorithm {
@@ -284,6 +309,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "DecimDelay",
         full_name: "Decimator Delay",
         category: "Delay",
+        family: Family::Delay,
         slots: &DECIM_DELAY,
     },
     Algorithm {
@@ -291,6 +317,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "ModDlyRev",
         full_name: "Modulation, Delay and Reverb",
         category: "Delay",
+        family: Family::Delay,
         slots: &MOD_DLY_REV,
     },
     Algorithm {
@@ -298,6 +325,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Chorus",
         full_name: "Stereo Chorus",
         category: "Creative",
+        family: Family::Modulation,
         slots: &CHORUS,
     },
     Algorithm {
@@ -305,6 +333,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Chorus-D",
         full_name: "Dimensional Chorus",
         category: "Creative",
+        family: Family::Modulation,
         slots: &CHORUS_D,
     },
     Algorithm {
@@ -312,6 +341,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Flanger",
         full_name: "Stereo Flanger",
         category: "Creative",
+        family: Family::Modulation,
         slots: &FLANGER,
     },
     Algorithm {
@@ -319,6 +349,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Phaser",
         full_name: "Stereo Phaser",
         category: "Creative",
+        family: Family::Modulation,
         slots: &PHASER,
     },
     Algorithm {
@@ -326,6 +357,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "MoodFilter",
         full_name: "Moog-Type Filter",
         category: "Creative",
+        family: Family::Filter,
         slots: &MOOD_FILTER,
     },
     Algorithm {
@@ -333,6 +365,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "DualPitch",
         full_name: "Dual Pitch Shifter",
         category: "Creative",
+        family: Family::Pitch,
         slots: &DUAL_PITCH,
     },
     Algorithm {
@@ -340,6 +373,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "Vintage Pitch",
         full_name: "Dual Pitch Shifter",
         category: "Creative",
+        family: Family::Pitch,
         slots: &VINTAGE_PITCH,
     },
     Algorithm {
@@ -347,6 +381,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         name: "RotarySpkr",
         full_name: "Rotary Speaker",
         category: "Creative",
+        family: Family::Rotary,
         slots: &ROTARY_SPKR,
     },
 ];
@@ -376,6 +411,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -392,6 +429,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: Some("6.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -410,6 +449,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -428,6 +469,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -446,6 +489,8 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -468,6 +513,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -486,6 +533,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("7.3"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -502,6 +551,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -518,6 +569,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -534,6 +587,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("30.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -550,6 +605,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -568,6 +625,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -584,6 +643,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -600,6 +661,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -616,6 +679,8 @@ static AMB_VERB: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -636,6 +701,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -654,6 +721,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("28.9"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -670,6 +739,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("76.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -686,6 +757,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -702,6 +775,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -718,6 +793,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -736,6 +813,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -752,6 +831,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -768,6 +849,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -784,6 +867,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -800,6 +885,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("250.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -816,6 +903,8 @@ static ROOM_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -836,6 +925,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -854,6 +945,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -872,6 +965,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("20.7"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -890,6 +985,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -906,6 +1003,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -922,6 +1021,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -938,6 +1039,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -954,6 +1057,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -970,6 +1075,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -986,6 +1093,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1002,6 +1111,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1020,6 +1131,8 @@ static VINTAGE_REV: [FxSlot; 12] = [
         max: Some("ON"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Switch,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1040,6 +1153,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1058,6 +1173,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("4.9"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1074,6 +1191,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1090,6 +1209,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1106,6 +1227,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("30.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1122,6 +1245,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1140,6 +1265,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1156,6 +1283,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1172,6 +1301,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("2.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1188,6 +1319,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1204,6 +1337,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("250.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1220,6 +1355,8 @@ static HALL_REV: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1240,6 +1377,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1258,6 +1397,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("28.9"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1274,6 +1415,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("76.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1290,6 +1433,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1306,6 +1451,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1322,6 +1469,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1340,6 +1489,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1356,6 +1507,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1372,6 +1525,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1388,6 +1543,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1404,6 +1561,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("250.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1420,6 +1579,8 @@ static CHAMBER_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1440,6 +1601,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1458,6 +1621,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1474,6 +1639,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1490,6 +1657,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1506,6 +1675,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("30.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1522,6 +1693,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1540,6 +1713,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1556,6 +1731,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1572,6 +1749,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("2.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1588,6 +1767,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1604,6 +1785,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1620,6 +1803,8 @@ static PLATE_REV: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1640,6 +1825,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1658,6 +1845,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("28.9"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1674,6 +1863,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("39.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1690,6 +1881,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1706,6 +1899,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1722,6 +1917,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1740,6 +1937,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1756,6 +1955,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1772,6 +1973,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1788,6 +1991,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1804,6 +2009,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1820,6 +2027,8 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1840,6 +2049,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1858,6 +2069,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("1000.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1874,6 +2087,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("30.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1890,6 +2105,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1906,6 +2123,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1922,6 +2141,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1940,6 +2161,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1956,6 +2179,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1974,6 +2199,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("0.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1992,6 +2219,8 @@ static GATED_REV: [FxSlot; 10] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2012,6 +2241,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2030,6 +2261,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("1000.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2046,6 +2279,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2062,6 +2297,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("30.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2078,6 +2315,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2096,6 +2335,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2114,6 +2355,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2130,6 +2373,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2148,6 +2393,8 @@ static REVERSE: [FxSlot; 9] = [
         max: Some("0.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2170,6 +2417,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2188,6 +2437,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2204,6 +2455,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2220,6 +2473,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("180.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2236,6 +2491,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2252,6 +2509,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2268,6 +2527,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2286,6 +2547,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("5.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2302,6 +2565,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2318,6 +2583,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2334,6 +2601,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2350,6 +2619,8 @@ static CHORUS_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2372,6 +2643,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2390,6 +2663,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2406,6 +2681,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2422,6 +2699,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2438,6 +2717,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2454,6 +2735,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2470,6 +2753,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2488,6 +2773,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("5.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2504,6 +2791,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2520,6 +2809,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2536,6 +2827,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2552,6 +2845,8 @@ static DELAY_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2574,6 +2869,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2592,6 +2889,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2608,6 +2907,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("20.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2624,6 +2925,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("180.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2640,6 +2943,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("90.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2656,6 +2961,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2672,6 +2979,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2690,6 +2999,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("5.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2706,6 +3017,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("200.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2722,6 +3035,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2738,6 +3053,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2754,6 +3071,8 @@ static FLANG_VERB: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2776,6 +3095,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("12.0"),
         group: Some("low"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2792,6 +3113,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: Some("low"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2808,6 +3131,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("12.0"),
         group: Some("low-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2824,6 +3149,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: Some("low-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2840,6 +3167,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("5.0"),
         group: Some("low-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2856,6 +3185,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("12.0"),
         group: Some("high-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2872,6 +3203,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: Some("high-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2888,6 +3221,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("5.0"),
         group: Some("high-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2904,6 +3239,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("12.0"),
         group: Some("high"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2920,6 +3257,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: Some("high"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2936,6 +3275,8 @@ static MIDAS_EQ: [FxSlot; 11] = [
         max: None,
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2956,6 +3297,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("12.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2972,6 +3315,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2988,6 +3333,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("100"),
         group: Some("low"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3004,6 +3351,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("50.0"),
         group: Some("low"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3020,6 +3369,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("100"),
         group: Some("mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3036,6 +3387,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("50.0"),
         group: Some("mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3052,6 +3405,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("100"),
         group: Some("high"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3068,6 +3423,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: Some("50.0"),
         group: Some("high"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3084,6 +3441,8 @@ static ENHANCER: [FxSlot; 9] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Switch,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3104,6 +3463,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3120,6 +3481,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("0.0"),
         group: Some("left-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3136,6 +3499,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("10.0"),
         group: Some("left-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3152,6 +3517,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("6.0"),
         group: Some("left-mid"),
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3168,6 +3535,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("left-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3186,6 +3555,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("6.0"),
         group: Some("left-mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3202,6 +3573,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3218,6 +3591,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("0.0"),
         group: Some("right-side"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3234,6 +3609,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("10.0"),
         group: Some("right-side"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3250,6 +3627,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("6.0"),
         group: Some("right-side"),
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3266,6 +3645,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("right-side"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3284,6 +3665,8 @@ static FAIR_COMP: [FxSlot; 12] = [
         max: Some("6.0"),
         group: Some("right-side"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3304,6 +3687,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("24.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3320,6 +3705,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3338,6 +3725,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("low"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3354,6 +3743,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("low"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3370,6 +3761,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("9000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3386,6 +3779,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3404,6 +3799,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("mid"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3422,6 +3819,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("9000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3438,6 +3837,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("high"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3454,6 +3855,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("high"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3472,6 +3875,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3490,6 +3895,8 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         max: Some("12.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3510,6 +3917,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3528,6 +3937,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3544,6 +3955,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3560,6 +3973,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3578,6 +3993,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3594,6 +4011,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3610,6 +4029,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3628,6 +4049,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3646,6 +4069,8 @@ static RACK_AMP: [FxSlot; 9] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3666,6 +4091,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        enable: true,
+        quantity: Quantity::Switch,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3682,6 +4109,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3698,6 +4127,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3714,6 +4145,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3730,6 +4163,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3746,6 +4181,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3762,6 +4199,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3778,6 +4217,8 @@ static EDISON_EX1: [FxSlot; 8] = [
         max: Some("12.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3798,6 +4239,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("5.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3814,6 +4257,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("180.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3830,6 +4275,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("50.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3846,6 +4293,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3862,6 +4311,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3878,6 +4329,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3894,6 +4347,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("1000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3910,6 +4365,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("2000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3926,6 +4383,8 @@ static AUTO_PAN: [FxSlot; 9] = [
         max: Some("1000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3946,6 +4405,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("0.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3962,6 +4423,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("0.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3980,6 +4443,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("20.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3996,6 +4461,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("1999.9"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4014,6 +4481,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("1999.9"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4030,6 +4499,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: Some("6.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4048,6 +4519,8 @@ static NOISE_GATE: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4057,13 +4530,15 @@ static NOISE_GATE: [FxSlot; 8] = [
         slot: 8,
         reference: "PWR",
         title: "Power",
-        kind: Kind::Continuous,
+        kind: Kind::Switch,
         values: &[],
         unit: None,
         min: Some("ON"),
         max: Some("OFF"),
         group: None,
         modulatable: false,
+        enable: true,
+        quantity: Quantity::Switch,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4084,6 +4559,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4102,6 +4579,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4120,6 +4599,8 @@ static DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4140,6 +4621,8 @@ static DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4158,6 +4641,8 @@ static DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4174,6 +4659,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4190,6 +4677,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4208,6 +4697,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4226,6 +4717,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4242,6 +4735,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4258,6 +4753,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4274,6 +4771,8 @@ static DELAY: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4294,6 +4793,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4312,6 +4813,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4328,6 +4831,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4344,6 +4849,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4362,6 +4869,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4378,6 +4887,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4394,6 +4905,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4412,6 +4925,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4428,6 +4943,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4444,6 +4961,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4460,6 +4979,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4476,6 +4997,8 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4498,6 +5021,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4516,6 +5041,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4532,6 +5059,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4548,6 +5077,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("6.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4566,6 +5097,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4582,6 +5115,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4600,6 +5135,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4616,6 +5153,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4634,6 +5173,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4650,6 +5191,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4666,6 +5209,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("1.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4682,6 +5227,8 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4704,6 +5251,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4722,6 +5271,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4738,6 +5289,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4756,6 +5309,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4774,6 +5329,8 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4794,6 +5351,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4812,6 +5371,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4830,6 +5391,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4848,6 +5411,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4866,6 +5431,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4882,6 +5449,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("1"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4898,6 +5467,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4916,6 +5487,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4932,6 +5505,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4948,6 +5523,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4964,6 +5541,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: Some("100.00"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4980,6 +5559,8 @@ static DECIM_DELAY: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5002,6 +5583,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("1500.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5022,6 +5605,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5038,6 +5623,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5054,6 +5641,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5070,6 +5659,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5086,6 +5677,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5104,6 +5697,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5120,6 +5715,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5136,6 +5733,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("10.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5152,6 +5751,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("20000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5168,6 +5769,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5184,6 +5787,8 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5206,6 +5811,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("5"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5224,6 +5831,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5240,6 +5849,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5256,6 +5867,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5272,6 +5885,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5288,6 +5903,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5306,6 +5923,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5322,6 +5941,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5338,6 +5959,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5354,6 +5977,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5372,6 +5997,8 @@ static CHORUS: [FxSlot; 11] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5394,6 +6021,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        enable: true,
+        quantity: Quantity::Switch,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5410,6 +6039,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5426,6 +6057,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5444,6 +6077,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: Some("channel-1"),
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Switch,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5460,6 +6095,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: Some("channel-2"),
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Switch,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5476,6 +6113,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Switch,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5492,6 +6131,8 @@ static CHORUS_D: [FxSlot; 7] = [
         max: Some("ON"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Switch,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5512,6 +6153,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("5"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5530,6 +6173,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5546,6 +6191,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5562,6 +6209,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("20.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5578,6 +6227,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("20.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5594,6 +6245,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5612,6 +6265,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5628,6 +6283,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5644,6 +6301,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("180.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5660,6 +6319,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5676,6 +6337,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5692,6 +6355,8 @@ static FLANGER: [FxSlot; 12] = [
         max: Some("90.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5712,6 +6377,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("5"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5730,6 +6397,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5746,6 +6415,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5762,6 +6433,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("15000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5778,6 +6451,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("12.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5794,6 +6469,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5812,6 +6489,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("50.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5828,6 +6507,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("180.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Position,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5844,6 +6525,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5860,6 +6543,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("1000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5876,6 +6561,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("2000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5892,6 +6579,8 @@ static PHASER: [FxSlot; 12] = [
         max: Some("1000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5912,6 +6601,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("20.0"),
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5930,6 +6621,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5946,6 +6639,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Shape,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5962,6 +6657,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("15000"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5978,6 +6675,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5996,6 +6695,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6016,6 +6717,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Selection,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6034,6 +6737,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6050,6 +6755,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("249.9"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6066,6 +6773,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("500.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6082,6 +6791,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6098,6 +6809,8 @@ static MOOD_FILTER: [FxSlot; 12] = [
         max: None,
         group: None,
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Switch,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6118,6 +6831,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("channel-1"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6134,6 +6849,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("50.0"),
         group: Some("channel-1"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6150,6 +6867,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("500.0"),
         group: Some("channel-1"),
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6168,6 +6887,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-1"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6184,6 +6905,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-1"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6200,6 +6923,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6218,6 +6943,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("channel-2"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6234,6 +6961,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("50.0"),
         group: Some("channel-2"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6250,6 +6979,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("500.0"),
         group: Some("channel-2"),
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6268,6 +6999,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-2"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Gain,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6284,6 +7017,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-2"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6300,6 +7035,8 @@ static DUAL_PITCH: [FxSlot; 12] = [
         max: Some("20000.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6322,6 +7059,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("channel-1"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6338,6 +7077,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("50.0"),
         group: Some("channel-1"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6354,6 +7095,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("500.0"),
         group: Some("channel-1"),
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6372,6 +7115,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-1"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6388,6 +7133,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-1"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6404,6 +7151,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6422,6 +7171,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("12.0"),
         group: Some("channel-2"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6438,6 +7189,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("50.0"),
         group: Some("channel-2"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6454,6 +7207,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("500.0"),
         group: Some("channel-2"),
         modulatable: false,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6472,6 +7227,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-2"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Feedback,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6488,6 +7245,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("100"),
         group: Some("channel-2"),
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6504,6 +7263,8 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         max: Some("20000 k"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6526,6 +7287,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("4.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6542,6 +7305,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("9.9"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6560,6 +7325,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6578,6 +7345,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6596,6 +7365,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("100.0"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Position,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6614,6 +7385,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: Some("100"),
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6632,6 +7405,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Switch,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6648,6 +7423,8 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         max: None,
         group: None,
         modulatable: true,
+        enable: false,
+        quantity: Quantity::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7538,5 +8315,193 @@ pub(super) static MODES: [Mode; MODE_COUNT] = [
         name: "Bypass",
         analog_path: true,
         digital_path: false,
+    },
+];
+/// Number of families the 35 algorithms fall into.
+pub const FAMILY_COUNT: usize = 9;
+
+/// One arrival and the room answering it, as a source with two wavefronts leaving.
+static MARK_REVERB: [Stroke; 3] = [
+    Stroke::Dot {
+        centre: Point::new(0.15, 0.5),
+        radius: 0.06,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.3,
+        start: -0.15,
+        sweep: 0.3,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.62,
+        start: -0.11,
+        sweep: 0.22,
+    },
+];
+
+/// The same sound three times and quieter each time, as three falling marks.
+static MARK_DELAY: [Stroke; 3] = [
+    Stroke::Line {
+        points: &[Point::new(0.14, 0.12), Point::new(0.14, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.5, 0.4), Point::new(0.5, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.86, 0.66), Point::new(0.86, 0.88)],
+    },
+];
+
+/// The wave that does the sweeping, one cycle of it.
+static MARK_MODULATION: [Stroke; 1] = [Stroke::Wave {
+    start: Point::new(0.08, 0.5),
+    end: Point::new(0.92, 0.5),
+    amplitude: 0.36,
+    cycles: 1.0,
+}];
+
+/// A corner: level up to a point, and falling away after it.
+static MARK_FILTER: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.24),
+        Point::new(0.46, 0.24),
+        Point::new(0.92, 0.82),
+    ],
+}];
+
+/// A level held between a ceiling and a floor, and the room left between them.
+static MARK_DYNAMICS: [Stroke; 3] = [
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.12), Point::new(0.92, 0.12)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.88), Point::new(0.92, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.5, 0.34), Point::new(0.5, 0.66)],
+    },
+];
+
+/// A wave with the curve driven out of it: two levels and hard corners.
+static MARK_DISTORTION: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.82),
+        Point::new(0.24, 0.82),
+        Point::new(0.24, 0.18),
+        Point::new(0.54, 0.18),
+        Point::new(0.54, 0.82),
+        Point::new(0.92, 0.82),
+    ],
+}];
+
+/// A width, measured: a span with a mark at each end of it.
+static MARK_IMAGING: [Stroke; 3] = [
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.5), Point::new(0.92, 0.5)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.28), Point::new(0.08, 0.72)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.92, 0.28), Point::new(0.92, 0.72)],
+    },
+];
+
+/// A step to another pitch and held there: one level, a riser, another level.
+static MARK_PITCH: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.74),
+        Point::new(0.5, 0.74),
+        Point::new(0.5, 0.26),
+        Point::new(0.92, 0.26),
+    ],
+}];
+
+/// A driver going round: a ring with its centre marked.
+static MARK_ROTARY: [Stroke; 2] = [
+    Stroke::Arc {
+        centre: Point::new(0.5, 0.5),
+        radius: 0.38,
+        start: 0.0,
+        sweep: 1.0,
+    },
+    Stroke::Dot {
+        centre: Point::new(0.5, 0.5),
+        radius: 0.07,
+    },
+];
+
+/// Side of the one-bit grid each family's mark is drawn again on.
+pub const MARK_PIXEL_SIDE: usize = 7;
+
+/// Each family's name, in the order `Family::ALL` gives them.
+pub(super) static FAMILY_NAMES: [&str; FAMILY_COUNT] = [
+    "Reverb",
+    "Delay",
+    "Modulation",
+    "Filter",
+    "Dynamics",
+    "Distortion",
+    "Imaging",
+    "Pitch",
+    "Rotary",
+];
+
+/// The mark for each family, in the order `Family::ALL` gives them.
+pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
+    Mark {
+        strokes: &MARK_REVERB,
+        pixels: Pixels::new([
+            0b000_0000, 0b001_0100, 0b010_1000, 0b010_1001, 0b010_1000, 0b001_0100, 0b000_0000,
+        ]),
+    },
+    Mark {
+        strokes: &MARK_DELAY,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0001, 0b000_0001, 0b000_1001, 0b000_1001, 0b100_1001, 0b100_1001,
+        ]),
+    },
+    Mark {
+        strokes: &MARK_MODULATION,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0110, 0b000_1001, 0b100_1001, 0b100_1000, 0b011_0000, 0b000_0000,
+        ]),
+    },
+    Mark {
+        strokes: &MARK_FILTER,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_1111, 0b001_0000, 0b010_0000, 0b100_0000, 0b000_0000, 0b000_0000,
+        ]),
+    },
+    Mark {
+        strokes: &MARK_DYNAMICS,
+        pixels: Pixels::new([
+            0b111_1111, 0b000_0000, 0b000_1000, 0b000_1000, 0b000_1000, 0b000_0000, 0b111_1111,
+        ]),
+    },
+    Mark {
+        strokes: &MARK_DISTORTION,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_1110, 0b000_1010, 0b000_1010, 0b000_1010, 0b111_1011, 0b000_0000,
+        ]),
+    },
+    Mark {
+        strokes: &MARK_IMAGING,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0000, 0b100_0001, 0b111_1111, 0b100_0001, 0b000_0000, 0b000_0000,
+        ]),
+    },
+    Mark {
+        strokes: &MARK_PITCH,
+        pixels: Pixels::new([
+            0b000_0000, 0b111_1000, 0b000_1000, 0b000_1000, 0b000_1111, 0b000_0000, 0b000_0000,
+        ]),
+    },
+    Mark {
+        strokes: &MARK_ROTARY,
+        pixels: Pixels::new([
+            0b001_1100, 0b010_0010, 0b100_0001, 0b100_1001, 0b100_0001, 0b010_0010, 0b001_1100,
+        ]),
     },
 ];

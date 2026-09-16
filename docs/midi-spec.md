@@ -1541,6 +1541,8 @@ The Moves column joins each destination to the program parameters it reaches, so
 
 Firmware 1.1+.
 
+Every value is an effect. The instrument has no slot-level off: section 7.2.4 of the manual, "To load an effect into a slot ... select from one of the following effects", lists exactly these 35 and no Off, None or Thru entry, and the effects table in section 9.1 gives the same 35. `FX n Type` is declared 0-34 to match. What takes effects out of circuit is `FX Mode = Bypass`, and that is the whole block of four rather than one engine. Three algorithms carry their own bypass inside their twelve bytes instead, which panels.toml marks as `enable`.
+
 | Value | Name | Notes |
 |---|---|---|
 | 0 | TC-DeepVRB | TC Deep Reverb (Reverb) |
@@ -1728,7 +1730,7 @@ Value 0 selects Off. Derived from the firmware 1.1 table by the renumbering rule
 
 Firmware 1.0.
 
-Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual.
+Derived from the firmware 1.1 table by the renumbering rule the manual states, not transcribed from a firmware 1.0 manual. Every value is an effect here too; see the firmware 1.1 table for why there is no slot-level off.
 
 > Unconfirmed. This mapping is inferred and needs checking against hardware.
 

@@ -91,6 +91,12 @@ pub fn all(spec: &Spec) -> Result<Vec<Diagram>, String> {
             kind: Kind::Svg,
             source: envelope(),
         },
+        Diagram {
+            id: "marks",
+            title: "Effect family marks",
+            kind: Kind::Svg,
+            source: marks(spec),
+        },
     ])
 }
 
@@ -377,4 +383,194 @@ fn envelope_legend(out: &mut String, p: &EnvelopePlot) {
             y + 2.5,
         );
     }
+}
+
+/// The nine family marks, each drawn both ways at the sizes they are for.
+///
+/// A proof rather than an illustration. The strokes drawn here are the ones the
+/// library publishes, straight out of `spec/marks.toml` with nothing added, and
+/// the pixel grids below them are the same bits a host blits. A mark that reads
+/// badly here reads badly in a host too, which is how three of these came to be
+/// redrawn.
+fn marks(spec: &Spec) -> String {
+    /// Side of the large stroked mark, in the SVG's own units.
+    const LARGE: f32 = 54.0;
+    /// Side of the small stroked mark, about what a panel header gives one.
+    const SMALL: f32 = 16.0;
+    /// Side of a pixel in the magnified grid.
+    const PIXEL: f32 = 6.0;
+    /// Space around each column.
+    const PAD: f32 = 16.0;
+
+    let side = count(
+        spec.families
+            .first()
+            .map_or(0, |family| family.pixels.len()),
+    );
+    let grid = side * PIXEL;
+    let column = LARGE.max(grid);
+    let pitch = column + PAD;
+    let width = pitch * count(spec.families.len()) + PAD;
+
+    let stroked_top = PAD;
+    let small_top = stroked_top + LARGE + 10.0;
+    let grid_top = small_top + SMALL + 14.0;
+    let true_top = grid_top + grid + 10.0;
+    let label_top = true_top + side + 14.0;
+    let height = label_top + PAD;
+
+    let mut out = format!(
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width} {height}\" \
+         width=\"{width}\" height=\"{height}\" role=\"img\" \
+         aria-label=\"The nine effect family marks, as strokes and as pixels\">\n\
+         <style>\n\
+         .mark {{ fill: none; stroke: #2b2f38; stroke-width: 2; stroke-linecap: round; \
+         stroke-linejoin: round; }}\n\
+         .mark .dot {{ fill: #2b2f38; stroke: none; }}\n\
+         .small {{ stroke-width: 1.4; }}\n\
+         .lit {{ fill: #2b2f38; }}\n\
+         .unlit {{ fill: #e7e9ed; }}\n\
+         .name {{ font: 500 9px system-ui, sans-serif; fill: #6b7280; text-anchor: middle; }}\n\
+         @media (prefers-color-scheme: dark) {{\n\
+         .mark {{ stroke: #d8dbe2; }}\n\
+         .mark .dot {{ fill: #d8dbe2; }}\n\
+         .lit {{ fill: #d8dbe2; }}\n\
+         .unlit {{ fill: #31353d; }}\n\
+         .name {{ fill: #9aa2b1; }}\n\
+         }}\n\
+         </style>\n"
+    );
+
+    for (index, family) in spec.families.iter().enumerate() {
+        let left = PAD + pitch * count(index);
+        let centre = left + column / 2.0;
+
+        let _ = write!(
+            out,
+            "  <g class=\"mark\">\n{}  </g>\n",
+            draw_mark(family, centre - LARGE / 2.0, stroked_top, LARGE)
+        );
+        let _ = write!(
+            out,
+            "  <g class=\"mark small\">\n{}  </g>\n",
+            draw_mark(family, centre - SMALL / 2.0, small_top, SMALL)
+        );
+
+        // The grid magnified, so the placement can be read, and again at one
+        // pixel per pixel, which is the size it is actually for.
+        let grid_left = centre - grid / 2.0;
+        for (y, row) in family.pixels.iter().enumerate() {
+            for (x, pixel) in row.chars().enumerate() {
+                let class = if pixel == '#' { "lit" } else { "unlit" };
+                let _ = writeln!(
+                    out,
+                    "  <rect class=\"{class}\" x=\"{:.1}\" y=\"{:.1}\" \
+                     width=\"{:.1}\" height=\"{:.1}\" />",
+                    grid_left + count(x) * PIXEL,
+                    grid_top + count(y) * PIXEL,
+                    PIXEL - 1.0,
+                    PIXEL - 1.0,
+                );
+                if pixel == '#' {
+                    let _ = writeln!(
+                        out,
+                        "  <rect class=\"lit\" x=\"{:.1}\" y=\"{:.1}\" width=\"1\" \
+                         height=\"1\" />",
+                        centre - side / 2.0 + count(x),
+                        true_top + count(y),
+                    );
+                }
+            }
+        }
+
+        let _ = writeln!(
+            out,
+            "  <text class=\"name\" x=\"{centre:.1}\" y=\"{label_top:.1}\">{}</text>",
+            family.name,
+        );
+    }
+    out.push_str("</svg>\n");
+    out
+}
+
+/// Returns a count as a length. The counts here are families, pixels and
+/// columns, so a byte holds every value one can take.
+fn count(of: usize) -> f32 {
+    f32::from(u8::try_from(of).unwrap_or(u8::MAX))
+}
+
+/// Draws one mark's strokes, scaling the unit box to `side` at `(left, top)`.
+fn draw_mark(family: &crate::spec::Family, left: f32, top: f32, side: f32) -> String {
+    let at = |x: f32, y: f32| (left + x * side, top + y * side);
+    let mut out = String::new();
+    for stroke in &family.strokes {
+        if let Some(points) = &stroke.line {
+            let drawn: Vec<String> = points
+                .iter()
+                .map(|&[x, y]| {
+                    let (x, y) = at(x, y);
+                    format!("{x:.2},{y:.2}")
+                })
+                .collect();
+            let _ = writeln!(out, "    <polyline points=\"{}\" />", drawn.join(" "));
+        } else if let Some(wave) = &stroke.wave {
+            // Sampled, because that is what the published curve is for. The
+            // count is this drawing's business and nobody else's: enough that
+            // the segments are shorter than a stroke width at the size drawn.
+            // A step count, not a step size, so that the same curve is drawn
+            // at whatever resolution this size deserves. Kept in a byte so
+            // there is no cast between a count and a length.
+            let samples: u8 = if side > 32.0 { 192 } else { 64 };
+            let (dx, dy) = (wave.end[0] - wave.start[0], wave.end[1] - wave.start[1]);
+            let length = dx.hypot(dy).max(f32::EPSILON);
+            let (nx, ny) = (dy / length, -dx / length);
+            let drawn: Vec<String> = (0..=samples)
+                .map(|step| {
+                    let u = f32::from(step) / f32::from(samples);
+                    let offset = wave.amplitude * (u * wave.cycles * core::f32::consts::TAU).sin();
+                    let (x, y) = at(
+                        wave.start[0] + dx * u + nx * offset,
+                        wave.start[1] + dy * u + ny * offset,
+                    );
+                    format!("{x:.2},{y:.2}")
+                })
+                .collect();
+            let _ = writeln!(out, "    <polyline points=\"{}\" />", drawn.join(" "));
+        } else if let Some(dot) = &stroke.dot {
+            let (cx, cy) = at(dot.centre[0], dot.centre[1]);
+            let _ = writeln!(
+                out,
+                "    <circle class=\"dot\" cx=\"{cx:.2}\" cy=\"{cy:.2}\" r=\"{:.2}\" />",
+                dot.radius * side,
+            );
+        } else if let Some(arc) = &stroke.arc {
+            let (cx, cy) = at(arc.centre[0], arc.centre[1]);
+            let radius = arc.radius * side;
+            // Turns clockwise from three o'clock, in a box with y downward, so
+            // the angle goes straight into cos/sin with no sign to flip.
+            let point = |turns: f32| {
+                let radians = turns * core::f32::consts::TAU;
+                (cx + radius * radians.cos(), cy + radius * radians.sin())
+            };
+            // A whole turn has the same two endpoints, which an arc command
+            // cannot draw; a circle is what it means.
+            if arc.sweep.abs() >= 1.0 {
+                let _ = writeln!(
+                    out,
+                    "    <circle cx=\"{cx:.2}\" cy=\"{cy:.2}\" r=\"{radius:.2}\" />"
+                );
+                continue;
+            }
+            let (x0, y0) = point(arc.start);
+            let (x1, y1) = point(arc.start + arc.sweep);
+            let large = u8::from(arc.sweep.abs() > 0.5);
+            let sweep = u8::from(arc.sweep > 0.0);
+            let _ = writeln!(
+                out,
+                "    <path d=\"M {x0:.2} {y0:.2} A {radius:.2} {radius:.2} 0 {large} {sweep} \
+                 {x1:.2} {y1:.2}\" />"
+            );
+        }
+    }
+    out
 }

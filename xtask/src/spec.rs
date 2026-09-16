@@ -4,6 +4,7 @@
 //! generated from them, and the parameter tables the library will use are
 //! generated from the same data, so a correction only ever has to be made once.
 
+use std::collections::BTreeMap;
 use std::path::Path;
 
 use serde::Deserialize;
@@ -268,12 +269,24 @@ pub struct PanelSlot {
     pub title: String,
     /// `continuous`, `switch` or `selector`.
     pub kind: String,
+    /// What the slot does to a signal, as against what it is called.
+    ///
+    /// One of `meta.quantities`. A different question from `kind`, which is
+    /// what control to draw: a delay's `Factor` is drawn as a selector and is a
+    /// time.
+    pub quantity: String,
     /// Slots sharing a label belong together, such as one side of a dual engine.
     #[serde(default)]
     pub group: Option<String>,
     /// `true` when the engine acts on modulation reaching this slot.
     #[serde(default)]
     pub modulatable: bool,
+    /// `true` when this switch takes the whole effect out of circuit.
+    ///
+    /// Three of the 35 have one, which is the only slot-level off the
+    /// instrument has; see the note on the `fx_type` table in `enums.toml`.
+    #[serde(default)]
+    pub enable: bool,
 }
 
 /// The grid the synthesizer draws its FX page on, in display pixels.
@@ -343,6 +356,301 @@ pub struct Layout {
     pub accent: String,
     /// The rows, in the order they are drawn.
     pub rows: Vec<LayoutRow>,
+}
+
+/// One family of effects and the mark it is drawn with.
+///
+/// `category` in layout.toml is the manual's own four buckets; a family is what
+/// an effect does to a signal, at the resolution a symbol needs.
+#[derive(Debug, Deserialize)]
+pub struct Family {
+    /// The family's name, which becomes a variant of `effect::Family`.
+    pub name: String,
+    /// What the mark is a picture of.
+    pub description: String,
+    /// The algorithms in this family, by their `effects.toml` name.
+    pub algorithms: Vec<String>,
+    /// The mark, as strokes in a unit box with the origin top left.
+    pub strokes: Vec<Stroke>,
+    /// The same mark on a square one-bit grid, one string per row.
+    pub pixels: Vec<String>,
+}
+
+impl Arc {
+    /// Returns the points the swept part of the arc has to be checked against.
+    ///
+    /// Its two ends, plus each compass point the sweep actually passes through,
+    /// which is where a circle reaches its extremes. Checking the whole circle
+    /// instead would forbid a shallow arc drawn from a distant centre, which is
+    /// how the reverb's wavefronts are drawn.
+    fn extent(&self) -> Vec<(f32, f32)> {
+        let at = |turns: f32| {
+            let radians = turns * std::f32::consts::TAU;
+            (
+                self.centre[0] + self.radius * radians.cos(),
+                self.centre[1] + self.radius * radians.sin(),
+            )
+        };
+        let (from, to) = if self.sweep >= 0.0 {
+            (self.start, self.start + self.sweep)
+        } else {
+            (self.start + self.sweep, self.start)
+        };
+
+        let mut points = vec![at(from), at(to)];
+        // Every quarter turn inside the swept range, whichever turn it is in.
+        let first = (from * 4.0).ceil();
+        let last = (to * 4.0).floor();
+        let mut quarter = first;
+        while quarter <= last {
+            points.push(at(quarter / 4.0));
+            quarter += 1.0;
+        }
+        points
+    }
+}
+
+impl Wave {
+    /// Returns the corners of the box the wave is drawn inside.
+    ///
+    /// The centre line's own ends, each pushed `amplitude` both ways along the
+    /// perpendicular. A sine reaches its amplitude somewhere whenever it runs a
+    /// half cycle or more, and every mark's wave does, so this is the box
+    /// rather than an over-estimate of it.
+    fn extent(&self) -> Vec<(f32, f32)> {
+        let (dx, dy) = (self.end[0] - self.start[0], self.end[1] - self.start[1]);
+        let length = dx.hypot(dy);
+        if length <= 0.0 {
+            return vec![(self.start[0], self.start[1])];
+        }
+        // The start-to-end direction turned a quarter turn anticlockwise, which
+        // in a y-down box points up the screen.
+        let (nx, ny) = (dy / length, -dx / length);
+
+        let mut points = Vec::new();
+        for end in [self.start, self.end] {
+            for side in [1.0, -1.0] {
+                points.push((
+                    end[0] + nx * self.amplitude * side,
+                    end[1] + ny * self.amplitude * side,
+                ));
+            }
+        }
+        points
+    }
+}
+
+impl Family {
+    /// Checks this family's strokes are drawable and inside the unit box.
+    ///
+    /// # Errors
+    ///
+    /// Returns a message when a stroke sets neither `line` nor `arc` or both,
+    /// when a polyline has fewer than two points, when an arc has no radius or
+    /// no sweep, or when any of it falls outside `margin..=1.0 - margin`.
+    fn validate_strokes(&self, margin: f32) -> Result<(), String> {
+        let inside = |what: &str, x: f32, y: f32| -> Result<(), String> {
+            if (margin..=1.0 - margin).contains(&x) && (margin..=1.0 - margin).contains(&y) {
+                return Ok(());
+            }
+            Err(format!(
+                "marks.toml: {}'s {what} reaches ({x}, {y}), outside {margin} to {}",
+                self.name,
+                1.0 - margin
+            ))
+        };
+
+        for (index, stroke) in self.strokes.iter().enumerate() {
+            let kinds = usize::from(stroke.line.is_some())
+                + usize::from(stroke.arc.is_some())
+                + usize::from(stroke.dot.is_some())
+                + usize::from(stroke.wave.is_some());
+            if kinds != 1 {
+                return Err(format!(
+                    "marks.toml: {} stroke {index} sets {kinds} of line, arc, dot and wave, not 1",
+                    self.name
+                ));
+            }
+
+            if let Some(points) = &stroke.line {
+                if points.len() < 2 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is a line of {} point(s)",
+                        self.name,
+                        points.len()
+                    ));
+                }
+                for &[x, y] in points {
+                    inside("line", x, y)?;
+                }
+            }
+
+            if let Some(arc) = &stroke.arc {
+                if arc.radius <= 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is an arc of radius {}",
+                        self.name, arc.radius
+                    ));
+                }
+                if arc.sweep == 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is an arc that sweeps nothing",
+                        self.name
+                    ));
+                }
+                // Only the part actually swept, so that an arc may be taken
+                // from a circle reaching outside the box. That is what lets a
+                // shallow wavefront be drawn from a distant centre.
+                for (x, y) in arc.extent() {
+                    inside("arc", x, y)?;
+                }
+            }
+
+            if let Some(dot) = &stroke.dot {
+                if dot.radius <= 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is a dot of radius {}",
+                        self.name, dot.radius
+                    ));
+                }
+                inside(
+                    "dot",
+                    dot.centre[0] - dot.radius,
+                    dot.centre[1] - dot.radius,
+                )?;
+                inside(
+                    "dot",
+                    dot.centre[0] + dot.radius,
+                    dot.centre[1] + dot.radius,
+                )?;
+            }
+
+            if let Some(wave) = &stroke.wave {
+                if wave.amplitude <= 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is a wave of amplitude {}",
+                        self.name, wave.amplitude
+                    ));
+                }
+                if wave.cycles <= 0.0 {
+                    return Err(format!(
+                        "marks.toml: {} stroke {index} is a wave of {} cycles",
+                        self.name, wave.cycles
+                    ));
+                }
+                for (x, y) in wave.extent() {
+                    inside("wave", x, y)?;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks this family's pixel grid is square, one bit per character, and
+    /// draws something a reader could tell from anything else.
+    ///
+    /// # Errors
+    ///
+    /// Returns a message when the grid is not `side` rows of `side`
+    /// characters, when a character is neither `#` nor `.`, or when the grid is
+    /// empty or completely full, both of which draw nothing.
+    fn validate_pixels(&self, side: usize) -> Result<(), String> {
+        if self.pixels.len() != side {
+            return Err(format!(
+                "marks.toml: {} has {} pixel rows, not {side}",
+                self.name,
+                self.pixels.len()
+            ));
+        }
+        let mut lit = 0;
+        for (y, row) in self.pixels.iter().enumerate() {
+            if row.chars().count() != side {
+                return Err(format!(
+                    "marks.toml: {} pixel row {y} is {} characters, not {side}",
+                    self.name,
+                    row.chars().count()
+                ));
+            }
+            for (x, pixel) in row.chars().enumerate() {
+                match pixel {
+                    '#' => lit += 1,
+                    '.' => {}
+                    other => {
+                        return Err(format!(
+                            "marks.toml: {} pixel ({x}, {y}) is {other:?}, not '#' or '.'",
+                            self.name
+                        ));
+                    }
+                }
+            }
+        }
+        if lit == 0 || lit == side * side {
+            return Err(format!(
+                "marks.toml: {} lights {lit} pixels of {}, which draws nothing",
+                self.name,
+                side * side
+            ));
+        }
+        Ok(())
+    }
+}
+
+/// One stroke of a mark: a polyline, a circular arc or a filled dot.
+///
+/// Exactly one of the three is set, which the loader checks; TOML has no tagged
+/// union, so this is how a stroke says which it is.
+#[derive(Debug, Deserialize)]
+pub struct Stroke {
+    /// Two or more points, in a unit box.
+    #[serde(default)]
+    pub line: Option<Vec<[f32; 2]>>,
+    /// A circular arc, in the same box.
+    #[serde(default)]
+    pub arc: Option<Arc>,
+    /// A filled disc, in the same box.
+    #[serde(default)]
+    pub dot: Option<Dot>,
+    /// A sine along a line, in the same box.
+    #[serde(default)]
+    pub wave: Option<Wave>,
+}
+
+/// A sine of a mark, along the line from `start` to `end`.
+///
+/// A function rather than a set of points: how finely to sample it is a
+/// question about the size the host is drawing at.
+#[derive(Debug, Deserialize)]
+pub struct Wave {
+    /// Where the centre line begins.
+    pub start: [f32; 2],
+    /// Where the centre line ends.
+    pub end: [f32; 2],
+    /// Peak displacement from the centre line, perpendicular to it.
+    pub amplitude: f32,
+    /// Cycles between `start` and `end`.
+    pub cycles: f32,
+}
+
+/// A filled dot of a mark, in a unit box with the origin top left.
+#[derive(Debug, Deserialize)]
+pub struct Dot {
+    /// Centre of the disc.
+    pub centre: [f32; 2],
+    /// Radius of the disc.
+    pub radius: f32,
+}
+
+/// A circular arc of a mark, in a unit box with the origin top left.
+#[derive(Debug, Deserialize)]
+pub struct Arc {
+    /// Centre of the circle the arc is taken from.
+    pub centre: [f32; 2],
+    /// Radius of that circle.
+    pub radius: f32,
+    /// Where the arc starts, in turns clockwise from three o'clock.
+    pub start: f32,
+    /// How far it goes, in turns, clockwise.
+    pub sweep: f32,
 }
 
 /// The presentation of one effect algorithm's slots.
@@ -544,7 +852,18 @@ struct Controllers {
 
 #[derive(Debug, Deserialize)]
 struct Panels {
+    meta: PanelMeta,
     panel: Vec<Panel>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PanelMeta {
+    quantities: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Marks {
+    family: Vec<Family>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -649,6 +968,10 @@ pub struct Spec {
     pub controls: Vec<String>,
     /// How each effect presents its slots, ordered by `FX Type` value.
     pub panels: Vec<Panel>,
+    /// The quantities a slot may declare.
+    pub quantities: Vec<String>,
+    /// What each effect does to a signal, with the mark it is drawn with.
+    pub families: Vec<Family>,
     /// How the four engines can be wired, ordered by `FX Routing` value.
     pub routings: Vec<Routing>,
     /// What each `FX Mode` setting does to the analog and digital paths.
@@ -683,6 +1006,7 @@ impl Spec {
         let firmwares: Firmwares = read(&spec.join("firmware.toml"))?;
         let mapping: Mapping = read(&spec.join("mapping.toml"))?;
         let panels: Panels = read(&spec.join("panels.toml"))?;
+        let marks: Marks = read(&spec.join("marks.toml"))?;
         let layouts: Layouts = read(&spec.join("layout.toml"))?;
         let routings: Routings = read(&spec.join("routing.toml"))?;
         let measurements: Measurements = read(&spec.join("measurements.toml"))?;
@@ -704,6 +1028,8 @@ impl Spec {
             aligns: layouts.meta.aligns,
             controls: layouts.meta.controls,
             panels: panels.panel,
+            quantities: panels.meta.quantities,
+            families: marks.family,
             routings: routings.routing,
             fx_modes: routings.mode,
             measurements: measurements.measurement,
@@ -1596,7 +1922,62 @@ impl Spec {
                 }
             }
         }
-        self.validate_panels()
+        self.validate_panels()?;
+        self.validate_marks()
+    }
+
+    /// Checks that every algorithm has exactly one family and every mark is
+    /// geometry a host can draw.
+    ///
+    /// The first half is what stops an algorithm added to effects.toml from
+    /// being silently drawn as whatever the first family happens to be. The
+    /// second is that a stroke says which of the two kinds it is, and stays
+    /// inside the box the marks are declared to live in.
+    fn validate_marks(&self) -> Result<(), String> {
+        /// Coordinates are kept this far inside the unit box so that a host's
+        /// stroke width has somewhere to go; see `meta.geometry`.
+        const MARGIN: f32 = 0.08;
+
+        /// Side of the grid each mark is drawn again on; see `meta.pixels`.
+        const PIXEL_SIDE: usize = 7;
+
+        let mut claimed: BTreeMap<&str, &str> = BTreeMap::new();
+        for family in &self.families {
+            if family.name.trim().is_empty() {
+                return Err("marks.toml: a family has no name".to_owned());
+            }
+            if family.strokes.is_empty() {
+                return Err(format!("marks.toml: {} has no mark", family.name));
+            }
+            for name in &family.algorithms {
+                if !self.effects.iter().any(|effect| &effect.name == name) {
+                    return Err(format!(
+                        "marks.toml: {} claims {name:?}, which effects.toml does not list",
+                        family.name
+                    ));
+                }
+                if let Some(first) = claimed.insert(name, &family.name) {
+                    return Err(format!(
+                        "marks.toml: {name:?} is in both {first} and {}",
+                        family.name
+                    ));
+                }
+            }
+            family.validate_strokes(MARGIN)?;
+            family.validate_pixels(PIXEL_SIDE)?;
+        }
+
+        if let Some(effect) = self
+            .effects
+            .iter()
+            .find(|effect| !claimed.contains_key(effect.name.as_str()))
+        {
+            return Err(format!(
+                "marks.toml: {} is in no family, so there is no mark to draw for it",
+                effect.name
+            ));
+        }
+        Ok(())
     }
 
     /// Checks that panels.toml lines up with effects.toml slot for slot.
@@ -1640,6 +2021,12 @@ impl Spec {
                         panel.name, slot.slot
                     ));
                 }
+                if !self.quantities.contains(&slot.quantity) {
+                    return Err(format!(
+                        "panels.toml: {} slot {} has unknown quantity {:?}",
+                        panel.name, slot.slot, slot.quantity
+                    ));
+                }
                 if !KINDS.contains(&slot.kind.as_str()) {
                     return Err(format!(
                         "panels.toml: {} slot {} has unknown kind {:?}",
@@ -1651,6 +2038,28 @@ impl Spec {
                         "panels.toml: {} slot {} disagrees with effects.toml about modulation",
                         panel.name, slot.slot
                     ));
+                }
+                if slot.enable && slot.kind != "switch" {
+                    return Err(format!(
+                        "panels.toml: {} slot {} is an enable but has kind {:?}, \
+                         and an effect is switched out of circuit or not",
+                        panel.name, slot.slot, slot.kind
+                    ));
+                }
+                // An enable is the manual's own claim that the slot bypasses the
+                // effect, so it is tied to the wording rather than left to a
+                // reading of the parameter's name. `bypass` catches the Noise
+                // Gate, whose entry says the gate is bypassed rather than off.
+                if let Some(description) = &parameter.description {
+                    let says_bypass = description.contains("turned On or Off")
+                        || description.contains("is bypassed");
+                    if slot.enable != says_bypass {
+                        return Err(format!(
+                            "panels.toml: {} slot {} is marked enable = {} but effects.toml \
+                             describes it as {description:?}",
+                            panel.name, slot.slot, slot.enable
+                        ));
+                    }
                 }
             }
         }

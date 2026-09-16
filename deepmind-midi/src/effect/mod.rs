@@ -68,14 +68,19 @@
 
 mod generated;
 
-pub use generated::{ALGORITHM_COUNT, ENGINE_COUNT, MODE_COUNT, ROUTING_COUNT, SLOTS_PER_ENGINE};
+pub use generated::{
+    ALGORITHM_COUNT, ENGINE_COUNT, FAMILY_COUNT, MARK_PIXEL_SIDE, MODE_COUNT, ROUTING_COUNT,
+    SLOTS_PER_ENGINE,
+};
 
-use generated::{ALGORITHMS, ENGINES, GRID, MODES, PANELS, ROUTINGS};
+use generated::{ALGORITHMS, ENGINES, FAMILY_NAMES, GRID, MARKS, MODES, PANELS, ROUTINGS};
 
 use core::fmt;
 
 use crate::error::{Error, Result};
-use crate::param::{Kind, ParamId, TableId};
+use crate::generator::{Generator, MAX_TAPS};
+use crate::param::{DEFAULT_FIRMWARE, Kind, ParamId, TableId};
+use crate::program::Program;
 use crate::sysex::inquiry::Version;
 
 /// One of the four effect engines.
@@ -216,6 +221,24 @@ impl fmt::Display for Engine {
 ///
 /// Reached through [`Algorithm::for_value`], which takes the byte `FX n Type`
 /// holds and the firmware that byte is to be read against.
+///
+/// # Every value is an effect
+///
+/// There is no `Off`, `None` or `Thru`, and no engine that is running nothing.
+/// Section 7.2.4 of the manual — *"To load an effect into a slot ... select
+/// from one of the following effects"* — lists these 35 and stops, and the
+/// effects table in section 9.1 gives the same 35. `FX n Type` is declared
+/// `0..=34` to match, so there is no value outside the table either.
+///
+/// What takes effects out of circuit is the `Bypass` [`Mode`], and that is the whole
+/// block of four rather than one engine. Three algorithms carry their own
+/// bypass in one of their twelve bytes instead, which is
+/// [`FxSlot::is_enable`].
+///
+/// A host looking for the parameter that silences one engine will not find one.
+/// `FX n Output Gain` is not it: the manual defines a slot's level as the level
+/// of an effect that is in parallel or last before the output stage, so on six
+/// of the ten [`Routing`]s an engine at zero gain still feeds the next engine.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[non_exhaustive]
@@ -236,7 +259,16 @@ pub struct Algorithm {
     pub full_name: &'static str,
     /// The family the manual groups it with: `Reverb`, `Delay`, `Processing`
     /// or `Creative`.
+    ///
+    /// The manual's own table of contents. [`Algorithm::family`] is what an
+    /// effect does to a signal, which is the finer question and the one a mark
+    /// is chosen by.
     pub category: &'static str,
+    /// What this effect does to a signal.
+    ///
+    /// [`Algorithm::family`](Self::family) is how it is read.
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) family: Family,
     /// The slots it uses, in slot order.
     ///
     /// Shorter than [`SLOTS_PER_ENGINE`] where the algorithm has fewer
@@ -319,6 +351,40 @@ impl Algorithm {
         PANELS.get(usize::from(self.index)).unwrap_or(&PANELS[0])
     }
 
+    /// Returns what this effect does to a signal.
+    ///
+    /// [`category`](Self::category) is the four buckets the manual's table of
+    /// contents uses, and `Creative` holds the phaser, the pitch shifter and
+    /// the rotary speaker, which do three unrelated things. This is the same
+    /// kind of published fact at the resolution a symbol needs.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::{Algorithm, Family};
+    ///
+    /// let phaser = Algorithm::by_name("Phaser").expect("a Phaser");
+    /// assert_eq!(phaser.category, "Creative");
+    /// assert_eq!(phaser.family(), Family::Modulation);
+    ///
+    /// let rotary = Algorithm::by_name("RotarySpkr").expect("a Rotary Speaker");
+    /// assert_eq!(rotary.category, "Creative");
+    /// assert_eq!(rotary.family(), Family::Rotary);
+    /// ```
+    #[must_use]
+    pub const fn family(&self) -> Family {
+        self.family
+    }
+
+    /// Returns the mark to draw for this effect.
+    ///
+    /// Its [`family`](Self::family)'s mark: nine marks across the 35, because
+    /// the difference between a Hall Reverb and a Plate Reverb is not something
+    /// a symbol carries and a drawing that implied it would be inventing one.
+    /// The name is what tells those two apart.
+    #[must_use]
+    pub fn mark(&self) -> &'static Mark {
+        self.family.mark()
+    }
+
     /// Returns the slot an engine's `parameter` is, under this algorithm.
     ///
     /// `None` when the parameter is not one of that engine's twelve, and when
@@ -395,6 +461,17 @@ pub struct FxSlot {
     /// Every slot is addressable from the modulation matrix regardless, as
     /// `Fx n Param m`; this says the engine does something with what arrives.
     pub modulatable: bool,
+    /// `true` when this switch takes the whole effect out of circuit.
+    ///
+    /// [`FxSlot::is_enable`](Self::is_enable) is how it is read, and says why
+    /// there are only three.
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) enable: bool,
+    /// What this slot does to a signal.
+    ///
+    /// [`FxSlot::quantity`](Self::quantity) is how it is read.
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) quantity: Quantity,
     /// Column of the FX page's grid this slot is drawn in, counting from 0.
     #[cfg_attr(feature = "serde", serde(skip))]
     pub(crate) column: u8,
@@ -433,6 +510,64 @@ impl FxSlot {
     #[must_use]
     pub const fn is_selector(&self) -> bool {
         !self.values.is_empty()
+    }
+
+    /// Returns what this slot does to a signal, as against what it is called.
+    ///
+    /// [`kind`](Self::kind) says what control to draw. This says what picture
+    /// the slot belongs in, which is a different question with a different
+    /// answer: a `Mix`, a `Feedback` and a `Pre-Delay` are all a byte `0..=255`
+    /// and they do three unrelated things to a drawing.
+    ///
+    /// It is what lets a host group an algorithm's slots without matching on
+    /// titles across 35 algorithms.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::{Algorithm, Quantity};
+    ///
+    /// let delay = Algorithm::by_name("3TapDelay").expect("a 3-Tap Delay");
+    ///
+    /// // Drawn as a selector, because it picks from ten printed fractions.
+    /// let factor = delay.slot(5).expect("a FactorA slot");
+    /// assert!(factor.is_selector());
+    /// // And it is a time, because what it sets is when the tap lands.
+    /// assert_eq!(factor.quantity(), Quantity::Time);
+    /// ```
+    #[must_use]
+    pub const fn quantity(&self) -> Quantity {
+        self.quantity
+    }
+
+    /// Returns whether this slot switches the whole effect in and out of
+    /// circuit.
+    ///
+    /// True for three slots of the 35 algorithms, and it is the only
+    /// slot-level off the instrument has: Stereo Imaging and Chorus D each
+    /// spend their first slot on an `ON`, and the Noise Gate its eighth on a
+    /// `PWR`. Nothing outside those three takes one engine out on its own; see
+    /// [`Algorithm`] for what the instrument does instead.
+    ///
+    /// A host that would otherwise match on `ON` and `PWR` as strings asks
+    /// this. Which way round the switch reads is
+    /// [`min`](Self::min) and [`max`](Self::max), and the Noise Gate is the one
+    /// that reads `ON` at the bottom and `OFF` at the top.
+    ///
+    /// Not the Rack Amplifier's `CAB`, which switches its cabinet simulation
+    /// and leaves the amplifier running. That is a stage within the effect, so
+    /// it is a plain [`Kind::Switch`].
+    ///
+    /// ```
+    /// use deepmind_midi::effect::Algorithm;
+    ///
+    /// let gate = Algorithm::by_name("NoiseGate").expect("a Noise Gate");
+    /// assert!(gate.slot(8).expect("a Power slot").is_enable());
+    ///
+    /// let amp = Algorithm::by_name("RackAmp").expect("a Rack Amplifier");
+    /// assert!(!amp.slot(9).expect("a Cabinet slot").is_enable());
+    /// ```
+    #[must_use]
+    pub const fn is_enable(&self) -> bool {
+        self.enable
     }
 
     /// Returns what this slot does, in the manual's own words.
@@ -607,6 +742,351 @@ impl Position {
     }
 }
 
+/// What an effect does to a signal, as a closed set.
+///
+/// [`Algorithm::category`] is the manual's own four buckets, chosen for a table
+/// of contents: `Creative` holds the phaser, the pitch shifter and the rotary
+/// speaker. This is the finer question, and the one [`Algorithm::mark`] is
+/// chosen by.
+///
+/// Where the two disagree is the point of having both. A host that wants to
+/// reproduce the manual's grouping reads the category; one that wants to draw a
+/// symbol, or to put the four delays together whatever page they are printed
+/// on, reads this.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum Family {
+    /// A decaying tail. Thirteen of the 35, including the three that pair a
+    /// reverb with something else.
+    Reverb,
+    /// Discrete repeats. The six the manual files under `Delay`.
+    Delay,
+    /// A swept delay: the chorus, the flanger and the phaser.
+    Modulation,
+    /// A response with a corner in it: the two equalisers and the Mood Filter.
+    Filter,
+    /// Level against level: the compressor and the noise gate.
+    Dynamics,
+    /// Harmonics added by driving a stage: the multi-band distortion and the
+    /// rack amplifier.
+    Distortion,
+    /// The stereo field: the Stereo Imaging and Auto-Panning.
+    Imaging,
+    /// An interval put beside the note: the two pitch shifters.
+    Pitch,
+    /// A horn going round: the Rotary Speaker, which is its own family because
+    /// it is its own thing.
+    Rotary,
+}
+
+impl Family {
+    /// Every family, in the order the specification declares them.
+    ///
+    /// Declared as [`FAMILY_COUNT`] long, which the specification generates, so
+    /// a family added to `spec/marks.toml` fails to compile here rather than
+    /// being left without a variant.
+    pub const ALL: [Self; FAMILY_COUNT] = [
+        Self::Reverb,
+        Self::Delay,
+        Self::Modulation,
+        Self::Filter,
+        Self::Dynamics,
+        Self::Distortion,
+        Self::Imaging,
+        Self::Pitch,
+        Self::Rotary,
+    ];
+
+    /// Returns this family's zero-based index, which is where its mark is.
+    #[must_use]
+    pub const fn index(self) -> usize {
+        match self {
+            Self::Reverb => 0,
+            Self::Delay => 1,
+            Self::Modulation => 2,
+            Self::Filter => 3,
+            Self::Dynamics => 4,
+            Self::Distortion => 5,
+            Self::Imaging => 6,
+            Self::Pitch => 7,
+            Self::Rotary => 8,
+        }
+    }
+
+    /// Returns the family's name, as the specification writes it.
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        // Unreachable fallback: `ALL` and the generated table are declared the
+        // same length and this indexes by the position in `ALL`.
+        FAMILY_NAMES.get(self.index()).copied().unwrap_or("Reverb")
+    }
+
+    /// Returns the mark this family is drawn with.
+    #[must_use]
+    pub fn mark(self) -> &'static Mark {
+        // Unreachable fallback, for the same reason as [`Family::name`].
+        MARKS.get(self.index()).unwrap_or(&MARKS[0])
+    }
+
+    /// Returns every algorithm in this family, in `FX Type` order.
+    pub fn algorithms(self) -> impl Iterator<Item = &'static Algorithm> {
+        ALGORITHMS
+            .iter()
+            .filter(move |algorithm| algorithm.family == self)
+    }
+}
+
+impl fmt::Display for Family {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.name())
+    }
+}
+
+/// A mark for an effect, drawn in the host's own materials.
+///
+/// Reached through [`Algorithm::mark`] or [`Family::mark`]. The data a drawing
+/// is generated from, not the drawing: a host cannot theme, rescale, hit-test
+/// or animate an SVG it did not lay out, and the same mark is wanted in a dark
+/// panel at twelve points and at forty.
+///
+/// [`strokes`](Self::strokes) is what to draw, in a unit box with the origin at
+/// the top left and y increasing downward. The host provides the size, the
+/// stroke width and the colour. Nothing here is filled and no path closes.
+///
+/// ```
+/// use deepmind_midi::effect::{Algorithm, Stroke};
+///
+/// let delay = Algorithm::by_name("3TapDelay").expect("a 3-Tap Delay");
+/// let strokes = delay.mark().strokes();
+///
+/// // A baseline and the taps standing on it, all inside the unit box.
+/// assert!(!strokes.is_empty());
+/// for stroke in strokes {
+///     if let Stroke::Line { points } = stroke {
+///         assert!(points.iter().all(|p| (0.0..=1.0).contains(&p.x())));
+///     }
+/// }
+/// ```
+///
+/// # What it is not
+///
+/// Not measured off the manual, unlike [`Panel`]'s colours. These are drawn by
+/// this project: a reading of what each family does, rather than a
+/// reproduction of anything the manufacturer prints. No font, no raster and no
+/// licensed symbol set.
+///
+/// Not a layout. Whether the mark goes beside the name, in the corner of a
+/// panel or on a tab is the host's question, the same way the [`grid`] is data
+/// and the pixel size is not.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+pub struct Mark {
+    strokes: &'static [Stroke],
+    pixels: Pixels,
+}
+
+impl Mark {
+    /// Returns the strokes that make the mark up, in drawing order.
+    #[must_use]
+    pub const fn strokes(&self) -> &'static [Stroke] {
+        self.strokes
+    }
+
+    /// Returns the same mark on a [`MARK_PIXEL_SIDE`] square grid, one bit a
+    /// pixel.
+    ///
+    /// For a display with no room to stroke anything: an LCD row beside an
+    /// effect name, or a hardware panel. Above about sixteen pixels a host
+    /// wants [`strokes`](Self::strokes) instead, which has no size of its own.
+    ///
+    /// Drawn by hand rather than reduced from the strokes. At forty-nine pixels
+    /// which pixels are lit is the whole of the design, and a one-pixel stroke
+    /// put through a rasteriser at this size comes out as a smear with the idea
+    /// gone.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::{Algorithm, MARK_PIXEL_SIDE};
+    ///
+    /// let rotary = Algorithm::by_name("RotarySpkr").expect("a Rotary Speaker");
+    /// let pixels = rotary.mark().pixels();
+    ///
+    /// // A ring with its centre marked, so the middle pixel is lit and the
+    /// // ones either side of it are not.
+    /// let middle = (MARK_PIXEL_SIDE / 2) as u8;
+    /// assert!(pixels.is_lit(middle, middle));
+    /// assert!(!pixels.is_lit(middle - 1, middle));
+    /// ```
+    #[must_use]
+    pub const fn pixels(&self) -> &Pixels {
+        &self.pixels
+    }
+}
+
+/// A [`Mark`] drawn on a square one-bit grid, for a display too small to stroke.
+///
+/// Reached through [`Mark::pixels`]. [`MARK_PIXEL_SIDE`] is how wide and how
+/// tall, and the origin is the top left, matching the unit box the strokes are
+/// in.
+///
+/// ```
+/// use deepmind_midi::effect::{Algorithm, MARK_PIXEL_SIDE};
+///
+/// let filter = Algorithm::by_name("MoodFilter").expect("a Mood Filter");
+/// let pixels = filter.mark().pixels();
+///
+/// // Blitting it is a walk over the grid.
+/// let mut lit = 0;
+/// for y in 0..MARK_PIXEL_SIDE as u8 {
+///     for x in 0..MARK_PIXEL_SIDE as u8 {
+///         if pixels.is_lit(x, y) {
+///             lit += 1;
+///         }
+///     }
+/// }
+/// assert!(lit > 0);
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Pixels {
+    rows: [u8; MARK_PIXEL_SIDE],
+}
+
+impl Pixels {
+    /// Builds a grid from its rows, a bit a pixel and bit 0 leftmost.
+    #[must_use]
+    pub const fn new(rows: [u8; MARK_PIXEL_SIDE]) -> Self {
+        Self { rows }
+    }
+
+    /// Returns whether the pixel at `x`, `y` is lit, counting from the top
+    /// left.
+    ///
+    /// `false` outside the grid, so a host walking a larger box than the mark
+    /// gets blank rather than an answer it has to bounds-check itself.
+    #[must_use]
+    pub fn is_lit(&self, x: u8, y: u8) -> bool {
+        if usize::from(x) >= MARK_PIXEL_SIDE {
+            return false;
+        }
+        self.row(y) & (1 << x) != 0
+    }
+
+    /// Returns one row as its low [`MARK_PIXEL_SIDE`] bits, bit 0 leftmost.
+    ///
+    /// What a host blitting a row at a time wants. Zero past the bottom of the
+    /// grid.
+    #[must_use]
+    pub fn row(&self, y: u8) -> u8 {
+        self.rows.get(usize::from(y)).copied().unwrap_or(0)
+    }
+
+    /// Returns every row, top to bottom.
+    #[must_use]
+    pub const fn rows(&self) -> &[u8; MARK_PIXEL_SIDE] {
+        &self.rows
+    }
+}
+
+/// One stroke of a [`Mark`], in a unit box with the origin top left.
+///
+/// Two kinds, because a rotary speaker wants a circle and everything else wants
+/// a polyline, and approximating the circle with one would put the number of
+/// segments in this library rather than in the host that knows how big it is
+/// drawing.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[non_exhaustive]
+pub enum Stroke {
+    /// A polyline through two or more points, stroked and not closed.
+    Line {
+        /// The points, in order.
+        points: &'static [Point],
+    },
+    /// An arc of a circle.
+    ///
+    /// Only the swept part is inside the box; the circle it is taken from may
+    /// reach outside, which is what lets a shallow arc be drawn from a distant
+    /// centre.
+    Arc {
+        /// Centre of the circle it is taken from.
+        centre: Point,
+        /// Radius of that circle.
+        radius: f32,
+        /// Where the arc begins, in turns clockwise from three o'clock.
+        ///
+        /// Clockwise because the box has y increasing downward, so a positive
+        /// sweep turns the way a reader expects on screen.
+        start: f32,
+        /// How far it goes, in turns. A whole turn is a closed circle.
+        sweep: f32,
+    },
+    /// A filled disc.
+    ///
+    /// The one thing in a mark that is filled rather than stroked, and the only
+    /// one whose size is not the host's stroke width. Two marks use it: the
+    /// source a reverb's wavefronts leave, and the centre of the rotary ring.
+    Dot {
+        /// Centre of the disc.
+        centre: Point,
+        /// Radius of the disc.
+        radius: f32,
+    },
+    /// A sine along the line from `start` to `end`.
+    ///
+    /// A function rather than a set of points, so a host samples it as finely
+    /// as the size it is drawing at deserves. The alternative is a polyline,
+    /// and a polyline through a sine is a row of corners: how many corners is a
+    /// question about the host's pixels, which this library does not have and
+    /// the [`generator`](crate::generator) module refuses for the same reason.
+    ///
+    /// The value at `u` along `0..=1` of the centre line is that point,
+    /// displaced perpendicular by `amplitude * sin(TAU * cycles * u)`. The
+    /// perpendicular is the start-to-end direction turned a quarter turn
+    /// anticlockwise, which in a box with y downward points up the screen, so a
+    /// positive sine rises.
+    Wave {
+        /// Where the centre line begins.
+        start: Point,
+        /// Where the centre line ends.
+        end: Point,
+        /// Peak displacement from the centre line, perpendicular to it.
+        amplitude: f32,
+        /// Cycles between `start` and `end`.
+        cycles: f32,
+    },
+}
+
+/// A point of a [`Mark`], in a unit box with the origin top left.
+///
+/// Unitless, so a host multiplies by whatever it is drawing into.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Point {
+    x: f32,
+    y: f32,
+}
+
+impl Point {
+    /// Builds a point from its two coordinates.
+    #[must_use]
+    pub const fn new(x: f32, y: f32) -> Self {
+        Self { x, y }
+    }
+
+    /// Returns the distance from the left of the box, 0 to 1.
+    #[must_use]
+    pub const fn x(self) -> f32 {
+        self.x
+    }
+
+    /// Returns the distance from the top of the box, 0 to 1.
+    #[must_use]
+    pub const fn y(self) -> f32 {
+        self.y
+    }
+}
+
 /// What an effect's own editor panel is made of.
 ///
 /// Reached through [`Algorithm::panel`]. Measured off the figure printed beside
@@ -708,6 +1188,60 @@ pub enum Control {
     Fader,
     /// A numeric display.
     Display,
+}
+
+/// What an effect slot does to a signal, as against what it is called.
+///
+/// Reached through [`FxSlot::quantity`]. [`Kind`] is what control to draw; this
+/// is what picture the slot belongs in. The two are separate because they
+/// disagree: a delay's `Factor` is drawn as a selector, because it picks from
+/// ten printed fractions, and what it sets is when a tap lands.
+///
+/// Derived from the parameter rather than stated by the manual, the same way
+/// [`FxSlot::title`] and [`FxSlot::group`] are, so it is a convention this
+/// project chose. `spec/panels.toml` records how, and names the slots where the
+/// manual's own description decided it against what the name suggests.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum Quantity {
+    /// When something happens: a pre-delay, an envelope stage, a tap's place in
+    /// a pattern.
+    Time,
+    /// Where in the spectrum: a cut, a corner, a rate, an interval.
+    Frequency,
+    /// How loud: an input, an output, a threshold, a band's level.
+    Gain,
+    /// How much of the output goes back in.
+    Feedback,
+    /// How much effect there is: a mix, a drive, a density.
+    Depth,
+    /// Where in the stereo field: a pan, a width, a spread, a phase offset.
+    Position,
+    /// What the response looks like: a Q, a damping, a size, a wave morph.
+    Shape,
+    /// In or out.
+    Switch,
+    /// One of a list of named kinds: a preset, a cabinet, a distortion type.
+    ///
+    /// Not a quantity at all, which is why it is last. A slot that picks from a
+    /// list still has to answer, and `Shape` would have been a lie.
+    Selection,
+}
+
+impl Quantity {
+    /// Every quantity, in the order they are declared.
+    pub const ALL: [Self; 9] = [
+        Self::Time,
+        Self::Frequency,
+        Self::Gain,
+        Self::Feedback,
+        Self::Depth,
+        Self::Position,
+        Self::Shape,
+        Self::Switch,
+        Self::Selection,
+    ];
 }
 
 /// What a row that is not full does with the space left over.
@@ -988,6 +1522,127 @@ impl fmt::Display for Mode {
     }
 }
 
+/// The ten fractions a delay's `Factor` slot picks from, in the order the manual
+/// prints them.
+///
+/// The same ten on every `Factor` slot of both tap delays, which
+/// `every_factor_slot_offers_the_same_ten_fractions` holds against
+/// [`FxSlot::values`] so that this table cannot drift from the specification.
+const FACTORS: [(f32, &str); 10] = [
+    (0.25, "1/4"),
+    (1.0 / 3.0, "1/3"),
+    (0.5, "1/2"),
+    (2.0 / 3.0, "2/3"),
+    (0.75, "3/4"),
+    (1.0, "1"),
+    (4.0 / 3.0, "4/3"),
+    (1.5, "3/2"),
+    (2.0, "2"),
+    (3.0, "3"),
+];
+
+/// Returns what this engine is doing to a signal, where that follows from
+/// published parameters.
+///
+/// [`None`] for most of the 35, and that is the answer rather than a gap. A
+/// reverb's impulse response is its designer's and is not published; a library
+/// that invented a plausible one would be drawing something that looks like
+/// information and is not. The same goes for a compressor's exact knee and a
+/// phaser's comb.
+///
+/// [`Some`] for the 3-Tap and 4-Tap delays. Their panels are literally a time
+/// and a gain per tap, and the times are ratios of the master delay that the
+/// manual prints as fractions, so the picture follows from the parameters
+/// rather than from anybody's DSP. The horizontal is [`Scale::Normalised`](crate::generator::Scale::Normalised), from
+/// zero to the furthest tap: the ratios between the taps are published, and the
+/// master delay time they are ratios *of* is a byte with no published curve, so
+/// there is no axis to label.
+///
+/// Read on [`DEFAULT_FIRMWARE`], as the program's own `fx1_type` and its
+/// siblings are, so an engine running Vintage Pitch on firmware 1.0 is read as
+/// the algorithm 1.1 numbers there.
+///
+/// # Why not the other four delays
+///
+/// The Stereo Delay and the Tel-Ray have a master time and a feedback rather
+/// than enumerated taps, so what they make is an endless train whose count
+/// depends on where a host decides the repeats have died away. That is the
+/// host's decision about its own picture, not a fact this library holds. The
+/// Decimator Delay is the same with a decimator in front of it, and Mod, Delay
+/// and Reverb has a reverb across the end of it.
+///
+/// ```
+/// use deepmind_midi::ProtocolVersion;
+/// use deepmind_midi::effect::{self, Engine};
+/// use deepmind_midi::program::{FxType, Program};
+///
+/// let mut program = Program::new(ProtocolVersion::V6);
+/// program.set_fx1_type(FxType::ThreeTapDelay);
+/// program.set_fx1_param2(255);    // the first tap, at full gain
+///
+/// // The master tap is the furthest out here, so it lands at the end.
+/// let response = effect::response(&program, Engine::One).expect("a 3-Tap Delay");
+/// assert!(response.at(1.0) > 0.9);
+/// assert_eq!(response.at(0.6), 0.0);
+///
+/// // And a reverb has none, which is an answer rather than a failure.
+/// program.set_fx1_type(FxType::RoomRev);
+/// assert!(effect::response(&program, Engine::One).is_none());
+/// ```
+#[must_use]
+pub fn response(program: &Program, engine: Engine) -> Option<Generator> {
+    let algorithm =
+        Algorithm::for_value(program.get(engine.algorithm_parameter()), DEFAULT_FIRMWARE)?;
+
+    // Slot numbers of the gain and the factor for each tap, in tap order. The
+    // first tap runs at the master time and so has no factor of its own.
+    let layout: &[(u8, Option<u8>)] = match algorithm.name {
+        "3TapDelay" => &[(2, None), (6, Some(5)), (9, Some(8))],
+        "4TapDelay" => &[(2, None), (6, Some(5)), (8, Some(7)), (10, Some(9))],
+        _ => return None,
+    };
+
+    let mut taps = [(0.0, 0.0); MAX_TAPS];
+    let mut used = 0;
+    let mut furthest = 0.0_f32;
+    for &(gain, factor) in layout {
+        let at = match factor {
+            None => 1.0,
+            Some(slot) => fraction(program, engine, slot)?,
+        };
+        let height = engine
+            .slot_parameter(gain)
+            .map_or(0.0, |parameter| f32::from(program.get(parameter)) / 255.0);
+        *taps.get_mut(used)? = (at, height);
+        furthest = furthest.max(at);
+        used += 1;
+    }
+
+    // Normalised to the furthest tap, since the master time the ratios are
+    // ratios of has no published curve to put an axis in.
+    if furthest > 0.0 {
+        for tap in taps.iter_mut().take(used) {
+            tap.0 /= furthest;
+        }
+    }
+    Some(crate::generator::taps(taps, used))
+}
+
+/// Returns the fraction of the master delay time a `Factor` slot selects.
+///
+/// # A reading, not a published mapping
+///
+/// The ten fractions are printed in the manual and are in [`FxSlot::values`].
+/// Which byte shows which of them is not, for the reason
+/// [`FxSlot::values`] gives, so this divides the byte's range evenly among them.
+/// That is the only mapping a `0..=255` byte and ten named options admit, and it
+/// is the one thing in this function that is not off the page.
+fn fraction(program: &Program, engine: Engine, slot: u8) -> Option<f32> {
+    let raw = program.get(engine.slot_parameter(slot)?);
+    let index = usize::from(raw) * FACTORS.len() / 256;
+    FACTORS.get(index).map(|&(fraction, _)| fraction)
+}
+
 #[cfg(test)]
 #[expect(
     clippy::expect_used,
@@ -996,10 +1651,12 @@ impl fmt::Display for Mode {
 )]
 mod tests {
     use super::{
-        ALGORITHM_COUNT, Algorithm, Align, Engine, MODE_COUNT, Mode, ROUTING_COUNT, Routing,
-        SLOTS_PER_ENGINE, Source, grid,
+        ALGORITHM_COUNT, Algorithm, Align, Engine, Family, MARK_PIXEL_SIDE, MODE_COUNT, Mode,
+        Point, Quantity, ROUTING_COUNT, Routing, SLOTS_PER_ENGINE, Source, Stroke, grid,
     };
+    use crate::ids::ProtocolVersion;
     use crate::param::{DEFAULT_FIRMWARE, Group, Kind, ParamId, TableId};
+    use crate::program::{FxType, Program};
     use crate::sysex::inquiry::Version;
 
     /// Firmware 1.0, which numbers the algorithms differently.
@@ -1384,5 +2041,427 @@ mod tests {
         });
         assert_eq!(slots, 371);
         assert_eq!(described, 369);
+    }
+
+    /// Exactly three slots take an effect out of circuit, and they are the only
+    /// slot-level off the instrument has. A fourth appearing here means either
+    /// the specification grew one or `enable` has been read too widely.
+    #[test]
+    fn three_slots_switch_their_effect_out_of_circuit() {
+        const EXPECTED: [(&str, u8); 3] = [("EdisonEX1", 1), ("NoiseGate", 8), ("Chorus-D", 1)];
+
+        let mut found = [("", 0_u8); EXPECTED.len()];
+        let mut count = 0_usize;
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots.iter().filter(|slot| slot.is_enable()) {
+                assert!(
+                    count < EXPECTED.len(),
+                    "a fourth enable: {algorithm} slot {}",
+                    slot.slot
+                );
+                if let Some(entry) = found.get_mut(count) {
+                    *entry = (algorithm.name, slot.slot);
+                }
+                count += 1;
+            }
+        }
+        assert_eq!(count, EXPECTED.len());
+        assert_eq!(found, EXPECTED);
+    }
+
+    /// An enable is a switch, because an effect is in circuit or it is not.
+    /// The Noise Gate is the one that reads `ON` at the bottom of its range.
+    #[test]
+    fn an_enable_is_a_switch_and_may_read_either_way_round() {
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots.iter().filter(|slot| slot.is_enable()) {
+                assert_eq!(slot.kind, Kind::Switch, "{algorithm} {}", slot.title);
+            }
+        }
+
+        let gate = Algorithm::by_name("NoiseGate").expect("a Noise Gate");
+        let power = gate.slot(8).expect("a Power slot");
+        assert_eq!((power.min, power.max), (Some("ON"), Some("OFF")));
+    }
+
+    /// Every algorithm reaches a mark, and the nine families between them
+    /// account for all 35 with none left over.
+    #[test]
+    fn every_algorithm_has_a_family_and_a_mark() {
+        for algorithm in Algorithm::all() {
+            assert!(
+                !algorithm.mark().strokes().is_empty(),
+                "{algorithm} has an empty mark"
+            );
+            assert_eq!(algorithm.mark(), algorithm.family().mark());
+        }
+
+        let counted: usize = Family::ALL
+            .into_iter()
+            .map(|family| family.algorithms().count())
+            .sum();
+        assert_eq!(counted, ALGORITHM_COUNT);
+    }
+
+    /// `Family::ALL` is hand-written and the marks beside it are generated, so
+    /// the two agree only as long as the order does. A family reordered or
+    /// renamed in marks.toml fails here rather than handing out the wrong mark.
+    #[test]
+    fn the_families_are_in_the_order_the_specification_declares() {
+        assert_eq!(
+            Family::ALL.map(Family::name),
+            [
+                "Reverb",
+                "Delay",
+                "Modulation",
+                "Filter",
+                "Dynamics",
+                "Distortion",
+                "Imaging",
+                "Pitch",
+                "Rotary",
+            ]
+        );
+        for (index, family) in Family::ALL.into_iter().enumerate() {
+            assert_eq!(family.index(), index);
+        }
+    }
+
+    /// Returns the point `u` along a wave, the way a host drawing one would.
+    ///
+    /// The centre line displaced perpendicular by the sine, with the
+    /// perpendicular a quarter turn anticlockwise from the run.
+    fn wave_at(start: Point, end: Point, amplitude: f32, cycles: f32, u: f32) -> (f32, f32) {
+        let (dx, dy) = (end.x() - start.x(), end.y() - start.y());
+        let length = dx.hypot(dy).max(f32::EPSILON);
+        let (nx, ny) = (dy / length, -dx / length);
+        let offset = amplitude * crate::math::sin_turns(u * cycles);
+        (
+            start.x() + dx * u + nx * offset,
+            start.y() + dy * u + ny * offset,
+        )
+    }
+
+    /// Sine and cosine of an angle in radians, for the arc checks below.
+    ///
+    /// The crate's own `math` module takes turns rather than radians; these
+    /// wrap it so the test reads the way the geometry does.
+    fn sin(radians: f32) -> f32 {
+        crate::math::sin_turns(radians / core::f32::consts::TAU)
+    }
+
+    fn cos(radians: f32) -> f32 {
+        crate::math::cos_turns(radians / core::f32::consts::TAU)
+    }
+
+    /// A mark is drawn in a unit box, and a host that scales it by its own size
+    /// expects nothing to land outside. The margin is what leaves room for a
+    /// stroke width; `spec/marks.toml` states it and this holds it.
+    #[test]
+    fn a_mark_stays_inside_the_unit_box() {
+        const MARGIN: f32 = 0.08;
+        let inside = |x: f32, y: f32, family: Family| {
+            assert!(
+                (MARGIN..=1.0 - MARGIN).contains(&x) && (MARGIN..=1.0 - MARGIN).contains(&y),
+                "{family} reaches ({x}, {y})"
+            );
+        };
+
+        for family in Family::ALL {
+            for stroke in family.mark().strokes() {
+                match *stroke {
+                    Stroke::Line { points } => {
+                        assert!(points.len() >= 2, "{family} has a line of one point");
+                        for point in points {
+                            inside(point.x(), point.y(), family);
+                        }
+                    }
+                    Stroke::Arc {
+                        centre,
+                        radius,
+                        start,
+                        sweep,
+                    } => {
+                        assert!(radius > 0.0, "{family} has an arc of no radius");
+                        assert!(sweep.abs() > 0.0, "{family} has an arc that sweeps nothing");
+                        // Only the swept part, because the circle an arc is
+                        // taken from is allowed to reach outside the box.
+                        for turns in [start, start + sweep] {
+                            let radians = turns * core::f32::consts::TAU;
+                            inside(
+                                centre.x() + radius * cos(radians),
+                                centre.y() + radius * sin(radians),
+                                family,
+                            );
+                        }
+                    }
+                    Stroke::Dot { centre, radius } => {
+                        assert!(radius > 0.0, "{family} has a dot of no radius");
+                        inside(centre.x() - radius, centre.y() - radius, family);
+                        inside(centre.x() + radius, centre.y() + radius, family);
+                    }
+                    Stroke::Wave {
+                        start,
+                        end,
+                        amplitude,
+                        cycles,
+                    } => {
+                        assert!(amplitude > 0.0, "{family} has a wave of no amplitude");
+                        assert!(cycles > 0.0, "{family} has a wave of no cycles");
+                        // Sampled the way a host would, which is the only way
+                        // to know a published curve stays in its box.
+                        for step in 0..=64_u8 {
+                            let u = f32::from(step) / 64.0;
+                            let (x, y) = wave_at(start, end, amplitude, cycles, u);
+                            inside(x, y, family);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Every family has a pixel grid, it is the declared size, and it draws
+    /// something. A mark that lit nothing, or everything, would blit as a blank
+    /// or a block and tell a reader nothing.
+    #[test]
+    fn every_mark_has_a_pixel_grid_that_draws_something() {
+        let side = u8::try_from(MARK_PIXEL_SIDE).expect("a small grid");
+        for family in Family::ALL {
+            let pixels = family.mark().pixels();
+            assert_eq!(pixels.rows().len(), MARK_PIXEL_SIDE, "{family}");
+
+            let mut lit = 0;
+            for y in 0..side {
+                for x in 0..side {
+                    if pixels.is_lit(x, y) {
+                        lit += 1;
+                    }
+                }
+            }
+            assert!(lit > 0, "{family} lights nothing");
+            assert!(lit < MARK_PIXEL_SIDE * MARK_PIXEL_SIDE, "{family} is solid");
+
+            // Nothing outside the grid is lit, and no row carries a bit past
+            // its own width, which is what a host blitting a row relies on.
+            assert!(
+                !pixels.is_lit(side, 0),
+                "{family} lights a column past the grid"
+            );
+            assert_eq!(pixels.row(side), 0, "{family} has a row past the grid");
+            for y in 0..side {
+                assert_eq!(
+                    pixels.row(y) >> side,
+                    0,
+                    "{family} row {y} carries a bit past the grid"
+                );
+            }
+        }
+    }
+
+    /// The nine grids are nine different pictures. Two families blitting the
+    /// same pixels would be a symbol that cannot do its one job.
+    #[test]
+    fn no_two_families_blit_the_same_pixels() {
+        for (index, family) in Family::ALL.into_iter().enumerate() {
+            for other in Family::ALL.into_iter().skip(index + 1) {
+                assert_ne!(
+                    family.mark().pixels().rows(),
+                    other.mark().pixels().rows(),
+                    "{family} and {other} draw the same grid"
+                );
+            }
+        }
+    }
+
+    /// The four buckets the manual prints are not the nine a symbol needs, and    /// The four buckets the manual prints are not the nine a symbol needs, and
+    /// `Creative` is where that shows: it holds three families at once.
+    #[test]
+    fn a_family_is_finer_than_the_manuals_category() {
+        let creative = |family: Family| {
+            Algorithm::all()
+                .iter()
+                .any(|algorithm| algorithm.category == "Creative" && algorithm.family() == family)
+        };
+        assert!(creative(Family::Modulation));
+        assert!(creative(Family::Filter));
+        assert!(creative(Family::Pitch));
+        assert!(creative(Family::Rotary));
+    }
+
+    /// Every slot answers what it does to a signal, and the answer is not just
+    /// a rewording of what control to draw. A `Factor` is the case that proves
+    /// it: drawn as a selector, and a time.
+    #[test]
+    fn a_quantity_is_a_different_question_from_a_control_kind() {
+        let mut counts = [0_usize; Quantity::ALL.len()];
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots {
+                let count = counts
+                    .get_mut(index_of(slot.quantity()))
+                    .expect("a quantity is in Quantity::ALL");
+                *count += 1;
+            }
+        }
+        // Every one of the nine is used, or it should not be in the enum.
+        for (quantity, count) in Quantity::ALL.into_iter().zip(counts) {
+            assert!(count > 0, "{quantity:?} is in the enum and on no slot");
+        }
+        assert_eq!(counts.iter().sum::<usize>(), 371);
+
+        let delay = Algorithm::by_name("3TapDelay").expect("a 3-Tap Delay");
+        let factor = delay.slot(5).expect("a FactorA slot");
+        assert!(factor.is_selector());
+        assert_eq!(factor.quantity(), Quantity::Time);
+
+        // And a switch is a switch both ways round, which is the easy case.
+        let gate = Algorithm::by_name("NoiseGate").expect("a Noise Gate");
+        let power = gate.slot(8).expect("a Power slot");
+        assert_eq!(power.kind, Kind::Switch);
+        assert_eq!(power.quantity(), Quantity::Switch);
+    }
+
+    /// Returns a quantity's position in `Quantity::ALL`.
+    fn index_of(quantity: Quantity) -> usize {
+        Quantity::ALL
+            .into_iter()
+            .position(|other| other == quantity)
+            .unwrap_or(0)
+    }
+
+    /// A unit decides a quantity wherever the manual gives one, so every slot
+    /// measured in the same unit answers the same way. A disagreement here is a
+    /// hand edit that got out of step with the rest of the column.
+    #[test]
+    fn a_unit_decides_the_quantity_wherever_there_is_one() {
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots {
+                let expected = match slot.unit {
+                    Some("ms" | "s") => Some(Quantity::Time),
+                    Some("Hz") => Some(Quantity::Frequency),
+                    Some("deg") => Some(Quantity::Position),
+                    _ => None,
+                };
+                if let Some(expected) = expected {
+                    assert_eq!(
+                        slot.quantity(),
+                        expected,
+                        "{algorithm} {} is in {:?}",
+                        slot.title,
+                        slot.unit
+                    );
+                }
+            }
+        }
+    }
+
+    /// The fractions `response` places taps with are the ones the manual prints,
+    /// held against the slot's own values so the table cannot drift from the
+    /// specification it was copied out of.
+    #[test]
+    fn every_factor_slot_offers_the_same_ten_fractions() {
+        let printed = super::FACTORS.map(|(_, name)| name);
+        let mut found = 0;
+        for algorithm in Algorithm::all() {
+            for slot in algorithm.slots {
+                if !slot.title.contains("Factor") {
+                    continue;
+                }
+                assert_eq!(
+                    slot.values,
+                    printed.as_slice(),
+                    "{algorithm} {}",
+                    slot.title
+                );
+                assert_eq!(slot.quantity(), Quantity::Time);
+                found += 1;
+            }
+        }
+        // Every algorithm that divides a master delay time offers the same ten,
+        // which is what makes one table right for all of them.
+        assert_eq!(found, 10);
+    }
+
+    /// The two tap delays have a response and the other 33 do not, which is the
+    /// answer rather than a gap.
+    #[test]
+    fn only_the_tap_delays_have_a_published_response() {
+        let mut program = Program::new(ProtocolVersion::V6);
+        for algorithm in Algorithm::all() {
+            let Some(value) = algorithm.value_for(DEFAULT_FIRMWARE) else {
+                continue;
+            };
+            program.set_clamped(Engine::One.algorithm_parameter(), value);
+            let response = super::response(&program, Engine::One);
+            let expected = matches!(algorithm.name, "3TapDelay" | "4TapDelay");
+            assert_eq!(response.is_some(), expected, "{algorithm}");
+        }
+    }
+
+    /// A tap lands where its factor puts it, against the master tap, and stands
+    /// as tall as its gain byte. That is the whole of what a tap delay's
+    /// picture is, and all of it comes off the manual's page bar the byte that
+    /// picks the fraction.
+    #[test]
+    fn a_tap_lands_where_its_factor_and_gain_put_it() {
+        let mut program = Program::new(ProtocolVersion::V6);
+        program.set_fx1_type(FxType::FourTapDelay);
+        // Every gain up, so each tap is there to be found.
+        for slot in [2, 6, 8, 10] {
+            program.set_clamped(Engine::One.slot_parameter(slot).expect("a gain slot"), 255);
+        }
+        // The last of the ten fractions is 3, the largest, so the fourth tap is
+        // the furthest out and the picture is normalised to it.
+        program.set_clamped(Engine::One.slot_parameter(9).expect("FactorC"), 255);
+        // And the first two at 1/4, the smallest.
+        for slot in [5, 7] {
+            program.set_clamped(Engine::One.slot_parameter(slot).expect("a factor"), 0);
+        }
+
+        let response = super::response(&program, Engine::One).expect("a 4-Tap Delay");
+        // Taps at 1, 1/4, 1/4 and 3 master times, over a furthest of 3.
+        assert!(
+            response.at(1.0) > 0.9,
+            "the furthest tap: {}",
+            response.at(1.0)
+        );
+        assert!(response.at(1.0 / 3.0) > 0.9, "the master tap");
+        assert!(response.at(0.25 / 3.0) > 0.9, "the two quarter taps");
+        // And nothing between them.
+        assert!(response.at(0.6) <= 0.0, "{}", response.at(0.6));
+
+        // A tap with its gain at nothing is drawn at nothing.
+        program.set_clamped(Engine::One.slot_parameter(2).expect("the master gain"), 0);
+        let quiet = super::response(&program, Engine::One).expect("a 4-Tap Delay");
+        assert!(quiet.at(1.0 / 3.0) <= 0.0, "{}", quiet.at(1.0 / 3.0));
+    }
+
+    /// The `FX Type` table is 35 effects and nothing else, on both firmwares.
+    /// This is the absence issue #30 asked to have stated somewhere a test can
+    /// keep true: a value that stops naming an effect fails here.
+    #[test]
+    fn every_fx_type_value_is_an_effect() {
+        for firmware in [FIRMWARE_1_0, DEFAULT_FIRMWARE] {
+            let table = TableId::FxType.table_for(firmware);
+            for (value, entry) in table.entries.iter().enumerate() {
+                assert!(
+                    Algorithm::by_name(entry.name).is_some(),
+                    "{:?} names no algorithm",
+                    entry.name
+                );
+                // Consecutive from zero, so there is no spare value sitting
+                // beside the effects for an off to have been given.
+                assert_eq!(u16::try_from(value), Ok(entry.value));
+            }
+        }
+
+        // Firmware 1.1 offers every algorithm; 1.0 is the same table without
+        // the Vintage Pitch it had not gained yet.
+        let newest = TableId::FxType.table_for(DEFAULT_FIRMWARE);
+        assert_eq!(newest.entries.len(), ALGORITHM_COUNT);
+        assert_eq!(
+            TableId::FxType.table_for(FIRMWARE_1_0).entries.len(),
+            ALGORITHM_COUNT - 1
+        );
     }
 }
