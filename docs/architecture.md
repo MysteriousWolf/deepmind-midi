@@ -539,7 +539,10 @@ which of the two a caller has:
 | `Scale::Normalised` | an ordering, nothing more — the envelopes |
 | `Scale::Turns(n)` | a cycle is a cycle, whatever the rate byte does |
 | `Scale::Octaves(n)` | the slope is published in dB per octave |
-| `Scale::Steps(n)` | the manual gives gate time as a fraction of a step |
+
+The arpeggiator's gates carry no scale, because a gate is two numbers rather
+than a curve: `Gate` gives both ends in steps of the arpeggiator's clock, which
+section 8.1.6 states in words.
 
 There is no `Seconds` and no `Hertz`, because not one generator here has one.
 The enum is `non_exhaustive` so that a measured curve can add them.

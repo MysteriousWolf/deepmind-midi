@@ -59,10 +59,13 @@
 //! one: every time and every frequency on this instrument is a byte whose curve
 //! has not been measured. See [Raw values stay
 //! raw](https://github.com/MysteriousWolf/deepmind-midi/blob/main/docs/architecture.md).
-//! The three scales that are here are the ones that *are* published — a turn of
-//! an LFO, an octave either side of a filter's corner, a step of the
-//! arpeggiator's clock — and [`Scale`] is `non_exhaustive` so that a measured
-//! curve can add to them.
+//! The two scales beside it are the ones that *are* published: a turn of an LFO
+//! and an octave either side of a filter's corner. [`Scale`] is
+//! `non_exhaustive` so that a measured curve can add to them.
+//!
+//! The arpeggiator's gates carry no [`Scale`] at all, because they are not a
+//! [`Generator`]: a gate is two numbers rather than a curve, and [`Gate`] gives
+//! both of them in steps of the arpeggiator's clock outright.
 //!
 //! # Where a shape is this library's reading
 //!
@@ -110,11 +113,6 @@ pub enum Scale {
     /// response *about* the corner is known even though the frequency the
     /// corner sits at is a byte with no published curve.
     Octaves(f32),
-    /// `0..=1` covers this many steps of the arpeggiator's clock.
-    ///
-    /// A step is what `Arp Clock` divides the tempo into, and the manual gives
-    /// gate time as a fraction of one, so this one is exact too.
-    Steps(f32),
 }
 
 /// A shape a set of parameters makes, sampled by the host.
