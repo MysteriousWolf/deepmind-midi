@@ -346,7 +346,7 @@ All of it reaches a host as data rather than as the drawing: `effect::grid()`
 is the grid, `FxSlot::position` is where a slot lands on it, and
 `Algorithm::panel` is the control shape and the four colours. The SVGs under
 `docs/diagrams/fx/` are the right output for a document and the wrong input for
-an editor — a host cannot theme, rescale or hit-test a picture it did not lay
+an editor: a host cannot theme, rescale or hit-test a picture it did not lay
 out, and a desktop window and a plugin window want the same panel at two sizes.
 The colours are three components rather than `#5d6379`, because three
 components are what a host wants and every host writing the same six-character
@@ -384,7 +384,7 @@ value table's name.
 `spec/front.toml` says which of the 242 parameters the instrument puts a
 physical control under, what is silkscreened over each one, and which of the
 panel's two rows its plate is in. It is the one part of this specification that
-is not in the MIDI appendix at all — a person can read it off a photograph, and
+is not in the MIDI appendix at all. A person can read it off a photograph, and
 no host can derive it.
 
 Three things make it belong here rather than in each editor. The legend is not
@@ -415,9 +415,9 @@ is and how long a fader runs are the host's, exactly as `layout.toml` splits the
 grid from the drawing.
 
 One instrument is described, a DeepMind 12. The 6 has the same 242 parameters
-and its own front, and a variant gets its own table when somebody has one in
-front of them — the way a value table gets its own firmware range. One
-documented panel is worth more than three inferred ones.
+and its own front. A variant gets its own table once somebody has one in front
+of them, the way a value table gets its own firmware range; one documented panel
+beats three inferred ones.
 
 ## Strings are reachable by key
 
@@ -430,8 +430,8 @@ merged at load. None exists yet, and adding one later is not a refactor.
 Ranges are stored as two ends and a unit rather than as `"0.1 to 6.0 s"` for
 the same reason.
 
-The manual's own prose about a parameter — its note, its displayed range, the
-reason a row departs from what the manual prints — reaches a host through
+The manual's own prose about a parameter, meaning its note, its displayed range
+and the reason a row departs from what the manual prints, reaches a host through
 `ParamId::note`, `display` and `correction`. Each is a function over its own
 strings and nothing else refers to them, so the 11 kB between them is dropped
 by any linker collecting unreachable sections: a host that never asks carries
@@ -450,7 +450,7 @@ The linker argument above stops working at a certain size. `ParamId::note`,
 `display` and `correction` are 11 kB between them because most parameters have
 no note; a sentence for *every* parameter is 30 kB, and the effect slots'
 sentences are another 40 kB. Unreachable-section collection still drops them,
-but only for a host that calls none of the three — and the host that wants one
+but only for a host that calls none of the three, and a host that wants one
 sentence would pull in all of them. On a microcontroller that is the difference
 between fitting and not, for a string nobody on that target is going to draw.
 
@@ -476,7 +476,7 @@ this project's reading. `FxSlot::description` is the manual's own text from
 section 9.3, credited in NOTICE and reproduced verbatim down to its typos.
 `ParamId::description` is not: the manual's program parameter descriptions have
 not been transcribed, and these sentences are written against what the rest of
-the specification records — the signal path, the value tables, the notes and the
+the specification records: the signal path, the value tables, the notes and the
 ranges. A parameter whose behaviour the specification does not establish gets
 none rather than a guessed one, and a description says what the control does and
 never what a value decodes to, which is what `note()` and the value tables are
@@ -508,7 +508,7 @@ musician is worse than an honest raw one.
 
 The two ends are a different matter: they are printed in the manual and are not
 invented, so `ParamId::display` hands them over as the sentence the manual
-prints — 26 parameters have one — and `FxSlot::min` and `max` do the same for
+prints, which 26 parameters have, and `FxSlot::min` and `max` do the same for
 an effect slot. A panel can say what the ends of a control mean while its
 reading stays raw. One string rather than a parsed range, because not all 26
 are ranges: one has a discrete value before a range in it, and another is a
@@ -688,8 +688,8 @@ at this size. Features: `std` (default), `alloc`, `serde`, `transport`, `sim`.
 
 Its modules are layered: `wire` under `sysex` under `param`, `effect`, `front`,
 `program`, `syx` and `device`. The three that describe the instrument rather
-than the protocol — `effect`'s panels, `front`, and the prose accessors on
-`param` — are reached only by the host that asks for them, so a firmware
+than the protocol (`effect`'s panels, `front`, and the prose accessors on
+`param`) are reached only by the host that asks for them, so a firmware
 loader that speaks NRPN and nothing else does not carry them.
 
 `fuzz/` is outside the workspace because `cargo fuzz` builds it on nightly
@@ -761,22 +761,16 @@ the year. So a release within a year must not break the public API, and a
 breaking change is a new year. CI checks the claim with `cargo-semver-checks`
 against the newest release tag, once there is one.
 
-`26.3.0` breaks that rule once, deliberately, and this is the record of it.
-`Seq Step Value 9` and `11` carried `kind = "switch"` in the manual's table
-while accepting 0 to 255, so `26.2.0` published `Program::seq_step_value9() ->
-bool` for a parameter that is a 256-value sweep. Correcting the specification
-changes those two getters and their setters to `u8`. `cargo-semver-checks`
-passes it, but only because it does not yet lint an inherent method's return
-type, so the tool agreeing is not the claim being true. The break was taken
-rather than deferred to 2027 because the accessors it removes could not be used
-correctly: a `bool` over a bipolar step reads every value but zero as `true`.
-Two days of a crate with no known caller of those four methods is the whole
-exposure, and the alternative was shipping a knowingly wrong reading for a
-year.
+The rule has been broken once. `26.3.0` changed the two `Seq Step Value`
+accessors from `bool` to `u8`, because the manual's table called them switches
+and they accept 0 to 255; a `bool` over a 256-value sweep reads every value but
+zero as `true`, so the accessors it removed could not be used correctly. Note
+that `cargo-semver-checks` passed that change: it does not lint an inherent
+method's return type, so a green check is not proof the API held.
 
 A human edits that one line. CI fails when the version is not ahead of the
 newest release tag, so the first pull request merged after a release has to
-move it. That check is eight lines of shell in the workflow.
+move it.
 
 Having the release workflow bump and commit instead would make the version in
 the tree wrong between releases and would need write access to the default
@@ -786,9 +780,7 @@ release job only reads.
 Releasing is one click. The workflow verifies the build and a `cargo publish
 --dry-run`, reads the version, refuses if that tag exists, then tags, releases
 and publishes. Notes come from GitHub's generator, categorised by label through
-`.github/release.yml`. An earlier version opened them with a paragraph written
-by a small model on GitHub Models; that service is being retired and answers
-the request with a 410, so the step is gone.
+`.github/release.yml`.
 
 crates.io is reached through trusted publishing: GitHub mints an OIDC token
 for the run and crates.io exchanges it for a short-lived publish token, so no
@@ -796,12 +788,10 @@ long-lived credential lives in the repository. The trusted publisher is
 configured on the crate's settings page at crates.io and names this repository
 and `release.yml`; the workflow header records the exact fields.
 
-crates.io only offers this for a crate that already exists, so the first two
-releases, `26.1.0` and `26.1.1`, went out on a `CARGO_REGISTRY_TOKEN` secret
-while the trusted-publishing step logged an error annotation on an otherwise
-green run and fell through to it. The crate exists now, the fallback is gone
-and the secret can be deleted. Authentication runs before the tag is pushed,
-so a failed exchange leaves nothing tagged or released.
+Trusted publishing is only offered for a crate that already exists, so the
+first two releases went out on a `CARGO_REGISTRY_TOKEN` secret. That fallback
+is gone and the secret can be deleted. Authentication runs before the tag is
+pushed, so a failed exchange leaves nothing tagged or released.
 
 Once published, `docs.rs` builds the API reference with every feature on, as
 `[package.metadata.docs.rs]` asks. The README on crates.io uses absolute links

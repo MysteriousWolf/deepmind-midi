@@ -2728,12 +2728,11 @@ impl ParamId {
     /// Returns what the specification records about this parameter beyond its
     /// table row.
     ///
-    /// The manual's own words, kept as prose because that is what they are: a
-    /// sentence about when a rate becomes a clock division, or about a value
-    /// that skips a step rather than sounding it. What a control has to act on
-    /// is typed — see [`ParamId::shape`], [`ParamId::inactive`] and
-    /// [`ParamId::bounded_by`] — and this is the rest of it, for a host with
-    /// somewhere to print it.
+    /// The manual's own words, kept as prose: a sentence about when a rate
+    /// becomes a clock division, or about a value that skips a step rather than
+    /// sounding it. What a control has to act on is typed, in
+    /// [`ParamId::shape`], [`ParamId::inactive`] and [`ParamId::bounded_by`].
+    /// This is the rest of it, for a host with somewhere to print it.
     ///
     /// `None` for the 113 parameters the manual says nothing more about.
     #[must_use]
@@ -2882,13 +2881,12 @@ impl ParamId {
     /// Returns the range the synthesizer's own display shows for this
     /// parameter, as the manual prints it.
     ///
-    /// The smallest useful thing a panel can say about a byte whose curve
-    /// nobody has measured: the reading stays raw, and this is what the two
-    /// ends of it mean. The same answer [`FxSlot::min`](crate::effect::FxSlot::min)
-    /// and [`FxSlot::max`](crate::effect::FxSlot::max) give for an effect slot,
-    /// in one string because these are not all ranges — one of them has a
-    /// discrete value before a range in it, and another is a sentence about two
-    /// different behaviours.
+    /// Where the curve has not been measured, the reading stays raw and this is
+    /// what its two ends mean. The same answer
+    /// [`FxSlot::min`](crate::effect::FxSlot::min) and
+    /// [`FxSlot::max`](crate::effect::FxSlot::max) give for an effect slot, in
+    /// one string because not all of them are ranges: one has a discrete value
+    /// before a range, and another is a sentence about two behaviours.
     ///
     /// Not a conversion, and no promise that the curve between the ends is a
     /// straight line. `None` where the manual gives none, which is 216 of them.
@@ -2950,9 +2948,8 @@ impl ParamId {
     ///
     /// 37 rows do. The manual contradicts itself about a range, or runs two
     /// numbers together, and the specification records both the reading it took
-    /// and the reason. Worth showing to somebody convinced the editor is wrong
-    /// about a range, and worth reading beside
-    /// [`ParamId::confirmed`](Self::confirmed).
+    /// and the reason. Worth printing beside a range a user thinks is wrong, and
+    /// worth reading beside [`ParamId::confirmed`](Self::confirmed).
     #[must_use]
     pub const fn correction(self) -> Option<&'static str> {
         match self {
@@ -3037,9 +3034,9 @@ impl ParamId {
 impl ParamId {
     /// Returns what this parameter does, in a sentence.
     ///
-    /// The answer to the question somebody points at a control to ask, which
-    /// the name and the range on their own do not give: [`ParamId::name`] says
-    /// `VCF Keyboard Tracking` and this says what happens when it is turned up.
+    /// What the name and the range do not give on their own:
+    /// [`ParamId::name`] says `VCF Keyboard Tracking`, and this says what
+    /// happens when it is turned up.
     ///
     /// # Behind a feature
     ///
@@ -3050,14 +3047,13 @@ impl ParamId {
     /// has.
     ///
     /// The feature is off by default because these 242 sentences are 31 kB
-    /// of prose: free on a desktop host, real money on the microcontrollers
-    /// this crate is also meant for, and so a cost that should land on whoever
-    /// asked for it.
+    /// of prose: free on a desktop host, and not free on the microcontrollers
+    /// this crate is also meant for.
     ///
     /// # Where these come from
     ///
     /// Written for this specification against what the rest of it records, and
-    /// *not* transcribed from the manual — unlike
+    /// *not* transcribed from the manual, unlike
     /// [`FxSlot::description`](crate::effect::FxSlot::description), which is the
     /// manual's own words. A parameter whose behaviour this specification does
     /// not establish has no sentence rather than a guessed one. See the

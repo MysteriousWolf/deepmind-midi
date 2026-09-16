@@ -168,10 +168,10 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
 
 /// Renders each algorithm's slots, including where the FX page draws them.
 ///
-/// The column and row come from `layout.toml` rather than from dividing the
-/// slot number by the grid's width: the file measured which row each slot is
-/// on, and a derivation would quietly stop agreeing with it the day an
-/// algorithm is measured as filling its rows some other way.
+/// The column and row come from `layout.toml` rather than from dividing the slot
+/// number by the grid's width. The file measured which row each slot is on, and
+/// a derivation would stop agreeing with it the day an algorithm is measured as
+/// filling its rows some other way.
 ///
 /// # Errors
 ///

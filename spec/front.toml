@@ -33,7 +33,7 @@ Every legend here is as the instrument prints it, in caps."""
 shapes = """
 The shape is not derivable from the parameter's kind. `Arp On/Off` is a button \
 and `Arp Rate (tempo)` is a fader, and to the parameter table they are a switch \
-and a sweep — which says how a byte is read and not what a hand touches. \
+and a sweep, which says how a byte is read and not what a hand touches. \
 `lamps` is a column of legends with one of them lit, which is how the panel \
 shows an LFO's shape."""
 omissions = """
