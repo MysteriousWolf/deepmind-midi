@@ -1017,7 +1017,7 @@ const HIGH_PASS_SLOPE: f32 = 6.0;
 /// assert!(response.at(0.2) < response.at(0.5));
 /// ```
 #[must_use]
-pub fn high_pass_response(program: &Program) -> Generator {
+pub const fn high_pass_response(program: &Program) -> Generator {
     // Nothing in the program moves this curve: the corner's position along
     // the frequency axis is the host's to place, for the reason above, and
     // the slope is fixed. The program is taken so that every generator here
