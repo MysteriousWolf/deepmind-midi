@@ -195,8 +195,10 @@ lets NRPN edits, dump parsing and dump building share a single table.
 | `spec/panels.toml` | how those 371 slots present themselves |
 | `spec/layout.toml` | where each slot sits on the FX page, and the panel colours |
 | `spec/front.toml` | which parameters the instrument's own front panel puts a control under |
-| `spec/marks.toml` | a mark per effect family, as strokes in a unit box and as a pixel grid |
+| `spec/marks.toml` | a mark per effect family and a variant per kind a symbol can carry, as strokes in a unit box and as a pixel grid |
 | `spec/cells.toml` | a dot-matrix cell per modulation source, on the same grid |
+| `spec/glyphs.toml` | a glyph per thing a parameter does, on the same grid, named by every effect slot and most parameters and controllers |
+| `spec/characters.toml` | what kind of thing each effect is, beside its family, with a reason per membership |
 | `spec/mapping.toml` | how an address and a value become bytes |
 | `spec/routing.toml` | how the four FX engines can be wired together |
 | `spec/measurements.toml` | 29 raw values with what the synthesizer displayed |
@@ -207,7 +209,7 @@ Two commands generate from these files:
 | Command | Output |
 |---|---|
 | `cargo xtask docs` | The tables in [`midi-spec.md`](midi-spec.md), the algorithms in [`effects.md`](effects.md), and everything under `docs/diagrams/`: the Mermaid sources, the envelope figure and a panel drawing per effect |
-| `cargo xtask codegen` | `deepmind-midi/src/param/generated.rs`, the 242 parameters as an enum whose discriminant is the NRPN number, with their groups, ranges, value tables per firmware, the parameters each modulation destination moves, which way each modulation source swings and the cell drawn for it, what a raw value means beyond its range, the manual's own prose, and the controller map; `deepmind-midi/src/program/generated.rs`, one Rust type per value table and a getter and setter for each of the 225 parameters that are not the program's name; `deepmind-midi/src/effect/generated.rs`, the 35 algorithms, what each of their slots is, the grid and colours each panel is drawn from, and the ten routings; and `deepmind-midi/src/front/generated.rs`, the instrument's own front panel |
+| `cargo xtask codegen` | `deepmind-midi/src/param/generated.rs`, the 242 parameters as an enum whose discriminant is the NRPN number, with their groups, ranges, value tables per firmware, the parameters each modulation destination moves, which way each modulation source swings and the cell drawn for it, what a raw value means beyond its range, the manual's own prose, and the controller map; `deepmind-midi/src/program/generated.rs`, one Rust type per value table and a getter and setter for each of the 225 parameters that are not the program's name; `deepmind-midi/src/effect/generated.rs`, the 35 algorithms, what each of their slots is and the glyph it is pictured by, their characters, the grid and colours each panel is drawn from, the marks and the ten routings; `deepmind-midi/src/front/generated.rs`, the instrument's own front panel; and `deepmind-midi/src/pixels/generated.rs`, the glyph catalogue |
 
 The library is compiled for targets with no filesystem and no allocator, so
 the specification is compiled in rather than parsed at runtime.
@@ -596,8 +598,9 @@ manual prints as five pictures and describes as "linear, exponential and
 reverse exponential"; the values `Sample & Hold` and the noise step through,
 which are random on the instrument and fixed here so that a picture does not
 flicker; how much rate limit a slew byte is worth, where the manual says only
-that a square becomes a ramp; the straight line of a fade; and the equal
-weight OSC 1's saw and pulse are summed at. What is refused is as deliberate:
+that a square becomes a ramp; the straight line of a fade; where each LFO
+shape starts, a sine at its rest and rising so that one cycle reads as a sine
+and not as a hill; and the equal weight OSC 1's saw and pulse are summed at. What is refused is as deliberate:
 the two filters are not put on one axis, because their spacing is two
 unpublished curves; what `OSC 2 Tone Mod` does to the square is not drawn,
 because the manual does not print it beyond its name; and the bass boost is
@@ -611,22 +614,45 @@ use.
 Nothing in `generator` renders, runs a clock or touches a sample buffer, for the
 reasons the effect panels give.
 
-## Two things drawn dot by dot
+## Three things drawn dot by dot
 
-Two kinds of picture in this crate are not geometry: the pixel grid of an
-effect family's mark and the cell of a modulation source. Both are seven dots
-by seven, the size the instrument's own display has room for beside a name,
-and both are one type, `pixels::Pixels`, so a host blits a mark and a cell with
-the same code. They are drawn by hand in `spec/marks.toml` and
-`spec/cells.toml` rather than reduced from anything, because at forty-nine
-dots which of them are lit is the whole of the design.
+Three kinds of picture in this crate are not geometry: the pixel grid of an
+effect's mark, the cell of a modulation source, and the glyph of what a
+parameter does. All are seven dots by seven, the size the instrument's own
+display has room for beside a name, and all are one type, `pixels::Pixels`, so
+a host blits any of them with the same code. They are drawn by hand in
+`spec/marks.toml`, `spec/cells.toml` and `spec/glyphs.toml` rather than
+reduced from anything, because at forty-nine dots which of them are lit is
+the whole of the design.
+
+A mark belongs first to the family, and under the nine families sit the
+variants: a plate reverb's wavefronts leave a plate, a hall's are far from
+their source, a flanger is the wave braided with its inverse. A variant adds
+one element to the family's mark and never a different idea, so four engines
+read as one set whichever marks they land on, and where a symbol cannot carry
+the difference between two algorithms there is no variant and the family's
+mark is drawn. `Algorithm::mark` is the one to draw; `Algorithm::own_mark`
+says whether it is the family's. Beside the family, an algorithm has any
+number of `Character`s, vintage, modelled, stereo, dual, combined, lo-fi,
+modulated, dynamic, each membership with its reason in the spec, so a host
+can draw a vintage unit as one without matching on `Vintage` in a name.
+
+A glyph is the picture of what a control does, reached from an effect slot,
+from `ParamId::glyph` and from a controller. One per kind of thing rather than
+one per control: every low cut is one glyph, whether on a reverb, a delay or
+the voice's own filter, and a controller that drives a parameter carries the
+parameter's. The pedals are where the catalogue says what a cell could not:
+the foot controller is a treadle, expression the same treadle carrying a
+level, and the sustain pedal a switch under a foot. A cell may name a glyph
+instead of drawing its own, so the mod wheel is one drawing wherever it is
+met.
 
 The cells are reached through `ValueTable::cell_of`, and `None` where nobody
-has drawn one, which is five of the sources and all of the destinations. A host
-draws the name it already prints. `spec/cells.toml` says why each of the five
-is blank, and the reason is the same one the marks give for being nine rather
-than thirty-five: an icon that is nearly right is worse than a word, because a
-word is honest about being a word.
+has drawn one, which is four of the sources and all of the destinations. A host
+draws the name it already prints. `spec/cells.toml` says why each of the four
+is blank, and the reason is the same one the marks give for having a variant
+only where a symbol can carry the difference: an icon that is nearly right is
+worse than a word, because a word is honest about being a word.
 
 They sit beside a table's entries rather than on them, as `ValueTable::cells`,
 a value-ordered slice the accessor searches. A cell on every `ValueEntry` would

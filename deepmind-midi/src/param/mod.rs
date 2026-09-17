@@ -100,7 +100,7 @@ use generated::{CONTROLLER_OF_PARAMETER, NO_CONTROLLER};
 use core::fmt;
 
 use crate::error::{Error, Result};
-use crate::pixels::Pixels;
+use crate::pixels::{Glyph, Pixels};
 use crate::sysex::inquiry::Version;
 use crate::wire::{Channel, ChannelMessage};
 
@@ -457,6 +457,28 @@ pub struct Controller {
     pub kind: ControllerKind,
     /// The program parameter it drives, where it drives one.
     pub parameter: Option<ParamId>,
+    /// The picture of what it does, where one fits.
+    ///
+    /// A controller that drives a parameter is pictured the way the parameter
+    /// is, so the mod wheel and `LFO 1 Rate` look the same from a port as
+    /// from a panel. The standard controllers are pictured by what the MIDI
+    /// specification says they are: the modulation wheel is a wheel, the foot
+    /// controller a treadle, expression the same treadle carrying a level, and
+    /// the sustain pedal a switch under a foot. `None` for the data entry and
+    /// bank select controllers, which are addressing and not a control.
+    ///
+    /// ```
+    /// use deepmind_midi::param::Controller;
+    /// use deepmind_midi::pixels::Glyph;
+    ///
+    /// let sustain = Controller::for_cc(64).expect("the sustain pedal");
+    /// assert_eq!(sustain.glyph, Some(Glyph::Footswitch));
+    /// let foot = Controller::for_cc(4).expect("the foot controller");
+    /// assert_eq!(foot.glyph, Some(Glyph::Pedal));
+    /// let expression = Controller::for_cc(11).expect("expression");
+    /// assert_eq!(expression.glyph, Some(Glyph::Expression));
+    /// ```
+    pub glyph: Option<Glyph>,
 }
 
 impl Controller {

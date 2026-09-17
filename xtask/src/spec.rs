@@ -52,6 +52,10 @@ pub struct Parameter {
     /// Identifier of the value table in `enums.toml` that decodes this parameter.
     #[serde(default, rename = "enum")]
     pub value_table: Option<String>,
+    /// The glyph in `glyphs.toml` that pictures what the parameter does, where
+    /// one fits.
+    #[serde(default)]
+    pub glyph: Option<String>,
     /// Free-form note carried through from the manual.
     #[serde(default)]
     pub note: Option<String>,
@@ -116,6 +120,51 @@ pub struct Cell {
     /// The entry, by the name it carries; see `meta.addressing` in cells.toml.
     pub name: String,
     /// The cell, one string per row, `#` for a lit dot and `.` for an unlit one.
+    ///
+    /// Drawn here, or copied from the glyph the cell names when the spec loads,
+    /// so that everything downstream reads one field.
+    #[serde(default)]
+    pub pixels: Vec<String>,
+    /// The glyph in `glyphs.toml` this cell is drawn with, instead of `pixels`.
+    #[serde(default)]
+    pub glyph: Option<String>,
+}
+
+/// One algorithm's membership of a character, with the reason it is listed.
+#[derive(Debug, Deserialize)]
+pub struct Member {
+    /// The algorithm, by its `effects.toml` name.
+    pub name: String,
+    /// Why it has the character: the manual's name, its slots, or the unit its
+    /// name refers to.
+    pub because: String,
+}
+
+/// What kind of thing an effect is, beside what it does.
+///
+/// A family is one per algorithm; characters are any number, and
+/// `characters.toml` says how they are decided.
+#[derive(Debug, Deserialize)]
+pub struct Character {
+    /// The character's name, which becomes a variant of `effect::Character`.
+    pub name: String,
+    /// What having the character means.
+    pub description: String,
+    /// The algorithms that have it, each with its reason.
+    pub algorithms: Vec<Member>,
+}
+
+/// A picture of what a parameter does, on the same grid the cells are drawn on.
+///
+/// Reached from an effect slot, a program parameter, a controller or a cell by
+/// name; `glyphs.toml` says how they are chosen.
+#[derive(Debug, Deserialize)]
+pub struct Glyph {
+    /// The glyph's name, which becomes a variant of `pixels::Glyph`.
+    pub name: String,
+    /// What the glyph is a picture of.
+    pub description: String,
+    /// The drawing, one string per row, `#` for a lit dot and `.` for an unlit one.
     pub pixels: Vec<String>,
 }
 
@@ -227,6 +276,12 @@ pub struct Controller {
     /// Free-form note.
     #[serde(default)]
     pub note: Option<String>,
+    /// The glyph in `glyphs.toml` that pictures a standard controller.
+    ///
+    /// A controller that drives a parameter takes the parameter's glyph, so
+    /// this is only set on the ones the MIDI specification defines.
+    #[serde(default)]
+    pub glyph: Option<String>,
 }
 
 /// One parameter of one effect algorithm.
@@ -301,6 +356,8 @@ pub struct PanelSlot {
     /// what control to draw: a delay's `Factor` is drawn as a selector and is a
     /// time.
     pub quantity: String,
+    /// The glyph in `glyphs.toml` that pictures what the slot does.
+    pub glyph: String,
     /// Slots sharing a label belong together, such as one side of a dual engine.
     #[serde(default)]
     pub group: Option<String>,
@@ -402,6 +459,26 @@ pub struct Family {
     pub pixels: Vec<String>,
 }
 
+/// A mark drawn for a kind of effect within a family, where the kind is
+/// something a symbol can carry.
+///
+/// The same shape as a [`Family`], and the same language: every reverb is a
+/// source with wavefronts leaving it, and a plate is one whose source is a
+/// plate. An algorithm in no variant is drawn with its family's mark.
+#[derive(Debug, Deserialize)]
+pub struct Variant {
+    /// The variant's name, one or two words.
+    pub name: String,
+    /// What the mark is a picture of, and what it adds to the family's.
+    pub description: String,
+    /// The algorithms drawn with it, by their `effects.toml` name.
+    pub algorithms: Vec<String>,
+    /// The mark, as strokes in a unit box with the origin top left.
+    pub strokes: Vec<Stroke>,
+    /// The same mark on a square one-bit grid, one string per row.
+    pub pixels: Vec<String>,
+}
+
 impl Arc {
     /// Returns the points the swept part of the arc has to be checked against.
     ///
@@ -466,123 +543,107 @@ impl Wave {
     }
 }
 
-impl Family {
-    /// Checks this family's strokes are drawable and inside the unit box.
-    ///
-    /// # Errors
-    ///
-    /// Returns a message when a stroke sets neither `line` nor `arc` or both,
-    /// when a polyline has fewer than two points, when an arc has no radius or
-    /// no sweep, or when any of it falls outside `margin..=1.0 - margin`.
-    fn validate_strokes(&self, margin: f32) -> Result<(), String> {
-        let inside = |what: &str, x: f32, y: f32| -> Result<(), String> {
-            if (margin..=1.0 - margin).contains(&x) && (margin..=1.0 - margin).contains(&y) {
-                return Ok(());
-            }
-            Err(format!(
-                "marks.toml: {}'s {what} reaches ({x}, {y}), outside {margin} to {}",
-                self.name,
-                1.0 - margin
-            ))
-        };
+/// Checks a mark's strokes are drawable and inside the unit box.
+///
+/// # Errors
+///
+/// Returns a message when a stroke sets neither `line` nor `arc` or both,
+/// when a polyline has fewer than two points, when an arc has no radius or
+/// no sweep, or when any of it falls outside `margin..=1.0 - margin`.
+fn validate_strokes(name: &str, strokes: &[Stroke], margin: f32) -> Result<(), String> {
+    let inside = |what: &str, x: f32, y: f32| -> Result<(), String> {
+        if (margin..=1.0 - margin).contains(&x) && (margin..=1.0 - margin).contains(&y) {
+            return Ok(());
+        }
+        Err(format!(
+            "marks.toml: {}'s {what} reaches ({x}, {y}), outside {margin} to {}",
+            name,
+            1.0 - margin
+        ))
+    };
 
-        for (index, stroke) in self.strokes.iter().enumerate() {
-            let kinds = usize::from(stroke.line.is_some())
-                + usize::from(stroke.arc.is_some())
-                + usize::from(stroke.dot.is_some())
-                + usize::from(stroke.wave.is_some());
-            if kinds != 1 {
+    for (index, stroke) in strokes.iter().enumerate() {
+        let kinds = usize::from(stroke.line.is_some())
+            + usize::from(stroke.arc.is_some())
+            + usize::from(stroke.dot.is_some())
+            + usize::from(stroke.wave.is_some());
+        if kinds != 1 {
+            return Err(format!(
+                "marks.toml: {name} stroke {index} sets {kinds} of line, arc, dot and wave, not 1"
+            ));
+        }
+
+        if let Some(points) = &stroke.line {
+            if points.len() < 2 {
                 return Err(format!(
-                    "marks.toml: {} stroke {index} sets {kinds} of line, arc, dot and wave, not 1",
-                    self.name
+                    "marks.toml: {} stroke {index} is a line of {} point(s)",
+                    name,
+                    points.len()
                 ));
             }
-
-            if let Some(points) = &stroke.line {
-                if points.len() < 2 {
-                    return Err(format!(
-                        "marks.toml: {} stroke {index} is a line of {} point(s)",
-                        self.name,
-                        points.len()
-                    ));
-                }
-                for &[x, y] in points {
-                    inside("line", x, y)?;
-                }
-            }
-
-            if let Some(arc) = &stroke.arc {
-                if arc.radius <= 0.0 {
-                    return Err(format!(
-                        "marks.toml: {} stroke {index} is an arc of radius {}",
-                        self.name, arc.radius
-                    ));
-                }
-                if arc.sweep == 0.0 {
-                    return Err(format!(
-                        "marks.toml: {} stroke {index} is an arc that sweeps nothing",
-                        self.name
-                    ));
-                }
-                // Only the part actually swept, so that an arc may be taken
-                // from a circle reaching outside the box. That is what lets a
-                // shallow wavefront be drawn from a distant centre.
-                for (x, y) in arc.extent() {
-                    inside("arc", x, y)?;
-                }
-            }
-
-            if let Some(dot) = &stroke.dot {
-                if dot.radius <= 0.0 {
-                    return Err(format!(
-                        "marks.toml: {} stroke {index} is a dot of radius {}",
-                        self.name, dot.radius
-                    ));
-                }
-                inside(
-                    "dot",
-                    dot.centre[0] - dot.radius,
-                    dot.centre[1] - dot.radius,
-                )?;
-                inside(
-                    "dot",
-                    dot.centre[0] + dot.radius,
-                    dot.centre[1] + dot.radius,
-                )?;
-            }
-
-            if let Some(wave) = &stroke.wave {
-                if wave.amplitude <= 0.0 {
-                    return Err(format!(
-                        "marks.toml: {} stroke {index} is a wave of amplitude {}",
-                        self.name, wave.amplitude
-                    ));
-                }
-                if wave.cycles <= 0.0 {
-                    return Err(format!(
-                        "marks.toml: {} stroke {index} is a wave of {} cycles",
-                        self.name, wave.cycles
-                    ));
-                }
-                for (x, y) in wave.extent() {
-                    inside("wave", x, y)?;
-                }
+            for &[x, y] in points {
+                inside("line", x, y)?;
             }
         }
-        Ok(())
-    }
 
-    /// Checks this family's pixel grid is square, one bit per character, and
-    /// draws something a reader could tell from anything else.
-    ///
-    /// # Errors
-    ///
-    /// Returns a message when the grid is not `side` rows of `side`
-    /// characters, when a character is neither `#` nor `.`, or when the grid is
-    /// empty or completely full, both of which draw nothing.
-    fn validate_pixels(&self, side: usize) -> Result<(), String> {
-        validate_pixels("marks.toml", &self.name, &self.pixels, side)
+        if let Some(arc) = &stroke.arc {
+            if arc.radius <= 0.0 {
+                return Err(format!(
+                    "marks.toml: {} stroke {index} is an arc of radius {}",
+                    name, arc.radius
+                ));
+            }
+            if arc.sweep == 0.0 {
+                return Err(format!(
+                    "marks.toml: {name} stroke {index} is an arc that sweeps nothing"
+                ));
+            }
+            // Only the part actually swept, so that an arc may be taken
+            // from a circle reaching outside the box. That is what lets a
+            // shallow wavefront be drawn from a distant centre.
+            for (x, y) in arc.extent() {
+                inside("arc", x, y)?;
+            }
+        }
+
+        if let Some(dot) = &stroke.dot {
+            if dot.radius <= 0.0 {
+                return Err(format!(
+                    "marks.toml: {} stroke {index} is a dot of radius {}",
+                    name, dot.radius
+                ));
+            }
+            inside(
+                "dot",
+                dot.centre[0] - dot.radius,
+                dot.centre[1] - dot.radius,
+            )?;
+            inside(
+                "dot",
+                dot.centre[0] + dot.radius,
+                dot.centre[1] + dot.radius,
+            )?;
+        }
+
+        if let Some(wave) = &stroke.wave {
+            if wave.amplitude <= 0.0 {
+                return Err(format!(
+                    "marks.toml: {} stroke {index} is a wave of amplitude {}",
+                    name, wave.amplitude
+                ));
+            }
+            if wave.cycles <= 0.0 {
+                return Err(format!(
+                    "marks.toml: {} stroke {index} is a wave of {} cycles",
+                    name, wave.cycles
+                ));
+            }
+            for (x, y) in wave.extent() {
+                inside("wave", x, y)?;
+            }
+        }
     }
+    Ok(())
 }
 
 /// Side of the grid every pixel drawing is on: the marks and the cells both.
@@ -904,11 +965,23 @@ struct PanelMeta {
 #[derive(Debug, Deserialize)]
 struct Marks {
     family: Vec<Family>,
+    #[serde(default)]
+    variant: Vec<Variant>,
 }
 
 #[derive(Debug, Deserialize)]
 struct Cells {
     cell: Vec<Cell>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Glyphs {
+    glyph: Vec<Glyph>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Characters {
+    character: Vec<Character>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -1017,8 +1090,15 @@ pub struct Spec {
     pub quantities: Vec<String>,
     /// What each effect does to a signal, with the mark it is drawn with.
     pub families: Vec<Family>,
-    /// The dot-matrix cells drawn for value table entries, as written.
+    /// The marks drawn for kinds of effect within a family, as written.
+    pub variants: Vec<Variant>,
+    /// The dot-matrix cells drawn for value table entries, as written, each
+    /// with its pixels filled in from its glyph where it named one.
     pub cells: Vec<Cell>,
+    /// The pictures of what a parameter does, as written.
+    pub glyphs: Vec<Glyph>,
+    /// What kind of thing each effect is, as written.
+    pub characters: Vec<Character>,
     /// How the four engines can be wired, ordered by `FX Routing` value.
     pub routings: Vec<Routing>,
     /// What each `FX Mode` setting does to the analog and digital paths.
@@ -1055,12 +1135,14 @@ impl Spec {
         let panels: Panels = read(&spec.join("panels.toml"))?;
         let marks: Marks = read(&spec.join("marks.toml"))?;
         let cells: Cells = read(&spec.join("cells.toml"))?;
+        let glyphs: Glyphs = read(&spec.join("glyphs.toml"))?;
+        let characters: Characters = read(&spec.join("characters.toml"))?;
         let layouts: Layouts = read(&spec.join("layout.toml"))?;
         let routings: Routings = read(&spec.join("routing.toml"))?;
         let measurements: Measurements = read(&spec.join("measurements.toml"))?;
         let front: Front = read(&spec.join("front.toml"))?;
 
-        let this = Self {
+        let mut this = Self {
             parameters: parameters.parameter,
             tables: tables.tables,
             messages: messages.message,
@@ -1078,7 +1160,10 @@ impl Spec {
             panels: panels.panel,
             quantities: panels.meta.quantities,
             families: marks.family,
+            variants: marks.variant,
             cells: cells.cell,
+            glyphs: glyphs.glyph,
+            characters: characters.character,
             routings: routings.routing,
             fx_modes: routings.mode,
             measurements: measurements.measurement,
@@ -1086,8 +1171,106 @@ impl Spec {
             panel_rows: front.meta.rows,
             shape_kinds: front.meta.shape_kinds,
         };
+        this.validate_glyphs()?;
+        this.resolve_cells()?;
         this.validate()?;
         Ok(this)
+    }
+
+    /// Checks the glyph catalogue and everything that names a glyph.
+    ///
+    /// Every glyph is drawn once, on the one grid; every effect slot names one;
+    /// and a parameter, a controller or a cell that names one names one that
+    /// exists. A reference to a glyph nobody drew is an error here rather than
+    /// a table that does not compile.
+    fn validate_glyphs(&self) -> Result<(), String> {
+        let mut names: Vec<&str> = Vec::new();
+        for glyph in &self.glyphs {
+            if glyph.name.trim().is_empty() {
+                return Err("glyphs.toml: a glyph has no name".to_owned());
+            }
+            if names.contains(&glyph.name.as_str()) {
+                return Err(format!("glyphs.toml: {:?} is drawn twice", glyph.name));
+            }
+            names.push(&glyph.name);
+            if glyph.description.trim().is_empty() {
+                return Err(format!("glyphs.toml: {} has no description", glyph.name));
+            }
+            validate_pixels("glyphs.toml", &glyph.name, &glyph.pixels, PIXEL_SIDE)?;
+        }
+        let known = |file: &str, what: &str, name: &str| -> Result<(), String> {
+            if names.contains(&name) {
+                Ok(())
+            } else {
+                Err(format!(
+                    "{file}: {what} names glyph {name:?}, which glyphs.toml does not draw"
+                ))
+            }
+        };
+        for panel in &self.panels {
+            for slot in &panel.slots {
+                known(
+                    "panels.toml",
+                    &format!("{} slot {}", panel.name, slot.slot),
+                    &slot.glyph,
+                )?;
+            }
+        }
+        for parameter in &self.parameters {
+            if let Some(glyph) = &parameter.glyph {
+                known("parameters.toml", &parameter.name, glyph)?;
+            }
+        }
+        for controller in &self.controllers {
+            if let Some(glyph) = &controller.glyph {
+                known("controllers.toml", &controller.name, glyph)?;
+                if controller.parameter.is_some() {
+                    return Err(format!(
+                        "controllers.toml: {} drives a parameter and names a glyph; the parameter's is the one it gets",
+                        controller.name
+                    ));
+                }
+            }
+        }
+        for cell in &self.cells {
+            if let Some(glyph) = &cell.glyph {
+                known("cells.toml", &cell.name, glyph)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Copies each glyph-drawn cell's pixels in from its glyph.
+    ///
+    /// A cell is either drawn or named, never both and never neither, so that
+    /// the picture of a source lives in exactly one place.
+    fn resolve_cells(&mut self) -> Result<(), String> {
+        let glyphs = &self.glyphs;
+        for cell in &mut self.cells {
+            match (&cell.glyph, cell.pixels.is_empty()) {
+                (Some(name), true) => {
+                    let glyph = glyphs
+                        .iter()
+                        .find(|glyph| &glyph.name == name)
+                        .ok_or_else(|| format!("cells.toml: {} names no glyph", cell.name))?;
+                    cell.pixels.clone_from(&glyph.pixels);
+                }
+                (None, false) => {}
+                (Some(_), false) => {
+                    return Err(format!(
+                        "cells.toml: {} both draws pixels and names a glyph",
+                        cell.name
+                    ));
+                }
+                (None, true) => {
+                    return Err(format!(
+                        "cells.toml: {} neither draws pixels nor names a glyph",
+                        cell.name
+                    ));
+                }
+            }
+        }
+        Ok(())
     }
 
     /// Returns the firmware version used when a caller names none.
@@ -1154,6 +1337,7 @@ impl Spec {
         self.validate_cells()?;
         self.validate_controllers()?;
         self.validate_effects()?;
+        self.validate_characters()?;
         self.validate_engines()?;
         self.validate_layout()?;
         self.validate_routing()?;
@@ -1772,6 +1956,72 @@ impl Spec {
         Ok(())
     }
 
+    /// Checks that every character names algorithms that exist, once each,
+    /// with a reason.
+    ///
+    /// A membership without a reason is a judgement about how something sounds,
+    /// which is the one kind of evidence `characters.toml` refuses.
+    fn validate_characters(&self) -> Result<(), String> {
+        let mut names: Vec<&str> = Vec::new();
+        for character in &self.characters {
+            if character.name.trim().is_empty() {
+                return Err("characters.toml: a character has no name".to_owned());
+            }
+            if names.contains(&character.name.as_str()) {
+                return Err(format!(
+                    "characters.toml: {} is listed twice",
+                    character.name
+                ));
+            }
+            names.push(&character.name);
+            if character.description.trim().is_empty() {
+                return Err(format!(
+                    "characters.toml: {} has no description",
+                    character.name
+                ));
+            }
+            if character.algorithms.is_empty() {
+                return Err(format!(
+                    "characters.toml: {} names no algorithm",
+                    character.name
+                ));
+            }
+            let mut members: Vec<&str> = Vec::new();
+            for member in &character.algorithms {
+                if !self.effects.iter().any(|effect| effect.name == member.name) {
+                    return Err(format!(
+                        "characters.toml: {} claims {:?}, which effects.toml does not list",
+                        character.name, member.name
+                    ));
+                }
+                if members.contains(&member.name.as_str()) {
+                    return Err(format!(
+                        "characters.toml: {} lists {:?} twice",
+                        character.name, member.name
+                    ));
+                }
+                members.push(&member.name);
+                if member.because.trim().is_empty() {
+                    return Err(format!(
+                        "characters.toml: {} lists {:?} without a reason",
+                        character.name, member.name
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Returns the characters `algorithm` has, in the order the file declares
+    /// them.
+    #[must_use]
+    pub fn characters_of(&self, algorithm: &str) -> Vec<&Character> {
+        self.characters
+            .iter()
+            .filter(|character| character.algorithms.iter().any(|m| m.name == algorithm))
+            .collect()
+    }
+
     /// Checks the ten routing topologies against the value tables and themselves.
     ///
     /// These were transcribed by eye from ten small printed diagrams. A slot
@@ -2095,8 +2345,8 @@ impl Spec {
                     ));
                 }
             }
-            family.validate_strokes(MARGIN)?;
-            family.validate_pixels(PIXEL_SIDE)?;
+            validate_strokes(&family.name, &family.strokes, MARGIN)?;
+            validate_pixels("marks.toml", &family.name, &family.pixels, PIXEL_SIDE)?;
         }
 
         if let Some(effect) = self
@@ -2109,7 +2359,64 @@ impl Spec {
                 effect.name
             ));
         }
+
+        // A variant is drawn for algorithms of one family, at most one variant
+        // each; an algorithm in none falls back to the family's mark.
+        let mut drawn: BTreeMap<&str, &str> = BTreeMap::new();
+        let mut names: Vec<&str> = Vec::new();
+        for variant in &self.variants {
+            if variant.name.trim().is_empty() {
+                return Err("marks.toml: a variant has no name".to_owned());
+            }
+            if names.contains(&variant.name.as_str()) {
+                return Err(format!(
+                    "marks.toml: variant {} is drawn twice",
+                    variant.name
+                ));
+            }
+            names.push(&variant.name);
+            if variant.algorithms.is_empty() {
+                return Err(format!(
+                    "marks.toml: variant {} is drawn for no algorithm",
+                    variant.name
+                ));
+            }
+            let mut family: Option<&str> = None;
+            for name in &variant.algorithms {
+                let Some(in_family) = claimed.get(name.as_str()) else {
+                    return Err(format!(
+                        "marks.toml: variant {} claims {name:?}, which effects.toml does not list",
+                        variant.name
+                    ));
+                };
+                // Spelled for Rust 1.85, which has no let chains.
+                if family.is_some_and(|first| first != *in_family) {
+                    return Err(format!(
+                        "marks.toml: variant {} spans {} and {in_family}; a variant is of one family",
+                        variant.name,
+                        family.unwrap_or_default()
+                    ));
+                }
+                family = Some(in_family);
+                if let Some(first) = drawn.insert(name, &variant.name) {
+                    return Err(format!(
+                        "marks.toml: {name:?} is drawn as both {first} and {}",
+                        variant.name
+                    ));
+                }
+            }
+            validate_strokes(&variant.name, &variant.strokes, MARGIN)?;
+            validate_pixels("marks.toml", &variant.name, &variant.pixels, PIXEL_SIDE)?;
+        }
         Ok(())
+    }
+
+    /// Returns the variant `algorithm` is drawn with, if one is.
+    #[must_use]
+    pub fn variant_of(&self, algorithm: &str) -> Option<&Variant> {
+        self.variants
+            .iter()
+            .find(|variant| variant.algorithms.iter().any(|a| a == algorithm))
     }
 
     /// Checks that panels.toml lines up with effects.toml slot for slot.
@@ -2313,6 +2620,40 @@ mod tests {
                 other => panic!("messages.toml: unknown direction {other:?}"),
             };
             assert_eq!(command.direction(), direction, "{}", message.name);
+        }
+    }
+
+    /// Fails when the drawn catalogues drift from what the library carries.
+    ///
+    /// The counts are generated, so a mismatch means a stale checkout; the
+    /// glyph names are checked one by one because the enum's variants are
+    /// what a host writes and a renamed glyph should be loud.
+    #[test]
+    fn the_library_catalogues_match_the_spec() {
+        use deepmind_midi::effect::{Algorithm, CHARACTER_COUNT, VARIANT_COUNT};
+        use deepmind_midi::pixels::Glyph;
+
+        let spec = spec();
+        assert_eq!(spec.glyphs.len(), Glyph::ALL.len());
+        for (glyph, drawn) in Glyph::ALL.iter().zip(&spec.glyphs) {
+            assert_eq!(glyph.name(), drawn.name);
+        }
+        assert_eq!(spec.characters.len(), CHARACTER_COUNT);
+        assert_eq!(spec.variants.len(), VARIANT_COUNT);
+        for effect in &spec.effects {
+            let algorithm = Algorithm::by_name(&effect.name).expect("an algorithm per effect");
+            assert_eq!(
+                algorithm.own_mark().is_some(),
+                spec.variant_of(&effect.name).is_some(),
+                "{}",
+                effect.name
+            );
+            assert_eq!(
+                algorithm.characters().len(),
+                spec.characters_of(&effect.name).len(),
+                "{}",
+                effect.name
+            );
         }
     }
 

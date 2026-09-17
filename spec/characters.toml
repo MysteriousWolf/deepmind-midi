@@ -1,0 +1,142 @@
+# What an effect is like, beside what it does: a character an algorithm has.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/effects.md, and `cargo xtask codegen` to
+# refresh the tables that carry the characters.
+#
+# An algorithm has a family from marks.toml, which is what it does to a signal
+# and is one thing per algorithm. This file is the other axis: what kind of
+# thing it is, which is several things at once. A Tel-Ray delay is a delay by
+# family and is vintage, modelled on a named unit, lo-fi and modulated by
+# character, and a host drawing four engines has four more ways to tell them
+# apart than the family gives it.
+
+[meta]
+purpose = """
+Nine families look alike from across the room, and thirteen reverbs look \
+alike from anywhere. A host that wants a vintage unit to look like one, a \
+stereo pair to be drawn as a pair, or two effects in one engine to be drawn \
+as two, needs the instrument to say which is which. It is the same kind of \
+fact as the family, published for the same reason: read here, every host \
+draws the same thing, and none of them matches on the word `Vintage` in a \
+name."""
+evidence = """
+Every membership carries its reason, and the reasons are of three kinds \
+only: the manual's own name for the effect, the slots the manual gives it, \
+and the unit a name refers to where that unit is a matter of record. Nothing \
+is a character because of how it sounds. An algorithm not listed under a \
+character does not have it as far as this project can say, which is not the \
+same as not having it: the manual describes the Chamber Reverb in one line."""
+overlap = """
+An algorithm may have any number of characters, including none. Twenty-nine \
+of the 35 have at least one; the plain reverbs and the noise gate are the \
+ones with nothing to say beyond their family, and that is the honest answer \
+rather than a character invented to fill the row."""
+
+[[character]]
+name = "Vintage"
+description = "Named vintage, or named for a unit from before effects were digital."
+algorithms = [
+    { name = "VintageRev", because = "the manual calls it the Vintage Room Reverb" },
+    { name = "Vintage Pitch", because = "the manual calls it Vintage Pitch" },
+    { name = "FairComp", because = "named for the Fairchild 670, a valve compressor of 1959" },
+    { name = "T-RayDelay", because = "named for the Tel-Ray oil-can delay of the 1960s" },
+    { name = "Chorus-D", because = "named for the Roland Dimension D of 1979" },
+    { name = "MoodFilter", because = "named for the Moog ladder filter of 1965" },
+    { name = "RotarySpkr", because = "a rotary speaker is a mechanical device of the 1940s, and its motor is one of the slots" },
+]
+
+[[character]]
+name = "Modelled"
+description = "Named for a specific product or maker, so its panel is a picture of that unit."
+algorithms = [
+    { name = "TC-DeepVRB", because = "TC Electronic's reverb, under their name" },
+    { name = "MidasEQ", because = "named for the Midas console equaliser" },
+    { name = "FairComp", because = "named for the Fairchild 670" },
+    { name = "T-RayDelay", because = "named for the Tel-Ray oil-can delay" },
+    { name = "Chorus-D", because = "named for the Roland Dimension D" },
+    { name = "EdisonEX1", because = "named for the Behringer Edison EX1 stereo image processor" },
+    { name = "MoodFilter", because = "the manual calls it the Moog-Type Filter" },
+]
+
+[[character]]
+name = "Stereo"
+description = "Two channels, with a control per side or a job that is the stereo field itself."
+algorithms = [
+    { name = "Delay", because = "the manual calls it the Stereo Delay, with a delay factor and a feedback per side" },
+    { name = "Chorus", because = "the manual calls it the Stereo Chorus, with a width and a delay per side" },
+    { name = "Flanger", because = "the manual calls it the Stereo Flanger, with a width and a delay per side" },
+    { name = "Phaser", because = "the manual calls it the Stereo Phaser" },
+    { name = "EdisonEX1", because = "the manual calls it Stereo Imaging" },
+    { name = "Auto Pan", because = "what it moves is stereo position" },
+    { name = "FairComp", because = "a left or mid side and a right or side side, each with its own slots" },
+]
+
+[[character]]
+name = "Dual"
+description = "Two of the same processor in one engine, each with its own slots."
+algorithms = [
+    { name = "DualPitch", because = "the manual calls it the Dual Pitch Shifter, with semitones, cents, delay, gain and pan per channel" },
+    { name = "Vintage Pitch", because = "the manual calls it the Dual Pitch Shifter, with semitones, cents, delay, feedback and pan per channel" },
+    { name = "FairComp", because = "two channels, each with its own gain, threshold, time and bias" },
+]
+
+[[character]]
+name = "Multiband"
+description = "Splits the signal into bands and treats each on its own."
+algorithms = [
+    { name = "MulBndDist", because = "the manual calls it the Multiband Distortion, with a level and a drive per band and two crossovers" },
+    { name = "MidasEQ", because = "four bands, each with its own gain and frequency" },
+    { name = "Enhancer", because = "three bands, each with its own gain" },
+]
+
+[[character]]
+name = "Combined"
+description = "Two effects in one engine, one after the other."
+algorithms = [
+    { name = "ChorusVerb", because = "the manual calls it Chorus and Reverb" },
+    { name = "DelayVerb", because = "the manual calls it Delay and Reverb" },
+    { name = "FlangVerb", because = "the manual calls it Flanger and Reverb" },
+    { name = "ModDlyRev", because = "the manual calls it Modulation, Delay and Reverb" },
+]
+
+[[character]]
+name = "LoFi"
+description = "Degrades the signal on purpose."
+algorithms = [
+    { name = "DecimDelay", because = "the manual calls it the Decimator Delay, with a downsample and a bit depth among its slots" },
+    { name = "T-RayDelay", because = "an oil-can delay is dark and unsteady by construction, and Wobble is one of its five slots" },
+]
+
+[[character]]
+name = "Modulated"
+description = "Something inside it moves on its own: an LFO, a spin or a motor."
+algorithms = [
+    { name = "Chorus", because = "a speed, a wave and a phase among its slots" },
+    { name = "Chorus-D", because = "a chorus by family" },
+    { name = "Flanger", because = "a speed and a phase among its slots" },
+    { name = "Phaser", because = "a speed, a wave and a phase among its slots" },
+    { name = "MoodFilter", because = "a speed and a wave among its slots" },
+    { name = "Auto Pan", because = "a speed, a wave and a phase among its slots" },
+    { name = "RotarySpkr", because = "two speeds, an acceleration and a motor among its slots" },
+    { name = "AmbVerb", because = "a modulation depth among its slots" },
+    { name = "RoomRev", because = "a spin among its slots" },
+    { name = "ChamberRev", because = "a spin among its slots" },
+    { name = "RichPltRev", because = "a spin among its slots" },
+    { name = "HallRev", because = "a modulation speed among its slots" },
+    { name = "PlateRev", because = "a modulation speed and depth among its slots" },
+    { name = "ChorusVerb", because = "a speed, a wave and a phase among its slots" },
+    { name = "FlangVerb", because = "a speed and a phase among its slots" },
+    { name = "ModDlyRev", because = "a speed and a depth among its slots" },
+]
+
+[[character]]
+name = "Dynamic"
+description = "Listens to the level of what goes in and moves with it."
+algorithms = [
+    { name = "FairComp", because = "a compressor, with a threshold per channel" },
+    { name = "NoiseGate", because = "a gate, with a threshold, an attack, a hold and a release" },
+    { name = "Auto Pan", because = "an envelope speed and depth among its slots" },
+    { name = "Phaser", because = "an envelope modulation, an attack, a hold and a release among its slots" },
+    { name = "MoodFilter", because = "an envelope modulation, an attack and a release among its slots" },
+]

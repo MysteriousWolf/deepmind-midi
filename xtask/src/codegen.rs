@@ -23,11 +23,12 @@ use crate::spec::{Parameter, Spec, ValueTable, version_parts};
 pub const CODE_PATH: &str = "deepmind-midi/src/param/generated.rs";
 
 /// Every generated source file, in the order they are written.
-pub const CODE_PATHS: [&str; 4] = [
+pub const CODE_PATHS: [&str; 5] = [
     CODE_PATH,
     crate::program::CODE_PATH,
     crate::effect::CODE_PATH,
     crate::front::CODE_PATH,
+    crate::glyph::CODE_PATH,
 ];
 
 /// Loads the spec, then renders the generated source files as [`generate`].
@@ -64,6 +65,10 @@ pub fn generate(spec: &Spec, root: &Path, check: bool) -> Result<Vec<String>, St
         (
             crate::front::CODE_PATH,
             crate::front::render(spec, &idents)?,
+        ),
+        (
+            crate::glyph::CODE_PATH,
+            crate::glyph::render(spec, &idents)?,
         ),
     ];
 
@@ -128,6 +133,8 @@ pub struct Identifiers {
     pub groups: BTreeMap<String, String>,
     /// By value table identifier.
     pub tables: BTreeMap<String, String>,
+    /// By glyph name.
+    pub glyphs: BTreeMap<String, String>,
 }
 
 impl Identifiers {
@@ -146,6 +153,11 @@ impl Identifiers {
             parameters: identifiers(spec.parameters.iter().map(|p| p.name.as_str()), "parameter")?,
             groups: owned(group_identifiers(spec)?),
             tables: owned(table_identifiers(spec)?),
+            glyphs: {
+                let names = spec.glyphs.iter().map(|glyph| glyph.name.as_str());
+                let idents = cased(names.clone(), "glyph", pascal)?;
+                names.map(str::to_owned).zip(idents).collect()
+            },
         })
     }
 }
@@ -160,6 +172,7 @@ fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     render_readings(spec, idents, &mut out)?;
     render_prose(spec, idents, &mut out);
     render_descriptions(spec, idents, &mut out);
+    render_glyphs(spec, idents, &mut out)?;
     render_tables(spec, idents, &mut out)?;
     render_controllers(spec, idents, &mut out)?;
     Ok(out)
@@ -179,7 +192,7 @@ const HEADER: &str = "\
 use super::{
     Controller, ControllerKind, Kind, Parameter, Shape, Swing, ValueEntry, ValueTable,
 };
-use crate::pixels::Pixels;
+use crate::pixels::{Glyph, Pixels};
 use crate::sysex::inquiry::Version;
 
 ";
@@ -284,6 +297,7 @@ fn render_parameters(spec: &Spec, idents: &Identifiers, out: &mut String) -> Res
         parameters: idents,
         groups,
         tables,
+        glyphs: _,
     } = idents;
 
     out.push_str(
@@ -722,6 +736,65 @@ fn arm(members: &[&str]) -> String {
         .join(" | ")
 }
 
+/// Renders the glyph each parameter is pictured by.
+///
+/// Grouped by glyph, as the prose is: the three envelopes' attacks are one
+/// arm. A parameter no glyph fits falls to `None`, which is the honest answer
+/// for a program name's characters and for the 48 effect slots, whose picture
+/// depends on what the engine is running and is
+/// `FxSlot::glyph` instead.
+fn render_glyphs(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
+    let mut by_glyph: Vec<(&str, Vec<&str>)> = Vec::new();
+    for (parameter, ident) in spec.parameters.iter().zip(&idents.parameters) {
+        let Some(name) = parameter.glyph.as_deref() else {
+            continue;
+        };
+        match by_glyph.iter_mut().find(|(seen, _)| *seen == name) {
+            Some((_, members)) => members.push(ident),
+            None => by_glyph.push((name, vec![ident])),
+        }
+    }
+    let pictured: usize = by_glyph.iter().map(|(_, members)| members.len()).sum();
+
+    let _ = writeln!(
+        out,
+        "\
+impl ParamId {{
+    /// Returns the picture of what this parameter does, where one fits.
+    ///
+    /// {pictured} of the {total} carry one. The rest are the effect slots, whose
+    /// picture depends on the algorithm the engine is running and is
+    /// [`FxSlot::glyph`](crate::effect::FxSlot::glyph), and the program name's
+    /// characters, which are letters and not a control. A host draws the name
+    /// it already prints for those.
+    ///
+    /// Which glyph a parameter carries is this crate's reading of what the
+    /// parameter does; `spec/glyphs.toml` says how it was decided.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    /// use deepmind_midi::pixels::Glyph;
+    ///
+    /// assert_eq!(ParamId::VcfResonance.glyph(), Some(Glyph::Resonance));
+    /// assert_eq!(ParamId::Fx1Param1.glyph(), None);
+    /// ```
+    #[must_use]
+    pub const fn glyph(self) -> Option<Glyph> {{
+        match self {{",
+        total = spec.parameters.len(),
+    );
+    for (name, members) in &by_glyph {
+        let _ = writeln!(
+            out,
+            "            {} => Some(Glyph::{}),",
+            arm(members),
+            crate::glyph::ident(idents, name)?
+        );
+    }
+    out.push_str("            _ => None,\n        }\n    }\n}\n\n");
+    Ok(())
+}
+
 fn render_tables(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
     // A value table entry names the parameters it moves under the names
     // `parameters.toml` gives, which is what keeps the file readable by hand.
@@ -909,6 +982,7 @@ pub fn firmware_test(table: &ValueTable) -> Result<String, String> {
 }
 
 fn render_controllers(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
+    let idents_all = idents;
     let idents = &idents.parameters;
 
     out.push_str(
@@ -941,9 +1015,20 @@ pub const CONTROLLERS: [Controller; CONTROLLER_COUNT] = [
                 format!("Some(ParamId::{ident})")
             }
         };
+        // A standard controller names its own glyph; one that drives a
+        // parameter is pictured the way the parameter is, so that the mod
+        // wheel and `LFO 1 Rate` look the same from a port as from a panel.
+        let own = controller.glyph.as_deref().or_else(|| {
+            let offset = usize::from(controller.parameter?);
+            spec.parameters.get(offset)?.glyph.as_deref()
+        });
+        let glyph = match own {
+            None => "None".to_owned(),
+            Some(name) => format!("Some(Glyph::{})", crate::glyph::ident(idents_all, name)?),
+        };
         let _ = writeln!(
             out,
-            "    Controller {{ cc: {}, name: {:?}, kind: {kind}, parameter: {parameter} }},",
+            "    Controller {{ cc: {}, name: {:?}, kind: {kind}, parameter: {parameter}, glyph: {glyph} }},",
             controller.cc, controller.name
         );
     }

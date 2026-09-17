@@ -84,11 +84,24 @@ Seven is odd, so every mark has a true centre pixel to hang symmetry on, and it 
 is the smallest grid that fits the ring with a middle in it. A host wanting a \
 bigger icon has the strokes; this is for where the strokes cannot go."""
 reuse = """
-Nine marks for 35 algorithms. Every reverb is one mark and the six delays are \
-one mark, because the difference between a Hall Reverb and a Plate Reverb is \
-not something a symbol at twelve pixels can carry, and a drawing that implied \
-it would be a guess about which reverb this is. The name is what tells them \
-apart, and the library already publishes that."""
+Nine family marks for 35 algorithms, and a variant where a kind within a \
+family is something a symbol can carry. Every reverb is the family's source \
+with wavefronts leaving it; a plate is that with a plate for a source, a hall \
+is that with the wavefronts far from the source, a gated reverb is that with \
+a wall the wavefronts stop at. What a variant adds is one element on top of \
+the family's mark and never a different idea, so that four engines on one page \
+read as one set whichever marks they land on. Where the difference between two \
+algorithms is not something a symbol can carry, an ambient reverb against a \
+TC reverb, a stereo delay against a 3-tap, there is no variant and the family \
+mark is drawn: a drawing that implied a difference it cannot show would be a \
+guess about which reverb this is, and the name is what tells them apart."""
+variants = """
+A variant is drawn for the algorithms it names, all of one family, at most \
+one variant per algorithm, and the loader checks all three. It is the same \
+five elements as the family marks and the same seven by seven grid, drawn \
+again by hand for the same reason. `Algorithm::mark` gives an algorithm its \
+variant's mark where it has one and its family's where it does not; \
+`Algorithm::own_mark` says which."""
 not_artwork = """
 No font, no raster and no licensed symbol set. Nothing here is measured off the \
 manual, unlike the panel colours: these are drawn by this project, and they are \
@@ -284,4 +297,399 @@ pixels = [
     "#.....#",
     ".#...#.",
     "..###..",
+]
+
+[[variant]]
+name = "Room"
+description = "The family's source and its wavefront, and the wall they meet: a corner at the right."
+algorithms = ["RoomRev", "ChamberRev", "VintageRev"]
+strokes = [
+    { dot = { centre = [0.15, 0.50], radius = 0.06 } },
+    { arc = { centre = [0.10, 0.50], radius = 0.30, start = -0.15, sweep = 0.30 } },
+    { line = [[0.62, 0.12], [0.88, 0.12], [0.88, 0.88], [0.62, 0.88]] },
+]
+pixels = [
+    ".....##",
+    "..#...#",
+    "...#..#",
+    "#..#..#",
+    "...#..#",
+    "..#...#",
+    ".....##",
+]
+
+[[variant]]
+name = "Hall"
+description = "The family's wavefronts a long way from their source: a big space."
+algorithms = ["HallRev"]
+strokes = [
+    { dot = { centre = [0.15, 0.50], radius = 0.06 } },
+    { arc = { centre = [0.10, 0.50], radius = 0.56, start = -0.11, sweep = 0.22 } },
+    { arc = { centre = [0.10, 0.50], radius = 0.80, start = -0.075, sweep = 0.15 } },
+]
+pixels = [
+    ".......",
+    ".....#.",
+    "....#.#",
+    "#...#.#",
+    "....#.#",
+    ".....#.",
+    ".......",
+]
+
+[[variant]]
+name = "Plate"
+description = "The family's wavefronts leaving a plate rather than a point."
+algorithms = ["PlateRev", "RichPltRev"]
+strokes = [
+    { line = [[0.14, 0.14], [0.14, 0.86]] },
+    { arc = { centre = [0.10, 0.50], radius = 0.30, start = -0.15, sweep = 0.30 } },
+    { arc = { centre = [0.10, 0.50], radius = 0.62, start = -0.11, sweep = 0.22 } },
+]
+pixels = [
+    ".......",
+    "#.#.#..",
+    "#..#.#.",
+    "#..#.#.",
+    "#..#.#.",
+    "#.#.#..",
+    ".......",
+]
+
+[[variant]]
+name = "Gated"
+description = "The family's source and wavefront, and a wall the tail stops at."
+algorithms = ["GatedRev"]
+strokes = [
+    { dot = { centre = [0.15, 0.50], radius = 0.06 } },
+    { arc = { centre = [0.10, 0.50], radius = 0.30, start = -0.15, sweep = 0.30 } },
+    { line = [[0.72, 0.12], [0.72, 0.88]] },
+]
+pixels = [
+    ".......",
+    "..#..#.",
+    "...#.#.",
+    "#..#.#.",
+    "...#.#.",
+    "..#..#.",
+    ".......",
+]
+
+[[variant]]
+name = "Reverse"
+description = "The family's mark turned round: wavefronts closing in on the source."
+algorithms = ["Reverse"]
+strokes = [
+    { dot = { centre = [0.85, 0.50], radius = 0.06 } },
+    { arc = { centre = [0.90, 0.50], radius = 0.30, start = 0.35, sweep = 0.30 } },
+    { arc = { centre = [0.90, 0.50], radius = 0.62, start = 0.39, sweep = 0.22 } },
+]
+pixels = [
+    ".......",
+    "..#.#..",
+    ".#.#...",
+    ".#.#..#",
+    ".#.#...",
+    "..#.#..",
+    ".......",
+]
+
+[[variant]]
+name = "Chorused"
+description = "The family's wavefronts leaving a wave rather than a point: a chorus or a flanger in front of a reverb."
+algorithms = ["ChorusVerb", "FlangVerb"]
+strokes = [
+    { wave = { start = [0.08, 0.50], end = [0.32, 0.50], amplitude = 0.12, cycles = 1.0 } },
+    { arc = { centre = [0.10, 0.50], radius = 0.30, start = -0.15, sweep = 0.30 } },
+    { arc = { centre = [0.10, 0.50], radius = 0.62, start = -0.11, sweep = 0.22 } },
+]
+pixels = [
+    ".......",
+    "..#.#..",
+    "#..#.#.",
+    ".#.#.#.",
+    "...#.#.",
+    "..#.#..",
+    ".......",
+]
+
+[[variant]]
+name = "Repeated"
+description = "The family's source twice, a repeat beside it, and the wavefronts leaving both."
+algorithms = ["DelayVerb"]
+strokes = [
+    { dot = { centre = [0.15, 0.50], radius = 0.06 } },
+    { dot = { centre = [0.33, 0.50], radius = 0.06 } },
+    { arc = { centre = [0.22, 0.50], radius = 0.30, start = -0.15, sweep = 0.30 } },
+    { arc = { centre = [0.22, 0.50], radius = 0.58, start = -0.11, sweep = 0.22 } },
+]
+pixels = [
+    ".......",
+    "...#.#.",
+    "....#.#",
+    "#.#.#.#",
+    "....#.#",
+    "...#.#.",
+    ".......",
+]
+
+[[variant]]
+name = "Four taps"
+description = "The family's falling marks, four of them."
+algorithms = ["4TapDelay"]
+strokes = [
+    { line = [[0.10, 0.12], [0.10, 0.88]] },
+    { line = [[0.37, 0.36], [0.37, 0.88]] },
+    { line = [[0.63, 0.58], [0.63, 0.88]] },
+    { line = [[0.90, 0.74], [0.90, 0.88]] },
+]
+pixels = [
+    ".......",
+    "#......",
+    "#......",
+    "#.#....",
+    "#.#....",
+    "#.#.#..",
+    "#.#.#.#",
+]
+
+[[variant]]
+name = "Oil can"
+description = "A can going round and the family's repeats coming off it: a ring, then two falling marks."
+algorithms = ["T-RayDelay"]
+strokes = [
+    { arc = { centre = [0.28, 0.50], radius = 0.20, start = 0.0, sweep = 1.0 } },
+    { line = [[0.64, 0.40], [0.64, 0.88]] },
+    { line = [[0.88, 0.66], [0.88, 0.88]] },
+]
+pixels = [
+    ".......",
+    ".#.....",
+    "#.#....",
+    "#.#.#..",
+    "#.#.#..",
+    ".#..#.#",
+    "....#.#",
+]
+
+[[variant]]
+name = "Decimated"
+description = "The family's repeats with their tops joined in steps: repeats that come out coarser."
+algorithms = ["DecimDelay"]
+strokes = [
+    { line = [[0.14, 0.12], [0.14, 0.88]] },
+    { line = [[0.50, 0.40], [0.50, 0.88]] },
+    { line = [[0.86, 0.66], [0.86, 0.88]] },
+    { line = [[0.14, 0.12], [0.32, 0.12], [0.32, 0.40], [0.68, 0.40], [0.68, 0.66], [0.86, 0.66]] },
+]
+pixels = [
+    ".......",
+    "##.....",
+    "#.##...",
+    "#..#...",
+    "#..###.",
+    "#..#..#",
+    "#..#..#",
+]
+
+[[variant]]
+name = "Into reverb"
+description = "Two of the family's repeats and a wavefront leaving the last: a delay in front of a reverb."
+algorithms = ["ModDlyRev"]
+strokes = [
+    { line = [[0.14, 0.12], [0.14, 0.88]] },
+    { line = [[0.44, 0.40], [0.44, 0.88]] },
+    { arc = { centre = [0.44, 0.60], radius = 0.34, start = -0.14, sweep = 0.28 } },
+]
+pixels = [
+    ".......",
+    "#......",
+    "#....#.",
+    "#..#..#",
+    "#..#..#",
+    "#..#.#.",
+    "#..#...",
+]
+
+[[variant]]
+name = "Doubled"
+description = "The family's wave twice, one under the other: a voice and its copy a little apart."
+algorithms = ["Chorus", "Chorus-D"]
+strokes = [
+    { wave = { start = [0.08, 0.32], end = [0.92, 0.32], amplitude = 0.18, cycles = 1.5 } },
+    { wave = { start = [0.08, 0.68], end = [0.92, 0.68], amplitude = 0.18, cycles = 1.5 } },
+]
+pixels = [
+    ".#.....",
+    "#.#.#.#",
+    "...#.#.",
+    ".......",
+    ".#.....",
+    "#.#.#.#",
+    "...#.#.",
+]
+
+[[variant]]
+name = "Braided"
+description = "The family's wave and its inverse through each other: a copy fed back against the original."
+algorithms = ["Flanger"]
+strokes = [
+    { wave = { start = [0.08, 0.50], end = [0.92, 0.50], amplitude = 0.36, cycles = 1.0 } },
+    { wave = { start = [0.50, 0.50], end = [0.08, 0.50], amplitude = 0.36, cycles = 0.5 } },
+    { wave = { start = [0.50, 0.50], end = [0.92, 0.50], amplitude = 0.36, cycles = 0.5 } },
+]
+pixels = [
+    ".......",
+    ".##.##.",
+    "#..#..#",
+    "#..#..#",
+    ".##.##.",
+    ".......",
+    ".......",
+]
+
+[[variant]]
+name = "Notched"
+description = "A level with two notches cut into it: the family's sweep, seen as the response it leaves."
+algorithms = ["Phaser"]
+strokes = [
+    { line = [[0.08, 0.34], [0.20, 0.34], [0.30, 0.70], [0.40, 0.34], [0.60, 0.34], [0.70, 0.70], [0.80, 0.34], [0.92, 0.34]] },
+]
+pixels = [
+    ".......",
+    "#.###.#",
+    ".#...#.",
+    ".#...#.",
+    ".......",
+    ".......",
+    ".......",
+]
+
+[[variant]]
+name = "Equaliser"
+description = "A level with a band lifted and a band cut: the family's corner, made into bands."
+algorithms = ["MidasEQ", "Enhancer"]
+strokes = [
+    { line = [[0.08, 0.50], [0.20, 0.50], [0.32, 0.22], [0.44, 0.50], [0.56, 0.50], [0.68, 0.78], [0.80, 0.50], [0.92, 0.50]] },
+]
+pixels = [
+    ".......",
+    "..#....",
+    ".#.#...",
+    "#...#.#",
+    ".....#.",
+    ".......",
+    ".......",
+]
+
+[[variant]]
+name = "Resonant"
+description = "The family's corner with a peak standing up before the fall."
+algorithms = ["MoodFilter"]
+strokes = [
+    { line = [[0.08, 0.44], [0.34, 0.44], [0.48, 0.14], [0.60, 0.52], [0.92, 0.86]] },
+]
+pixels = [
+    ".......",
+    "...#...",
+    "..#.#..",
+    "##...#.",
+    "......#",
+    ".......",
+    ".......",
+]
+
+[[variant]]
+name = "Gate"
+description = "The family's floor and a level over it, with what falls under the line stopped."
+algorithms = ["NoiseGate"]
+strokes = [
+    { line = [[0.08, 0.88], [0.92, 0.88]] },
+    { line = [[0.08, 0.60], [0.92, 0.60]] },
+    { line = [[0.34, 0.12], [0.34, 0.88]] },
+    { line = [[0.66, 0.70], [0.66, 0.88]] },
+]
+pixels = [
+    ".......",
+    "..#....",
+    "..#....",
+    "..#....",
+    "#######",
+    "..#.#..",
+    "#######",
+]
+
+[[variant]]
+name = "Amplifier"
+description = "A cabinet: a box with a driver in it."
+algorithms = ["RackAmp"]
+strokes = [
+    { line = [[0.12, 0.14], [0.88, 0.14], [0.88, 0.86], [0.12, 0.86], [0.12, 0.14]] },
+    { arc = { centre = [0.50, 0.50], radius = 0.20, start = 0.0, sweep = 1.0 } },
+]
+pixels = [
+    "#######",
+    "#.###.#",
+    "##...##",
+    "##.#.##",
+    "##...##",
+    "#.###.#",
+    "#######",
+]
+
+[[variant]]
+name = "Banded"
+description = "The family's driven levels as three bands standing on a floor."
+algorithms = ["MulBndDist"]
+strokes = [
+    { line = [[0.08, 0.88], [0.92, 0.88]] },
+    { line = [[0.20, 0.54], [0.20, 0.88]] },
+    { line = [[0.50, 0.14], [0.50, 0.88]] },
+    { line = [[0.80, 0.36], [0.80, 0.88]] },
+]
+pixels = [
+    ".......",
+    "...#...",
+    "...#...",
+    "...#.#.",
+    "...#.#.",
+    ".#.#.#.",
+    "#######",
+]
+
+[[variant]]
+name = "Panning"
+description = "The family's span with a wave along it: a position that moves."
+algorithms = ["Auto Pan"]
+strokes = [
+    { wave = { start = [0.08, 0.50], end = [0.92, 0.50], amplitude = 0.16, cycles = 1.0 } },
+    { line = [[0.08, 0.28], [0.08, 0.72]] },
+    { line = [[0.92, 0.28], [0.92, 0.72]] },
+]
+pixels = [
+    ".......",
+    ".......",
+    "#.#...#",
+    "##.#.##",
+    "#...#.#",
+    ".......",
+    ".......",
+]
+
+[[variant]]
+name = "Two intervals"
+description = "The family's step twice, one up and one down from the note."
+algorithms = ["DualPitch", "Vintage Pitch"]
+strokes = [
+    { line = [[0.08, 0.50], [0.42, 0.50], [0.42, 0.20], [0.92, 0.20]] },
+    { line = [[0.42, 0.50], [0.42, 0.80], [0.92, 0.80]] },
+]
+pixels = [
+    ".......",
+    "...####",
+    "...#...",
+    "####...",
+    "...#...",
+    "...####",
+    ".......",
 ]

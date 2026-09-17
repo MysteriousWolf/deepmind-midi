@@ -1,0 +1,733 @@
+# A glyph per thing a parameter does, for a display with room for a picture
+# beside a value and not for a sentence.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/effects.md and docs/diagrams/glyphs.svg,
+# and `cargo xtask codegen` to refresh the tables that carry the glyphs.
+#
+# A parameter has a name, a range and, from #24, a shape. What it did not have
+# is a picture of what turning it does: that a `Decay` is a tail falling away,
+# that a `Mix` is wet against dry, that a `Low Cut` is the lows taken off. On
+# the instrument's own display, and on the small one a controller has beside
+# each of its knobs, a picture and a bar say what a sentence has no room to.
+#
+# Three tables reach these. Every effect slot names one in panels.toml, because
+# what a slot does depends on the algorithm and the algorithm is the only thing
+# that knows. A program parameter names one in parameters.toml where one fits.
+# A controller names one in controllers.toml where one fits. And a modulation
+# source cell in cells.toml may point at one rather than draw its own, so the
+# mod wheel is one drawing whether it is met as a source, a controller or a
+# parameter.
+
+[meta]
+language = """
+The same seven by seven grid the effect marks and the source cells are drawn \
+on, one bit a dot, drawn by hand for the reason marks.toml gives: at forty-nine \
+dots which of them are lit is the whole of the design. Each glyph is a diagram \
+of one idea and not a picture of a control. A level is a wedge, because that is \
+how the travel of a fader is printed; a time is a clock; a cut is a corner, \
+turned the way the response goes. The envelope stages are the segment itself \
+with enough of its neighbours to say which one it is, so a host with a row of \
+four knobs draws four different pictures over them rather than four envelopes."""
+choice = """
+Which glyph a parameter carries is this project's reading, the same way the \
+`quantity` column in panels.toml is: derived from what the parameter does, \
+which the unit and the manual's description settle, and never from what it is \
+called. Where two parameters do the same thing to a signal they carry the same \
+glyph: every `Low Cut` is a low cut, whether it is on a reverb or a delay. A \
+parameter that has no glyph because none would say more than its name does is \
+left without one rather than given a nearly-right one."""
+counts = """
+Some glyphs stand for a whole class: `selection` is any list of named options, \
+`switch` is any in-or-out, `steps` is anything that goes in steps. A host that \
+wants to tell a preset from a cabinet has the parameter's own values for that; \
+the glyph says what kind of thing is being chosen, not which."""
+
+[[glyph]]
+name = "level"
+description = "How loud: a wedge rising to the right, the way a fader's travel is printed."
+pixels = [
+    ".......",
+    "......#",
+    ".....##",
+    "....###",
+    "...####",
+    "..#####",
+    "#######",
+]
+
+[[glyph]]
+name = "mix"
+description = "Wet against dry: a disc half filled."
+pixels = [
+    "..###..",
+    ".#..##.",
+    "#...###",
+    "#...###",
+    "#...###",
+    ".#..##.",
+    "..###..",
+]
+
+[[glyph]]
+name = "time"
+description = "When: a clock face with one hand."
+pixels = [
+    "..###..",
+    ".#...#.",
+    "#..#..#",
+    "#..##.#",
+    "#.....#",
+    ".#...#.",
+    "..###..",
+]
+
+[[glyph]]
+name = "pre delay"
+description = "A gap before the effect starts: the dry hit, empty space, then the tail arriving."
+pixels = [
+    "#......",
+    "#......",
+    "#...##.",
+    "#...###",
+    "#..####",
+    "#..####",
+    "#######",
+]
+
+[[glyph]]
+name = "decay"
+description = "A tail falling away: an exponential fall from full."
+pixels = [
+    "#......",
+    "#......",
+    ".#.....",
+    ".#.....",
+    "..#....",
+    "...##..",
+    ".....##",
+]
+
+[[glyph]]
+name = "attack"
+description = "A rise to full and held there: the onset of an envelope."
+pixels = [
+    "...####",
+    "...#...",
+    "..#....",
+    "..#....",
+    ".#.....",
+    ".#.....",
+    "#......",
+]
+
+[[glyph]]
+name = "release"
+description = "Held, then let go: a level falling to the floor at the end."
+pixels = [
+    "####...",
+    "....#..",
+    "....#..",
+    ".....#.",
+    ".....#.",
+    "......#",
+    "......#",
+]
+
+[[glyph]]
+name = "hold"
+description = "A level held: a line kept up between the moment it starts and the moment it ends."
+pixels = [
+    ".......",
+    "#######",
+    ".......",
+    ".......",
+    ".......",
+    "#.....#",
+    "#.....#",
+]
+
+[[glyph]]
+name = "size"
+description = "How big: the corners of a box, with what is inside it marked."
+pixels = [
+    "##...##",
+    "#.....#",
+    ".......",
+    "...#...",
+    ".......",
+    "#.....#",
+    "##...##",
+]
+
+[[glyph]]
+name = "high cut"
+description = "The highs taken off: level, then falling to the right. A low-pass corner."
+pixels = [
+    ".......",
+    "####...",
+    "....#..",
+    ".....#.",
+    "......#",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "low cut"
+description = "The lows taken off: rising from the left, then level. A high-pass corner."
+pixels = [
+    ".......",
+    "...####",
+    "..#....",
+    ".#.....",
+    "#......",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "low shelf"
+description = "The lows lifted: a shelf above the level at the left."
+pixels = [
+    ".......",
+    "###....",
+    "...#...",
+    "....###",
+    ".......",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "high shelf"
+description = "The highs lifted: a shelf above the level at the right."
+pixels = [
+    ".......",
+    "....###",
+    "...#...",
+    "###....",
+    ".......",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "bell"
+description = "A band lifted about a centre: a bump on a level."
+pixels = [
+    ".......",
+    ".......",
+    "...#...",
+    "..#.#..",
+    "##...##",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "resonance"
+description = "A peak: the response standing up at one frequency."
+pixels = [
+    ".......",
+    "...#...",
+    "...#...",
+    "..#.#..",
+    "..#.#..",
+    ".#...#.",
+    "##...##",
+]
+
+[[glyph]]
+name = "frequency"
+description = "Where in the spectrum: a ruler whose ticks close up towards the right, the way octaves do."
+pixels = [
+    ".......",
+    ".......",
+    "#...#.#",
+    "#...#.#",
+    "#######",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "feedback"
+description = "Sent round again: a loop with an arrowhead on it."
+pixels = [
+    "..##...",
+    ".#.##..",
+    "#..#..#",
+    "#.....#",
+    "#.....#",
+    ".#...#.",
+    "..###..",
+]
+
+[[glyph]]
+name = "rate"
+description = "How fast: a wave, a cycle and a half of it."
+pixels = [
+    ".......",
+    ".......",
+    ".#...#.",
+    "#.#.#.#",
+    "...#...",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "wave"
+description = "The wave itself: one cycle of a sine."
+pixels = [
+    ".......",
+    ".##....",
+    "#..#...",
+    "#..#..#",
+    "...#..#",
+    "....##.",
+    ".......",
+]
+
+[[glyph]]
+name = "depth"
+description = "How far the wave swings: a cycle between the two rails it reaches."
+pixels = [
+    "#######",
+    ".......",
+    ".##....",
+    "#..#..#",
+    "....##.",
+    ".......",
+    "#######",
+]
+
+[[glyph]]
+name = "width"
+description = "How wide: a span with a mark at each end."
+pixels = [
+    ".......",
+    ".......",
+    "#.....#",
+    "#######",
+    "#.....#",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "spread"
+description = "Pushed apart: arrows pointing both ways from the middle."
+pixels = [
+    ".......",
+    ".......",
+    ".#...#.",
+    "#######",
+    ".#...#.",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "pan"
+description = "Where between left and right: a dot between the two ways it can go."
+pixels = [
+    ".......",
+    ".......",
+    ".#...#.",
+    "##.#.##",
+    ".#...#.",
+    ".......",
+    ".......",
+]
+
+[[glyph]]
+name = "threshold"
+description = "A level things happen above: a line across, with one peak over it."
+pixels = [
+    ".......",
+    "...#...",
+    "#######",
+    ".#.#.#.",
+    ".#.#.#.",
+    ".#.#.#.",
+    ".#.#.#.",
+]
+
+[[glyph]]
+name = "ratio"
+description = "How hard a level is held down past the threshold: a slope with a knee in it."
+pixels = [
+    ".......",
+    ".......",
+    "....###",
+    "...#...",
+    "..#....",
+    ".#.....",
+    "#......",
+]
+
+[[glyph]]
+name = "drive"
+description = "Pushed hard: a bolt."
+pixels = [
+    "....#..",
+    "...##..",
+    "..##...",
+    ".####..",
+    "...#...",
+    "..#....",
+    ".#.....",
+]
+
+[[glyph]]
+name = "tone"
+description = "Tilted: more of one end of the spectrum and less of the other, about a pivot."
+pixels = [
+    ".......",
+    ".....##",
+    "...##..",
+    ".##....",
+    "#..#...",
+    "..###..",
+    ".......",
+]
+
+[[glyph]]
+name = "pitch"
+description = "A pitch: a note."
+pixels = [
+    "....#..",
+    "....##.",
+    "....#.#",
+    "....#..",
+    "....#..",
+    ".####..",
+    ".####..",
+]
+
+[[glyph]]
+name = "detune"
+description = "Two pitches almost the same: two waves almost in step."
+pixels = [
+    ".......",
+    ".##..#.",
+    "#..##..",
+    ".......",
+    ".##..#.",
+    "#..##..",
+    ".......",
+]
+
+[[glyph]]
+name = "phase"
+description = "Where in the cycle: a wave with its axis through it."
+pixels = [
+    "...#...",
+    "..###..",
+    ".#.#.#.",
+    ".#.#.#.",
+    ".#.#.#.",
+    "..###..",
+    "...#...",
+]
+
+[[glyph]]
+name = "selection"
+description = "One of a list: the list."
+pixels = [
+    ".......",
+    "#.#####",
+    ".......",
+    "#.#####",
+    ".......",
+    "#.#####",
+    ".......",
+]
+
+[[glyph]]
+name = "switch"
+description = "In or out: the power ring."
+pixels = [
+    "...#...",
+    ".#.#.#.",
+    "#..#..#",
+    "#..#..#",
+    "#.....#",
+    ".#...#.",
+    "..###..",
+]
+
+[[glyph]]
+name = "diffusion"
+description = "Scattered: dots with no line through them."
+pixels = [
+    ".......",
+    ".#..#..",
+    "...#..#",
+    ".#...#.",
+    "..#.#..",
+    "#...#..",
+    ".......",
+]
+
+[[glyph]]
+name = "noise"
+description = "Random: dots everywhere."
+pixels = [
+    ".#..#.#",
+    "#..#...",
+    "..#..#.",
+    "#...#..",
+    ".#.#..#",
+    "..#..#.",
+    "#....#.",
+]
+
+[[glyph]]
+name = "steps"
+description = "In steps: a staircase."
+pixels = [
+    ".......",
+    "....###",
+    "....#..",
+    "..###..",
+    "..#....",
+    "###....",
+    ".......",
+]
+
+[[glyph]]
+name = "tap"
+description = "Repeats: the same mark three times, shorter each time."
+pixels = [
+    ".......",
+    "#......",
+    "#......",
+    "#..#...",
+    "#..#...",
+    "#..#..#",
+    "#..#..#",
+]
+
+[[glyph]]
+name = "square"
+description = "A pulse: a wave with two levels and nothing between them."
+pixels = [
+    ".......",
+    ".###...",
+    ".#.#...",
+    ".#.#...",
+    ".#.#...",
+    "##.####",
+    ".......",
+]
+
+[[glyph]]
+name = "saw"
+description = "A saw: a ramp up and a drop."
+pixels = [
+    ".......",
+    ".....#.",
+    "....##.",
+    "...#.#.",
+    "..#..#.",
+    ".#...#.",
+    "#....#.",
+]
+
+[[glyph]]
+name = "gate"
+description = "How long a note is held open: one pulse and its width."
+pixels = [
+    ".......",
+    "..###..",
+    "..#.#..",
+    "..#.#..",
+    "..#.#..",
+    "###.###",
+    ".......",
+]
+
+[[glyph]]
+name = "swing"
+description = "Long then short: two pulses that do not share a width."
+pixels = [
+    ".......",
+    ".####.#",
+    ".#..#.#",
+    ".#..#.#",
+    ".#..#.#",
+    "##..###",
+    ".......",
+]
+
+[[glyph]]
+name = "curve"
+description = "Bent away from straight: a line that bows."
+pixels = [
+    ".......",
+    "......#",
+    ".....#.",
+    "....#..",
+    "..##...",
+    "##.....",
+    ".......",
+]
+
+[[glyph]]
+name = "glide"
+description = "Slid from one pitch to the next rather than stepped."
+pixels = [
+    ".......",
+    "....###",
+    "...#...",
+    "...#...",
+    "..#....",
+    "###....",
+    ".......",
+]
+
+[[glyph]]
+name = "polarity"
+description = "Which way up: plus over minus."
+pixels = [
+    "...#...",
+    "...#...",
+    ".#####.",
+    "...#...",
+    "...#...",
+    ".......",
+    ".#####.",
+]
+
+[[glyph]]
+name = "keys"
+description = "The keyboard: keys, with the black ones between them."
+pixels = [
+    "#######",
+    "##.##.#",
+    "##.##.#",
+    "#.....#",
+    "#.#.#.#",
+    "#.#.#.#",
+    "#######",
+]
+
+[[glyph]]
+name = "envelope"
+description = "An envelope: up fast, down to a level, held, and let go."
+pixels = [
+    "..#....",
+    "..#....",
+    ".#.#...",
+    ".#.###.",
+    ".#...#.",
+    "#.....#",
+    "#.....#",
+]
+
+[[glyph]]
+name = "velocity"
+description = "How hard the key was hit: an arrow with motion beside it."
+pixels = [
+    "...#...",
+    ".#.#.#.",
+    ".#.#.#.",
+    ".#####.",
+    "..###..",
+    "...#...",
+    ".......",
+]
+
+[[glyph]]
+name = "pressure"
+description = "Pressed after the key is down: an arrow pressing on a key."
+pixels = [
+    "...#...",
+    "...#...",
+    ".#####.",
+    "..###..",
+    "...#...",
+    ".......",
+    "#######",
+]
+
+[[glyph]]
+name = "bend"
+description = "The pitch bender: a wheel seen from the side, resting in the middle."
+pixels = [
+    "..###..",
+    ".#...#.",
+    ".#...#.",
+    ".#####.",
+    ".#...#.",
+    ".#...#.",
+    "..###..",
+]
+
+[[glyph]]
+name = "mod wheel"
+description = "The modulation wheel: a wheel seen from the side, resting at the bottom."
+pixels = [
+    "..###..",
+    ".#...#.",
+    ".#...#.",
+    ".#...#.",
+    ".#####.",
+    ".#####.",
+    "..###..",
+]
+
+[[glyph]]
+name = "pedal"
+description = "A pedal under a foot: a treadle over its base, tipped by the toe."
+pixels = [
+    ".......",
+    ".....#.",
+    "...##..",
+    ".##....",
+    "#......",
+    ".......",
+    "#######",
+]
+
+[[glyph]]
+name = "expression"
+description = "An expression pedal: the same treadle, carrying a level."
+pixels = [
+    ".......",
+    ".....#.",
+    "...###.",
+    ".#####.",
+    "#######",
+    ".......",
+    "#######",
+]
+
+[[glyph]]
+name = "footswitch"
+description = "A footswitch: a box on the floor with a button on top."
+pixels = [
+    "..###..",
+    "..#.#..",
+    "#######",
+    "#.....#",
+    "#.....#",
+    "#.....#",
+    "#######",
+]
+
+[[glyph]]
+name = "cabinet"
+description = "A speaker cabinet: a box with a driver in it."
+pixels = [
+    "#######",
+    "#.###.#",
+    "##...##",
+    "##.#.##",
+    "##...##",
+    "#.###.#",
+    "#######",
+]

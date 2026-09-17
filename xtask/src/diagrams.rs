@@ -99,9 +99,15 @@ pub fn all(spec: &Spec) -> Result<Vec<Diagram>, String> {
         },
         Diagram {
             id: "marks",
-            title: "Effect family marks",
+            title: "Effect marks",
             kind: Kind::Svg,
             source: marks(spec),
+        },
+        Diagram {
+            id: "glyphs",
+            title: "Parameter glyphs",
+            kind: Kind::Svg,
+            source: glyphs(spec),
         },
     ])
 }
@@ -408,27 +414,41 @@ fn marks(spec: &Spec) -> String {
     /// Space around each column.
     const PAD: f32 = 16.0;
 
-    let side = count(
-        spec.families
-            .first()
-            .map_or(0, |family| family.pixels.len()),
-    );
+    /// Marks per row: the nine families make the first row, and the variants
+    /// wrap under them at the same pitch.
+    const ACROSS: usize = 9;
+
+    let side = count(crate::spec::PIXEL_SIDE);
     let grid = side * PIXEL;
     let column = LARGE.max(grid);
     let pitch = column + PAD;
-    let width = pitch * count(spec.families.len()) + PAD;
+    let width = pitch * count(ACROSS) + PAD;
 
-    let stroked_top = PAD;
-    let small_top = stroked_top + LARGE + 10.0;
-    let grid_top = small_top + SMALL + 14.0;
-    let true_top = grid_top + grid + 10.0;
-    let label_top = true_top + side + 14.0;
-    let height = label_top + PAD;
+    // Every mark, the families first and then the variants, each as a name
+    // and the two drawings of it.
+    let marks: Vec<(&str, &[crate::spec::Stroke], &[String])> = spec
+        .families
+        .iter()
+        .map(|f| (f.name.as_str(), f.strokes.as_slice(), f.pixels.as_slice()))
+        .chain(
+            spec.variants
+                .iter()
+                .map(|v| (v.name.as_str(), v.strokes.as_slice(), v.pixels.as_slice())),
+        )
+        .collect();
+    let rows = spec.families.len().div_ceil(ACROSS) + spec.variants.len().div_ceil(ACROSS);
+
+    let small_gap = LARGE + 10.0;
+    let grid_gap = small_gap + SMALL + 14.0;
+    let true_gap = grid_gap + grid + 10.0;
+    let label_gap = true_gap + side + 14.0;
+    let row_height = label_gap + PAD;
+    let height = PAD + row_height * count(rows);
 
     let mut out = format!(
         "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width} {height}\" \
          width=\"{width}\" height=\"{height}\" role=\"img\" \
-         aria-label=\"The nine effect family marks, as strokes and as pixels\">\n\
+         aria-label=\"{MARKS_ALT}\">\n\
          <style>\n\
          .mark {{ fill: none; stroke: #2b2f38; stroke-width: 2; stroke-linecap: round; \
          stroke-linejoin: round; }}\n\
@@ -447,57 +467,59 @@ fn marks(spec: &Spec) -> String {
          </style>\n"
     );
 
-    for (index, family) in spec.families.iter().enumerate() {
-        let left = PAD + pitch * count(index);
+    for (index, (name, strokes, pixels)) in marks.iter().enumerate() {
+        // The variants start a new row under the families, whatever is left
+        // of the families' last one.
+        let (column_index, row) = if index < spec.families.len() {
+            (index % ACROSS, index / ACROSS)
+        } else {
+            let offset = index - spec.families.len();
+            (
+                offset % ACROSS,
+                spec.families.len().div_ceil(ACROSS) + offset / ACROSS,
+            )
+        };
+        let left = PAD + pitch * count(column_index);
         let centre = left + column / 2.0;
+        let stroked_top = PAD + row_height * count(row);
+        let small_top = stroked_top + small_gap;
+        let grid_top = stroked_top + grid_gap;
+        let true_top = stroked_top + true_gap;
+        let label_top = stroked_top + label_gap;
 
         let _ = write!(
             out,
             "  <g class=\"mark\">\n{}  </g>\n",
-            draw_mark(family, centre - LARGE / 2.0, stroked_top, LARGE)
+            draw_mark(strokes, centre - LARGE / 2.0, stroked_top, LARGE)
         );
         let _ = write!(
             out,
             "  <g class=\"mark small\">\n{}  </g>\n",
-            draw_mark(family, centre - SMALL / 2.0, small_top, SMALL)
+            draw_mark(strokes, centre - SMALL / 2.0, small_top, SMALL)
         );
 
         // The grid magnified, so the placement can be read, and again at one
         // pixel per pixel, which is the size it is actually for.
-        let grid_left = centre - grid / 2.0;
-        for (y, row) in family.pixels.iter().enumerate() {
-            for (x, pixel) in row.chars().enumerate() {
-                let class = if pixel == '#' { "lit" } else { "unlit" };
-                let _ = writeln!(
-                    out,
-                    "  <rect class=\"{class}\" x=\"{:.1}\" y=\"{:.1}\" \
-                     width=\"{:.1}\" height=\"{:.1}\" />",
-                    grid_left + count(x) * PIXEL,
-                    grid_top + count(y) * PIXEL,
-                    PIXEL - 1.0,
-                    PIXEL - 1.0,
-                );
-                if pixel == '#' {
-                    let _ = writeln!(
-                        out,
-                        "  <rect class=\"lit\" x=\"{:.1}\" y=\"{:.1}\" width=\"1\" \
-                         height=\"1\" />",
-                        centre - side / 2.0 + count(x),
-                        true_top + count(y),
-                    );
-                }
-            }
-        }
+        draw_grid(
+            &mut out,
+            pixels,
+            PIXEL,
+            (centre - grid / 2.0, grid_top),
+            (centre - side / 2.0, true_top),
+        );
 
         let _ = writeln!(
             out,
-            "  <text class=\"name\" x=\"{centre:.1}\" y=\"{label_top:.1}\">{}</text>",
-            family.name,
+            "  <text class=\"name\" x=\"{centre:.1}\" y=\"{label_top:.1}\">{name}</text>",
         );
     }
     out.push_str("</svg>\n");
     out
 }
+
+/// The alt text of the marks drawing, shared with the document that embeds it.
+pub const MARKS_ALT: &str =
+    "The nine effect family marks and the variants under them, as strokes and as pixels";
 
 /// The alt text of the cells drawing, shared with the document that embeds it.
 pub const CELLS_ALT: &str = "The modulation source cells, magnified and at one dot per dot";
@@ -527,13 +549,44 @@ pub fn cells_width(spec: &Spec) -> usize {
 /// straight out of `spec/cells.toml`, so a cell that reads badly here reads
 /// badly in a host too.
 fn cells(spec: &Spec) -> String {
+    let items: Vec<(&str, &[String])> = spec
+        .cells
+        .iter()
+        .map(|cell| (cell.name.as_str(), cell.pixels.as_slice()))
+        .collect();
+    sheet(&items, CELLS_ALT)
+}
+
+/// The alt text of the glyphs drawing, shared with the document that embeds it.
+pub const GLYPHS_ALT: &str = "The parameter glyphs, magnified and at one dot per dot";
+
+/// Returns the width the glyphs drawing is rendered at, as [`cells_width`].
+pub fn glyphs_width(spec: &Spec) -> usize {
+    let pitch = crate::spec::PIXEL_SIDE * CELL_DOT + CELL_PAD;
+    pitch * spec.glyphs.len().min(CELLS_ACROSS) + CELL_PAD
+}
+
+/// Draws every glyph, magnified and at one dot per dot, with its name.
+fn glyphs(spec: &Spec) -> String {
+    let items: Vec<(&str, &[String])> = spec
+        .glyphs
+        .iter()
+        .map(|glyph| (glyph.name.as_str(), glyph.pixels.as_slice()))
+        .collect();
+    sheet(&items, GLYPHS_ALT)
+}
+
+/// Draws a sheet of pixel grids, [`CELLS_ACROSS`] to a row, each magnified
+/// and again at one dot per dot, with its name under it.
+fn sheet(items: &[(&str, &[String])], alt: &str) -> String {
     let side = count(crate::spec::PIXEL_SIDE);
     let dot = count(CELL_DOT);
     let pad = count(CELL_PAD);
     let grid = side * dot;
     let pitch = grid + pad;
-    let rows = spec.cells.len().div_ceil(CELLS_ACROSS);
-    let width = cells_width(spec);
+    let rows = items.len().div_ceil(CELLS_ACROSS);
+    let width =
+        (crate::spec::PIXEL_SIDE * CELL_DOT + CELL_PAD) * items.len().min(CELLS_ACROSS) + CELL_PAD;
 
     let true_gap = 10.0;
     let label_gap = 14.0;
@@ -542,7 +595,7 @@ fn cells(spec: &Spec) -> String {
 
     let mut out = format!(
         "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width} {height}\" \
-         width=\"{width}\" height=\"{height}\" role=\"img\" aria-label=\"{CELLS_ALT}\">\n\
+         width=\"{width}\" height=\"{height}\" role=\"img\" aria-label=\"{alt}\">\n\
          <style>\n\
          .lit {{ fill: #2b2f38; }}\n\
          .unlit {{ fill: #e7e9ed; }}\n\
@@ -555,7 +608,7 @@ fn cells(spec: &Spec) -> String {
          </style>\n"
     );
 
-    for (index, cell) in spec.cells.iter().enumerate() {
+    for (index, (name, pixels)) in items.iter().enumerate() {
         let column = index % CELLS_ACROSS;
         let row = index / CELLS_ACROSS;
         let left = pad + pitch * count(column);
@@ -567,37 +620,55 @@ fn cells(spec: &Spec) -> String {
         // than straddling two of them.
         let true_left = (centre - side / 2.0).round();
 
-        for (y, line) in cell.pixels.iter().enumerate() {
-            for (x, pixel) in line.chars().enumerate() {
-                let class = if pixel == '#' { "lit" } else { "unlit" };
-                let _ = writeln!(
-                    out,
-                    "  <rect class=\"{class}\" x=\"{:.1}\" y=\"{:.1}\" \
-                     width=\"{:.1}\" height=\"{:.1}\" />",
-                    left + count(x) * dot,
-                    grid_top + count(y) * dot,
-                    dot - 1.0,
-                    dot - 1.0,
-                );
-                if pixel == '#' {
-                    let _ = writeln!(
-                        out,
-                        "  <rect class=\"lit\" x=\"{:.1}\" y=\"{:.1}\" width=\"1\" \
-                         height=\"1\" />",
-                        true_left + count(x),
-                        true_top + count(y),
-                    );
-                }
-            }
-        }
+        draw_grid(
+            &mut out,
+            pixels,
+            dot,
+            (left, grid_top),
+            (true_left, true_top),
+        );
         let _ = writeln!(
             out,
             "  <text class=\"name\" x=\"{centre:.1}\" y=\"{label_top:.1}\">{}</text>",
-            cell.name.replace('&', "&amp;"),
+            name.replace('&', "&amp;"),
         );
     }
     out.push_str("</svg>\n");
     out
+}
+
+/// Draws a pixel grid twice: magnified to `dot` per pixel at `magnified`, and
+/// at one unit per pixel at `actual`, which is the size it is for.
+fn draw_grid(
+    out: &mut String,
+    pixels: &[String],
+    dot: f32,
+    magnified: (f32, f32),
+    actual: (f32, f32),
+) {
+    for (y, row) in pixels.iter().enumerate() {
+        for (x, pixel) in row.chars().enumerate() {
+            let class = if pixel == '#' { "lit" } else { "unlit" };
+            let _ = writeln!(
+                out,
+                "  <rect class=\"{class}\" x=\"{:.1}\" y=\"{:.1}\" \
+                 width=\"{:.1}\" height=\"{:.1}\" />",
+                magnified.0 + count(x) * dot,
+                magnified.1 + count(y) * dot,
+                dot - 1.0,
+                dot - 1.0,
+            );
+            if pixel == '#' {
+                let _ = writeln!(
+                    out,
+                    "  <rect class=\"lit\" x=\"{:.1}\" y=\"{:.1}\" width=\"1\" \
+                     height=\"1\" />",
+                    actual.0 + count(x),
+                    actual.1 + count(y),
+                );
+            }
+        }
+    }
 }
 
 /// Returns a count as a length. The counts here are families, pixels and
@@ -607,10 +678,10 @@ fn count(of: usize) -> f32 {
 }
 
 /// Draws one mark's strokes, scaling the unit box to `side` at `(left, top)`.
-fn draw_mark(family: &crate::spec::Family, left: f32, top: f32, side: f32) -> String {
+fn draw_mark(strokes: &[crate::spec::Stroke], left: f32, top: f32, side: f32) -> String {
     let at = |x: f32, y: f32| (left + x * side, top + y * side);
     let mut out = String::new();
-    for stroke in &family.strokes {
+    for stroke in strokes {
         if let Some(points) = &stroke.line {
             let drawn: Vec<String> = points
                 .iter()

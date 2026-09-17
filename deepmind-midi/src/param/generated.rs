@@ -9,7 +9,7 @@
 #![expect(clippy::too_many_lines, reason = "a generated table, not logic")]
 
 use super::{Controller, ControllerKind, Kind, Parameter, Shape, Swing, ValueEntry, ValueTable};
-use crate::pixels::Pixels;
+use crate::pixels::{Glyph, Pixels};
 use crate::sysex::inquiry::Version;
 
 /// Number of program parameters. Offsets run `0..PARAMETER_COUNT`.
@@ -3520,6 +3520,198 @@ impl ParamId {
     }
 }
 
+impl ParamId {
+    /// Returns the picture of what this parameter does, where one fits.
+    ///
+    /// 177 of the 242 carry one. The rest are the effect slots, whose
+    /// picture depends on the algorithm the engine is running and is
+    /// [`FxSlot::glyph`](crate::effect::FxSlot::glyph), and the program name's
+    /// characters, which are letters and not a control. A host draws the name
+    /// it already prints for those.
+    ///
+    /// Which glyph a parameter carries is this crate's reading of what the
+    /// parameter does; `spec/glyphs.toml` says how it was decided.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    /// use deepmind_midi::pixels::Glyph;
+    ///
+    /// assert_eq!(ParamId::VcfResonance.glyph(), Some(Glyph::Resonance));
+    /// assert_eq!(ParamId::Fx1Param1.glyph(), None);
+    /// ```
+    #[must_use]
+    pub const fn glyph(self) -> Option<Glyph> {
+        match self {
+            Self::Lfo1Rate | Self::Lfo2Rate | Self::DriftRate => Some(Glyph::Rate),
+            Self::Lfo1DelayFade
+            | Self::Lfo2DelayFade
+            | Self::VcaEnvelopeAttackTime
+            | Self::VcfEnvelopeAttackTime
+            | Self::ModEnvelopeAttackTime => Some(Glyph::Attack),
+            Self::Lfo1Shape | Self::Lfo2Shape | Self::VcfLfoDepth => Some(Glyph::Wave),
+            Self::Lfo1KeySync
+            | Self::Lfo2KeySync
+            | Self::VcfKeyboardTracking
+            | Self::OscKeyDownReset
+            | Self::KeySyncAndLoop
+            | Self::ArpKeySync => Some(Glyph::Keys),
+            Self::Lfo1ArpSync
+            | Self::Lfo2ArpSync
+            | Self::CtrlSequencerClockDivider
+            | Self::ArpRateTempo
+            | Self::ArpClock => Some(Glyph::Time),
+            Self::Lfo1MonoMode
+            | Self::Lfo2MonoMode
+            | Self::Osc1PwmSource
+            | Self::Osc2ToneModSource
+            | Self::Osc1PitchModSelect
+            | Self::Osc2PitchModSelect
+            | Self::PortamentoMode
+            | Self::Osc1PitchModMode
+            | Self::VcfLfoSelect
+            | Self::VcaEnvelopeTriggerMode
+            | Self::VcfEnvelopeTriggerMode
+            | Self::ModEnvelopeTriggerMode
+            | Self::VoicePriorityMode
+            | Self::PolyphonyMode
+            | Self::EnvelopeTriggerMode
+            | Self::Mod1Source
+            | Self::Mod1Destination
+            | Self::Mod2Source
+            | Self::Mod2Destination
+            | Self::Mod3Source
+            | Self::Mod3Destination
+            | Self::Mod4Source
+            | Self::Mod4Destination
+            | Self::Mod5Source
+            | Self::Mod5Destination
+            | Self::Mod6Source
+            | Self::Mod6Destination
+            | Self::Mod7Source
+            | Self::Mod7Destination
+            | Self::Mod8Source
+            | Self::Mod8Destination
+            | Self::ArpMode
+            | Self::ArpPattern
+            | Self::FxRouting
+            | Self::Fx1Type
+            | Self::Fx2Type
+            | Self::Fx3Type
+            | Self::Fx4Type
+            | Self::FxMode
+            | Self::ProgramCategory => Some(Glyph::Selection),
+            Self::Lfo1SlewRate
+            | Self::Lfo2SlewRate
+            | Self::VcaEnvelopeAttackCurve
+            | Self::VcaEnvelopeDecayCurve
+            | Self::VcaEnvelopeSustainCurve
+            | Self::VcaEnvelopeReleaseCurve
+            | Self::VcfEnvelopeAttackCurve
+            | Self::VcfEnvelopeDecayCurve
+            | Self::VcfEnvelopeSustainCurve
+            | Self::VcfEnvelopeReleaseCurve
+            | Self::ModEnvelopeAttackCurve
+            | Self::ModEnvelopeDecayCurve
+            | Self::ModEnvelopeSustainCurve
+            | Self::ModEnvelopeReleaseCurve
+            | Self::SlewRate => Some(Glyph::Curve),
+            Self::Osc1Range
+            | Self::Osc2Range
+            | Self::Osc2Pitch
+            | Self::ArpOctaves
+            | Self::ProgramTranspose => Some(Glyph::Pitch),
+            Self::Osc1PulseEnable | Self::Osc1PwmDepth => Some(Glyph::Square),
+            Self::Osc1SawEnable => Some(Glyph::Saw),
+            Self::OscSyncEnable | Self::CtrlSequencerEnable | Self::ArpOnOff => Some(Glyph::Switch),
+            Self::Osc1PitchModDepth
+            | Self::Osc2ToneModDepth
+            | Self::Osc2PitchModDepth
+            | Self::Mod1Depth
+            | Self::Mod2Depth
+            | Self::Mod3Depth
+            | Self::Mod4Depth
+            | Self::Mod5Depth
+            | Self::Mod6Depth
+            | Self::Mod7Depth
+            | Self::Mod8Depth => Some(Glyph::Depth),
+            Self::Osc1AftertouchToPitchModDepth
+            | Self::Osc2AftertouchToPitchModDepth
+            | Self::VcfAftertouchToLfoDepth => Some(Glyph::Pressure),
+            Self::Osc1ModWheelToPitchModDepth
+            | Self::Osc2ModWheelToPitchModDepth
+            | Self::VcfModWheelToLfoDepth => Some(Glyph::ModWheel),
+            Self::Osc2Level
+            | Self::VcaLevel
+            | Self::Fx1OutputGain
+            | Self::Fx2OutputGain
+            | Self::Fx3OutputGain
+            | Self::Fx4OutputGain => Some(Glyph::Level),
+            Self::NoiseLevel | Self::VoiceDrift | Self::ParameterDrift => Some(Glyph::Noise),
+            Self::PortamentoTime | Self::OscPortamentoBalance => Some(Glyph::Glide),
+            Self::PitchBendUpDepth | Self::PitchBendDownDepth | Self::VcfPitchBendToFreqDepth => {
+                Some(Glyph::Bend)
+            }
+            Self::VcfFrequency | Self::Vcf2PoleMode => Some(Glyph::HighCut),
+            Self::VcfHighPassFrequency => Some(Glyph::LowCut),
+            Self::VcfResonance => Some(Glyph::Resonance),
+            Self::VcfEnvelopeDepth | Self::VcaEnvelopeDepth => Some(Glyph::Envelope),
+            Self::VcfEnvelopeVelocitySensitivity | Self::VcaEnvelopeVelocitySensitivity => {
+                Some(Glyph::Velocity)
+            }
+            Self::VcfEnvelopePolarity => Some(Glyph::Polarity),
+            Self::VcfBassBoost => Some(Glyph::LowShelf),
+            Self::VcaEnvelopeDecayTime
+            | Self::VcfEnvelopeDecayTime
+            | Self::ModEnvelopeDecayTime => Some(Glyph::Decay),
+            Self::VcaEnvelopeSustainLevel
+            | Self::VcfEnvelopeSustainLevel
+            | Self::ModEnvelopeSustainLevel
+            | Self::ArpHold => Some(Glyph::Hold),
+            Self::VcaEnvelopeReleaseTime
+            | Self::VcfEnvelopeReleaseTime
+            | Self::ModEnvelopeReleaseTime => Some(Glyph::Release),
+            Self::VcaPanSpread => Some(Glyph::Spread),
+            Self::UnisonDetune => Some(Glyph::Detune),
+            Self::SequenceLength
+            | Self::SeqStepValue1
+            | Self::SeqStepValue2
+            | Self::SeqStepValue3
+            | Self::SeqStepValue4
+            | Self::SeqStepValue5
+            | Self::SeqStepValue6
+            | Self::SeqStepValue7
+            | Self::SeqStepValue8
+            | Self::SeqStepValue9
+            | Self::SeqStepValue10
+            | Self::SeqStepValue11
+            | Self::SeqStepValue12
+            | Self::SeqStepValue13
+            | Self::SeqStepValue14
+            | Self::SeqStepValue15
+            | Self::SeqStepValue16
+            | Self::SeqStepValue17
+            | Self::SeqStepValue18
+            | Self::SeqStepValue19
+            | Self::SeqStepValue20
+            | Self::SeqStepValue21
+            | Self::SeqStepValue22
+            | Self::SeqStepValue23
+            | Self::SeqStepValue24
+            | Self::SeqStepValue25
+            | Self::SeqStepValue26
+            | Self::SeqStepValue27
+            | Self::SeqStepValue28
+            | Self::SeqStepValue29
+            | Self::SeqStepValue30
+            | Self::SeqStepValue31
+            | Self::SeqStepValue32 => Some(Glyph::Steps),
+            Self::SequencerSwingTiming | Self::ArpSwing => Some(Glyph::Swing),
+            Self::ArpGateTime => Some(Glyph::Gate),
+            _ => None,
+        }
+    }
+}
+
 /// A named set of parameter values.
 ///
 /// Three of these were renumbered by firmware 1.1 rather than extended, so an
@@ -5157,13 +5349,19 @@ static MOD_SOURCE_FW_1_1: ValueTable = ValueTable {
         (
             3,
             Pixels::new([
-                0b000_0000, 0b110_0000, 0b101_1000, 0b100_0110, 0b100_0001, 0b111_1111, 0b000_0000,
+                0b000_0000, 0b010_0000, 0b001_1000, 0b000_0110, 0b000_0001, 0b000_0000, 0b111_1111,
             ]),
         ),
         (
             5,
             Pixels::new([
                 0b000_1000, 0b000_1000, 0b011_1110, 0b001_1100, 0b000_1000, 0b000_0000, 0b111_1111,
+            ]),
+        ),
+        (
+            6,
+            Pixels::new([
+                0b000_0000, 0b010_0000, 0b011_1000, 0b011_1110, 0b111_1111, 0b000_0000, 0b111_1111,
             ]),
         ),
         (
@@ -5426,7 +5624,7 @@ static MOD_SOURCE_FW_1_0: ValueTable = ValueTable {
         (
             3,
             Pixels::new([
-                0b000_0000, 0b110_0000, 0b101_1000, 0b100_0110, 0b100_0001, 0b111_1111, 0b000_0000,
+                0b000_0000, 0b010_0000, 0b001_1000, 0b000_0110, 0b000_0001, 0b000_0000, 0b111_1111,
             ]),
         ),
         (
@@ -7683,672 +7881,784 @@ pub const CONTROLLERS: [Controller; CONTROLLER_COUNT] = [
         name: "Modulation Wheel",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: Some(Glyph::ModWheel),
     },
     Controller {
         cc: 2,
         name: "Breath Controller",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 4,
         name: "Foot Controller",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: Some(Glyph::Pedal),
     },
     Controller {
         cc: 5,
         name: "Portamento time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::PortamentoTime),
+        glyph: Some(Glyph::Glide),
     },
     Controller {
         cc: 6,
         name: "Data Entry MSB",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 7,
         name: "Channel Volume",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: Some(Glyph::Level),
     },
     Controller {
         cc: 8,
         name: "Balance",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: Some(Glyph::Pan),
     },
     Controller {
         cc: 10,
         name: "Pan",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: Some(Glyph::Pan),
     },
     Controller {
         cc: 11,
         name: "Expression",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: Some(Glyph::Expression),
     },
     Controller {
         cc: 12,
         name: "Arp Rate (tempo)",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ArpRateTempo),
+        glyph: Some(Glyph::Time),
     },
     Controller {
         cc: 13,
         name: "Arp Gate Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ArpGateTime),
+        glyph: Some(Glyph::Gate),
     },
     Controller {
         cc: 16,
         name: "LFO 1 Rate",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Lfo1Rate),
+        glyph: Some(Glyph::Rate),
     },
     Controller {
         cc: 17,
         name: "LFO 1 Delay / Fade",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Lfo1DelayFade),
+        glyph: Some(Glyph::Attack),
     },
     Controller {
         cc: 18,
         name: "LFO 2 Rate",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Lfo2Rate),
+        glyph: Some(Glyph::Rate),
     },
     Controller {
         cc: 19,
         name: "LFO 2 Delay / Fade",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Lfo2DelayFade),
+        glyph: Some(Glyph::Attack),
     },
     Controller {
         cc: 20,
         name: "OSC 1 Pitch Mod Depth",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Osc1PitchModDepth),
+        glyph: Some(Glyph::Depth),
     },
     Controller {
         cc: 21,
         name: "OSC 1 PWM Depth",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Osc1PwmDepth),
+        glyph: Some(Glyph::Square),
     },
     Controller {
         cc: 23,
         name: "OSC 2 Pitch Mod Depth",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Osc2PitchModDepth),
+        glyph: Some(Glyph::Depth),
     },
     Controller {
         cc: 24,
         name: "OSC 2 Tone Mod Depth",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Osc2ToneModDepth),
+        glyph: Some(Glyph::Depth),
     },
     Controller {
         cc: 25,
         name: "OSC 2 Pitch",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Osc2Pitch),
+        glyph: Some(Glyph::Pitch),
     },
     Controller {
         cc: 26,
         name: "OSC 2 Level",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Osc2Level),
+        glyph: Some(Glyph::Level),
     },
     Controller {
         cc: 27,
         name: "Noise Level",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::NoiseLevel),
+        glyph: Some(Glyph::Noise),
     },
     Controller {
         cc: 28,
         name: "Unison Detune",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::UnisonDetune),
+        glyph: Some(Glyph::Detune),
     },
     Controller {
         cc: 29,
         name: "VCF Frequency",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfFrequency),
+        glyph: Some(Glyph::HighCut),
     },
     Controller {
         cc: 30,
         name: "VCF Resonance",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfResonance),
+        glyph: Some(Glyph::Resonance),
     },
     Controller {
         cc: 31,
         name: "VCF Mod",
         kind: ControllerKind::Other,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 32,
         name: "Bank Select LSB",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 33,
         name: "VCF LFO Depth",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfLfoDepth),
+        glyph: Some(Glyph::Wave),
     },
     Controller {
         cc: 34,
         name: "VCF Keyboard Tracking",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfKeyboardTracking),
+        glyph: Some(Glyph::Keys),
     },
     Controller {
         cc: 35,
         name: "VCF HighPass Frequency",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfHighPassFrequency),
+        glyph: Some(Glyph::LowCut),
     },
     Controller {
         cc: 36,
         name: "VCA Level",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcaLevel),
+        glyph: Some(Glyph::Level),
     },
     Controller {
         cc: 37,
         name: "VCA Envelope Attack Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcaEnvelopeAttackTime),
+        glyph: Some(Glyph::Attack),
     },
     Controller {
         cc: 38,
         name: "Data Entry LSB",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 39,
         name: "VCA Envelope Decay Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcaEnvelopeDecayTime),
+        glyph: Some(Glyph::Decay),
     },
     Controller {
         cc: 40,
         name: "VCA Envelope Sustain Level",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcaEnvelopeSustainLevel),
+        glyph: Some(Glyph::Hold),
     },
     Controller {
         cc: 41,
         name: "VCA Envelope Release Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcaEnvelopeReleaseTime),
+        glyph: Some(Glyph::Release),
     },
     Controller {
         cc: 42,
         name: "VCF Envelope Attack Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfEnvelopeAttackTime),
+        glyph: Some(Glyph::Attack),
     },
     Controller {
         cc: 43,
         name: "VCF Envelope Decay Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfEnvelopeDecayTime),
+        glyph: Some(Glyph::Decay),
     },
     Controller {
         cc: 44,
         name: "VCF Envelope Sustain Level",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfEnvelopeSustainLevel),
+        glyph: Some(Glyph::Hold),
     },
     Controller {
         cc: 45,
         name: "VCF Envelope Release Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfEnvelopeReleaseTime),
+        glyph: Some(Glyph::Release),
     },
     Controller {
         cc: 46,
         name: "Mod Envelope Attack Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ModEnvelopeAttackTime),
+        glyph: Some(Glyph::Attack),
     },
     Controller {
         cc: 47,
         name: "Mod Envelope Decay Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ModEnvelopeDecayTime),
+        glyph: Some(Glyph::Decay),
     },
     Controller {
         cc: 48,
         name: "Mod Envelope Sustain Level",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ModEnvelopeSustainLevel),
+        glyph: Some(Glyph::Hold),
     },
     Controller {
         cc: 49,
         name: "Mod Envelope Release Time",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ModEnvelopeReleaseTime),
+        glyph: Some(Glyph::Release),
     },
     Controller {
         cc: 50,
         name: "VCA Envelope Attack Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcaEnvelopeAttackCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 51,
         name: "VCA Envelope Decay Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcaEnvelopeDecayCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 52,
         name: "VCA Envelope Sustain Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcaEnvelopeSustainCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 53,
         name: "VCA Envelope Release Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcaEnvelopeReleaseCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 54,
         name: "VCF Envelope Attack Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfEnvelopeAttackCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 55,
         name: "VCF Envelope Decay Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfEnvelopeDecayCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 56,
         name: "VCF Envelope Sustain Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfEnvelopeSustainCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 57,
         name: "VCF Envelope Release Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::VcfEnvelopeReleaseCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 58,
         name: "Mod Envelope Attack Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ModEnvelopeAttackCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 59,
         name: "Mod Envelope Decay Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ModEnvelopeDecayCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 60,
         name: "Mod Envelope Sustain Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ModEnvelopeSustainCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 61,
         name: "Mod Envelope Release Curve",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::ModEnvelopeReleaseCurve),
+        glyph: Some(Glyph::Curve),
     },
     Controller {
         cc: 62,
         name: "FX 1 Param 1",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param1),
+        glyph: None,
     },
     Controller {
         cc: 63,
         name: "FX 1 Param 2",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param2),
+        glyph: None,
     },
     Controller {
         cc: 64,
         name: "Sustain Pedal",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: Some(Glyph::Footswitch),
     },
     Controller {
         cc: 65,
         name: "FX 1 Param 3",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param3),
+        glyph: None,
     },
     Controller {
         cc: 66,
         name: "FX 1 Param 4",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param4),
+        glyph: None,
     },
     Controller {
         cc: 67,
         name: "FX 1 Param 5",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param5),
+        glyph: None,
     },
     Controller {
         cc: 68,
         name: "FX 1 Param 6",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param6),
+        glyph: None,
     },
     Controller {
         cc: 69,
         name: "FX 1 Param 7",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param7),
+        glyph: None,
     },
     Controller {
         cc: 70,
         name: "FX 1 Param 8",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param8),
+        glyph: None,
     },
     Controller {
         cc: 71,
         name: "FX 1 Param 9",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param9),
+        glyph: None,
     },
     Controller {
         cc: 72,
         name: "FX 1 Param 10",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param10),
+        glyph: None,
     },
     Controller {
         cc: 73,
         name: "FX 1 Param 11",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param11),
+        glyph: None,
     },
     Controller {
         cc: 74,
         name: "FX 1 Param 12",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Param12),
+        glyph: None,
     },
     Controller {
         cc: 75,
         name: "FX 2 Param 1",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param1),
+        glyph: None,
     },
     Controller {
         cc: 76,
         name: "FX 2 Param 2",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param2),
+        glyph: None,
     },
     Controller {
         cc: 77,
         name: "FX 2 Param 3",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param3),
+        glyph: None,
     },
     Controller {
         cc: 78,
         name: "FX 2 Param 4",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param4),
+        glyph: None,
     },
     Controller {
         cc: 79,
         name: "FX 2 Param 5",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param5),
+        glyph: None,
     },
     Controller {
         cc: 80,
         name: "FX 2 Param 6",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param6),
+        glyph: None,
     },
     Controller {
         cc: 81,
         name: "FX 2 Param 7",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param7),
+        glyph: None,
     },
     Controller {
         cc: 82,
         name: "FX 2 Param 8",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param8),
+        glyph: None,
     },
     Controller {
         cc: 83,
         name: "FX 2 Param 9",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param9),
+        glyph: None,
     },
     Controller {
         cc: 84,
         name: "FX 2 Param 10",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param10),
+        glyph: None,
     },
     Controller {
         cc: 85,
         name: "FX 2 Param 11",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param11),
+        glyph: None,
     },
     Controller {
         cc: 86,
         name: "FX 2 Param 12",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Param12),
+        glyph: None,
     },
     Controller {
         cc: 87,
         name: "FX 3 Param 1",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param1),
+        glyph: None,
     },
     Controller {
         cc: 88,
         name: "FX 3 Param 2",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param2),
+        glyph: None,
     },
     Controller {
         cc: 89,
         name: "FX 3 Param 3",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param3),
+        glyph: None,
     },
     Controller {
         cc: 90,
         name: "FX 3 Param 4",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param4),
+        glyph: None,
     },
     Controller {
         cc: 91,
         name: "FX 3 Param 5",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param5),
+        glyph: None,
     },
     Controller {
         cc: 92,
         name: "FX 3 Param 6",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param6),
+        glyph: None,
     },
     Controller {
         cc: 93,
         name: "FX 3 Param 7",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param7),
+        glyph: None,
     },
     Controller {
         cc: 94,
         name: "FX 3 Param 8",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param8),
+        glyph: None,
     },
     Controller {
         cc: 95,
         name: "FX 3 Param 9",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param9),
+        glyph: None,
     },
     Controller {
         cc: 96,
         name: "Data Increment",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 97,
         name: "Data Decrement",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 98,
         name: "NRPN LSB",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 99,
         name: "NRPN MSB",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 100,
         name: "RPN LSB",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 101,
         name: "RPN MSB",
         kind: ControllerKind::Standard,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 102,
         name: "FX 3 Param 10",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param10),
+        glyph: None,
     },
     Controller {
         cc: 103,
         name: "FX 3 Param 11",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param11),
+        glyph: None,
     },
     Controller {
         cc: 104,
         name: "FX 3 Param 12",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Param12),
+        glyph: None,
     },
     Controller {
         cc: 105,
         name: "FX 1 Type",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1Type),
+        glyph: Some(Glyph::Selection),
     },
     Controller {
         cc: 106,
         name: "FX 2 Type",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2Type),
+        glyph: Some(Glyph::Selection),
     },
     Controller {
         cc: 107,
         name: "FX 3 Type",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3Type),
+        glyph: Some(Glyph::Selection),
     },
     Controller {
         cc: 108,
         name: "FX 4 Type",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx4Type),
+        glyph: Some(Glyph::Selection),
     },
     Controller {
         cc: 109,
         name: "FX 1 Output Gain",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx1OutputGain),
+        glyph: Some(Glyph::Level),
     },
     Controller {
         cc: 110,
         name: "FX 2 Output Gain",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx2OutputGain),
+        glyph: Some(Glyph::Level),
     },
     Controller {
         cc: 111,
         name: "FX 3 Output Gain",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx3OutputGain),
+        glyph: Some(Glyph::Level),
     },
     Controller {
         cc: 112,
         name: "FX 4 Output Gain",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::Fx4OutputGain),
+        glyph: Some(Glyph::Level),
     },
     Controller {
         cc: 113,
         name: "Analog Thru",
         kind: ControllerKind::Other,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 114,
         name: "FX Mode",
         kind: ControllerKind::Parameter,
         parameter: Some(ParamId::FxMode),
+        glyph: Some(Glyph::Selection),
     },
     Controller {
         cc: 115,
         name: "3D X axis",
         kind: ControllerKind::Other,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 116,
         name: "3D Y axis",
         kind: ControllerKind::Other,
         parameter: None,
+        glyph: None,
     },
     Controller {
         cc: 117,
         name: "3D Z axis",
         kind: ControllerKind::Other,
         parameter: None,
+        glyph: None,
     },
 ];
 

@@ -23,6 +23,7 @@ mod docs;
 mod effect;
 mod front;
 mod fx;
+mod glyph;
 mod output;
 mod program;
 mod spec;

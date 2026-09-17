@@ -44,7 +44,10 @@ filter responses, what each oscillator is putting out, the arpeggiator's gates
 axis is published and where it is only an ordering, where the shape rests, and
 where along it the things a player is editing fall. The modulation sources say
 which way they swing and carry a dot-matrix cell each, so a patch bay can be
-drawn in pictures. The `descriptions` feature adds a sentence per parameter and
+drawn in pictures; every effect slot, most parameters and the standard
+controllers carry a glyph of what they do, so a tiny display can show a
+picture and a bar; and each effect has a mark, its family's or a finer one of
+its own, and the characters that say what kind of thing it is. The `descriptions` feature adds a sentence per parameter and
 per effect slot saying what the control does; leaving it off keeps that prose
 out of an embedded build.
 

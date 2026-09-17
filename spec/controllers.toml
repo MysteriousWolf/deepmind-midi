@@ -14,6 +14,7 @@ resolution = "7-bit, 0-127"
 cc = 1
 name = "Modulation Wheel"
 kind = "standard"
+glyph = "mod wheel"
 
 [[controller]]
 cc = 2
@@ -24,6 +25,7 @@ kind = "standard"
 cc = 4
 name = "Foot Controller"
 kind = "standard"
+glyph = "pedal"
 
 [[controller]]
 cc = 5
@@ -40,21 +42,25 @@ kind = "standard"
 cc = 7
 name = "Channel Volume"
 kind = "standard"
+glyph = "level"
 
 [[controller]]
 cc = 8
 name = "Balance"
 kind = "standard"
+glyph = "pan"
 
 [[controller]]
 cc = 10
 name = "Pan"
 kind = "standard"
+glyph = "pan"
 
 [[controller]]
 cc = 11
 name = "Expression"
 kind = "standard"
+glyph = "expression"
 
 [[controller]]
 cc = 12
@@ -360,6 +366,7 @@ parameter = 168
 cc = 64
 name = "Sustain Pedal"
 kind = "standard"
+glyph = "footswitch"
 
 [[controller]]
 cc = 65

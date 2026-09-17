@@ -8,8 +8,14 @@
 # seven dots by seven, one bit a dot, the size the instrument's own 128 by 64
 # display has room for beside a name and the size a host lays down at any scale
 # without resampling anything. It is the same grid the effect family marks are
-# drawn again on in marks.toml, reached through the same `Pixels` type, and it
-# reaches a host through `ValueTable::cell_of`.
+# drawn again on in marks.toml and the parameter glyphs are drawn on in
+# glyphs.toml, reached through the same `Pixels` type, and it reaches a host
+# through `ValueTable::cell_of`.
+#
+# A cell either draws its own `pixels` or names a `glyph` from glyphs.toml.
+# The wheels, the pedals, the pressure and the velocity are things a parameter
+# and a controller are pictured by too, and one drawing serves all three so
+# that the mod wheel looks the same wherever it is met.
 
 [meta]
 purpose = """
@@ -43,13 +49,21 @@ on a key, a release velocity is the first arrow turned round. The note number \
 is a note, the sequencer is a row of steps, and the three axes of the joystick \
 are the letters the display prints for them, because `X` is the picture of \
 `X`."""
+pedals = """
+`Foot Ctrl` and `Expression` are both pedals, and the two cells say what each \
+is for rather than drawing one pedal twice. The foot controller is the \
+treadle: a plate over its base, tipped by the toe, which is what the \
+instrument's own pedal input takes. Expression is the same treadle filled in, \
+because what an expression pedal carries by definition is a level, and a level \
+is drawn filled everywhere in this crate. The sustain pedal is a different \
+thing again, a switch under a foot, and it has a glyph of its own, \
+`footswitch`, for the controller table; it is not a modulation source, so it \
+is not here."""
 undrawn = """
-Five sources have no cell, and a host draws the name it already prints. `Off` \
-is nothing to draw. `Expression` is a pedal, and a second pedal beside the foot \
-controller's would be one picture saying less than the two names do. \
-`BreathCtrl`, `Voice Num` and `Uni Voice` have no picture that would be told \
-from another at this size, and an icon that is nearly right is worse than a \
-word, because a word is honest about being a word.
+Four sources have no cell, and a host draws the name it already prints. `Off` \
+is nothing to draw. `BreathCtrl`, `Voice Num` and `Uni Voice` have no picture \
+that would be told from another at this size, and an icon that is nearly right \
+is worse than a word, because a word is honest about being a word.
 
 The 130 destinations have none either, for now. Most of them name a parameter, \
 and a host that wants a picture for one has `ValueEntry::parameters` to find \
@@ -60,54 +74,27 @@ yet."""
 [[cell]]
 table = "mod_source"
 name = "Pitch Bend"
-pixels = [
-    "..###..",
-    ".#...#.",
-    ".#...#.",
-    ".#####.",
-    ".#...#.",
-    ".#...#.",
-    "..###..",
-]
+glyph = "bend"
 
 [[cell]]
 table = "mod_source"
 name = "Mod Wheel"
-pixels = [
-    "..###..",
-    ".#...#.",
-    ".#...#.",
-    ".#...#.",
-    ".#####.",
-    ".#####.",
-    "..###..",
-]
+glyph = "mod wheel"
 
 [[cell]]
 table = "mod_source"
 name = "Foot Ctrl"
-pixels = [
-    ".......",
-    ".....##",
-    "...##.#",
-    ".##...#",
-    "#.....#",
-    "#######",
-    ".......",
-]
+glyph = "pedal"
+
+[[cell]]
+table = "mod_source"
+name = "Expression"
+glyph = "expression"
 
 [[cell]]
 table = "mod_source"
 name = "Pressure"
-pixels = [
-    "...#...",
-    "...#...",
-    ".#####.",
-    "..###..",
-    "...#...",
-    ".......",
-    "#######",
-]
+glyph = "pressure"
 
 [[cell]]
 table = "mod_source"
@@ -190,15 +177,7 @@ pixels = [
 [[cell]]
 table = "mod_source"
 name = "Note Vel"
-pixels = [
-    "...#...",
-    ".#.#.#.",
-    ".#.#.#.",
-    ".#####.",
-    "..###..",
-    "...#...",
-    ".......",
-]
+glyph = "velocity"
 
 [[cell]]
 table = "mod_source"
