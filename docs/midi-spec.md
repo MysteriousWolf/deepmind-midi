@@ -1329,33 +1329,37 @@ Section 8.2.4. When LFO Arp Sync is on, the LFO rate parameter selects one of th
 
 Firmware 1.1+.
 
-| Value | Name | Notes |
-|---|---|---|
-| 0 | Off | The matrix row is switched off |
-| 1 | Pitch Bend | Pitch bend wheel |
-| 2 | Mod Wheel | Modulation wheel |
-| 3 | Foot Ctrl | Foot controller |
-| 4 | BreathCtrl | Breath controller |
-| 5 | Pressure | Aftertouch pressure |
-| 6 | Expression | Expression pedal |
-| 7 | LFO1 | LFO 1 |
-| 8 | LFO2 | LFO 2 |
-| 9 | Env 1 | VCA envelope |
-| 10 | Env 2 | VCF envelope |
-| 11 | Env 3 | Mod envelope |
-| 12 | Note Num | Note number |
-| 13 | Note Vel | Note velocity |
-| 14 | Note Off Vel | Note off velocity |
-| 15 | Ctrl Seq | Control sequencer |
-| 16 | LFO1 (Uni) | LFO 1, unipolar |
-| 17 | LFO2 (Uni) | LFO 2, unipolar |
-| 18 | LFO1 (Fade) | LFO 1 fade envelope |
-| 19 | LFO2 (Fade) | LFO 2 fade envelope |
-| 20 | Voice Num | Voice number |
-| 21 | Uni Voice | Unison voice number |
-| 22 | CC X (115) | Continuous controller X axis, CC 115 |
-| 23 | CC Y (116) | Continuous controller Y axis, CC 116 |
-| 24 | CC Z (117) | Continuous controller Z axis, CC 117 |
+The Swing column says which way a source moves what it reaches. `centred` swings either side of where the destination sits: an LFO, the pitch bender, which rests in the middle of its travel, and the control sequencer, whose steps are signed about their centre. `rising` moves it one way from where it sits and back: an envelope, a fade, an LFO taken unipolar, a wheel or a pedal that rests at one end of its travel, and a velocity or a pressure, which start from nothing. The instrument's own display prints the difference: the manual's screenshot of a pitch modulation depth reads `+/-4.5 semitones` from an LFO and `+7.8 semitones` from a unipolar source, which `measurements.toml` records at offset 21. A blank is a source the specification does not settle: where a note number or a voice number counts from is not printed anywhere, and a guess would be drawn as confidently as a fact.
+
+<img src="diagrams/cells.svg" alt="The modulation source cells, magnified and at one dot per dot" width="596">
+
+| Value | Name | Swing | Notes |
+|---|---|---|---|
+| 0 | Off |  | The matrix row is switched off |
+| 1 | Pitch Bend | centred | Pitch bend wheel |
+| 2 | Mod Wheel | rising | Modulation wheel |
+| 3 | Foot Ctrl | rising | Foot controller |
+| 4 | BreathCtrl | rising | Breath controller |
+| 5 | Pressure | rising | Aftertouch pressure |
+| 6 | Expression | rising | Expression pedal |
+| 7 | LFO1 | centred | LFO 1 |
+| 8 | LFO2 | centred | LFO 2 |
+| 9 | Env 1 | rising | VCA envelope |
+| 10 | Env 2 | rising | VCF envelope |
+| 11 | Env 3 | rising | Mod envelope |
+| 12 | Note Num |  | Note number |
+| 13 | Note Vel | rising | Note velocity |
+| 14 | Note Off Vel | rising | Note off velocity |
+| 15 | Ctrl Seq | centred | Control sequencer |
+| 16 | LFO1 (Uni) | rising | LFO 1, unipolar |
+| 17 | LFO2 (Uni) | rising | LFO 2, unipolar |
+| 18 | LFO1 (Fade) | rising | LFO 1 fade envelope |
+| 19 | LFO2 (Fade) | rising | LFO 2 fade envelope |
+| 20 | Voice Num |  | Voice number |
+| 21 | Uni Voice |  | Unison voice number |
+| 22 | CC X (115) | rising | Continuous controller X axis, CC 115 |
+| 23 | CC Y (116) | rising | Continuous controller Y axis, CC 116 |
+| 24 | CC Z (117) | rising | Continuous controller Z axis, CC 117 |
 
 <a id="mod_source-fw10"></a>
 
@@ -1365,31 +1369,31 @@ Firmware 1.0.
 
 Value 0 selects Off.
 
-| Value | Name | Notes |
-|---|---|---|
-| 0 | Off | The matrix row is switched off |
-| 1 | Pitch Bend |  |
-| 2 | Mod Wheel |  |
-| 3 | Foot Ctrl |  |
-| 4 | BreathCtrl |  |
-| 5 | Pressure |  |
-| 6 | LFO1 |  |
-| 7 | LFO2 |  |
-| 8 | Env 1 |  |
-| 9 | Env 2 |  |
-| 10 | Env 3 |  |
-| 11 | Note Num |  |
-| 12 | Note Vel |  |
-| 13 | Ctrl Seq |  |
-| 14 | LFO1 (Uni) |  |
-| 15 | LFO2 (Uni) |  |
-| 16 | LFO1 (Fade) |  |
-| 17 | LFO2 (Fade) |  |
-| 18 | NoteOff Vel |  |
-| 19 | Voice Num |  |
-| 20 | CC X (114) |  |
-| 21 | CC Y (115) |  |
-| 22 | CC Z (116) |  |
+| Value | Name | Swing | Notes |
+|---|---|---|---|
+| 0 | Off |  | The matrix row is switched off |
+| 1 | Pitch Bend | centred |  |
+| 2 | Mod Wheel | rising |  |
+| 3 | Foot Ctrl | rising |  |
+| 4 | BreathCtrl | rising |  |
+| 5 | Pressure | rising |  |
+| 6 | LFO1 | centred |  |
+| 7 | LFO2 | centred |  |
+| 8 | Env 1 | rising |  |
+| 9 | Env 2 | rising |  |
+| 10 | Env 3 | rising |  |
+| 11 | Note Num |  |  |
+| 12 | Note Vel | rising |  |
+| 13 | Ctrl Seq | centred |  |
+| 14 | LFO1 (Uni) | rising |  |
+| 15 | LFO2 (Uni) | rising |  |
+| 16 | LFO1 (Fade) | rising |  |
+| 17 | LFO2 (Fade) | rising |  |
+| 18 | NoteOff Vel | rising |  |
+| 19 | Voice Num |  |  |
+| 20 | CC X (114) | rising |  |
+| 21 | CC Y (115) | rising |  |
+| 22 | CC Z (116) | rising |  |
 
 <a id="mod_destination"></a>
 
@@ -1899,7 +1903,7 @@ Where this document departs from what the manual prints, and why.
 
 ## Open questions
 
-Seven things the manual does not settle. Each needs a hardware session.
+Eight things the manual does not settle. Each needs a hardware session.
 
 - **The packed length of a program dump.** The manual prints 278 packed bytes
   for 242 raw. Padding the last group gives 280 and sending it short gives 277,
@@ -1931,6 +1935,14 @@ Seven things the manual does not settle. Each needs a hardware session.
   version 7 added three bytes at offsets 242-244 which are zero in every factory
   program, so that is the likely home for it and for anything else firmware 1.1
   added.
+- **What a modulation depth is worth.** `Mod n Depth` is signed about 128 and
+  the destination table says what each destination moves, but nothing relates
+  the two: whether full depth sweeps a destination over its whole range, half
+  of it, or something that depends on the destination is not printed. A
+  session that sets a routing at a known depth and reads the destination's
+  displayed value at the extremes settles it, one destination at a time; the
+  readings belong in `spec/measurements.toml`, and `ParamId::modulation_reach`
+  answers `None` until they exist.
 
 ## Scaling raw values to displayed values
 
