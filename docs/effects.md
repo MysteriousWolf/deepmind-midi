@@ -205,8 +205,8 @@ from what the control is called.
 | <a id="glyph-pedal"></a>`pedal` | A pedal under a foot: a treadle over its base, tipped by the toe. | 0 | 0 | 1 | 1 |
 | <a id="glyph-expression"></a>`expression` | An expression pedal: the same treadle, carrying a level. | 0 | 0 | 1 | 1 |
 | <a id="glyph-footswitch"></a>`footswitch` | A footswitch: a box on the floor with a button on top. | 0 | 0 | 1 | 0 |
-| <a id="glyph-breath"></a>`breath` | Breath down a tube: a flow between two walls. | 0 | 0 | 1 | 1 |
 | <a id="glyph-cabinet"></a>`cabinet` | A speaker cabinet: a box with a driver in it. | 1 | 0 | 0 | 0 |
+| <a id="glyph-breath"></a>`breath` | Breath down a tube: a flow between two walls. | 0 | 0 | 1 | 1 |
 
 <!-- /generated:glyphs -->
 
