@@ -1399,9 +1399,10 @@ impl Spec {
     fn validate_swings(&self) -> Result<(), String> {
         for table in &self.tables {
             for entry in &table.entries {
-                if let Some(swing) = &entry.swing
-                    && !SWINGS.contains(&swing.as_str())
-                {
+                let Some(swing) = &entry.swing else {
+                    continue;
+                };
+                if !SWINGS.contains(&swing.as_str()) {
                     return Err(format!(
                         "enums.toml: table {} value {} ({}) swings {swing:?}, not one of {SWINGS:?}",
                         table.id, entry.value, entry.name
