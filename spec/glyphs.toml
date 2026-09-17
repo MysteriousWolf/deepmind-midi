@@ -720,6 +720,19 @@ pixels = [
 ]
 
 [[glyph]]
+name = "breath"
+description = "Breath down a tube: a flow between two walls."
+pixels = [
+    ".......",
+    "#######",
+    "....#..",
+    ".#####.",
+    "....#..",
+    "#######",
+    ".......",
+]
+
+[[glyph]]
 name = "cabinet"
 description = "A speaker cabinet: a box with a driver in it."
 pixels = [

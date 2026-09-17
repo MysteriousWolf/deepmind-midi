@@ -2,7 +2,7 @@
 //!
 //! Three things in this crate are drawn this way: the mark of an effect,
 //! through [`Mark::pixels`](crate::effect::Mark::pixels); the cell of a
-//! modulation source, through
+//! modulation source or destination, through
 //! [`ValueTable::cell_of`](crate::param::ValueTable::cell_of); and a
 //! [`Glyph`], the picture of what a parameter does, through
 //! [`FxSlot::glyph`](crate::effect::FxSlot::glyph),

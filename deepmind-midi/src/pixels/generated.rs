@@ -7,7 +7,7 @@
 use super::Pixels;
 
 /// Number of glyphs in the catalogue.
-pub const GLYPH_COUNT: usize = 53;
+pub const GLYPH_COUNT: usize = 54;
 
 /// A picture of what a parameter does, the size of a character.
 ///
@@ -131,6 +131,8 @@ pub enum Glyph {
     Expression,
     /// A footswitch: a box on the floor with a button on top.
     Footswitch,
+    /// Breath down a tube: a flow between two walls.
+    Breath,
     /// A speaker cabinet: a box with a driver in it.
     Cabinet,
 }
@@ -190,6 +192,7 @@ impl Glyph {
         Self::Pedal,
         Self::Expression,
         Self::Footswitch,
+        Self::Breath,
         Self::Cabinet,
     ];
 
@@ -250,7 +253,8 @@ impl Glyph {
             Self::Pedal => 49,
             Self::Expression => 50,
             Self::Footswitch => 51,
-            Self::Cabinet => 52,
+            Self::Breath => 52,
+            Self::Cabinet => 53,
         }
     }
 
@@ -310,6 +314,7 @@ impl Glyph {
             Self::Pedal => "pedal",
             Self::Expression => "expression",
             Self::Footswitch => "footswitch",
+            Self::Breath => "breath",
             Self::Cabinet => "cabinet",
         }
     }
@@ -472,6 +477,9 @@ pub(super) static GLYPHS: [Pixels; GLYPH_COUNT] = [
     ]),
     Pixels::new([
         0b001_1100, 0b001_0100, 0b111_1111, 0b100_0001, 0b100_0001, 0b100_0001, 0b111_1111,
+    ]),
+    Pixels::new([
+        0b000_0000, 0b111_1111, 0b001_0000, 0b011_1110, 0b001_0000, 0b111_1111, 0b000_0000,
     ]),
     Pixels::new([
         0b111_1111, 0b101_1101, 0b110_0011, 0b110_1011, 0b110_0011, 0b101_1101, 0b111_1111,

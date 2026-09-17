@@ -123,7 +123,7 @@ A display with a row of characters per parameter has room for a name and a
 number. A controller with a small screen beside each knob has room for less. A
 glyph is what goes in that room: a picture of what turning the control does,
 the size of a character, on the same seven by seven grid the marks and the
-modulation source cells are drawn on, so a host blits all three with one
+modulation matrix cells are drawn on, so a host blits all three with one
 routine.
 
 Every effect slot carries one, through `FxSlot::glyph`, because what a slot
@@ -135,7 +135,10 @@ carries one through `Controller::glyph`: its parameter's where it drives one,
 and for the standard controllers what the MIDI specification says they are.
 The foot controller is a treadle, expression is the same treadle carrying a
 level, and the sustain pedal is a switch under a foot, so a host drawing
-pedals draws three different pedals.
+pedals draws three different pedals. A modulation matrix cell may name a glyph
+rather than draw its own dots, which is the last column of the catalogue: the
+mod wheel is one picture whether it is met as a controller or as a source, and
+`All Attack` is the attack its three envelopes' parameters carry.
 
 The same glyph serves every control that does the same thing: every `Low Cut`
 is a low cut, whether it is on a reverb, a delay or the voice's own filter, and
@@ -148,61 +151,62 @@ from what the control is called.
 
 <img src="diagrams/glyphs.svg" alt="The parameter glyphs, magnified and at one dot per dot" width="596">
 
-| Glyph | Picture of | Effect slots | Parameters | Controllers |
-|---|---|---|---|---|
-| <a id="glyph-level"></a>`level` | How loud: a wedge rising to the right, the way a fader's travel is printed. | 25 | 6 | 1 |
-| <a id="glyph-mix"></a>`mix` | Wet against dry: a disc half filled. | 31 | 0 | 0 |
-| <a id="glyph-time"></a>`time` | When: a clock face with one hand. | 20 | 5 | 0 |
-| <a id="glyph-pre-delay"></a>`pre delay` | A gap before the effect starts: the dry hit, empty space, then the tail arriving. | 14 | 0 | 0 |
-| <a id="glyph-decay"></a>`decay` | A tail falling away: an exponential fall from full. | 14 | 3 | 0 |
-| <a id="glyph-attack"></a>`attack` | A rise to full and held there: the onset of an envelope. | 7 | 5 | 0 |
-| <a id="glyph-release"></a>`release` | Held, then let go: a level falling to the floor at the end. | 4 | 3 | 0 |
-| <a id="glyph-hold"></a>`hold` | A level held: a line kept up between the moment it starts and the moment it ends. | 5 | 4 | 0 |
-| <a id="glyph-size"></a>`size` | How big: the corners of a box, with what is inside it marked. | 12 | 0 | 0 |
-| <a id="glyph-high-cut"></a>`high cut` | The highs taken off: level, then falling to the right. A low-pass corner. | 27 | 2 | 0 |
-| <a id="glyph-low-cut"></a>`low cut` | The lows taken off: rising from the left, then level. A high-pass corner. | 17 | 1 | 0 |
-| <a id="glyph-low-shelf"></a>`low shelf` | The lows lifted: a shelf above the level at the left. | 10 | 1 | 0 |
-| <a id="glyph-high-shelf"></a>`high shelf` | The highs lifted: a shelf above the level at the right. | 8 | 0 | 0 |
-| <a id="glyph-bell"></a>`bell` | A band lifted about a centre: a bump on a level. | 3 | 0 | 0 |
-| <a id="glyph-resonance"></a>`resonance` | A peak: the response standing up at one frequency. | 6 | 1 | 0 |
-| <a id="glyph-frequency"></a>`frequency` | Where in the spectrum: a ruler whose ticks close up towards the right, the way octaves do. | 8 | 0 | 0 |
-| <a id="glyph-feedback"></a>`feedback` | Sent round again: a loop with an arrowhead on it. | 15 | 0 | 0 |
-| <a id="glyph-rate"></a>`rate` | How fast: a wave, a cycle and a half of it. | 17 | 3 | 0 |
-| <a id="glyph-wave"></a>`wave` | The wave itself: one cycle of a sine. | 5 | 3 | 0 |
-| <a id="glyph-depth"></a>`depth` | How far the wave swings: a cycle between the two rails it reaches. | 15 | 11 | 0 |
-| <a id="glyph-width"></a>`width` | How wide: a span with a mark at each end. | 0 | 0 | 0 |
-| <a id="glyph-spread"></a>`spread` | Pushed apart: arrows pointing both ways from the middle. | 11 | 1 | 0 |
-| <a id="glyph-pan"></a>`pan` | Where between left and right: a dot between the two ways it can go. | 9 | 0 | 2 |
-| <a id="glyph-threshold"></a>`threshold` | A level things happen above: a line across, with one peak over it. | 3 | 0 | 0 |
-| <a id="glyph-ratio"></a>`ratio` | How hard a level is held down past the threshold: a slope with a knee in it. | 3 | 0 | 0 |
-| <a id="glyph-drive"></a>`drive` | Pushed hard: a bolt. | 9 | 0 | 0 |
-| <a id="glyph-tone"></a>`tone` | Tilted: more of one end of the spectrum and less of the other, about a pivot. | 4 | 0 | 0 |
-| <a id="glyph-pitch"></a>`pitch` | A pitch: a note. | 4 | 5 | 0 |
-| <a id="glyph-detune"></a>`detune` | Two pitches almost the same: two waves almost in step. | 5 | 1 | 0 |
-| <a id="glyph-phase"></a>`phase` | Where in the cycle: a wave with its axis through it. | 6 | 0 | 0 |
-| <a id="glyph-selection"></a>`selection` | One of a list: the list. | 14 | 40 | 0 |
-| <a id="glyph-switch"></a>`switch` | In or out: the power ring. | 12 | 3 | 0 |
-| <a id="glyph-diffusion"></a>`diffusion` | Scattered: dots with no line through them. | 10 | 0 | 0 |
-| <a id="glyph-noise"></a>`noise` | Random: dots everywhere. | 0 | 3 | 0 |
-| <a id="glyph-steps"></a>`steps` | In steps: a staircase. | 3 | 33 | 0 |
-| <a id="glyph-tap"></a>`tap` | Repeats: the same mark three times, shorter each time. | 10 | 0 | 0 |
-| <a id="glyph-square"></a>`square` | A pulse: a wave with two levels and nothing between them. | 0 | 2 | 0 |
-| <a id="glyph-saw"></a>`saw` | A saw: a ramp up and a drop. | 0 | 1 | 0 |
-| <a id="glyph-gate"></a>`gate` | How long a note is held open: one pulse and its width. | 0 | 1 | 0 |
-| <a id="glyph-swing"></a>`swing` | Long then short: two pulses that do not share a width. | 0 | 2 | 0 |
-| <a id="glyph-curve"></a>`curve` | Bent away from straight: a line that bows. | 4 | 15 | 0 |
-| <a id="glyph-glide"></a>`glide` | Slid from one pitch to the next rather than stepped. | 0 | 2 | 0 |
-| <a id="glyph-polarity"></a>`polarity` | Which way up: plus over minus. | 0 | 1 | 0 |
-| <a id="glyph-keys"></a>`keys` | The keyboard: keys, with the black ones between them. | 0 | 6 | 0 |
-| <a id="glyph-envelope"></a>`envelope` | An envelope: up fast, down to a level, held, and let go. | 0 | 2 | 0 |
-| <a id="glyph-velocity"></a>`velocity` | How hard the key was hit: an arrow with motion beside it. | 0 | 2 | 0 |
-| <a id="glyph-pressure"></a>`pressure` | Pressed after the key is down: an arrow pressing on a key. | 0 | 3 | 0 |
-| <a id="glyph-bend"></a>`bend` | The pitch bender: a wheel seen from the side, resting in the middle. | 0 | 3 | 0 |
-| <a id="glyph-mod-wheel"></a>`mod wheel` | The modulation wheel: a wheel seen from the side, resting at the bottom. | 0 | 3 | 1 |
-| <a id="glyph-pedal"></a>`pedal` | A pedal under a foot: a treadle over its base, tipped by the toe. | 0 | 0 | 1 |
-| <a id="glyph-expression"></a>`expression` | An expression pedal: the same treadle, carrying a level. | 0 | 0 | 1 |
-| <a id="glyph-footswitch"></a>`footswitch` | A footswitch: a box on the floor with a button on top. | 0 | 0 | 1 |
-| <a id="glyph-cabinet"></a>`cabinet` | A speaker cabinet: a box with a driver in it. | 1 | 0 | 0 |
+| Glyph | Picture of | Effect slots | Parameters | Controllers | Matrix cells |
+|---|---|---|---|---|---|
+| <a id="glyph-level"></a>`level` | How loud: a wedge rising to the right, the way a fader's travel is printed. | 25 | 6 | 1 | 0 |
+| <a id="glyph-mix"></a>`mix` | Wet against dry: a disc half filled. | 31 | 0 | 0 | 0 |
+| <a id="glyph-time"></a>`time` | When: a clock face with one hand. | 20 | 5 | 0 | 0 |
+| <a id="glyph-pre-delay"></a>`pre delay` | A gap before the effect starts: the dry hit, empty space, then the tail arriving. | 14 | 0 | 0 | 0 |
+| <a id="glyph-decay"></a>`decay` | A tail falling away: an exponential fall from full. | 14 | 3 | 0 | 1 |
+| <a id="glyph-attack"></a>`attack` | A rise to full and held there: the onset of an envelope. | 7 | 5 | 0 | 1 |
+| <a id="glyph-release"></a>`release` | Held, then let go: a level falling to the floor at the end. | 4 | 3 | 0 | 1 |
+| <a id="glyph-hold"></a>`hold` | A level held: a line kept up between the moment it starts and the moment it ends. | 5 | 4 | 0 | 1 |
+| <a id="glyph-size"></a>`size` | How big: the corners of a box, with what is inside it marked. | 12 | 0 | 0 | 0 |
+| <a id="glyph-high-cut"></a>`high cut` | The highs taken off: level, then falling to the right. A low-pass corner. | 27 | 2 | 0 | 0 |
+| <a id="glyph-low-cut"></a>`low cut` | The lows taken off: rising from the left, then level. A high-pass corner. | 17 | 1 | 0 | 0 |
+| <a id="glyph-low-shelf"></a>`low shelf` | The lows lifted: a shelf above the level at the left. | 10 | 1 | 0 | 0 |
+| <a id="glyph-high-shelf"></a>`high shelf` | The highs lifted: a shelf above the level at the right. | 8 | 0 | 0 | 0 |
+| <a id="glyph-bell"></a>`bell` | A band lifted about a centre: a bump on a level. | 3 | 0 | 0 | 0 |
+| <a id="glyph-resonance"></a>`resonance` | A peak: the response standing up at one frequency. | 6 | 1 | 0 | 0 |
+| <a id="glyph-frequency"></a>`frequency` | Where in the spectrum: a ruler whose ticks close up towards the right, the way octaves do. | 8 | 0 | 0 | 0 |
+| <a id="glyph-feedback"></a>`feedback` | Sent round again: a loop with an arrowhead on it. | 15 | 0 | 0 | 0 |
+| <a id="glyph-rate"></a>`rate` | How fast: a wave, a cycle and a half of it. | 17 | 3 | 0 | 0 |
+| <a id="glyph-wave"></a>`wave` | The wave itself: one cycle of a sine. | 5 | 3 | 0 | 0 |
+| <a id="glyph-depth"></a>`depth` | How far the wave swings: a cycle between the two rails it reaches. | 15 | 11 | 0 | 0 |
+| <a id="glyph-width"></a>`width` | How wide: a span with a mark at each end. | 0 | 0 | 0 | 0 |
+| <a id="glyph-spread"></a>`spread` | Pushed apart: arrows pointing both ways from the middle. | 11 | 1 | 0 | 0 |
+| <a id="glyph-pan"></a>`pan` | Where between left and right: a dot between the two ways it can go. | 9 | 0 | 2 | 1 |
+| <a id="glyph-threshold"></a>`threshold` | A level things happen above: a line across, with one peak over it. | 3 | 0 | 0 | 0 |
+| <a id="glyph-ratio"></a>`ratio` | How hard a level is held down past the threshold: a slope with a knee in it. | 3 | 0 | 0 | 0 |
+| <a id="glyph-drive"></a>`drive` | Pushed hard: a bolt. | 9 | 0 | 0 | 0 |
+| <a id="glyph-tone"></a>`tone` | Tilted: more of one end of the spectrum and less of the other, about a pivot. | 4 | 0 | 0 | 0 |
+| <a id="glyph-pitch"></a>`pitch` | A pitch: a note. | 4 | 5 | 0 | 2 |
+| <a id="glyph-detune"></a>`detune` | Two pitches almost the same: two waves almost in step. | 5 | 1 | 0 | 3 |
+| <a id="glyph-phase"></a>`phase` | Where in the cycle: a wave with its axis through it. | 6 | 0 | 0 | 0 |
+| <a id="glyph-selection"></a>`selection` | One of a list: the list. | 14 | 40 | 0 | 0 |
+| <a id="glyph-switch"></a>`switch` | In or out: the power ring. | 12 | 3 | 0 | 0 |
+| <a id="glyph-diffusion"></a>`diffusion` | Scattered: dots with no line through them. | 10 | 0 | 0 | 0 |
+| <a id="glyph-noise"></a>`noise` | Random: dots everywhere. | 0 | 3 | 0 | 0 |
+| <a id="glyph-steps"></a>`steps` | In steps: a staircase. | 3 | 33 | 0 | 0 |
+| <a id="glyph-tap"></a>`tap` | Repeats: the same mark three times, shorter each time. | 10 | 0 | 0 | 0 |
+| <a id="glyph-square"></a>`square` | A pulse: a wave with two levels and nothing between them. | 0 | 2 | 0 | 0 |
+| <a id="glyph-saw"></a>`saw` | A saw: a ramp up and a drop. | 0 | 1 | 0 | 0 |
+| <a id="glyph-gate"></a>`gate` | How long a note is held open: one pulse and its width. | 0 | 1 | 0 | 0 |
+| <a id="glyph-swing"></a>`swing` | Long then short: two pulses that do not share a width. | 0 | 2 | 0 | 0 |
+| <a id="glyph-curve"></a>`curve` | Bent away from straight: a line that bows. | 4 | 15 | 0 | 0 |
+| <a id="glyph-glide"></a>`glide` | Slid from one pitch to the next rather than stepped. | 0 | 2 | 0 | 0 |
+| <a id="glyph-polarity"></a>`polarity` | Which way up: plus over minus. | 0 | 1 | 0 | 0 |
+| <a id="glyph-keys"></a>`keys` | The keyboard: keys, with the black ones between them. | 0 | 6 | 0 | 0 |
+| <a id="glyph-envelope"></a>`envelope` | An envelope: up fast, down to a level, held, and let go. | 0 | 2 | 0 | 0 |
+| <a id="glyph-velocity"></a>`velocity` | How hard the key was hit: an arrow with motion beside it. | 0 | 2 | 0 | 1 |
+| <a id="glyph-pressure"></a>`pressure` | Pressed after the key is down: an arrow pressing on a key. | 0 | 3 | 0 | 1 |
+| <a id="glyph-bend"></a>`bend` | The pitch bender: a wheel seen from the side, resting in the middle. | 0 | 3 | 0 | 1 |
+| <a id="glyph-mod-wheel"></a>`mod wheel` | The modulation wheel: a wheel seen from the side, resting at the bottom. | 0 | 3 | 1 | 1 |
+| <a id="glyph-pedal"></a>`pedal` | A pedal under a foot: a treadle over its base, tipped by the toe. | 0 | 0 | 1 | 1 |
+| <a id="glyph-expression"></a>`expression` | An expression pedal: the same treadle, carrying a level. | 0 | 0 | 1 | 1 |
+| <a id="glyph-footswitch"></a>`footswitch` | A footswitch: a box on the floor with a button on top. | 0 | 0 | 1 | 0 |
+| <a id="glyph-breath"></a>`breath` | Breath down a tube: a flow between two walls. | 0 | 0 | 1 | 1 |
+| <a id="glyph-cabinet"></a>`cabinet` | A speaker cabinet: a box with a driver in it. | 1 | 0 | 0 | 0 |
 
 <!-- /generated:glyphs -->
 

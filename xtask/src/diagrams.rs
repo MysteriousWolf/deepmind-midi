@@ -35,9 +35,12 @@ impl Kind {
 #[derive(Debug)]
 pub struct Diagram {
     /// File stem, used for `docs/diagrams/<id>.<ext>`.
-    pub id: &'static str,
+    ///
+    /// Owned rather than fixed, because the cells are drawn one sheet per
+    /// value table that has any and the tables are named in the specification.
+    pub id: String,
     /// Title, used as the section heading in the document.
-    pub title: &'static str,
+    pub title: String,
     /// What `source` is written in.
     pub kind: Kind,
     /// The source, without any file header.
@@ -72,44 +75,57 @@ impl Diagram {
 /// Returns a message when a parameter group the diagrams describe is empty, or
 /// when a value table they count is missing.
 pub fn all(spec: &Spec) -> Result<Vec<Diagram>, String> {
-    Ok(vec![
+    let mut diagrams = vec![
         Diagram {
-            id: "signal-path",
-            title: "Voice signal path",
+            id: "signal-path".into(),
+            title: "Voice signal path".into(),
             kind: Kind::Mermaid,
             source: signal_path(spec)?,
         },
         Diagram {
-            id: "modulation-matrix",
-            title: "Modulation matrix",
+            id: "modulation-matrix".into(),
+            title: "Modulation matrix".into(),
             kind: Kind::Mermaid,
             source: modulation_matrix(spec)?,
         },
         Diagram {
-            id: "envelope",
-            title: "Envelopes",
+            id: "envelope".into(),
+            title: "Envelopes".into(),
             kind: Kind::Svg,
             source: envelope(),
         },
         Diagram {
-            id: "cells",
-            title: "Modulation source cells",
-            kind: Kind::Svg,
-            source: cells(spec),
-        },
-        Diagram {
-            id: "marks",
-            title: "Effect marks",
+            id: "marks".into(),
+            title: "Effect marks".into(),
             kind: Kind::Svg,
             source: marks(spec),
         },
         Diagram {
-            id: "glyphs",
-            title: "Parameter glyphs",
+            id: "glyphs".into(),
+            title: "Parameter glyphs".into(),
             kind: Kind::Svg,
             source: glyphs(spec),
         },
-    ])
+    ];
+    // One sheet of cells per table that has any, drawn beside that table in the
+    // document, so the sources and the destinations are not one picture.
+    let default = spec.default_firmware();
+    for table in &spec.tables {
+        if !crate::spec::Firmware::range_covers(table.firmware.as_deref(), default) {
+            continue;
+        }
+        let drawn = cells_of(spec, table);
+        if drawn.is_empty() {
+            continue;
+        }
+        diagrams.push(Diagram {
+            id: cells_id(&table.id),
+            title: format!("{} cells", table.name),
+            kind: Kind::Svg,
+            source: sheet(&drawn, &cells_alt(table)),
+        });
+    }
+    Ok(diagrams)
 }
 
 /// Returns the inclusive offset range of a parameter group, as `first-last`.
@@ -521,8 +537,41 @@ fn marks(spec: &Spec) -> String {
 pub const MARKS_ALT: &str =
     "The nine effect family marks and the variants under them, as strokes and as pixels";
 
-/// The alt text of the cells drawing, shared with the document that embeds it.
-pub const CELLS_ALT: &str = "The modulation source cells, magnified and at one dot per dot";
+/// The file stem of the sheet of cells drawn for a value table.
+#[must_use]
+pub fn cells_id(table: &str) -> String {
+    format!("cells-{}", table.replace('_', "-"))
+}
+
+/// The alt text of a table's cells drawing, shared with the document that
+/// embeds it.
+#[must_use]
+pub fn cells_alt(table: &crate::spec::ValueTable) -> String {
+    format!(
+        "The {} cells, magnified and at one dot per dot",
+        table.name.to_lowercase()
+    )
+}
+
+/// The cells drawn for a table, in the order its entries are listed, each with
+/// the name of the entry it is drawn for.
+///
+/// The same proof the marks drawing is: these are the bits a host blits,
+/// straight out of `spec/cells.toml`, so a cell that reads badly in the sheet
+/// reads badly in a host too.
+fn cells_of<'a>(
+    spec: &'a Spec,
+    table: &'a crate::spec::ValueTable,
+) -> Vec<(&'a str, &'a [String])> {
+    table
+        .entries
+        .iter()
+        .filter_map(|entry| {
+            let cell = spec.cell_for(table, entry)?;
+            Some((entry.name.as_str(), cell.pixels.as_slice()))
+        })
+        .collect()
+}
 
 /// Cells per row of the cells drawing.
 const CELLS_ACROSS: usize = 10;
@@ -533,28 +582,15 @@ const CELL_DOT: usize = 6;
 /// Space around each column of the cells drawing.
 const CELL_PAD: usize = 16;
 
-/// Returns the width the cells drawing is rendered at, for the `<img>` that
-/// embeds it.
+/// Returns the width a sheet of `drawn` cells is rendered at, for the `<img>`
+/// that embeds it.
 ///
-/// Integer arithmetic on the same numbers [`cells`] lays the drawing out with,
+/// Integer arithmetic on the same numbers [`sheet`] lays the drawing out with,
 /// so the two cannot disagree by a rounding.
-pub fn cells_width(spec: &Spec) -> usize {
+#[must_use]
+pub fn cells_width(drawn: usize) -> usize {
     let pitch = crate::spec::PIXEL_SIDE * CELL_DOT + CELL_PAD;
-    pitch * spec.cells.len().min(CELLS_ACROSS) + CELL_PAD
-}
-
-/// The cells, each drawn magnified and again at one dot per dot.
-///
-/// The same proof the marks drawing is: these are the bits a host blits,
-/// straight out of `spec/cells.toml`, so a cell that reads badly here reads
-/// badly in a host too.
-fn cells(spec: &Spec) -> String {
-    let items: Vec<(&str, &[String])> = spec
-        .cells
-        .iter()
-        .map(|cell| (cell.name.as_str(), cell.pixels.as_slice()))
-        .collect();
-    sheet(&items, CELLS_ALT)
+    pitch * drawn.min(CELLS_ACROSS) + CELL_PAD
 }
 
 /// The alt text of the glyphs drawing, shared with the document that embeds it.

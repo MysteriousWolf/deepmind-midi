@@ -38,8 +38,9 @@
 //! program parameter addresses, which the specification records beside the entry.
 //! [`ValueTable::values_naming`] is the same join read backwards, most specific
 //! destination first, for a host that starts from the control. A source carries
-//! which way it moves what it reaches, as [`ValueTable::swing_of`], and a
-//! picture of itself the size of a character, as [`ValueTable::cell_of`].
+//! which way it moves what it reaches, as [`ValueTable::swing_of`], and both
+//! ends carry a picture the size of a character, as [`ValueTable::cell_of`] —
+//! every source but `Off`, and every destination the join cannot picture.
 //!
 //! It carries what a raw value means beyond its range, wherever the manual says:
 //! [`ParamId::shape`] is the point a bipolar parameter is read about,
@@ -273,11 +274,16 @@ pub struct ValueTable {
     pub entries: &'static [ValueEntry],
     /// A dot-matrix cell per value that has one, in value order.
     ///
-    /// The modulation sources have them: a picture of `LFO 1` or `Mod Wheel`
-    /// the size of a character, for a patch bay drawn in pictures rather than
-    /// in abbreviations. Empty for every other table, and missing a value
-    /// nobody has drawn, for which a host draws the name it already prints.
-    /// `spec/cells.toml` says which are drawn and why the rest are not.
+    /// The two ends of the modulation matrix have them: a picture of `LFO 1`
+    /// or `Mod Wheel` the size of a character, for a patch bay drawn in
+    /// pictures rather than in abbreviations. Every source but `Off` is drawn.
+    /// A destination is drawn where [`ValueEntry::parameters`] leaves a host
+    /// nothing to reach for — where it names none, or names a set with no one
+    /// of them narrowest — and otherwise takes its picture from the one
+    /// parameter it moves, through [`ParamId::glyph`]. Empty for every other
+    /// table, and missing a value nobody has drawn, for which a host draws the
+    /// name it already prints. `spec/cells.toml` says which are drawn and why
+    /// the rest are not.
     ///
     /// Beside the entries rather than on them, so that the twenty-odd tables
     /// with no cells do not carry a blank per entry; reached through
@@ -333,13 +339,27 @@ impl ValueTable {
     /// has been; see [`ValueTable::cells`].
     ///
     /// ```
-    /// use deepmind_midi::param::TableId;
+    /// use deepmind_midi::param::{ParamId, TableId};
+    /// use deepmind_midi::pixels::Glyph;
     /// use deepmind_midi::program::ModSource;
     ///
     /// let sources = TableId::ModSource.table();
     /// let lfo = sources.cell_of(u16::from(ModSource::Lfo1.raw())).expect("LFO 1 is drawn");
     /// assert!(lfo.rows().iter().any(|row| *row != 0));
     /// assert!(sources.cell_of(u16::from(ModSource::Off.raw())).is_none());
+    ///
+    /// // A destination that moves a set of parameters is drawn as the set:
+    /// // `All Attack` is three envelopes' attack, drawn once.
+    /// let destinations = TableId::ModDestination.table();
+    /// let all_attack = destinations.cell_of(25).expect("All Attack is drawn");
+    /// assert_eq!(all_attack, Glyph::Attack.pixels());
+    /// // One that moves one parameter takes that parameter's own glyph.
+    /// assert!(destinations.cell_of(35).is_none());
+    /// assert_eq!(
+    ///     destinations.parameters_of(35),
+    ///     &[ParamId::VcaEnvelopeAttackTime],
+    /// );
+    /// assert_eq!(ParamId::VcaEnvelopeAttackTime.glyph(), Some(Glyph::Attack));
     /// ```
     #[must_use]
     pub fn cell_of(&self, value: u16) -> Option<&'static Pixels> {
@@ -463,9 +483,10 @@ pub struct Controller {
     /// is, so the mod wheel and `LFO 1 Rate` look the same from a port as
     /// from a panel. The standard controllers are pictured by what the MIDI
     /// specification says they are: the modulation wheel is a wheel, the foot
-    /// controller a treadle, expression the same treadle carrying a level, and
-    /// the sustain pedal a switch under a foot. `None` for the data entry and
-    /// bank select controllers, which are addressing and not a control.
+    /// controller a treadle, expression the same treadle carrying a level, the
+    /// breath controller air down a tube, and the sustain pedal a switch under
+    /// a foot. `None` for the data entry and bank select controllers, which are
+    /// addressing and not a control.
     ///
     /// ```
     /// use deepmind_midi::param::Controller;
@@ -1278,44 +1299,82 @@ mod tests {
         }
     }
 
-    /// The sources carry cells and nothing else does; a cell is a drawing
-    /// rather than a blank; and the two firmware tables draw a source the same
+    /// Both ends of the matrix carry cells and nothing else does; a cell is a
+    /// drawing rather than a blank; every end a host cannot reach a picture
+    /// through is drawn; and the two firmware tables draw an entry the same
     /// way, whatever number it has.
     #[test]
-    fn a_source_carries_a_cell_where_one_was_drawn() {
-        let sources = TableId::ModSource.table();
-        assert!(sources.cells.len() >= 16, "{} cells", sources.cells.len());
-        assert!(sources.cell_of(0).is_none(), "Off is nothing to draw");
-        let lfo1 = sources.cell_of(7).expect("LFO1 is drawn");
-        assert!(lfo1.rows().iter().any(|row| *row != 0));
-        assert!(lfo1.rows().iter().any(|row| *row != 0x7f));
-        // Every cell is drawn for a value the table lists, and the values
-        // ascend, which is what lets `cell_of` search rather than scan.
-        for (left, right) in sources.cells.iter().zip(sources.cells.iter().skip(1)) {
-            assert!(left.0 < right.0, "cells out of order at {}", right.0);
+    fn a_matrix_entry_carries_a_cell_where_one_was_drawn() {
+        for id in [TableId::ModSource, TableId::ModDestination] {
+            let table = id.table();
+            assert!(table.cell_of(0).is_none(), "{id:?}: Off is nothing to draw");
+            // Every cell is drawn for a value the table lists, and the values
+            // ascend, which is what lets `cell_of` search rather than scan.
+            for (left, right) in table.cells.iter().zip(table.cells.iter().skip(1)) {
+                assert!(
+                    left.0 < right.0,
+                    "{id:?}: cells out of order at {}",
+                    right.0
+                );
+            }
+            for (value, cell) in table.cells {
+                assert!(
+                    table.entry(*value).is_some(),
+                    "{id:?}: a cell for nothing at {value}"
+                );
+                assert!(
+                    cell.rows().iter().any(|row| *row != 0),
+                    "{id:?}: {value} is blank"
+                );
+                assert!(
+                    cell.rows().iter().any(|row| *row != 0x7f),
+                    "{id:?}: {value} is solid"
+                );
+            }
+            // A renumbered entry keeps its drawing, which is what joining the
+            // two firmware tables by name is for.
+            let old = id.table_for(FIRMWARE_1_0);
+            for entry in table.entries {
+                let Some(twin) = old.entries.iter().find(|e| e.name == entry.name) else {
+                    continue;
+                };
+                assert_eq!(
+                    table.cell_of(entry.value),
+                    old.cell_of(twin.value),
+                    "{}",
+                    entry.name
+                );
+            }
         }
-        for &(value, _) in sources.cells {
+
+        // Every source but Off is drawn.
+        let sources = TableId::ModSource.table();
+        for entry in sources.entries.iter().filter(|e| e.name != "Off") {
             assert!(
-                sources.entry(value).is_some(),
-                "a cell for nothing at {value}"
+                sources.cell_of(entry.value).is_some(),
+                "the source {} is undrawn",
+                entry.name
             );
         }
 
-        let old = TableId::ModSource.table_for(FIRMWARE_1_0);
-        for entry in sources.entries {
-            let Some(twin) = old.entries.iter().find(|e| e.name == entry.name) else {
+        // So is every destination a host cannot reach a picture through: the
+        // ones naming no program parameter and the ones naming a set of them.
+        // A destination naming exactly one is pictured by that parameter's own
+        // glyph, which is where the effect slots' pictures come from too.
+        let destinations = TableId::ModDestination.table();
+        for entry in destinations.entries.iter().filter(|e| e.name != "Off") {
+            if entry.parameters.len() == 1 {
                 continue;
-            };
-            assert_eq!(
-                sources.cell_of(entry.value),
-                old.cell_of(twin.value),
-                "{}",
+            }
+            assert!(
+                destinations.cell_of(entry.value).is_some(),
+                "the destination {} is undrawn",
                 entry.name
             );
         }
 
         for id in TableId::ALL.iter().copied() {
-            if id == TableId::ModSource {
+            if matches!(id, TableId::ModSource | TableId::ModDestination) {
                 continue;
             }
             assert!(id.table().cells.is_empty(), "{id:?} carries a cell");

@@ -3353,91 +3353,162 @@
   <rect class="lit" x="110.0" y="497.0" width="5.0" height="5.0" />
   <rect class="lit" x="98.0" y="519.0" width="1" height="1" />
   <text class="name" x="95.0" y="534.0">footswitch</text>
-  <rect class="lit" x="132.0" y="461.0" width="5.0" height="5.0" />
-  <rect class="lit" x="150.0" y="513.0" width="1" height="1" />
-  <rect class="lit" x="138.0" y="461.0" width="5.0" height="5.0" />
-  <rect class="lit" x="151.0" y="513.0" width="1" height="1" />
-  <rect class="lit" x="144.0" y="461.0" width="5.0" height="5.0" />
-  <rect class="lit" x="152.0" y="513.0" width="1" height="1" />
-  <rect class="lit" x="150.0" y="461.0" width="5.0" height="5.0" />
-  <rect class="lit" x="153.0" y="513.0" width="1" height="1" />
-  <rect class="lit" x="156.0" y="461.0" width="5.0" height="5.0" />
-  <rect class="lit" x="154.0" y="513.0" width="1" height="1" />
-  <rect class="lit" x="162.0" y="461.0" width="5.0" height="5.0" />
-  <rect class="lit" x="155.0" y="513.0" width="1" height="1" />
-  <rect class="lit" x="168.0" y="461.0" width="5.0" height="5.0" />
-  <rect class="lit" x="156.0" y="513.0" width="1" height="1" />
+  <rect class="unlit" x="132.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="138.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="144.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="150.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="156.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="162.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="168.0" y="461.0" width="5.0" height="5.0" />
   <rect class="lit" x="132.0" y="467.0" width="5.0" height="5.0" />
   <rect class="lit" x="150.0" y="514.0" width="1" height="1" />
-  <rect class="unlit" x="138.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="138.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="151.0" y="514.0" width="1" height="1" />
   <rect class="lit" x="144.0" y="467.0" width="5.0" height="5.0" />
   <rect class="lit" x="152.0" y="514.0" width="1" height="1" />
   <rect class="lit" x="150.0" y="467.0" width="5.0" height="5.0" />
   <rect class="lit" x="153.0" y="514.0" width="1" height="1" />
   <rect class="lit" x="156.0" y="467.0" width="5.0" height="5.0" />
   <rect class="lit" x="154.0" y="514.0" width="1" height="1" />
-  <rect class="unlit" x="162.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="162.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="155.0" y="514.0" width="1" height="1" />
   <rect class="lit" x="168.0" y="467.0" width="5.0" height="5.0" />
   <rect class="lit" x="156.0" y="514.0" width="1" height="1" />
-  <rect class="lit" x="132.0" y="473.0" width="5.0" height="5.0" />
-  <rect class="lit" x="150.0" y="515.0" width="1" height="1" />
-  <rect class="lit" x="138.0" y="473.0" width="5.0" height="5.0" />
-  <rect class="lit" x="151.0" y="515.0" width="1" height="1" />
+  <rect class="unlit" x="132.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="138.0" y="473.0" width="5.0" height="5.0" />
   <rect class="unlit" x="144.0" y="473.0" width="5.0" height="5.0" />
   <rect class="unlit" x="150.0" y="473.0" width="5.0" height="5.0" />
-  <rect class="unlit" x="156.0" y="473.0" width="5.0" height="5.0" />
-  <rect class="lit" x="162.0" y="473.0" width="5.0" height="5.0" />
-  <rect class="lit" x="155.0" y="515.0" width="1" height="1" />
-  <rect class="lit" x="168.0" y="473.0" width="5.0" height="5.0" />
-  <rect class="lit" x="156.0" y="515.0" width="1" height="1" />
-  <rect class="lit" x="132.0" y="479.0" width="5.0" height="5.0" />
-  <rect class="lit" x="150.0" y="516.0" width="1" height="1" />
+  <rect class="lit" x="156.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="lit" x="154.0" y="515.0" width="1" height="1" />
+  <rect class="unlit" x="162.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="168.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="132.0" y="479.0" width="5.0" height="5.0" />
   <rect class="lit" x="138.0" y="479.0" width="5.0" height="5.0" />
   <rect class="lit" x="151.0" y="516.0" width="1" height="1" />
-  <rect class="unlit" x="144.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="144.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="152.0" y="516.0" width="1" height="1" />
   <rect class="lit" x="150.0" y="479.0" width="5.0" height="5.0" />
   <rect class="lit" x="153.0" y="516.0" width="1" height="1" />
-  <rect class="unlit" x="156.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="156.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="154.0" y="516.0" width="1" height="1" />
   <rect class="lit" x="162.0" y="479.0" width="5.0" height="5.0" />
   <rect class="lit" x="155.0" y="516.0" width="1" height="1" />
-  <rect class="lit" x="168.0" y="479.0" width="5.0" height="5.0" />
-  <rect class="lit" x="156.0" y="516.0" width="1" height="1" />
-  <rect class="lit" x="132.0" y="485.0" width="5.0" height="5.0" />
-  <rect class="lit" x="150.0" y="517.0" width="1" height="1" />
-  <rect class="lit" x="138.0" y="485.0" width="5.0" height="5.0" />
-  <rect class="lit" x="151.0" y="517.0" width="1" height="1" />
+  <rect class="unlit" x="168.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="132.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="138.0" y="485.0" width="5.0" height="5.0" />
   <rect class="unlit" x="144.0" y="485.0" width="5.0" height="5.0" />
   <rect class="unlit" x="150.0" y="485.0" width="5.0" height="5.0" />
-  <rect class="unlit" x="156.0" y="485.0" width="5.0" height="5.0" />
-  <rect class="lit" x="162.0" y="485.0" width="5.0" height="5.0" />
-  <rect class="lit" x="155.0" y="517.0" width="1" height="1" />
-  <rect class="lit" x="168.0" y="485.0" width="5.0" height="5.0" />
-  <rect class="lit" x="156.0" y="517.0" width="1" height="1" />
+  <rect class="lit" x="156.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="lit" x="154.0" y="517.0" width="1" height="1" />
+  <rect class="unlit" x="162.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="168.0" y="485.0" width="5.0" height="5.0" />
   <rect class="lit" x="132.0" y="491.0" width="5.0" height="5.0" />
   <rect class="lit" x="150.0" y="518.0" width="1" height="1" />
-  <rect class="unlit" x="138.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="138.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="151.0" y="518.0" width="1" height="1" />
   <rect class="lit" x="144.0" y="491.0" width="5.0" height="5.0" />
   <rect class="lit" x="152.0" y="518.0" width="1" height="1" />
   <rect class="lit" x="150.0" y="491.0" width="5.0" height="5.0" />
   <rect class="lit" x="153.0" y="518.0" width="1" height="1" />
   <rect class="lit" x="156.0" y="491.0" width="5.0" height="5.0" />
   <rect class="lit" x="154.0" y="518.0" width="1" height="1" />
-  <rect class="unlit" x="162.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="162.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="155.0" y="518.0" width="1" height="1" />
   <rect class="lit" x="168.0" y="491.0" width="5.0" height="5.0" />
   <rect class="lit" x="156.0" y="518.0" width="1" height="1" />
-  <rect class="lit" x="132.0" y="497.0" width="5.0" height="5.0" />
-  <rect class="lit" x="150.0" y="519.0" width="1" height="1" />
-  <rect class="lit" x="138.0" y="497.0" width="5.0" height="5.0" />
-  <rect class="lit" x="151.0" y="519.0" width="1" height="1" />
-  <rect class="lit" x="144.0" y="497.0" width="5.0" height="5.0" />
-  <rect class="lit" x="152.0" y="519.0" width="1" height="1" />
-  <rect class="lit" x="150.0" y="497.0" width="5.0" height="5.0" />
-  <rect class="lit" x="153.0" y="519.0" width="1" height="1" />
-  <rect class="lit" x="156.0" y="497.0" width="5.0" height="5.0" />
-  <rect class="lit" x="154.0" y="519.0" width="1" height="1" />
-  <rect class="lit" x="162.0" y="497.0" width="5.0" height="5.0" />
-  <rect class="lit" x="155.0" y="519.0" width="1" height="1" />
-  <rect class="lit" x="168.0" y="497.0" width="5.0" height="5.0" />
-  <rect class="lit" x="156.0" y="519.0" width="1" height="1" />
-  <text class="name" x="153.0" y="534.0">cabinet</text>
+  <rect class="unlit" x="132.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="138.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="144.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="150.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="156.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="162.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="168.0" y="497.0" width="5.0" height="5.0" />
+  <text class="name" x="153.0" y="534.0">breath</text>
+  <rect class="lit" x="190.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="lit" x="208.0" y="513.0" width="1" height="1" />
+  <rect class="lit" x="196.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="lit" x="209.0" y="513.0" width="1" height="1" />
+  <rect class="lit" x="202.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="lit" x="210.0" y="513.0" width="1" height="1" />
+  <rect class="lit" x="208.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="lit" x="211.0" y="513.0" width="1" height="1" />
+  <rect class="lit" x="214.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="lit" x="212.0" y="513.0" width="1" height="1" />
+  <rect class="lit" x="220.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="lit" x="213.0" y="513.0" width="1" height="1" />
+  <rect class="lit" x="226.0" y="461.0" width="5.0" height="5.0" />
+  <rect class="lit" x="214.0" y="513.0" width="1" height="1" />
+  <rect class="lit" x="190.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="208.0" y="514.0" width="1" height="1" />
+  <rect class="unlit" x="196.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="202.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="210.0" y="514.0" width="1" height="1" />
+  <rect class="lit" x="208.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="211.0" y="514.0" width="1" height="1" />
+  <rect class="lit" x="214.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="212.0" y="514.0" width="1" height="1" />
+  <rect class="unlit" x="220.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="226.0" y="467.0" width="5.0" height="5.0" />
+  <rect class="lit" x="214.0" y="514.0" width="1" height="1" />
+  <rect class="lit" x="190.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="lit" x="208.0" y="515.0" width="1" height="1" />
+  <rect class="lit" x="196.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="lit" x="209.0" y="515.0" width="1" height="1" />
+  <rect class="unlit" x="202.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="208.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="214.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="lit" x="220.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="lit" x="213.0" y="515.0" width="1" height="1" />
+  <rect class="lit" x="226.0" y="473.0" width="5.0" height="5.0" />
+  <rect class="lit" x="214.0" y="515.0" width="1" height="1" />
+  <rect class="lit" x="190.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="208.0" y="516.0" width="1" height="1" />
+  <rect class="lit" x="196.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="209.0" y="516.0" width="1" height="1" />
+  <rect class="unlit" x="202.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="208.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="211.0" y="516.0" width="1" height="1" />
+  <rect class="unlit" x="214.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="220.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="213.0" y="516.0" width="1" height="1" />
+  <rect class="lit" x="226.0" y="479.0" width="5.0" height="5.0" />
+  <rect class="lit" x="214.0" y="516.0" width="1" height="1" />
+  <rect class="lit" x="190.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="lit" x="208.0" y="517.0" width="1" height="1" />
+  <rect class="lit" x="196.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="lit" x="209.0" y="517.0" width="1" height="1" />
+  <rect class="unlit" x="202.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="208.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="unlit" x="214.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="lit" x="220.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="lit" x="213.0" y="517.0" width="1" height="1" />
+  <rect class="lit" x="226.0" y="485.0" width="5.0" height="5.0" />
+  <rect class="lit" x="214.0" y="517.0" width="1" height="1" />
+  <rect class="lit" x="190.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="208.0" y="518.0" width="1" height="1" />
+  <rect class="unlit" x="196.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="202.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="210.0" y="518.0" width="1" height="1" />
+  <rect class="lit" x="208.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="211.0" y="518.0" width="1" height="1" />
+  <rect class="lit" x="214.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="212.0" y="518.0" width="1" height="1" />
+  <rect class="unlit" x="220.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="226.0" y="491.0" width="5.0" height="5.0" />
+  <rect class="lit" x="214.0" y="518.0" width="1" height="1" />
+  <rect class="lit" x="190.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="lit" x="208.0" y="519.0" width="1" height="1" />
+  <rect class="lit" x="196.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="lit" x="209.0" y="519.0" width="1" height="1" />
+  <rect class="lit" x="202.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="lit" x="210.0" y="519.0" width="1" height="1" />
+  <rect class="lit" x="208.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="lit" x="211.0" y="519.0" width="1" height="1" />
+  <rect class="lit" x="214.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="lit" x="212.0" y="519.0" width="1" height="1" />
+  <rect class="lit" x="220.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="lit" x="213.0" y="519.0" width="1" height="1" />
+  <rect class="lit" x="226.0" y="497.0" width="5.0" height="5.0" />
+  <rect class="lit" x="214.0" y="519.0" width="1" height="1" />
+  <text class="name" x="211.0" y="534.0">cabinet</text>
 </svg>

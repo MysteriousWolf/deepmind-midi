@@ -740,9 +740,15 @@ fn arm(members: &[&str]) -> String {
 ///
 /// Grouped by glyph, as the prose is: the three envelopes' attacks are one
 /// arm. A parameter no glyph fits falls to `None`, which is the honest answer
-/// for a program name's characters and for the 48 effect slots, whose picture
-/// depends on what the engine is running and is
-/// `FxSlot::glyph` instead.
+/// for a program name's characters and for the effect slots, whose picture
+/// depends on what the engine is running and is `FxSlot::glyph` instead. The
+/// counts in the rendered prose are counted here rather than written down, so
+/// that a glyph added to one of those families cannot leave the prose behind.
+///
+/// # Errors
+///
+/// Returns a message when a parameter outside those two families carries no
+/// glyph, which the prose would then be describing as one of them.
 fn render_glyphs(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<(), String> {
     let mut by_glyph: Vec<(&str, Vec<&str>)> = Vec::new();
     for (parameter, ident) in spec.parameters.iter().zip(&idents.parameters) {
@@ -755,6 +761,21 @@ fn render_glyphs(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<
         }
     }
     let pictured: usize = by_glyph.iter().map(|(_, members)| members.len()).sum();
+    // The two families that answer `None` by design, counted rather than
+    // asserted: the effect slots and the program name's characters.
+    let unpictured = |group: &str| {
+        spec.parameters
+            .iter()
+            .filter(|p| p.glyph.is_none() && p.group == group)
+            .count()
+    };
+    let (slots, characters) = (unpictured("Effects"), unpictured("Program"));
+    if pictured + slots + characters != spec.parameters.len() {
+        return Err(format!(
+            "{} parameters carry no glyph and are neither an effect slot nor a name character",
+            spec.parameters.len() - pictured - slots - characters
+        ));
+    }
 
     let _ = writeln!(
         out,
@@ -762,26 +783,45 @@ fn render_glyphs(spec: &Spec, idents: &Identifiers, out: &mut String) -> Result<
 impl ParamId {{
     /// Returns the picture of what this parameter does, where one fits.
     ///
-    /// {pictured} of the {total} carry one. The rest are the effect slots, whose
-    /// picture depends on the algorithm the engine is running and is
-    /// [`FxSlot::glyph`](crate::effect::FxSlot::glyph), and the program name's
-    /// characters, which are letters and not a control. A host draws the name
-    /// it already prints for those.
+    /// {pictured} of the {total} carry one. The other {unpictured} answer `None`
+    /// by design rather than by omission, and they are two families.
+    ///
+    /// The {slots} effect slots are one: what `FX 1 Param 3` does depends on which
+    /// algorithm its engine is running, so a picture fixed to the parameter
+    /// would be wrong five times out of six. The right one is the slot's own
+    /// [`FxSlot::glyph`](crate::effect::FxSlot::glyph) under the loaded
+    /// algorithm, which [`Engine::of`](crate::effect::Engine::of) and
+    /// [`Algorithm::slot_of`](crate::effect::Algorithm::slot_of) reach from this
+    /// parameter, and the coarser one is that algorithm's
+    /// [`mark`](crate::effect::Algorithm::mark). Both are facts about the engine
+    /// rather than about the parameter, so neither is answered here.
+    ///
+    /// The program name's {characters} characters are the other: they are letters
+    /// and not a control, and a host draws the name it already prints.
     ///
     /// Which glyph a parameter carries is this crate's reading of what the
     /// parameter does; `spec/glyphs.toml` says how it was decided.
     ///
     /// ```
+    /// use deepmind_midi::effect::{{Algorithm, Engine}};
     /// use deepmind_midi::param::ParamId;
     /// use deepmind_midi::pixels::Glyph;
     ///
     /// assert_eq!(ParamId::VcfResonance.glyph(), Some(Glyph::Resonance));
-    /// assert_eq!(ParamId::Fx1Param1.glyph(), None);
+    ///
+    /// // An effect slot is `None` here, and a picture under the algorithm
+    /// // the engine is running.
+    /// assert_eq!(ParamId::Fx1Param2.glyph(), None);
+    /// let engine = Engine::of(ParamId::Fx1Param2).expect(\"engine one\");
+    /// let room = Algorithm::by_name(\"RoomRev\").expect(\"a Room Reverb\");
+    /// let slot = room.slot_of(engine, ParamId::Fx1Param2).expect(\"a Decay slot\");
+    /// assert_eq!(slot.glyph(), Glyph::Decay);
     /// ```
     #[must_use]
     pub const fn glyph(self) -> Option<Glyph> {{
         match self {{",
         total = spec.parameters.len(),
+        unpictured = slots + characters,
     );
     for (name, members) in &by_glyph {
         let _ = writeln!(

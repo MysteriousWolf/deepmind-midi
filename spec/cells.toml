@@ -1,13 +1,16 @@
-# A dot-matrix cell per modulation source, for a patch bay drawn in pictures.
+# A dot-matrix cell per modulation source, and per destination a parameter
+# cannot answer for, so that a patch bay is drawn in pictures.
 #
 # Generated documentation is built from this file. Edit it here, then run
-# `cargo xtask docs` to refresh docs/midi-spec.md and docs/diagrams/cells.svg,
-# and `cargo xtask codegen` to refresh the value tables that carry the cells.
+# `cargo xtask docs` to refresh docs/midi-spec.md and the sheet of cells each
+# table is drawn in docs/diagrams/, and `cargo xtask codegen` to refresh the
+# value tables that carry the cells.
 #
-# A modulation source has a name the display prints and, from here, a picture:
-# seven dots by seven, one bit a dot, the size the instrument's own 128 by 64
-# display has room for beside a name and the size a host lays down at any scale
-# without resampling anything. It is the same grid the effect family marks are
+# A modulation source, and a destination the parameter table cannot picture,
+# has a name the display prints and, from here, a picture: seven dots by seven,
+# one bit a dot, the size the instrument's own 128 by 64 display has room for
+# beside a name and the size a host lays down at any scale without resampling
+# anything. It is the same grid the effect family marks are
 # drawn again on in marks.toml and the parameter glyphs are drawn on in
 # glyphs.toml, reached through the same `Pixels` type, and it reaches a host
 # through `ValueTable::cell_of`.
@@ -34,9 +37,9 @@ cell lands on an entry that exists and that no entry is drawn twice."""
 language = """
 Cells and not marks: a stroke drawing rasterised into forty-nine dots is a \
 drawing whose author never saw what it came out as, so these are drawn dot by \
-dot, the way the pixel grids in marks.toml are. Where a source has a number, \
+dot, the way the pixel grids in marks.toml are. Where an entry has a number, \
 the number is a count of dots in the top right corner: one for `LFO1`, two for \
-`LFO2`, three for `Env 3`. A digit does not fit beside a picture at this size, \
+`LFO2`, three for `Env 3` and for `Env3 Rates`. A digit does not fit beside a picture at this size, \
 and a count reads at a glance where a digit would be read.
 
 An LFO is a sine crossing the middle; taken unipolar it is an arch on a floor, \
@@ -48,7 +51,15 @@ A velocity is an arrow with motion beside it, a pressure is an arrow pressing \
 on a key, a release velocity is the first arrow turned round. The note number \
 is a note, the sequencer is a row of steps, and the three axes of the joystick \
 are the letters the display prints for them, because `X` is the picture of \
-`X`."""
+`X`.
+
+A cell that names a glyph is that glyph, drawn as glyphs.toml draws it and \
+carrying nothing extra, so that the `All Attack` a host reads off the entry \
+and the `Env2 Attack` it reaches through the parameter table are one picture. \
+A cell drawn here may carry a count, and the counted drawings are the ones \
+this file owns: the LFOs, the envelopes and the envelope curves. On one of \
+those, no count means the whole family rather than any one of them, which is \
+what `Env Rates` is."""
 pedals = """
 `Foot Ctrl` and `Expression` are both pedals, and the two cells say what each \
 is for rather than drawing one pedal twice. The foot controller is the \
@@ -59,17 +70,39 @@ is drawn filled everywhere in this crate. The sustain pedal is a different \
 thing again, a switch under a foot, and it has a glyph of its own, \
 `footswitch`, for the controller table; it is not a modulation source, so it \
 is not here."""
-undrawn = """
-Four sources have no cell, and a host draws the name it already prints. `Off` \
-is nothing to draw. `BreathCtrl`, `Voice Num` and `Uni Voice` have no picture \
-that would be told from another at this size, and an icon that is nearly right \
-is worse than a word, because a word is honest about being a word.
+voices = """
+`Voice Num` is which of the instrument's voices a note was given and \
+`Uni Voice` is which voice of a unison stack is playing one note. Neither is a \
+shape, so each is drawn as what it is: a row of cells with one of them inked, \
+and the same cells piled up rather than laid along, because a unison stack is \
+one note's voices on top of each other. `BreathCtrl` is drawn by the `breath` \
+glyph, air down a tube, which the breath controller on CC 2 carries too: one \
+drawing whether it is met as a source or as a controller."""
+destinations = """
+A destination is drawn here only where reaching through it leaves a host with \
+nothing to draw. 113 of the 133 name one program parameter, and the picture of \
+one of those is that parameter's own glyph, kept in one place so that an \
+attack is an attack wherever it is met; the name beside the cell says which \
+envelope's it is, the way it says which oscillator's pitch a note stands for.
 
-The 130 destinations have none either, for now. Most of them name a parameter, \
-and a host that wants a picture for one has `ValueEntry::parameters` to find \
-the control it moves; the ones that name no parameter — a played pitch, a \
-voice's amplitude — are the ones worth drawing and the ones this file does not \
-yet."""
+Eleven name a set of parameters on purpose, with no one of them the narrowest: \
+`All Attack` is three envelopes' attack and the picture of that is an attack, \
+drawn once on the entry. Eight name something no program parameter holds — a \
+pitch as it is played, the amplitude or the pan of one voice — and those are \
+the ones a host can neither light a control for nor reach a glyph through, so \
+they are drawn here or nowhere."""
+undrawn = """
+`Off` carries none at either end of the matrix: that is the table saying this \
+end is not wired, and a picture of nothing is a picture.
+
+The 48 `FX n Param m` destinations carry none either, and that is the one \
+deliberate gap left. What `FX 1 \
+Param 3` is depends on which algorithm its engine is running, so a fixed \
+picture would be wrong five times out of six. The right picture is the slot's \
+own glyph under the loaded algorithm, which `Engine::of` and \
+`Algorithm::slot_of` reach, and the coarser one is that algorithm's mark. Both \
+are facts about the engine rather than about the parameter, so neither is \
+written down here and `ParamId::glyph` answers `None` for all 48 by design."""
 
 [[cell]]
 table = "mod_source"
@@ -85,6 +118,11 @@ glyph = "mod wheel"
 table = "mod_source"
 name = "Foot Ctrl"
 glyph = "pedal"
+
+[[cell]]
+table = "mod_source"
+name = "BreathCtrl"
+glyph = "breath"
 
 [[cell]]
 table = "mod_source"
@@ -259,6 +297,32 @@ pixels = [
 
 [[cell]]
 table = "mod_source"
+name = "Voice Num"
+pixels = [
+    ".......",
+    "#######",
+    "#.###.#",
+    "#.###.#",
+    "#.###.#",
+    "#######",
+    ".......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Uni Voice"
+pixels = [
+    ".#####.",
+    ".#...#.",
+    ".#####.",
+    ".#####.",
+    ".#####.",
+    ".#...#.",
+    ".#####.",
+]
+
+[[cell]]
+table = "mod_source"
 name = "CC X (115)"
 pixels = [
     ".#...#.",
@@ -295,3 +359,170 @@ pixels = [
     ".#.....",
     ".#####.",
 ]
+
+[[cell]]
+table = "mod_destination"
+name = "OSC1+2 Pit"
+glyph = "pitch"
+
+[[cell]]
+table = "mod_destination"
+name = "OSC1+2 Fine"
+glyph = "detune"
+
+[[cell]]
+table = "mod_destination"
+name = "OSC1 Pitch"
+glyph = "pitch"
+
+[[cell]]
+table = "mod_destination"
+name = "OSC1 Fine"
+glyph = "detune"
+
+[[cell]]
+table = "mod_destination"
+name = "OSC2 Fine"
+glyph = "detune"
+
+[[cell]]
+table = "mod_destination"
+name = "Env Rates"
+pixels = [
+    ".......",
+    "..#....",
+    ".#.#...",
+    ".#..#..",
+    "#....#.",
+    "......#",
+    ".......",
+]
+
+[[cell]]
+table = "mod_destination"
+name = "All Attack"
+glyph = "attack"
+
+[[cell]]
+table = "mod_destination"
+name = "All Decay"
+glyph = "decay"
+
+[[cell]]
+table = "mod_destination"
+name = "All Sus"
+glyph = "hold"
+
+[[cell]]
+table = "mod_destination"
+name = "All Rel"
+glyph = "release"
+
+[[cell]]
+table = "mod_destination"
+name = "Env1 Rates"
+pixels = [
+    "......#",
+    "..#....",
+    ".#.#...",
+    ".#..#..",
+    "#....#.",
+    "......#",
+    ".......",
+]
+
+[[cell]]
+table = "mod_destination"
+name = "Env2 Rates"
+pixels = [
+    "....#.#",
+    "..#....",
+    ".#.#...",
+    ".#..#..",
+    "#....#.",
+    "......#",
+    ".......",
+]
+
+[[cell]]
+table = "mod_destination"
+name = "Env3 Rates"
+pixels = [
+    "..#.#.#",
+    "..#....",
+    ".#.#...",
+    ".#..#..",
+    "#....#.",
+    "......#",
+    ".......",
+]
+
+[[cell]]
+table = "mod_destination"
+name = "Env1CurveS"
+pixels = [
+    "......#",
+    ".......",
+    ".....#.",
+    "....##.",
+    "...##..",
+    ".##....",
+    "##.....",
+]
+
+[[cell]]
+table = "mod_destination"
+name = "Env2CurveS"
+pixels = [
+    "....#.#",
+    ".......",
+    ".....#.",
+    "....##.",
+    "...##..",
+    ".##....",
+    "##.....",
+]
+
+[[cell]]
+table = "mod_destination"
+name = "Env3CurveS"
+pixels = [
+    "..#.#.#",
+    ".......",
+    ".....#.",
+    "....##.",
+    "...##..",
+    ".##....",
+    "##.....",
+]
+
+[[cell]]
+table = "mod_destination"
+name = "VCA All"
+pixels = [
+    ".......",
+    ".......",
+    "#.#.#.#",
+    "#.#.#.#",
+    "#.#.#.#",
+    "#.#.#.#",
+    "#######",
+]
+
+[[cell]]
+table = "mod_destination"
+name = "VCA Active"
+pixels = [
+    ".......",
+    ".......",
+    "....#..",
+    "....#..",
+    "....#..",
+    "#.#.#.#",
+    "#######",
+]
+
+[[cell]]
+table = "mod_destination"
+name = "VCA Pan"
+glyph = "pan"
