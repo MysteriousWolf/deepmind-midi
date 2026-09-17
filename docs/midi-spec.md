@@ -340,134 +340,134 @@ controller or DAW lane is easier.
 
 Each of these drives one program parameter. The offset column is that parameter's entry in the table above.
 
-| CC | Controls | Offset | Notes |
-|---|---|---|---|
-| 5 | Portamento time | 34 |  |
-| 12 | Arp Rate (tempo) | 157 |  |
-| 13 | Arp Gate Time | 160 |  |
-| 16 | LFO 1 Rate | 0 |  |
-| 17 | LFO 1 Delay / Fade | 1 |  |
-| 18 | LFO 2 Rate | 7 |  |
-| 19 | LFO 2 Delay / Fade | 8 |  |
-| 20 | OSC 1 Pitch Mod Depth | 21 |  |
-| 21 | OSC 1 PWM Depth | 25 |  |
-| 23 | OSC 2 Pitch Mod Depth | 29 |  |
-| 24 | OSC 2 Tone Mod Depth | 28 |  |
-| 25 | OSC 2 Pitch | 27 |  |
-| 26 | OSC 2 Level | 26 |  |
-| 27 | Noise Level | 33 |  |
-| 28 | Unison Detune | 87 |  |
-| 29 | VCF Frequency | 39 |  |
-| 30 | VCF Resonance | 41 |  |
-| 33 | VCF LFO Depth | 45 |  |
-| 34 | VCF Keyboard Tracking | 49 |  |
-| 35 | VCF HighPass Frequency | 40 |  |
-| 36 | VCA Level | 80 |  |
-| 37 | VCA Envelope Attack Time | 53 |  |
-| 39 | VCA Envelope Decay Time | 54 |  |
-| 40 | VCA Envelope Sustain Level | 55 | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
-| 41 | VCA Envelope Release Time | 56 |  |
-| 42 | VCF Envelope Attack Time | 62 |  |
-| 43 | VCF Envelope Decay Time | 63 |  |
-| 44 | VCF Envelope Sustain Level | 64 | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
-| 45 | VCF Envelope Release Time | 65 |  |
-| 46 | Mod Envelope Attack Time | 71 |  |
-| 47 | Mod Envelope Decay Time | 72 |  |
-| 48 | Mod Envelope Sustain Level | 73 |  |
-| 49 | Mod Envelope Release Time | 74 |  |
-| 50 | VCA Envelope Attack Curve | 58 |  |
-| 51 | VCA Envelope Decay Curve | 59 |  |
-| 52 | VCA Envelope Sustain Curve | 60 | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
-| 53 | VCA Envelope Release Curve | 61 |  |
-| 54 | VCF Envelope Attack Curve | 67 |  |
-| 55 | VCF Envelope Decay Curve | 68 |  |
-| 56 | VCF Envelope Sustain Curve | 69 | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
-| 57 | VCF Envelope Release Curve | 70 |  |
-| 58 | Mod Envelope Attack Curve | 76 |  |
-| 59 | Mod Envelope Decay Curve | 77 |  |
-| 60 | Mod Envelope Sustain Curve | 78 |  |
-| 61 | Mod Envelope Release Curve | 79 |  |
-| 62 | FX 1 Param 1 | 167 |  |
-| 63 | FX 1 Param 2 | 168 |  |
-| 65 | FX 1 Param 3 | 169 |  |
-| 66 | FX 1 Param 4 | 170 |  |
-| 67 | FX 1 Param 5 | 171 |  |
-| 68 | FX 1 Param 6 | 172 |  |
-| 69 | FX 1 Param 7 | 173 |  |
-| 70 | FX 1 Param 8 | 174 |  |
-| 71 | FX 1 Param 9 | 175 |  |
-| 72 | FX 1 Param 10 | 176 |  |
-| 73 | FX 1 Param 11 | 177 |  |
-| 74 | FX 1 Param 12 | 178 |  |
-| 75 | FX 2 Param 1 | 180 |  |
-| 76 | FX 2 Param 2 | 181 |  |
-| 77 | FX 2 Param 3 | 182 |  |
-| 78 | FX 2 Param 4 | 183 |  |
-| 79 | FX 2 Param 5 | 184 |  |
-| 80 | FX 2 Param 6 | 185 |  |
-| 81 | FX 2 Param 7 | 186 |  |
-| 82 | FX 2 Param 8 | 187 |  |
-| 83 | FX 2 Param 9 | 188 |  |
-| 84 | FX 2 Param 10 | 189 |  |
-| 85 | FX 2 Param 11 | 190 |  |
-| 86 | FX 2 Param 12 | 191 |  |
-| 87 | FX 3 Param 1 | 193 |  |
-| 88 | FX 3 Param 2 | 194 |  |
-| 89 | FX 3 Param 3 | 195 |  |
-| 90 | FX 3 Param 4 | 196 |  |
-| 91 | FX 3 Param 5 | 197 |  |
-| 92 | FX 3 Param 6 | 198 |  |
-| 93 | FX 3 Param 7 | 199 |  |
-| 94 | FX 3 Param 8 | 200 |  |
-| 95 | FX 3 Param 9 | 201 |  |
-| 102 | FX 3 Param 10 | 202 |  |
-| 103 | FX 3 Param 11 | 203 |  |
-| 104 | FX 3 Param 12 | 204 |  |
-| 105 | FX 1 Type | 166 |  |
-| 106 | FX 2 Type | 179 |  |
-| 107 | FX 3 Type | 192 |  |
-| 108 | FX 4 Type | 205 |  |
-| 109 | FX 1 Output Gain | 218 |  |
-| 110 | FX 2 Output Gain | 219 |  |
-| 111 | FX 3 Output Gain | 220 |  |
-| 112 | FX 4 Output Gain | 221 |  |
-| 114 | FX Mode | 222 |  |
+| CC | Controls | Offset | Glyph | Notes |
+|---|---|---|---|---|
+| 5 | Portamento time | 34 | [glide](effects.md#glyph-glide) |  |
+| 12 | Arp Rate (tempo) | 157 | [time](effects.md#glyph-time) |  |
+| 13 | Arp Gate Time | 160 | [gate](effects.md#glyph-gate) |  |
+| 16 | LFO 1 Rate | 0 | [rate](effects.md#glyph-rate) |  |
+| 17 | LFO 1 Delay / Fade | 1 | [attack](effects.md#glyph-attack) |  |
+| 18 | LFO 2 Rate | 7 | [rate](effects.md#glyph-rate) |  |
+| 19 | LFO 2 Delay / Fade | 8 | [attack](effects.md#glyph-attack) |  |
+| 20 | OSC 1 Pitch Mod Depth | 21 | [depth](effects.md#glyph-depth) |  |
+| 21 | OSC 1 PWM Depth | 25 | [square](effects.md#glyph-square) |  |
+| 23 | OSC 2 Pitch Mod Depth | 29 | [depth](effects.md#glyph-depth) |  |
+| 24 | OSC 2 Tone Mod Depth | 28 | [depth](effects.md#glyph-depth) |  |
+| 25 | OSC 2 Pitch | 27 | [pitch](effects.md#glyph-pitch) |  |
+| 26 | OSC 2 Level | 26 | [level](effects.md#glyph-level) |  |
+| 27 | Noise Level | 33 | [noise](effects.md#glyph-noise) |  |
+| 28 | Unison Detune | 87 | [detune](effects.md#glyph-detune) |  |
+| 29 | VCF Frequency | 39 | [high cut](effects.md#glyph-high-cut) |  |
+| 30 | VCF Resonance | 41 | [resonance](effects.md#glyph-resonance) |  |
+| 33 | VCF LFO Depth | 45 | [wave](effects.md#glyph-wave) |  |
+| 34 | VCF Keyboard Tracking | 49 | [keys](effects.md#glyph-keys) |  |
+| 35 | VCF HighPass Frequency | 40 | [low cut](effects.md#glyph-low-cut) |  |
+| 36 | VCA Level | 80 | [level](effects.md#glyph-level) |  |
+| 37 | VCA Envelope Attack Time | 53 | [attack](effects.md#glyph-attack) |  |
+| 39 | VCA Envelope Decay Time | 54 | [decay](effects.md#glyph-decay) |  |
+| 40 | VCA Envelope Sustain Level | 55 | [hold](effects.md#glyph-hold) | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
+| 41 | VCA Envelope Release Time | 56 | [release](effects.md#glyph-release) |  |
+| 42 | VCF Envelope Attack Time | 62 | [attack](effects.md#glyph-attack) |  |
+| 43 | VCF Envelope Decay Time | 63 | [decay](effects.md#glyph-decay) |  |
+| 44 | VCF Envelope Sustain Level | 64 | [hold](effects.md#glyph-hold) | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
+| 45 | VCF Envelope Release Time | 65 | [release](effects.md#glyph-release) |  |
+| 46 | Mod Envelope Attack Time | 71 | [attack](effects.md#glyph-attack) |  |
+| 47 | Mod Envelope Decay Time | 72 | [decay](effects.md#glyph-decay) |  |
+| 48 | Mod Envelope Sustain Level | 73 | [hold](effects.md#glyph-hold) |  |
+| 49 | Mod Envelope Release Time | 74 | [release](effects.md#glyph-release) |  |
+| 50 | VCA Envelope Attack Curve | 58 | [curve](effects.md#glyph-curve) |  |
+| 51 | VCA Envelope Decay Curve | 59 | [curve](effects.md#glyph-curve) |  |
+| 52 | VCA Envelope Sustain Curve | 60 | [curve](effects.md#glyph-curve) | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
+| 53 | VCA Envelope Release Curve | 61 | [curve](effects.md#glyph-curve) |  |
+| 54 | VCF Envelope Attack Curve | 67 | [curve](effects.md#glyph-curve) |  |
+| 55 | VCF Envelope Decay Curve | 68 | [curve](effects.md#glyph-curve) |  |
+| 56 | VCF Envelope Sustain Curve | 69 | [curve](effects.md#glyph-curve) | **Unconfirmed.** The source list labels CC 44 "VCA S" and CC 56 "VCA Scrv" and omits CC 40 and CC 52 entirely. Controllers 37-49 run as three envelopes of attack, decay, sustain, release and 50-61 as the same three sets of curves, which puts VCA sustain at 40, VCF sustain at 44, VCA sustain curve at 52 and VCF sustain curve at 56. The run is encoded here; confirm against hardware. |
+| 57 | VCF Envelope Release Curve | 70 | [curve](effects.md#glyph-curve) |  |
+| 58 | Mod Envelope Attack Curve | 76 | [curve](effects.md#glyph-curve) |  |
+| 59 | Mod Envelope Decay Curve | 77 | [curve](effects.md#glyph-curve) |  |
+| 60 | Mod Envelope Sustain Curve | 78 | [curve](effects.md#glyph-curve) |  |
+| 61 | Mod Envelope Release Curve | 79 | [curve](effects.md#glyph-curve) |  |
+| 62 | FX 1 Param 1 | 167 |  |  |
+| 63 | FX 1 Param 2 | 168 |  |  |
+| 65 | FX 1 Param 3 | 169 |  |  |
+| 66 | FX 1 Param 4 | 170 |  |  |
+| 67 | FX 1 Param 5 | 171 |  |  |
+| 68 | FX 1 Param 6 | 172 |  |  |
+| 69 | FX 1 Param 7 | 173 |  |  |
+| 70 | FX 1 Param 8 | 174 |  |  |
+| 71 | FX 1 Param 9 | 175 |  |  |
+| 72 | FX 1 Param 10 | 176 |  |  |
+| 73 | FX 1 Param 11 | 177 |  |  |
+| 74 | FX 1 Param 12 | 178 |  |  |
+| 75 | FX 2 Param 1 | 180 |  |  |
+| 76 | FX 2 Param 2 | 181 |  |  |
+| 77 | FX 2 Param 3 | 182 |  |  |
+| 78 | FX 2 Param 4 | 183 |  |  |
+| 79 | FX 2 Param 5 | 184 |  |  |
+| 80 | FX 2 Param 6 | 185 |  |  |
+| 81 | FX 2 Param 7 | 186 |  |  |
+| 82 | FX 2 Param 8 | 187 |  |  |
+| 83 | FX 2 Param 9 | 188 |  |  |
+| 84 | FX 2 Param 10 | 189 |  |  |
+| 85 | FX 2 Param 11 | 190 |  |  |
+| 86 | FX 2 Param 12 | 191 |  |  |
+| 87 | FX 3 Param 1 | 193 |  |  |
+| 88 | FX 3 Param 2 | 194 |  |  |
+| 89 | FX 3 Param 3 | 195 |  |  |
+| 90 | FX 3 Param 4 | 196 |  |  |
+| 91 | FX 3 Param 5 | 197 |  |  |
+| 92 | FX 3 Param 6 | 198 |  |  |
+| 93 | FX 3 Param 7 | 199 |  |  |
+| 94 | FX 3 Param 8 | 200 |  |  |
+| 95 | FX 3 Param 9 | 201 |  |  |
+| 102 | FX 3 Param 10 | 202 |  |  |
+| 103 | FX 3 Param 11 | 203 |  |  |
+| 104 | FX 3 Param 12 | 204 |  |  |
+| 105 | FX 1 Type | 166 | [selection](effects.md#glyph-selection) |  |
+| 106 | FX 2 Type | 179 | [selection](effects.md#glyph-selection) |  |
+| 107 | FX 3 Type | 192 | [selection](effects.md#glyph-selection) |  |
+| 108 | FX 4 Type | 205 | [selection](effects.md#glyph-selection) |  |
+| 109 | FX 1 Output Gain | 218 | [level](effects.md#glyph-level) |  |
+| 110 | FX 2 Output Gain | 219 | [level](effects.md#glyph-level) |  |
+| 111 | FX 3 Output Gain | 220 | [level](effects.md#glyph-level) |  |
+| 112 | FX 4 Output Gain | 221 | [level](effects.md#glyph-level) |  |
+| 114 | FX Mode | 222 | [selection](effects.md#glyph-selection) |  |
 
 #### Standard controllers
 
 Ordinary MIDI controllers, answered in the usual way.
 
-| CC | Controls | Notes |
-|---|---|---|
-| 1 | Modulation Wheel |  |
-| 2 | Breath Controller |  |
-| 4 | Foot Controller |  |
-| 6 | Data Entry MSB |  |
-| 7 | Channel Volume |  |
-| 8 | Balance |  |
-| 10 | Pan |  |
-| 11 | Expression |  |
-| 32 | Bank Select LSB |  |
-| 38 | Data Entry LSB |  |
-| 64 | Sustain Pedal |  |
-| 96 | Data Increment |  |
-| 97 | Data Decrement |  |
-| 98 | NRPN LSB |  |
-| 99 | NRPN MSB |  |
-| 100 | RPN LSB |  |
-| 101 | RPN MSB |  |
+| CC | Controls | Glyph | Notes |
+|---|---|---|---|
+| 1 | Modulation Wheel | [mod wheel](effects.md#glyph-mod-wheel) |  |
+| 2 | Breath Controller |  |  |
+| 4 | Foot Controller | [pedal](effects.md#glyph-pedal) |  |
+| 6 | Data Entry MSB |  |  |
+| 7 | Channel Volume | [level](effects.md#glyph-level) |  |
+| 8 | Balance | [pan](effects.md#glyph-pan) |  |
+| 10 | Pan | [pan](effects.md#glyph-pan) |  |
+| 11 | Expression | [expression](effects.md#glyph-expression) |  |
+| 32 | Bank Select LSB |  |  |
+| 38 | Data Entry LSB |  |  |
+| 64 | Sustain Pedal | [footswitch](effects.md#glyph-footswitch) |  |
+| 96 | Data Increment |  |  |
+| 97 | Data Decrement |  |  |
+| 98 | NRPN LSB |  |  |
+| 99 | NRPN MSB |  |  |
+| 100 | RPN LSB |  |  |
+| 101 | RPN MSB |  |  |
 
 #### Everything else
 
 Controllers that do something but are not a single program parameter.
 
-| CC | Controls | Notes |
-|---|---|---|
-| 31 | VCF Mod | The source lists this as "VCF MOD" without saying which VCF modulation depth it drives. Left unmapped. |
-| 113 | Analog Thru | Switches the analog thru path. |
-| 115 | 3D X axis | Modulation matrix source CC X. |
-| 116 | 3D Y axis | Modulation matrix source CC Y. |
-| 117 | 3D Z axis | Modulation matrix source CC Z. |
+| CC | Controls | Glyph | Notes |
+|---|---|---|---|
+| 31 | VCF Mod |  | The source lists this as "VCF MOD" without saying which VCF modulation depth it drives. Left unmapped. |
+| 113 | Analog Thru |  | Switches the analog thru path. |
+| 115 | 3D X axis |  | Modulation matrix source CC X. |
+| 116 | 3D Y axis |  | Modulation matrix source CC Y. |
+| 117 | 3D Z axis |  | Modulation matrix source CC Z. |
 
 <!-- /generated:controllers -->
 
@@ -534,315 +534,315 @@ under its `descriptions` feature, which is off by default.
 
 ### LFO 1
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 0 | LFO 1 Rate | 0-255 | When LFO 1 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate. | 0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix | Sets how fast LFO 1 runs, which is what the modulation depths elsewhere in the program are a depth of. |
-| 1 | LFO 1 Delay / Fade | 0-255 |  | 0.00 s to 6.59 s | Sets how long LFO 1 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack. |
-| 2 | LFO 1 Shape | 0-6 | [LFO Shape](#lfo_shape) |  | Chooses the waveform LFO 1 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle. |
-| 3 | LFO 1 Key Sync | 0-1 | Off (0), On (1) |  | Restarts LFO 1 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to. |
-| 4 | LFO 1 Arp Sync | 0-1 | Off (0), On (1) |  | Locks LFO 1 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed. |
-| 5 | LFO 1 Mono Mode | 0-255 | [LFO Mono Mode](#lfo_mono_mode) |  | Chooses whether each voice gets its own copy of LFO 1, whether all voices share one, or whether the voices' copies are spread apart in phase. |
-| 6 | LFO 1 Slew Rate | 0-255 |  |  | Rounds the corners off LFO 1's waveform, which turns a square into something that ramps between its two levels rather than jumping. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 0 | LFO 1 Rate | 0-255 | When LFO 1 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate. | 0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix | [rate](effects.md#glyph-rate) | Sets how fast LFO 1 runs, which is what the modulation depths elsewhere in the program are a depth of. |
+| 1 | LFO 1 Delay / Fade | 0-255 |  | 0.00 s to 6.59 s | [attack](effects.md#glyph-attack) | Sets how long LFO 1 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack. |
+| 2 | LFO 1 Shape | 0-6 | [LFO Shape](#lfo_shape) |  | [wave](effects.md#glyph-wave) | Chooses the waveform LFO 1 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle. |
+| 3 | LFO 1 Key Sync | 0-1 | Off (0), On (1) |  | [keys](effects.md#glyph-keys) | Restarts LFO 1 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to. |
+| 4 | LFO 1 Arp Sync | 0-1 | Off (0), On (1) |  | [time](effects.md#glyph-time) | Locks LFO 1 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed. |
+| 5 | LFO 1 Mono Mode | 0-255 | [LFO Mono Mode](#lfo_mono_mode) |  | [selection](effects.md#glyph-selection) | Chooses whether each voice gets its own copy of LFO 1, whether all voices share one, or whether the voices' copies are spread apart in phase. |
+| 6 | LFO 1 Slew Rate | 0-255 |  |  | [curve](effects.md#glyph-curve) | Rounds the corners off LFO 1's waveform, which turns a square into something that ramps between its two levels rather than jumping. |
 
 ### LFO 2
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 7 | LFO 2 Rate | 0-255 | When LFO 2 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate. | 0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix | Sets how fast LFO 2 runs, which is what the modulation depths elsewhere in the program are a depth of. |
-| 8 | LFO 2 Delay / Fade | 0-255 |  | 0.00 s to 6.59 s | Sets how long LFO 2 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack. |
-| 9 | LFO 2 Shape | 0-6 | [LFO Shape](#lfo_shape) |  | Chooses the waveform LFO 2 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle. |
-| 10 | LFO 2 Key Sync | 0-1 | Off (0), On (1) |  | Restarts LFO 2 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to. |
-| 11 | LFO 2 Arp Sync | 0-1 | Off (0), On (1) |  | Locks LFO 2 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed. |
-| 12 | LFO 2 Mono Mode | 0-255 | [LFO Mono Mode](#lfo_mono_mode) |  | Chooses whether each voice gets its own copy of LFO 2, whether all voices share one, or whether the voices' copies are spread apart in phase. |
-| 13 | LFO 2 Slew Rate | 0-255 |  |  | Rounds the corners off LFO 2's waveform, which turns a square into something that ramps between its two levels rather than jumping. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 7 | LFO 2 Rate | 0-255 | When LFO 2 Arp Sync is on, this selects a division of the master BPM from the LFO clock divider table instead of setting a free-running rate. | 0.041 Hz to 65.4 Hz, or up to 1280 Hz when driven from the modulation matrix | [rate](effects.md#glyph-rate) | Sets how fast LFO 2 runs, which is what the modulation depths elsewhere in the program are a depth of. |
+| 8 | LFO 2 Delay / Fade | 0-255 |  | 0.00 s to 6.59 s | [attack](effects.md#glyph-attack) | Sets how long LFO 2 takes to reach full depth after a note starts, so that vibrato can arrive rather than being there from the attack. |
+| 9 | LFO 2 Shape | 0-6 | [LFO Shape](#lfo_shape) |  | [wave](effects.md#glyph-wave) | Chooses the waveform LFO 2 runs: one of the four periodic shapes, or one of the two that pick a fresh random value each cycle. |
+| 10 | LFO 2 Key Sync | 0-1 | Off (0), On (1) |  | [keys](effects.md#glyph-keys) | Restarts LFO 2 at the start of its cycle on each new note, so every note is modulated the same way instead of catching the LFO wherever it had got to. |
+| 11 | LFO 2 Arp Sync | 0-1 | Off (0), On (1) |  | [time](effects.md#glyph-time) | Locks LFO 2 to the master tempo, which is what turns its rate into a choice of clock division rather than a speed. |
+| 12 | LFO 2 Mono Mode | 0-255 | [LFO Mono Mode](#lfo_mono_mode) |  | [selection](effects.md#glyph-selection) | Chooses whether each voice gets its own copy of LFO 2, whether all voices share one, or whether the voices' copies are spread apart in phase. |
+| 13 | LFO 2 Slew Rate | 0-255 |  |  | [curve](effects.md#glyph-curve) | Rounds the corners off LFO 2's waveform, which turns a square into something that ramps between its two levels rather than jumping. |
 
 ### Oscillators
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 14 | OSC 1 Range | 0-2 | [Oscillator Range](#osc_range) |  | Sets the octave OSC 1 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest. |
-| 15 | OSC 2 Range | 0-2 | [Oscillator Range](#osc_range) |  | Sets the octave OSC 2 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest. |
-| 16 | OSC 1 PWM Source | 0-5 | [OSC 1 PWM Source](#pwm_source) |  | Chooses what moves OSC 1's pulse width: a fixed setting, either LFO, or one of the three envelopes. |
-| 17 | OSC 2 Tone Mod Source | 0-5 | [OSC 2 Tone Mod Source](#tone_mod_source) |  | Chooses what moves OSC 2's tone modulation: a fixed setting, either LFO, or one of the three envelopes. |
-| 18 | OSC 1 Pulse Enable | 0-1 | Off (0), On (1) |  | Adds OSC 1's pulse wave to the mix. It and the saw are independent, so either, both or neither can sound. |
-| 19 | OSC 1 Saw Enable | 0-1 | Off (0), On (1) |  | Adds OSC 1's sawtooth wave to the mix. It and the pulse are independent, so either, both or neither can sound. |
-| 20 | OSC Sync Enable | 0-1 | Off (0), On (1) |  | Hard-syncs the oscillators, so that one restarts each time the other completes a cycle and its own pitch becomes a timbre control rather than a note. |
-| 21 | OSC 1 Pitch Mod Depth | 0-255 |  | 0.00 cents to 36.0 semitones, on a non-linear fader response | Sets how far the source chosen by OSC 1 Pitch Mod Select moves OSC 1's pitch. |
-| 22 | OSC 1 Pitch Mod Select | 0-6 | [Oscillator Pitch Mod Source](#pitch_mod_source) |  | Chooses what moves OSC 1's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way. |
-| 23 | OSC 1 Aftertouch > Pitch Mod Depth | 0-255 |  |  | Sets how much aftertouch adds to OSC 1's pitch modulation depth, so that leaning on a held key deepens the vibrato. |
-| 24 | OSC 1 Mod Wheel > Pitch Mod Depth | 0-255 |  |  | Sets how much the modulation wheel adds to OSC 1's pitch modulation depth. |
-| 25 | OSC 1 PWM Depth | 0-255 |  | 50.0% to 99.0% pulse width when the source is Manual, otherwise 0 to plus or minus 49% modulation | Sets how far OSC 1's pulse width moves. With a fixed source this is the width itself; with an LFO or an envelope it is how far that source sweeps it. |
-| 26 | OSC 2 Level | 0-255 |  | Off, then -48.0 dB to 0.0 dB | Sets how much of OSC 2 reaches the filter. |
-| 27 | OSC 2 Pitch | 0-255 |  | -12.0 to +12.0 semitones | Tunes OSC 2 away from OSC 1, up to an octave either way, which is what a detune or an interval between the two is set with. |
-| 28 | OSC 2 Tone Mod Depth | 0-255 |  | 50% to 100% tone modulation when the source is Manual, otherwise 0 to plus or minus 49% | Sets how far OSC 2's tone modulation moves. With a fixed source this is the setting itself; with an LFO or an envelope it is how far that source sweeps it. |
-| 29 | OSC 2 Pitch Mod Depth | 0-255 |  | 0.00 cents to 36.0 semitones, on a non-linear fader response | Sets how far the source chosen by OSC 2 Pitch Mod Select moves OSC 2's pitch. |
-| 30 | OSC 2 Aftertouch > Pitch Mod Depth | 0-255 |  |  | Sets how much aftertouch adds to OSC 2's pitch modulation depth, so that leaning on a held key deepens the vibrato. |
-| 31 | OSC 2 Mod Wheel > Pitch Mod Depth | 0-255 |  |  | Sets how much the modulation wheel adds to OSC 2's pitch modulation depth. |
-| 32 | OSC 2 Pitch Mod Select | 0-6 | [Oscillator Pitch Mod Source](#pitch_mod_source) |  | Chooses what moves OSC 2's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way. |
-| 33 | Noise Level | 0-255 |  | Off, then -48.1 dB to 0.0 dB | Sets how much of the noise generator is mixed in with the oscillators ahead of the filter. |
-| 34 | Portamento time | 0-255 |  | 0.00 s to 10.00 s | Sets how long a new note takes to slide to its pitch from the note before it. |
-| 35 | Portamento mode | 0-13 | [Portamento Mode](#portamento_mode) |  | Chooses how the slide behaves: whether it happens on every note or only where two overlap, whether its time or its rate is what stays fixed, and whether it is a fixed interval away rather than a slide at all. |
-| 36 | Pitch Bend Up Depth | 0-48 | **Unconfirmed.**  | -24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pushing up bends down. | Sets how far the pitch bender bends when it is pushed up. |
-| 37 | Pitch Bend Down Depth | 0-48 | **Unconfirmed.**  | -24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pulling down bends up. | Sets how far the pitch bender bends when it is pulled down. |
-| 38 | OSC 1 Pitch Mod Mode | 0-1 | [OSC 1 Pitch Mod Mode](#osc1_pitch_mod_mode) |  | Chooses whether OSC 1's pitch modulation moves both oscillators together or OSC 1 alone. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 14 | OSC 1 Range | 0-2 | [Oscillator Range](#osc_range) |  | [pitch](effects.md#glyph-pitch) | Sets the octave OSC 1 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest. |
+| 15 | OSC 2 Range | 0-2 | [Oscillator Range](#osc_range) |  | [pitch](effects.md#glyph-pitch) | Sets the octave OSC 2 sounds at, in the organ footages the display prints: 16' is the lowest and 4' the highest. |
+| 16 | OSC 1 PWM Source | 0-5 | [OSC 1 PWM Source](#pwm_source) |  | [selection](effects.md#glyph-selection) | Chooses what moves OSC 1's pulse width: a fixed setting, either LFO, or one of the three envelopes. |
+| 17 | OSC 2 Tone Mod Source | 0-5 | [OSC 2 Tone Mod Source](#tone_mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what moves OSC 2's tone modulation: a fixed setting, either LFO, or one of the three envelopes. |
+| 18 | OSC 1 Pulse Enable | 0-1 | Off (0), On (1) |  | [square](effects.md#glyph-square) | Adds OSC 1's pulse wave to the mix. It and the saw are independent, so either, both or neither can sound. |
+| 19 | OSC 1 Saw Enable | 0-1 | Off (0), On (1) |  | [saw](effects.md#glyph-saw) | Adds OSC 1's sawtooth wave to the mix. It and the pulse are independent, so either, both or neither can sound. |
+| 20 | OSC Sync Enable | 0-1 | Off (0), On (1) |  | [switch](effects.md#glyph-switch) | Hard-syncs the oscillators, so that one restarts each time the other completes a cycle and its own pitch becomes a timbre control rather than a note. |
+| 21 | OSC 1 Pitch Mod Depth | 0-255 |  | 0.00 cents to 36.0 semitones, on a non-linear fader response | [depth](effects.md#glyph-depth) | Sets how far the source chosen by OSC 1 Pitch Mod Select moves OSC 1's pitch. |
+| 22 | OSC 1 Pitch Mod Select | 0-6 | [Oscillator Pitch Mod Source](#pitch_mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what moves OSC 1's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way. |
+| 23 | OSC 1 Aftertouch > Pitch Mod Depth | 0-255 |  |  | [pressure](effects.md#glyph-pressure) | Sets how much aftertouch adds to OSC 1's pitch modulation depth, so that leaning on a held key deepens the vibrato. |
+| 24 | OSC 1 Mod Wheel > Pitch Mod Depth | 0-255 |  |  | [mod wheel](effects.md#glyph-mod-wheel) | Sets how much the modulation wheel adds to OSC 1's pitch modulation depth. |
+| 25 | OSC 1 PWM Depth | 0-255 |  | 50.0% to 99.0% pulse width when the source is Manual, otherwise 0 to plus or minus 49% modulation | [square](effects.md#glyph-square) | Sets how far OSC 1's pulse width moves. With a fixed source this is the width itself; with an LFO or an envelope it is how far that source sweeps it. |
+| 26 | OSC 2 Level | 0-255 |  | Off, then -48.0 dB to 0.0 dB | [level](effects.md#glyph-level) | Sets how much of OSC 2 reaches the filter. |
+| 27 | OSC 2 Pitch | 0-255 |  | -12.0 to +12.0 semitones | [pitch](effects.md#glyph-pitch) | Tunes OSC 2 away from OSC 1, up to an octave either way, which is what a detune or an interval between the two is set with. |
+| 28 | OSC 2 Tone Mod Depth | 0-255 |  | 50% to 100% tone modulation when the source is Manual, otherwise 0 to plus or minus 49% | [depth](effects.md#glyph-depth) | Sets how far OSC 2's tone modulation moves. With a fixed source this is the setting itself; with an LFO or an envelope it is how far that source sweeps it. |
+| 29 | OSC 2 Pitch Mod Depth | 0-255 |  | 0.00 cents to 36.0 semitones, on a non-linear fader response | [depth](effects.md#glyph-depth) | Sets how far the source chosen by OSC 2 Pitch Mod Select moves OSC 2's pitch. |
+| 30 | OSC 2 Aftertouch > Pitch Mod Depth | 0-255 |  |  | [pressure](effects.md#glyph-pressure) | Sets how much aftertouch adds to OSC 2's pitch modulation depth, so that leaning on a held key deepens the vibrato. |
+| 31 | OSC 2 Mod Wheel > Pitch Mod Depth | 0-255 |  |  | [mod wheel](effects.md#glyph-mod-wheel) | Sets how much the modulation wheel adds to OSC 2's pitch modulation depth. |
+| 32 | OSC 2 Pitch Mod Select | 0-6 | [Oscillator Pitch Mod Source](#pitch_mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what moves OSC 2's pitch: either LFO, one of the three envelopes, or an LFO taken unipolar so that it only bends one way. |
+| 33 | Noise Level | 0-255 |  | Off, then -48.1 dB to 0.0 dB | [noise](effects.md#glyph-noise) | Sets how much of the noise generator is mixed in with the oscillators ahead of the filter. |
+| 34 | Portamento time | 0-255 |  | 0.00 s to 10.00 s | [glide](effects.md#glyph-glide) | Sets how long a new note takes to slide to its pitch from the note before it. |
+| 35 | Portamento mode | 0-13 | [Portamento Mode](#portamento_mode) |  | [selection](effects.md#glyph-selection) | Chooses how the slide behaves: whether it happens on every note or only where two overlap, whether its time or its rate is what stays fixed, and whether it is a fixed interval away rather than a slide at all. |
+| 36 | Pitch Bend Up Depth | 0-48 | **Unconfirmed.**  | -24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pushing up bends down. | [bend](effects.md#glyph-bend) | Sets how far the pitch bender bends when it is pushed up. |
+| 37 | Pitch Bend Down Depth | 0-48 | **Unconfirmed.**  | -24 to +24 semitones, where 24 is no bend. A negative depth inverts the wheel, so pulling down bends up. | [bend](effects.md#glyph-bend) | Sets how far the pitch bender bends when it is pulled down. |
+| 38 | OSC 1 Pitch Mod Mode | 0-1 | [OSC 1 Pitch Mod Mode](#osc1_pitch_mod_mode) |  | [selection](effects.md#glyph-selection) | Chooses whether OSC 1's pitch modulation moves both oscillators together or OSC 1 alone. |
 
 ### VCF
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 39 | VCF Frequency | 0-255 |  | 50.0 Hz to 20000.0 Hz | Sets the cutoff frequency of the low pass filter, the point above which the oscillators' harmonics are removed. Turning it down darkens the sound. |
-| 40 | VCF HighPass Frequency | 0-255 |  | 20.0 Hz to 2000.0 Hz | Sets the cutoff of the high pass filter, which removes what is below it. The manual's block diagram places this after the VCA, so it acts on the mixed voices rather than on one. |
-| 41 | VCF Resonance | 0-255 |  | 0.0% to 100.0% | Emphasises the frequencies around the low pass cutoff, which sharpens the filter's peak and thins out what sits below it. |
-| 42 | VCF Envelope Depth | 0-255 |  | 0.0% to 100.0% | Sets how far the VCF envelope moves the low pass cutoff, and so how much of the filter's sweep is played by the envelope rather than set by hand. |
-| 43 | VCF Envelope Velocity Sensitivity | 0-255 |  |  | Sets how much playing harder deepens the VCF envelope's effect on the cutoff. |
-| 44 | VCF Pitch Bend to Freq Depth | 0-255 |  |  | Sets how much the pitch bender moves the low pass cutoff along with the pitch. |
-| 45 | VCF LFO Depth | 0-255 |  | 0.0% to 100.0% | Sets how far the LFO chosen by VCF LFO Select moves the low pass cutoff. |
-| 46 | VCF LFO Select | 0-1 | [VCF LFO Select](#vcf_lfo_select) |  | Chooses which of the two LFOs moves the low pass cutoff. |
-| 47 | VCF Aftertouch > LFO Depth | 0-255 |  |  | Sets how much aftertouch adds to the LFO's effect on the cutoff, so that leaning on a held key opens up the filter's wobble. |
-| 48 | VCF Mod Wheel > LFO Depth | 0-255 |  |  | Sets how much the modulation wheel adds to the LFO's effect on the cutoff. |
-| 49 | VCF Keyboard Tracking | 0-255 |  | 0.0% to 100.0% | Sets how far the low pass cutoff follows the note played, so that high notes keep the brightness low ones have instead of being filtered away. |
-| 50 | VCF Envelope Polarity | 0-1 | [VCF Envelope Polarity](#vcf_envelope_polarity) |  | Chooses whether the VCF envelope opens the filter or closes it. |
-| 51 | VCF 2 Pole Mode | 0-1 | [VCF Pole Mode](#vcf_pole_mode) |  | Chooses the low pass filter's slope: four poles for the steeper, darker response, two for the gentler one. |
-| 52 | VCF Bass Boost | 0-1 | Off (0), On (1) |  | Lifts the low end after the filter, putting back the weight a resonant low pass takes out. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 39 | VCF Frequency | 0-255 |  | 50.0 Hz to 20000.0 Hz | [high cut](effects.md#glyph-high-cut) | Sets the cutoff frequency of the low pass filter, the point above which the oscillators' harmonics are removed. Turning it down darkens the sound. |
+| 40 | VCF HighPass Frequency | 0-255 |  | 20.0 Hz to 2000.0 Hz | [low cut](effects.md#glyph-low-cut) | Sets the cutoff of the high pass filter, which removes what is below it. The manual's block diagram places this after the VCA, so it acts on the mixed voices rather than on one. |
+| 41 | VCF Resonance | 0-255 |  | 0.0% to 100.0% | [resonance](effects.md#glyph-resonance) | Emphasises the frequencies around the low pass cutoff, which sharpens the filter's peak and thins out what sits below it. |
+| 42 | VCF Envelope Depth | 0-255 |  | 0.0% to 100.0% | [envelope](effects.md#glyph-envelope) | Sets how far the VCF envelope moves the low pass cutoff, and so how much of the filter's sweep is played by the envelope rather than set by hand. |
+| 43 | VCF Envelope Velocity Sensitivity | 0-255 |  |  | [velocity](effects.md#glyph-velocity) | Sets how much playing harder deepens the VCF envelope's effect on the cutoff. |
+| 44 | VCF Pitch Bend to Freq Depth | 0-255 |  |  | [bend](effects.md#glyph-bend) | Sets how much the pitch bender moves the low pass cutoff along with the pitch. |
+| 45 | VCF LFO Depth | 0-255 |  | 0.0% to 100.0% | [wave](effects.md#glyph-wave) | Sets how far the LFO chosen by VCF LFO Select moves the low pass cutoff. |
+| 46 | VCF LFO Select | 0-1 | [VCF LFO Select](#vcf_lfo_select) |  | [selection](effects.md#glyph-selection) | Chooses which of the two LFOs moves the low pass cutoff. |
+| 47 | VCF Aftertouch > LFO Depth | 0-255 |  |  | [pressure](effects.md#glyph-pressure) | Sets how much aftertouch adds to the LFO's effect on the cutoff, so that leaning on a held key opens up the filter's wobble. |
+| 48 | VCF Mod Wheel > LFO Depth | 0-255 |  |  | [mod wheel](effects.md#glyph-mod-wheel) | Sets how much the modulation wheel adds to the LFO's effect on the cutoff. |
+| 49 | VCF Keyboard Tracking | 0-255 |  | 0.0% to 100.0% | [keys](effects.md#glyph-keys) | Sets how far the low pass cutoff follows the note played, so that high notes keep the brightness low ones have instead of being filtered away. |
+| 50 | VCF Envelope Polarity | 0-1 | [VCF Envelope Polarity](#vcf_envelope_polarity) |  | [polarity](effects.md#glyph-polarity) | Chooses whether the VCF envelope opens the filter or closes it. |
+| 51 | VCF 2 Pole Mode | 0-1 | [VCF Pole Mode](#vcf_pole_mode) |  | [high cut](effects.md#glyph-high-cut) | Chooses the low pass filter's slope: four poles for the steeper, darker response, two for the gentler one. |
+| 52 | VCF Bass Boost | 0-1 | Off (0), On (1) |  | [low shelf](effects.md#glyph-low-shelf) | Lifts the low end after the filter, putting back the weight a resonant low pass takes out. |
 
 ### VCA Envelope
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 53 | VCA Envelope Attack Time | 0-255 |  |  | Sets how long the envelope takes to rise to full level once it is triggered. |
-| 54 | VCA Envelope Decay Time | 0-255 |  |  | Sets how long the envelope takes to fall from full level to its sustain level. |
-| 55 | VCA Envelope Sustain Level | 0-255 |  |  | Sets the level the envelope holds at for as long as the note is held. |
-| 56 | VCA Envelope Release Time | 0-255 |  |  | Sets how long the envelope takes to fall back to nothing once the key is released. |
-| 57 | VCA Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |  | Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer. |
-| 58 | VCA Envelope Attack Curve | 0-255 |  |  | Bends the attack segment away from a straight line, towards an exponential in either direction. |
-| 59 | VCA Envelope Decay Curve | 0-255 |  |  | Bends the decay segment away from a straight line, towards an exponential in either direction. |
-| 60 | VCA Envelope Sustain Curve | 0-255 |  |  | Bends the sustain segment away from a straight line, towards an exponential in either direction. |
-| 61 | VCA Envelope Release Curve | 0-255 |  |  | Bends the release segment away from a straight line, towards an exponential in either direction. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 53 | VCA Envelope Attack Time | 0-255 |  |  | [attack](effects.md#glyph-attack) | Sets how long the envelope takes to rise to full level once it is triggered. |
+| 54 | VCA Envelope Decay Time | 0-255 |  |  | [decay](effects.md#glyph-decay) | Sets how long the envelope takes to fall from full level to its sustain level. |
+| 55 | VCA Envelope Sustain Level | 0-255 |  |  | [hold](effects.md#glyph-hold) | Sets the level the envelope holds at for as long as the note is held. |
+| 56 | VCA Envelope Release Time | 0-255 |  |  | [release](effects.md#glyph-release) | Sets how long the envelope takes to fall back to nothing once the key is released. |
+| 57 | VCA Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |  | [selection](effects.md#glyph-selection) | Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer. |
+| 58 | VCA Envelope Attack Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the attack segment away from a straight line, towards an exponential in either direction. |
+| 59 | VCA Envelope Decay Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the decay segment away from a straight line, towards an exponential in either direction. |
+| 60 | VCA Envelope Sustain Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the sustain segment away from a straight line, towards an exponential in either direction. |
+| 61 | VCA Envelope Release Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the release segment away from a straight line, towards an exponential in either direction. |
 
 ### VCF Envelope
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 62 | VCF Envelope Attack Time | 0-255 |  |  | Sets how long the envelope takes to rise to full level once it is triggered. |
-| 63 | VCF Envelope Decay Time | 0-255 |  |  | Sets how long the envelope takes to fall from full level to its sustain level. |
-| 64 | VCF Envelope Sustain Level | 0-255 |  |  | Sets the level the envelope holds at for as long as the note is held. |
-| 65 | VCF Envelope Release Time | 0-255 |  |  | Sets how long the envelope takes to fall back to nothing once the key is released. |
-| 66 | VCF Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |  | Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer. |
-| 67 | VCF Envelope Attack Curve | 0-255 |  |  | Bends the attack segment away from a straight line, towards an exponential in either direction. |
-| 68 | VCF Envelope Decay Curve | 0-255 |  |  | Bends the decay segment away from a straight line, towards an exponential in either direction. |
-| 69 | VCF Envelope Sustain Curve | 0-255 |  |  | Bends the sustain segment away from a straight line, towards an exponential in either direction. |
-| 70 | VCF Envelope Release Curve | 0-255 |  |  | Bends the release segment away from a straight line, towards an exponential in either direction. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 62 | VCF Envelope Attack Time | 0-255 |  |  | [attack](effects.md#glyph-attack) | Sets how long the envelope takes to rise to full level once it is triggered. |
+| 63 | VCF Envelope Decay Time | 0-255 |  |  | [decay](effects.md#glyph-decay) | Sets how long the envelope takes to fall from full level to its sustain level. |
+| 64 | VCF Envelope Sustain Level | 0-255 |  |  | [hold](effects.md#glyph-hold) | Sets the level the envelope holds at for as long as the note is held. |
+| 65 | VCF Envelope Release Time | 0-255 |  |  | [release](effects.md#glyph-release) | Sets how long the envelope takes to fall back to nothing once the key is released. |
+| 66 | VCF Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |  | [selection](effects.md#glyph-selection) | Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer. |
+| 67 | VCF Envelope Attack Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the attack segment away from a straight line, towards an exponential in either direction. |
+| 68 | VCF Envelope Decay Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the decay segment away from a straight line, towards an exponential in either direction. |
+| 69 | VCF Envelope Sustain Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the sustain segment away from a straight line, towards an exponential in either direction. |
+| 70 | VCF Envelope Release Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the release segment away from a straight line, towards an exponential in either direction. |
 
 ### Mod Envelope
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 71 | Mod Envelope Attack Time | 0-255 |  |  | Sets how long the envelope takes to rise to full level once it is triggered. |
-| 72 | Mod Envelope Decay Time | 0-255 |  |  | Sets how long the envelope takes to fall from full level to its sustain level. |
-| 73 | Mod Envelope Sustain Level | 0-255 |  |  | Sets the level the envelope holds at for as long as the note is held. |
-| 74 | Mod Envelope Release Time | 0-255 |  |  | Sets how long the envelope takes to fall back to nothing once the key is released. |
-| 75 | Mod Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |  | Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer. |
-| 76 | Mod Envelope Attack Curve | 0-255 |  |  | Bends the attack segment away from a straight line, towards an exponential in either direction. |
-| 77 | Mod Envelope Decay Curve | 0-255 |  |  | Bends the decay segment away from a straight line, towards an exponential in either direction. |
-| 78 | Mod Envelope Sustain Curve | 0-255 |  |  | Bends the sustain segment away from a straight line, towards an exponential in either direction. |
-| 79 | Mod Envelope Release Curve | 0-255 |  |  | Bends the release segment away from a straight line, towards an exponential in either direction. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 71 | Mod Envelope Attack Time | 0-255 |  |  | [attack](effects.md#glyph-attack) | Sets how long the envelope takes to rise to full level once it is triggered. |
+| 72 | Mod Envelope Decay Time | 0-255 |  |  | [decay](effects.md#glyph-decay) | Sets how long the envelope takes to fall from full level to its sustain level. |
+| 73 | Mod Envelope Sustain Level | 0-255 |  |  | [hold](effects.md#glyph-hold) | Sets the level the envelope holds at for as long as the note is held. |
+| 74 | Mod Envelope Release Time | 0-255 |  |  | [release](effects.md#glyph-release) | Sets how long the envelope takes to fall back to nothing once the key is released. |
+| 75 | Mod Envelope Trigger Mode | 0-4 | [Envelope Trigger Source](#envelope_trigger) |  | [selection](effects.md#glyph-selection) | Chooses what triggers the envelope: a key, either LFO, a free-running loop, or a step of the control sequencer. |
+| 76 | Mod Envelope Attack Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the attack segment away from a straight line, towards an exponential in either direction. |
+| 77 | Mod Envelope Decay Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the decay segment away from a straight line, towards an exponential in either direction. |
+| 78 | Mod Envelope Sustain Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the sustain segment away from a straight line, towards an exponential in either direction. |
+| 79 | Mod Envelope Release Curve | 0-255 |  |  | [curve](effects.md#glyph-curve) | Bends the release segment away from a straight line, towards an exponential in either direction. |
 
 ### VCA
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 80 | VCA Level | 0-255 |  | -12.0 dB to +6.0 dB | Sets the level the voice leaves the amplifier at, ahead of the high pass and the effects. |
-| 81 | VCA Envelope Depth | 0-255 |  |  | Sets how far the VCA envelope moves the voice's level, and so how much of the loudness is played by the envelope rather than held flat. |
-| 82 | VCA Envelope Velocity Sensitivity | 0-255 |  |  | Sets how much playing harder raises the voice's level. |
-| 83 | VCA Pan Spread | 0-255 | -128 (0) to +127 (255) |  | Spreads the voices across the stereo field, so that a chord is placed across it rather than stacked in the middle. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 80 | VCA Level | 0-255 |  | -12.0 dB to +6.0 dB | [level](effects.md#glyph-level) | Sets the level the voice leaves the amplifier at, ahead of the high pass and the effects. |
+| 81 | VCA Envelope Depth | 0-255 |  |  | [envelope](effects.md#glyph-envelope) | Sets how far the VCA envelope moves the voice's level, and so how much of the loudness is played by the envelope rather than held flat. |
+| 82 | VCA Envelope Velocity Sensitivity | 0-255 |  |  | [velocity](effects.md#glyph-velocity) | Sets how much playing harder raises the voice's level. |
+| 83 | VCA Pan Spread | 0-255 | -128 (0) to +127 (255) |  | [spread](effects.md#glyph-spread) | Spreads the voices across the stereo field, so that a chord is placed across it rather than stacked in the middle. |
 
 ### Voicing
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 84 | Voice Priority Mode | 0-2 | [Voice Priority Mode](#voice_priority) |  | Chooses which note keeps a voice when more are held than there are voices: the lowest, the highest, or the most recently played. |
-| 85 | Polyphony Mode | 0-12 | [Polyphony Mode](#polyphony_mode) |  | Chooses how the voices are handed out: one to a note, several stacked on each note in unison, a limited number of them at a time, or the whole instrument reduced to one voice. |
-| 86 | Envelope Trigger Mode | 0-3 | [Envelope Trigger Mode](#key_assign_mode) |  | Chooses whether the envelopes restart on each new note or run on from where they are when notes overlap, and whether they run once through however long the key is held. |
-| 87 | Unison Detune | 0-255 | Sets the amount phatness! | plus or minus 0.0 to 50.0 cents | Sets how far the stacked voices of a unison mode are tuned apart from one another, which is what thickens the sound. |
-| 88 | Voice Drift | 0-255 |  |  | Sets how much drift is applied per voice, which is what keeps two voices playing the same note from being identical. |
-| 89 | Parameter Drift | 0-255 |  |  | Sets how much drift is applied to parameter values, which is what keeps a setting from sounding exactly where it was left. |
-| 90 | Drift Rate | 0-255 |  | Each drift step lasts a random time between 25-50 ms at 0 and 2.5-5.0 s at 255 | Sets how quickly drift moves from one random value to the next. |
-| 91 | OSC Portamento Balance | 0-255 | -128 (0) to +127 (255) |  | Sets how the portamento time is split between the two oscillators, so that one can arrive at the new note ahead of the other. |
-| 92 | OSC Key Down Reset | 0-1 | Off (0), On (1) |  | Restarts the oscillators' waveforms on each new note, so that every note begins from the same point in the cycle. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 84 | Voice Priority Mode | 0-2 | [Voice Priority Mode](#voice_priority) |  | [selection](effects.md#glyph-selection) | Chooses which note keeps a voice when more are held than there are voices: the lowest, the highest, or the most recently played. |
+| 85 | Polyphony Mode | 0-12 | [Polyphony Mode](#polyphony_mode) |  | [selection](effects.md#glyph-selection) | Chooses how the voices are handed out: one to a note, several stacked on each note in unison, a limited number of them at a time, or the whole instrument reduced to one voice. |
+| 86 | Envelope Trigger Mode | 0-3 | [Envelope Trigger Mode](#key_assign_mode) |  | [selection](effects.md#glyph-selection) | Chooses whether the envelopes restart on each new note or run on from where they are when notes overlap, and whether they run once through however long the key is held. |
+| 87 | Unison Detune | 0-255 | Sets the amount phatness! | plus or minus 0.0 to 50.0 cents | [detune](effects.md#glyph-detune) | Sets how far the stacked voices of a unison mode are tuned apart from one another, which is what thickens the sound. |
+| 88 | Voice Drift | 0-255 |  |  | [noise](effects.md#glyph-noise) | Sets how much drift is applied per voice, which is what keeps two voices playing the same note from being identical. |
+| 89 | Parameter Drift | 0-255 |  |  | [noise](effects.md#glyph-noise) | Sets how much drift is applied to parameter values, which is what keeps a setting from sounding exactly where it was left. |
+| 90 | Drift Rate | 0-255 |  | Each drift step lasts a random time between 25-50 ms at 0 and 2.5-5.0 s at 255 | [rate](effects.md#glyph-rate) | Sets how quickly drift moves from one random value to the next. |
+| 91 | OSC Portamento Balance | 0-255 | -128 (0) to +127 (255) |  | [glide](effects.md#glyph-glide) | Sets how the portamento time is split between the two oscillators, so that one can arrive at the new note ahead of the other. |
+| 92 | OSC Key Down Reset | 0-1 | Off (0), On (1) |  | [keys](effects.md#glyph-keys) | Restarts the oscillators' waveforms on each new note, so that every note begins from the same point in the cycle. |
 
 ### Mod Matrix
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 93 | Mod 1 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
-| 94 | Mod 1 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
-| 95 | Mod 1 Depth | 0-255 | -128 (0) to +127 (255) |  | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
-| 96 | Mod 2 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
-| 97 | Mod 2 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
-| 98 | Mod 2 Depth | 0-255 | -128 (0) to +127 (255) |  | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
-| 99 | Mod 3 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
-| 100 | Mod 3 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
-| 101 | Mod 3 Depth | 0-255 | -128 (0) to +127 (255) |  | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
-| 102 | Mod 4 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
-| 103 | Mod 4 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
-| 104 | Mod 4 Depth | 0-255 | -128 (0) to +127 (255) |  | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
-| 105 | Mod 5 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
-| 106 | Mod 5 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
-| 107 | Mod 5 Depth | 0-255 | -128 (0) to +127 (255) |  | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
-| 108 | Mod 6 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
-| 109 | Mod 6 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
-| 110 | Mod 6 Depth | 0-255 | -128 (0) to +127 (255) |  | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
-| 111 | Mod 7 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
-| 112 | Mod 7 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
-| 113 | Mod 7 Depth | 0-255 | -128 (0) to +127 (255) |  | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
-| 114 | Mod 8 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
-| 115 | Mod 8 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
-| 116 | Mod 8 Depth | 0-255 | -128 (0) to +127 (255) |  | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 93 | Mod 1 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
+| 94 | Mod 1 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | [selection](effects.md#glyph-selection) | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
+| 95 | Mod 1 Depth | 0-255 | -128 (0) to +127 (255) |  | [depth](effects.md#glyph-depth) | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
+| 96 | Mod 2 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
+| 97 | Mod 2 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | [selection](effects.md#glyph-selection) | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
+| 98 | Mod 2 Depth | 0-255 | -128 (0) to +127 (255) |  | [depth](effects.md#glyph-depth) | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
+| 99 | Mod 3 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
+| 100 | Mod 3 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | [selection](effects.md#glyph-selection) | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
+| 101 | Mod 3 Depth | 0-255 | -128 (0) to +127 (255) |  | [depth](effects.md#glyph-depth) | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
+| 102 | Mod 4 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
+| 103 | Mod 4 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | [selection](effects.md#glyph-selection) | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
+| 104 | Mod 4 Depth | 0-255 | -128 (0) to +127 (255) |  | [depth](effects.md#glyph-depth) | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
+| 105 | Mod 5 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
+| 106 | Mod 5 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | [selection](effects.md#glyph-selection) | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
+| 107 | Mod 5 Depth | 0-255 | -128 (0) to +127 (255) |  | [depth](effects.md#glyph-depth) | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
+| 108 | Mod 6 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
+| 109 | Mod 6 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | [selection](effects.md#glyph-selection) | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
+| 110 | Mod 6 Depth | 0-255 | -128 (0) to +127 (255) |  | [depth](effects.md#glyph-depth) | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
+| 111 | Mod 7 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
+| 112 | Mod 7 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | [selection](effects.md#glyph-selection) | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
+| 113 | Mod 7 Depth | 0-255 | -128 (0) to +127 (255) |  | [depth](effects.md#glyph-depth) | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
+| 114 | Mod 8 Source | 0-24 | [Modulation Matrix Source](#mod_source) |  | [selection](effects.md#glyph-selection) | Chooses what drives this modulation bus. Zero is off; the rest are the instrument's own controls, its envelopes, its LFOs and the control sequencer. |
+| 115 | Mod 8 Destination | 0-132 | [Modulation Matrix Destination](#mod_destination) |  | [selection](effects.md#glyph-selection) | Chooses what this modulation bus moves. Zero is off, and a destination names an abbreviation the display prints rather than a single parameter, so one of them can move several parameters together. |
+| 116 | Mod 8 Depth | 0-255 | -128 (0) to +127 (255) |  | [depth](effects.md#glyph-depth) | Sets how far this bus moves its destination, and which way round: the value is signed about its centre, and below the centre it inverts what the source does. |
 
 ### Control Sequencer
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 117 | Ctrl Sequencer Enable | 0-1 | Off (0), On (1) |  | Runs the control sequencer, the stepped modulation source the matrix can draw on. |
-| 118 | Ctrl Sequencer Clock Divider | 0-15 | [Control Sequencer Clock Divider](#sequencer_clock) |  | Sets how fast the sequencer steps, as a division of the master tempo. |
-| 119 | Sequence Length | 0-31 | 1 (0) to 32 (31) steps |  | Sets how many of the 32 steps are played before the sequence returns to the first. |
-| 120 | Sequencer Swing Timing | 0-255 | 0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel. | 50% to 75% | Holds every second step back, which is what turns an even run of steps into a swung one. |
-| 121 | Key Sync & Loop | 0-2 | [Control Sequencer Key Sync and Loop](#sequencer_sync) |  | Chooses whether the sequence restarts on a new note, whether it repeats when it reaches its end, or both. |
-| 122 | Slew Rate | 0-255 |  |  | Smooths the jump from one step's value to the next, which turns a staircase into a slope. |
-| 123 | Seq Step Value 1 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 124 | Seq Step Value 2 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 125 | Seq Step Value 3 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 126 | Seq Step Value 4 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 127 | Seq Step Value 5 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 128 | Seq Step Value 6 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 129 | Seq Step Value 7 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 130 | Seq Step Value 8 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 131 | Seq Step Value 9 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 132 | Seq Step Value 10 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 133 | Seq Step Value 11 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 134 | Seq Step Value 12 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 135 | Seq Step Value 13 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 136 | Seq Step Value 14 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 137 | Seq Step Value 15 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 138 | Seq Step Value 16 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 139 | Seq Step Value 17 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 140 | Seq Step Value 18 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 141 | Seq Step Value 19 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 142 | Seq Step Value 20 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 143 | Seq Step Value 21 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 144 | Seq Step Value 22 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 145 | Seq Step Value 23 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 146 | Seq Step Value 24 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 147 | Seq Step Value 25 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 148 | Seq Step Value 26 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 149 | Seq Step Value 27 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 150 | Seq Step Value 28 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 151 | Seq Step Value 29 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 152 | Seq Step Value 30 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 153 | Seq Step Value 31 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
-| 154 | Seq Step Value 32 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 117 | Ctrl Sequencer Enable | 0-1 | Off (0), On (1) |  | [switch](effects.md#glyph-switch) | Runs the control sequencer, the stepped modulation source the matrix can draw on. |
+| 118 | Ctrl Sequencer Clock Divider | 0-15 | [Control Sequencer Clock Divider](#sequencer_clock) |  | [time](effects.md#glyph-time) | Sets how fast the sequencer steps, as a division of the master tempo. |
+| 119 | Sequence Length | 0-31 | 1 (0) to 32 (31) steps |  | [steps](effects.md#glyph-steps) | Sets how many of the 32 steps are played before the sequence returns to the first. |
+| 120 | Sequencer Swing Timing | 0-255 | 0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel. | 50% to 75% | [swing](effects.md#glyph-swing) | Holds every second step back, which is what turns an even run of steps into a swung one. |
+| 121 | Key Sync & Loop | 0-2 | [Control Sequencer Key Sync and Loop](#sequencer_sync) |  | [keys](effects.md#glyph-keys) | Chooses whether the sequence restarts on a new note, whether it repeats when it reaches its end, or both. |
+| 122 | Slew Rate | 0-255 |  |  | [curve](effects.md#glyph-curve) | Smooths the jump from one step's value to the next, which turns a staircase into a slope. |
+| 123 | Seq Step Value 1 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 124 | Seq Step Value 2 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 125 | Seq Step Value 3 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 126 | Seq Step Value 4 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 127 | Seq Step Value 5 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 128 | Seq Step Value 6 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 129 | Seq Step Value 7 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 130 | Seq Step Value 8 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 131 | Seq Step Value 9 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 132 | Seq Step Value 10 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 133 | Seq Step Value 11 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 134 | Seq Step Value 12 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 135 | Seq Step Value 13 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 136 | Seq Step Value 14 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 137 | Seq Step Value 15 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 138 | Seq Step Value 16 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 139 | Seq Step Value 17 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 140 | Seq Step Value 18 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 141 | Seq Step Value 19 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 142 | Seq Step Value 20 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 143 | Seq Step Value 21 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 144 | Seq Step Value 22 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 145 | Seq Step Value 23 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 146 | Seq Step Value 24 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 147 | Seq Step Value 25 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 148 | Seq Step Value 26 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 149 | Seq Step Value 27 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 150 | Seq Step Value 28 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 151 | Seq Step Value 29 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 152 | Seq Step Value 30 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 153 | Seq Step Value 31 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
+| 154 | Seq Step Value 32 | 0-255 | Bipolar step value -127 (1) to +127 (255). A value of 0 means "skip step". |  | [steps](effects.md#glyph-steps) | Sets how far this step moves whatever the matrix points at it. The value is signed about its centre, so a step can modulate either way from nothing. |
 
 ### Arpeggiator
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 155 | Arp On/Off | 0-1 | Off (0), On (1) |  | Runs the arpeggiator over the notes being held. |
-| 156 | Arp Mode | 0-10 | [Arpeggiator Mode](#arp_mode) |  | Chooses the order the held notes are played in: up, down, alternating, as they were played, at random, or all at once. |
-| 157 | Arp Rate (tempo) | 0-255 | 20 bpm (0) to 275 bpm (255) | 20.0 to 275.0 BPM | Sets the master tempo, in beats per minute. The arpeggiator, the control sequencer and a tempo-locked LFO all divide it. |
-| 158 | Arp Clock | 0-12 | [Arpeggiator Clock Divider](#arp_clock) |  | Sets how fast the arpeggiator steps, as a division of the master tempo. |
-| 159 | Arp Key Sync | 0-1 | Off (0), On (1) |  | Restarts the arpeggiated pattern on each new note rather than letting it run on. |
-| 160 | Arp Gate Time | 0-255 |  |  | Sets how much of each step the note actually sounds for, from a short stab to a run that joins up. |
-| 161 | Arp Hold | 0-1 | Off (0), On (1) |  | Keeps the arpeggio running after the keys are let go. |
-| 162 | Arp Pattern | 0-64 | [Arpeggiator Pattern](#arp_pattern) |  | Chooses the rhythm the arpeggiator plays: which of its steps sound and which are rests. |
-| 163 | Arp Swing | 0-255 | 0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel. | 50% to 75% | Holds every second step of the arpeggio back, which is what turns an even run into a swung one. |
-| 164 | Arp Octaves | 0-5 | 1 to 6 octaves |  | Sets how many octaves the arpeggio climbs through before it returns to the note it started on. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 155 | Arp On/Off | 0-1 | Off (0), On (1) |  | [switch](effects.md#glyph-switch) | Runs the arpeggiator over the notes being held. |
+| 156 | Arp Mode | 0-10 | [Arpeggiator Mode](#arp_mode) |  | [selection](effects.md#glyph-selection) | Chooses the order the held notes are played in: up, down, alternating, as they were played, at random, or all at once. |
+| 157 | Arp Rate (tempo) | 0-255 | 20 bpm (0) to 275 bpm (255) | 20.0 to 275.0 BPM | [time](effects.md#glyph-time) | Sets the master tempo, in beats per minute. The arpeggiator, the control sequencer and a tempo-locked LFO all divide it. |
+| 158 | Arp Clock | 0-12 | [Arpeggiator Clock Divider](#arp_clock) |  | [time](effects.md#glyph-time) | Sets how fast the arpeggiator steps, as a division of the master tempo. |
+| 159 | Arp Key Sync | 0-1 | Off (0), On (1) |  | [keys](effects.md#glyph-keys) | Restarts the arpeggiated pattern on each new note rather than letting it run on. |
+| 160 | Arp Gate Time | 0-255 |  |  | [gate](effects.md#glyph-gate) | Sets how much of each step the note actually sounds for, from a short stab to a run that joins up. |
+| 161 | Arp Hold | 0-1 | Off (0), On (1) |  | [hold](effects.md#glyph-hold) | Keeps the arpeggio running after the keys are let go. |
+| 162 | Arp Pattern | 0-64 | [Arpeggiator Pattern](#arp_pattern) |  | [selection](effects.md#glyph-selection) | Chooses the rhythm the arpeggiator plays: which of its steps sound and which are rests. |
+| 163 | Arp Swing | 0-255 | 0 is 50%, no swing. 255 is 75%, full swing. 66% is a triplet feel. | 50% to 75% | [swing](effects.md#glyph-swing) | Holds every second step of the arpeggio back, which is what turns an even run into a swung one. |
+| 164 | Arp Octaves | 0-5 | 1 to 6 octaves |  | [pitch](effects.md#glyph-pitch) | Sets how many octaves the arpeggio climbs through before it returns to the note it started on. |
 
 ### Effects
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 165 | FX Routing | 0-9 | [FX Connection Mode](#fx_routing) |  | Chooses how the four effect engines are wired to each other: in a chain, side by side, or a mixture of the two, with two of the ten routings feeding a later engine back into an earlier one. |
-| 166 | FX 1 Type | 0-34 | [FX Type](#fx_type) |  | Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean. |
-| 167 | FX 1 Param 1 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 168 | FX 1 Param 2 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 169 | FX 1 Param 3 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 170 | FX 1 Param 4 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 171 | FX 1 Param 5 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 172 | FX 1 Param 6 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 173 | FX 1 Param 7 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 174 | FX 1 Param 8 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 175 | FX 1 Param 9 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 176 | FX 1 Param 10 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 177 | FX 1 Param 11 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 178 | FX 1 Param 12 | 0-255 | Meaning depends on FX 1 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 179 | FX 2 Type | 0-34 | [FX Type](#fx_type) |  | Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean. |
-| 180 | FX 2 Param 1 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 181 | FX 2 Param 2 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 182 | FX 2 Param 3 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 183 | FX 2 Param 4 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 184 | FX 2 Param 5 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 185 | FX 2 Param 6 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 186 | FX 2 Param 7 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 187 | FX 2 Param 8 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 188 | FX 2 Param 9 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 189 | FX 2 Param 10 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 190 | FX 2 Param 11 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 191 | FX 2 Param 12 | 0-255 | Meaning depends on FX 2 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 192 | FX 3 Type | 0-34 | [FX Type](#fx_type) |  | Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean. |
-| 193 | FX 3 Param 1 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 194 | FX 3 Param 2 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 195 | FX 3 Param 3 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 196 | FX 3 Param 4 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 197 | FX 3 Param 5 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 198 | FX 3 Param 6 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 199 | FX 3 Param 7 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 200 | FX 3 Param 8 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 201 | FX 3 Param 9 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 202 | FX 3 Param 10 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 203 | FX 3 Param 11 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 204 | FX 3 Param 12 | 0-255 | Meaning depends on FX 3 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 205 | FX 4 Type | 0-34 | [FX Type](#fx_type) |  | Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean. |
-| 206 | FX 4 Param 1 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 207 | FX 4 Param 2 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 208 | FX 4 Param 3 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 209 | FX 4 Param 4 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 210 | FX 4 Param 5 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 211 | FX 4 Param 6 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 212 | FX 4 Param 7 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 213 | FX 4 Param 8 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 214 | FX 4 Param 9 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 215 | FX 4 Param 10 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 216 | FX 4 Param 11 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 217 | FX 4 Param 12 | 0-255 | Meaning depends on FX 4 Type |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
-| 218 | FX 1 Output Gain | 0-150 |  |  | Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output. |
-| 219 | FX 2 Output Gain | 0-150 |  |  | Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output. |
-| 220 | FX 3 Output Gain | 0-150 |  |  | Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output. |
-| 221 | FX 4 Output Gain | 0-150 |  |  | Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output. |
-| 222 | FX Mode | 0-2 | [FX Mode](#fx_mode) |  | Chooses what the effects do to the two signal paths: sit in the chain, be fed from a send alongside it, or be bypassed. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 165 | FX Routing | 0-9 | [FX Connection Mode](#fx_routing) |  | [selection](effects.md#glyph-selection) | Chooses how the four effect engines are wired to each other: in a chain, side by side, or a mixture of the two, with two of the ten routings feeding a later engine back into an earlier one. |
+| 166 | FX 1 Type | 0-34 | [FX Type](#fx_type) |  | [selection](effects.md#glyph-selection) | Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean. |
+| 167 | FX 1 Param 1 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 168 | FX 1 Param 2 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 169 | FX 1 Param 3 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 170 | FX 1 Param 4 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 171 | FX 1 Param 5 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 172 | FX 1 Param 6 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 173 | FX 1 Param 7 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 174 | FX 1 Param 8 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 175 | FX 1 Param 9 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 176 | FX 1 Param 10 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 177 | FX 1 Param 11 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 178 | FX 1 Param 12 | 0-255 | Meaning depends on FX 1 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 179 | FX 2 Type | 0-34 | [FX Type](#fx_type) |  | [selection](effects.md#glyph-selection) | Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean. |
+| 180 | FX 2 Param 1 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 181 | FX 2 Param 2 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 182 | FX 2 Param 3 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 183 | FX 2 Param 4 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 184 | FX 2 Param 5 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 185 | FX 2 Param 6 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 186 | FX 2 Param 7 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 187 | FX 2 Param 8 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 188 | FX 2 Param 9 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 189 | FX 2 Param 10 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 190 | FX 2 Param 11 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 191 | FX 2 Param 12 | 0-255 | Meaning depends on FX 2 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 192 | FX 3 Type | 0-34 | [FX Type](#fx_type) |  | [selection](effects.md#glyph-selection) | Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean. |
+| 193 | FX 3 Param 1 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 194 | FX 3 Param 2 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 195 | FX 3 Param 3 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 196 | FX 3 Param 4 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 197 | FX 3 Param 5 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 198 | FX 3 Param 6 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 199 | FX 3 Param 7 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 200 | FX 3 Param 8 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 201 | FX 3 Param 9 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 202 | FX 3 Param 10 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 203 | FX 3 Param 11 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 204 | FX 3 Param 12 | 0-255 | Meaning depends on FX 3 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 205 | FX 4 Type | 0-34 | [FX Type](#fx_type) |  | [selection](effects.md#glyph-selection) | Chooses which algorithm this engine runs, which is what decides what its twelve parameter bytes mean. |
+| 206 | FX 4 Param 1 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 207 | FX 4 Param 2 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 208 | FX 4 Param 3 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 209 | FX 4 Param 4 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 210 | FX 4 Param 5 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 211 | FX 4 Param 6 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 212 | FX 4 Param 7 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 213 | FX 4 Param 8 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 214 | FX 4 Param 9 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 215 | FX 4 Param 10 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 216 | FX 4 Param 11 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 217 | FX 4 Param 12 | 0-255 | Meaning depends on FX 4 Type |  |  | One of the engine's twelve parameter bytes. What it controls depends on the algorithm the engine is running, so on its own it has no meaning to show. |
+| 218 | FX 1 Output Gain | 0-150 |  |  | [level](effects.md#glyph-level) | Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output. |
+| 219 | FX 2 Output Gain | 0-150 |  |  | [level](effects.md#glyph-level) | Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output. |
+| 220 | FX 3 Output Gain | 0-150 |  |  | [level](effects.md#glyph-level) | Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output. |
+| 221 | FX 4 Output Gain | 0-150 |  |  | [level](effects.md#glyph-level) | Sets how much of this engine's output carries on, which for some routings is into the next engine and for others is to the instrument's output. |
+| 222 | FX Mode | 0-2 | [FX Mode](#fx_mode) |  | [selection](effects.md#glyph-selection) | Chooses what the effects do to the two signal paths: sit in the chain, be fed from a send alongside it, or be bypassed. |
 
 ### Program
 
-| Offset | Parameter | Raw | Values | Shows as | What it does |
-|---|---|---|---|---|---|
-| 223 | Program Name Char 1 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 224 | Program Name Char 2 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 225 | Program Name Char 3 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 226 | Program Name Char 4 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 227 | Program Name Char 5 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 228 | Program Name Char 6 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 229 | Program Name Char 7 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 230 | Program Name Char 8 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 231 | Program Name Char 9 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 232 | Program Name Char 10 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 233 | Program Name Char 11 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 234 | Program Name Char 12 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 235 | Program Name Char 13 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 236 | Program Name Char 14 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 237 | Program Name Char 15 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 238 | Program Name Char 16 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 239 | Program Name Char 17 | 0-127 | Null-terminated 16 char ASCII string |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
-| 240 | Program Category | 0-16 | [Program Category](#program_category) |  | Tags the program with the kind of sound it is, which is what the instrument's own browser sorts and filters on. |
-| 241 | Program Transpose | 80-176 | -48 (80) ... 0 (128) ... +48 (176) |  | Shifts the whole program in semitones, either side of its centre. |
+| Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |
+|---|---|---|---|---|---|---|
+| 223 | Program Name Char 1 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 224 | Program Name Char 2 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 225 | Program Name Char 3 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 226 | Program Name Char 4 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 227 | Program Name Char 5 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 228 | Program Name Char 6 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 229 | Program Name Char 7 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 230 | Program Name Char 8 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 231 | Program Name Char 9 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 232 | Program Name Char 10 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 233 | Program Name Char 11 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 234 | Program Name Char 12 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 235 | Program Name Char 13 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 236 | Program Name Char 14 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 237 | Program Name Char 15 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 238 | Program Name Char 16 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 239 | Program Name Char 17 | 0-127 | Null-terminated 16 char ASCII string |  |  | One byte of the program's name, as an ASCII code: sixteen printable characters at most, and a zero where the name ends. |
+| 240 | Program Category | 0-16 | [Program Category](#program_category) |  | [selection](effects.md#glyph-selection) | Tags the program with the kind of sound it is, which is what the instrument's own browser sorts and filters on. |
+| 241 | Program Transpose | 80-176 | -48 (80) ... 0 (128) ... +48 (176) |  | [pitch](effects.md#glyph-pitch) | Shifts the whole program in semitones, either side of its centre. |
 
 <!-- /generated:parameters -->
 

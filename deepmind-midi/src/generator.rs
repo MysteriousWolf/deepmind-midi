@@ -754,6 +754,12 @@ pub fn envelope(program: &Program, which: EnvelopeId) -> Generator {
 /// A program whose shape byte names no shape is drawn as a sine, which is the
 /// byte the instrument ships at.
 ///
+/// Each shape starts where its own geometry begins: a sine at its rest and
+/// rising, so that one cycle of it reads as a sine and not as a hill; a ramp
+/// and a triangle at their bottom; a square at its top. Where the instrument
+/// itself starts a key-synced cycle is not printed, so this is a drawing
+/// convention and [`Generator::anchored`] is the only claim made about phase 0.
+///
 /// # What is read
 ///
 /// The shape byte, and three of the four beside it:
@@ -1400,10 +1406,12 @@ impl Lfo {
 /// Returns one cycle of an LFO shape, as `0..=1`.
 fn shape_at(shape: LfoShape, t: f32) -> f32 {
     match shape {
-        // Starting at the bottom rather than the middle, so that every shape in
-        // the table begins where the others do and a host can draw them side by
-        // side without one appearing shifted.
-        LfoShape::Sine => 0.5 - 0.5 * math::cos_turns(t),
+        // A sine starts where it rests and rises: the middle, then the top a
+        // quarter of the way round. Started at the bottom instead, one cycle of
+        // it is a hill, and a hill is not what anybody recognises a sine by.
+        // The ramps and the triangle start at their bottom because that is
+        // where their own geometry begins.
+        LfoShape::Sine => 0.5 + 0.5 * math::sin_turns(t),
         LfoShape::Triangle => {
             let t = wrap(t);
             if t < 0.5 { t * 2.0 } else { 2.0 - t * 2.0 }
@@ -1756,7 +1764,21 @@ mod tests {
             close(cycles, expected, "one mark per cycle");
         }
 
-        // The shapes the manual names by their geometry are that geometry.
+        // The shapes the manual names by their geometry are that geometry. A
+        // sine leaves its rest going up and is recognised by that: started at
+        // the bottom, one cycle of it is a hill.
+        program.set_lfo1_shape(LfoShape::Sine);
+        let sine = lfo(&program, LfoId::One);
+        close(sine.at(0.0), 0.5, "a sine starts at its rest");
+        close(
+            sine.at(0.25),
+            1.0,
+            "and reaches the top a quarter of the way round",
+        );
+        close(sine.at(0.5), 0.5, "back through the middle");
+        close(sine.at(0.75), 0.0, "and the bottom three quarters round");
+        close(sine.at(1.0), 0.5, "to end where it began");
+
         program.set_lfo1_shape(LfoShape::RampUp);
         let up = lfo(&program, LfoId::One);
         assert!(up.at(0.0) < up.at(0.5) && up.at(0.5) < up.at(1.0));

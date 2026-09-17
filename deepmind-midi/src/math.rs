@@ -169,6 +169,10 @@ pub(crate) fn sin_turns(turns: f32) -> f32 {
 }
 
 /// Cosine of `turns` full turns.
+///
+/// Nothing drawn uses it since the sine started at its rest; the effect marks'
+/// arc checks still do, so it stays for them.
+#[cfg(test)]
 pub(crate) fn cos_turns(turns: f32) -> f32 {
     sin_turns(turns + 0.25)
 }
