@@ -38,11 +38,18 @@ what the instrument prints over each of its own faders, where an effect's
 controls sit and what colour its panel is, how the four effect engines are
 wired, and which parameters are read about a centre rather than from the bottom
 of their range. `generator` goes one step further and publishes the shapes a
-set of parameters makes — the envelope, the LFO wave, the filter response, the
-arpeggiator's gates — as functions a host samples into its own screen, saying
-in the type where an axis is published and where it is only an ordering. The `descriptions` feature adds a sentence per parameter and per
-effect slot saying what the control does; leaving it off keeps that prose out of
-an embedded build.
+set of parameters makes — the envelopes, the LFO waves and fades, the two
+filter responses, what each oscillator is putting out, the arpeggiator's gates
+— as functions a host samples into its own screen, saying in the type where an
+axis is published and where it is only an ordering, where the shape rests, and
+where along it the things a player is editing fall. The modulation sources say
+which way they swing and carry a dot-matrix cell each, so a patch bay can be
+drawn in pictures; every effect slot, most parameters and the standard
+controllers carry a glyph of what they do, so a tiny display can show a
+picture and a bar; and each effect has a mark, its family's or a finer one of
+its own, and the characters that say what kind of thing it is. The `descriptions` feature adds a sentence per parameter and
+per effect slot saying what the control does; leaving it off keeps that prose
+out of an embedded build.
 
 **Status: early.** Every layer is implemented and tested against the manual:
 MIDI decoding, SysEx, the 242-parameter table, the 35 effect panels, the

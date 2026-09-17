@@ -9,6 +9,7 @@ use super::{
     Panel, Pixels, Point, Quantity, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
+use crate::pixels::Glyph;
 
 /// Number of effect algorithms the newest firmware offers.
 ///
@@ -110,7 +111,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "TC Deep Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: None,
         slots: &TC_DEEP_VRB,
+        characters: &TC_DEEP_VRB_CHARACTERS,
     },
     Algorithm {
         index: 1,
@@ -118,7 +121,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Ambient Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: None,
         slots: &AMB_VERB,
+        characters: &AMB_VERB_CHARACTERS,
     },
     Algorithm {
         index: 2,
@@ -126,7 +131,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Room Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(0),
         slots: &ROOM_REV,
+        characters: &ROOM_REV_CHARACTERS,
     },
     Algorithm {
         index: 3,
@@ -134,7 +141,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Vintage Room Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(0),
         slots: &VINTAGE_REV,
+        characters: &VINTAGE_REV_CHARACTERS,
     },
     Algorithm {
         index: 4,
@@ -142,7 +151,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Hall Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(1),
         slots: &HALL_REV,
+        characters: &HALL_REV_CHARACTERS,
     },
     Algorithm {
         index: 5,
@@ -150,7 +161,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Chamber Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(0),
         slots: &CHAMBER_REV,
+        characters: &CHAMBER_REV_CHARACTERS,
     },
     Algorithm {
         index: 6,
@@ -158,7 +171,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Plate Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(2),
         slots: &PLATE_REV,
+        characters: &PLATE_REV_CHARACTERS,
     },
     Algorithm {
         index: 7,
@@ -166,7 +181,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Rich Plate Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(2),
         slots: &RICH_PLT_REV,
+        characters: &RICH_PLT_REV_CHARACTERS,
     },
     Algorithm {
         index: 8,
@@ -174,7 +191,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Gated Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(3),
         slots: &GATED_REV,
+        characters: &GATED_REV_CHARACTERS,
     },
     Algorithm {
         index: 9,
@@ -182,7 +201,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Reverse Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(4),
         slots: &REVERSE,
+        characters: &REVERSE_CHARACTERS,
     },
     Algorithm {
         index: 10,
@@ -190,7 +211,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Chorus and Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(5),
         slots: &CHORUS_VERB,
+        characters: &CHORUS_VERB_CHARACTERS,
     },
     Algorithm {
         index: 11,
@@ -198,7 +221,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Delay and Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(6),
         slots: &DELAY_VERB,
+        characters: &DELAY_VERB_CHARACTERS,
     },
     Algorithm {
         index: 12,
@@ -206,7 +231,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Flanger and Reverb",
         category: "Reverb",
         family: Family::Reverb,
+        variant: Some(5),
         slots: &FLANG_VERB,
+        characters: &FLANG_VERB_CHARACTERS,
     },
     Algorithm {
         index: 13,
@@ -214,7 +241,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Midas Equaliser",
         category: "Processing",
         family: Family::Filter,
+        variant: Some(14),
         slots: &MIDAS_EQ,
+        characters: &MIDAS_EQ_CHARACTERS,
     },
     Algorithm {
         index: 14,
@@ -222,7 +251,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Enhancing EQ",
         category: "Processing",
         family: Family::Filter,
+        variant: Some(14),
         slots: &ENHANCER,
+        characters: &ENHANCER_CHARACTERS,
     },
     Algorithm {
         index: 15,
@@ -230,7 +261,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Compressor",
         category: "Processing",
         family: Family::Dynamics,
+        variant: None,
         slots: &FAIR_COMP,
+        characters: &FAIR_COMP_CHARACTERS,
     },
     Algorithm {
         index: 16,
@@ -238,7 +271,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Multiband Distortion",
         category: "Processing",
         family: Family::Distortion,
+        variant: Some(18),
         slots: &MUL_BND_DIST,
+        characters: &MUL_BND_DIST_CHARACTERS,
     },
     Algorithm {
         index: 17,
@@ -246,7 +281,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Rack Amplifier",
         category: "Processing",
         family: Family::Distortion,
+        variant: Some(17),
         slots: &RACK_AMP,
+        characters: &RACK_AMP_CHARACTERS,
     },
     Algorithm {
         index: 18,
@@ -254,7 +291,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Stereo Imaging",
         category: "Processing",
         family: Family::Imaging,
+        variant: None,
         slots: &EDISON_EX1,
+        characters: &EDISON_EX1_CHARACTERS,
     },
     Algorithm {
         index: 19,
@@ -262,7 +301,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Auto Panning",
         category: "Processing",
         family: Family::Imaging,
+        variant: Some(19),
         slots: &AUTO_PAN,
+        characters: &AUTO_PAN_CHARACTERS,
     },
     Algorithm {
         index: 20,
@@ -270,7 +311,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Noise Gate",
         category: "Processing",
         family: Family::Dynamics,
+        variant: Some(16),
         slots: &NOISE_GATE,
+        characters: &NOISE_GATE_CHARACTERS,
     },
     Algorithm {
         index: 21,
@@ -278,7 +321,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Stereo Delay",
         category: "Delay",
         family: Family::Delay,
+        variant: None,
         slots: &DELAY,
+        characters: &DELAY_CHARACTERS,
     },
     Algorithm {
         index: 22,
@@ -286,7 +331,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "3-Tap Delay",
         category: "Delay",
         family: Family::Delay,
+        variant: None,
         slots: &THREE_TAP_DELAY,
+        characters: &THREE_TAP_DELAY_CHARACTERS,
     },
     Algorithm {
         index: 23,
@@ -294,7 +341,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "4-Tap Delay",
         category: "Delay",
         family: Family::Delay,
+        variant: Some(7),
         slots: &FOUR_TAP_DELAY,
+        characters: &FOUR_TAP_DELAY_CHARACTERS,
     },
     Algorithm {
         index: 24,
@@ -302,7 +351,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Tel-Ray Delay",
         category: "Delay",
         family: Family::Delay,
+        variant: Some(8),
         slots: &T_RAY_DELAY,
+        characters: &T_RAY_DELAY_CHARACTERS,
     },
     Algorithm {
         index: 25,
@@ -310,7 +361,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Decimator Delay",
         category: "Delay",
         family: Family::Delay,
+        variant: Some(9),
         slots: &DECIM_DELAY,
+        characters: &DECIM_DELAY_CHARACTERS,
     },
     Algorithm {
         index: 26,
@@ -318,7 +371,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Modulation, Delay and Reverb",
         category: "Delay",
         family: Family::Delay,
+        variant: Some(10),
         slots: &MOD_DLY_REV,
+        characters: &MOD_DLY_REV_CHARACTERS,
     },
     Algorithm {
         index: 27,
@@ -326,7 +381,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Stereo Chorus",
         category: "Creative",
         family: Family::Modulation,
+        variant: Some(11),
         slots: &CHORUS,
+        characters: &CHORUS_CHARACTERS,
     },
     Algorithm {
         index: 28,
@@ -334,7 +391,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Dimensional Chorus",
         category: "Creative",
         family: Family::Modulation,
+        variant: Some(11),
         slots: &CHORUS_D,
+        characters: &CHORUS_D_CHARACTERS,
     },
     Algorithm {
         index: 29,
@@ -342,7 +401,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Stereo Flanger",
         category: "Creative",
         family: Family::Modulation,
+        variant: Some(12),
         slots: &FLANGER,
+        characters: &FLANGER_CHARACTERS,
     },
     Algorithm {
         index: 30,
@@ -350,7 +411,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Stereo Phaser",
         category: "Creative",
         family: Family::Modulation,
+        variant: Some(13),
         slots: &PHASER,
+        characters: &PHASER_CHARACTERS,
     },
     Algorithm {
         index: 31,
@@ -358,7 +421,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Moog-Type Filter",
         category: "Creative",
         family: Family::Filter,
+        variant: Some(15),
         slots: &MOOD_FILTER,
+        characters: &MOOD_FILTER_CHARACTERS,
     },
     Algorithm {
         index: 32,
@@ -366,7 +431,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Dual Pitch Shifter",
         category: "Creative",
         family: Family::Pitch,
+        variant: Some(20),
         slots: &DUAL_PITCH,
+        characters: &DUAL_PITCH_CHARACTERS,
     },
     Algorithm {
         index: 33,
@@ -374,7 +441,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Dual Pitch Shifter",
         category: "Creative",
         family: Family::Pitch,
+        variant: Some(20),
         slots: &VINTAGE_PITCH,
+        characters: &VINTAGE_PITCH_CHARACTERS,
     },
     Algorithm {
         index: 34,
@@ -382,7 +451,9 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
         full_name: "Rotary Speaker",
         category: "Creative",
         family: Family::Rotary,
+        variant: None,
         slots: &ROTARY_SPKR,
+        characters: &ROTARY_SPKR_CHARACTERS,
     },
 ];
 
@@ -413,6 +484,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -431,6 +503,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -451,6 +524,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Tone,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -471,6 +545,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -491,6 +566,7 @@ static TC_DEEP_VRB: [FxSlot; 5] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -515,6 +591,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -535,6 +612,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -553,6 +631,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -571,6 +650,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -589,6 +669,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Diffusion,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -607,6 +688,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -627,6 +709,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -645,6 +728,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -663,6 +747,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -681,6 +766,7 @@ static AMB_VERB: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -703,6 +789,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -723,6 +810,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -741,6 +829,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -759,6 +848,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -777,6 +867,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Diffusion,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -795,6 +886,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -815,6 +907,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -833,6 +926,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -851,6 +945,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::LowShelf,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -869,6 +964,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -887,6 +983,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Curve,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -905,6 +1002,7 @@ static ROOM_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Rate,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -927,6 +1025,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -947,6 +1046,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -967,6 +1067,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -987,6 +1088,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::LowShelf,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1005,6 +1107,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::HighShelf,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1023,6 +1126,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Diffusion,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1041,6 +1145,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1059,6 +1164,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1077,6 +1183,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1095,6 +1202,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1113,6 +1221,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1133,6 +1242,7 @@ static VINTAGE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Switch,
+        glyph: Glyph::Hold,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1155,6 +1265,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1175,6 +1286,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1193,6 +1305,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1211,6 +1324,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1229,6 +1343,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Diffusion,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1247,6 +1362,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1267,6 +1383,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1285,6 +1402,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1303,6 +1421,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::LowShelf,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1321,6 +1440,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1339,6 +1459,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Curve,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1357,6 +1478,7 @@ static HALL_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1379,6 +1501,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1399,6 +1522,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1417,6 +1541,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1435,6 +1560,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1453,6 +1579,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Diffusion,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1471,6 +1598,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1491,6 +1619,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1509,6 +1638,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1527,6 +1657,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::LowShelf,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1545,6 +1676,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1563,6 +1695,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Curve,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1581,6 +1714,7 @@ static CHAMBER_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Rate,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1603,6 +1737,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1623,6 +1758,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1641,6 +1777,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1659,6 +1796,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1677,6 +1815,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Diffusion,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1695,6 +1834,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1715,6 +1855,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1733,6 +1874,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1751,6 +1893,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::LowShelf,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1769,6 +1912,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Frequency,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1787,6 +1931,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1805,6 +1950,7 @@ static PLATE_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1827,6 +1973,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1847,6 +1994,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1865,6 +2013,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1883,6 +2032,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1901,6 +2051,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Diffusion,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1919,6 +2070,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -1939,6 +2091,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1957,6 +2110,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1975,6 +2129,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::LowShelf,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -1993,6 +2148,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2011,6 +2167,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Attack,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2029,6 +2186,7 @@ static RICH_PLT_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Rate,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2051,6 +2209,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2071,6 +2230,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2089,6 +2249,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Attack,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2107,6 +2268,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Diffusion,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2125,6 +2287,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2143,6 +2306,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2163,6 +2327,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2181,6 +2346,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighShelf,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2201,6 +2367,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::HighShelf,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2221,6 +2388,7 @@ static GATED_REV: [FxSlot; 10] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Diffusion,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2243,6 +2411,7 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2263,6 +2432,7 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2281,6 +2451,7 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Attack,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2299,6 +2470,7 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Diffusion,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2317,6 +2489,7 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2337,6 +2510,7 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2357,6 +2531,7 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2375,6 +2550,7 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighShelf,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2395,6 +2571,7 @@ static REVERSE: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::HighShelf,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2419,6 +2596,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2439,6 +2617,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2457,6 +2636,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2475,6 +2655,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Phase,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2493,6 +2674,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Wave,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2511,6 +2693,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2529,6 +2712,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2549,6 +2733,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2567,6 +2752,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2585,6 +2771,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2603,6 +2790,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2621,6 +2809,7 @@ static CHORUS_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2645,6 +2834,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2665,6 +2855,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2683,6 +2874,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2701,6 +2893,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2719,6 +2912,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2737,6 +2931,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2755,6 +2950,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2775,6 +2971,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2793,6 +2990,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2811,6 +3009,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2829,6 +3028,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2847,6 +3047,7 @@ static DELAY_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -2871,6 +3072,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2891,6 +3093,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2909,6 +3112,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2927,6 +3131,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Phase,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2945,6 +3150,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2963,6 +3169,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -2981,6 +3188,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::PreDelay,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3001,6 +3209,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3019,6 +3228,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Size,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3037,6 +3247,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3055,6 +3266,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3073,6 +3285,7 @@ static FLANG_VERB: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3097,6 +3310,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::LowShelf,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3115,6 +3329,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowShelf,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3133,6 +3348,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Bell,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3151,6 +3367,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3169,6 +3386,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Resonance,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3187,6 +3405,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Bell,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3205,6 +3424,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Frequency,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3223,6 +3443,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Resonance,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3241,6 +3462,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::HighShelf,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3259,6 +3481,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighShelf,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3277,6 +3500,7 @@ static MIDAS_EQ: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Switch,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3299,6 +3523,7 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3317,6 +3542,7 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3335,6 +3561,7 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::LowShelf,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3353,6 +3580,7 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowShelf,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3371,6 +3599,7 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Bell,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3389,6 +3618,7 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Resonance,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3407,6 +3637,7 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::HighShelf,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3425,6 +3656,7 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3443,6 +3675,7 @@ static ENHANCER: [FxSlot; 9] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3465,6 +3698,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3483,6 +3717,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3501,6 +3736,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Threshold,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3519,6 +3755,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3537,6 +3774,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Ratio,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3557,6 +3795,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3575,6 +3814,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Ratio,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3593,6 +3833,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3611,6 +3852,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Threshold,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3629,6 +3871,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3647,6 +3890,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Ratio,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3667,6 +3911,7 @@ static FAIR_COMP: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3689,6 +3934,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3707,6 +3953,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3727,6 +3974,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3745,6 +3993,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Drive,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3763,6 +4012,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Frequency,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3781,6 +4031,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3801,6 +4052,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Drive,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3821,6 +4073,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Frequency,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3839,6 +4092,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3857,6 +4111,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Drive,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3877,6 +4132,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3897,6 +4153,7 @@ static MUL_BND_DIST: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -3919,6 +4176,7 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Level,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3939,6 +4197,7 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Drive,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3957,6 +4216,7 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Drive,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3975,6 +4235,7 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Drive,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -3995,6 +4256,7 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Drive,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4013,6 +4275,7 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4031,6 +4294,7 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Tone,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4051,6 +4315,7 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Tone,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4071,6 +4336,7 @@ static RACK_AMP: [FxSlot; 9] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Cabinet,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4093,6 +4359,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: false,
         enable: true,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4111,6 +4378,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4129,6 +4397,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4147,6 +4416,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4165,6 +4435,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4183,6 +4454,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Pan,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4201,6 +4473,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Size,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4219,6 +4492,7 @@ static EDISON_EX1: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4241,6 +4515,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4259,6 +4534,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Phase,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4277,6 +4553,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Wave,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4295,6 +4572,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4313,6 +4591,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Rate,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4331,6 +4610,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4349,6 +4629,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Attack,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4367,6 +4648,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Hold,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4385,6 +4667,7 @@ static AUTO_PAN: [FxSlot; 9] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Release,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4407,6 +4690,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Threshold,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4425,6 +4709,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4445,6 +4730,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Attack,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4463,6 +4749,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Release,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4483,6 +4770,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Hold,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4501,6 +4789,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Drive,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4521,6 +4810,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4539,6 +4829,7 @@ static NOISE_GATE: [FxSlot; 8] = [
         modulatable: false,
         enable: true,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4561,6 +4852,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4581,6 +4873,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4601,6 +4894,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4623,6 +4917,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4643,6 +4938,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4661,6 +4957,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4679,6 +4976,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4699,6 +4997,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4719,6 +5018,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4737,6 +5037,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4755,6 +5056,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4773,6 +5075,7 @@ static DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4795,6 +5098,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4815,6 +5119,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4833,6 +5138,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Pan,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4851,6 +5157,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4871,6 +5178,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4889,6 +5197,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -4907,6 +5216,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Pan,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4927,6 +5237,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4945,6 +5256,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4963,6 +5275,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Pan,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4981,6 +5294,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -4999,6 +5313,7 @@ static THREE_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5023,6 +5338,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5043,6 +5359,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5061,6 +5378,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5079,6 +5397,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5099,6 +5418,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5117,6 +5437,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5137,6 +5458,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5155,6 +5477,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5175,6 +5498,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5193,6 +5517,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5211,6 +5536,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5229,6 +5555,7 @@ static FOUR_TAP_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5253,6 +5580,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5273,6 +5601,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5291,6 +5620,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Hold,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5311,6 +5641,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Detune,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5331,6 +5662,7 @@ static T_RAY_DELAY: [FxSlot; 5] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Tone,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5353,6 +5685,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5373,6 +5706,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5393,6 +5727,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Steps,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5413,6 +5748,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5433,6 +5769,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5451,6 +5788,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Steps,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5469,6 +5807,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5489,6 +5828,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Resonance,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5507,6 +5847,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5525,6 +5866,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5543,6 +5885,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5561,6 +5904,7 @@ static DECIM_DELAY: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Switch,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5585,6 +5929,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5607,6 +5952,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Tap,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5625,6 +5971,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5643,6 +5990,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5661,6 +6009,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5679,6 +6028,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5699,6 +6049,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5717,6 +6068,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5735,6 +6087,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Decay,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5753,6 +6106,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5771,6 +6125,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Mix,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5789,6 +6144,7 @@ static MOD_DLY_REV: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5813,6 +6169,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5833,6 +6190,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5851,6 +6209,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Depth,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5869,6 +6228,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5887,6 +6247,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5905,6 +6266,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -5925,6 +6287,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5943,6 +6306,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5961,6 +6325,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Phase,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5979,6 +6344,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Wave,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -5999,6 +6365,7 @@ static CHORUS: [FxSlot; 11] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Spread,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6023,6 +6390,7 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         enable: true,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6041,6 +6409,7 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6059,6 +6428,7 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6079,6 +6449,7 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6097,6 +6468,7 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6115,6 +6487,7 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6133,6 +6506,7 @@ static CHORUS_D: [FxSlot; 7] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6155,6 +6529,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6175,6 +6550,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6193,6 +6569,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Depth,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6211,6 +6588,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6229,6 +6607,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6247,6 +6626,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6267,6 +6647,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6285,6 +6666,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6303,6 +6685,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Phase,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6321,6 +6704,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::LowCut,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6339,6 +6723,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6357,6 +6742,7 @@ static FLANGER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6379,6 +6765,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6399,6 +6786,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6417,6 +6805,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Resonance,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6435,6 +6824,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6453,6 +6843,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Steps,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6471,6 +6862,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6491,6 +6883,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Wave,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6509,6 +6902,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Phase,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6527,6 +6921,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6545,6 +6940,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Attack,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6563,6 +6959,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Hold,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6581,6 +6978,7 @@ static PHASER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Release,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6603,6 +7001,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6623,6 +7022,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6641,6 +7041,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Shape,
+        glyph: Glyph::Resonance,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6659,6 +7060,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Frequency,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6677,6 +7079,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Selection,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6697,6 +7100,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6719,6 +7123,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Selection,
+        glyph: Glyph::Wave,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6739,6 +7144,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Depth,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6757,6 +7163,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Attack,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6775,6 +7182,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Release,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6793,6 +7201,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Drive,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6811,6 +7220,7 @@ static MOOD_FILTER: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6833,6 +7243,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Pitch,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6851,6 +7262,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Detune,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6869,6 +7281,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6889,6 +7302,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6907,6 +7321,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Pan,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6925,6 +7340,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -6945,6 +7361,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Pitch,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6963,6 +7380,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Detune,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -6981,6 +7399,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7001,6 +7420,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Gain,
+        glyph: Glyph::Level,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7019,6 +7439,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Pan,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7037,6 +7458,7 @@ static DUAL_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7061,6 +7483,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Pitch,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7079,6 +7502,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Detune,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7097,6 +7521,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7117,6 +7542,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7135,6 +7561,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Pan,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7153,6 +7580,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7173,6 +7601,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Pitch,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7191,6 +7620,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Detune,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7209,6 +7639,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: false,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Time,
         column: 2,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7229,6 +7660,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Feedback,
+        glyph: Glyph::Feedback,
         column: 3,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7247,6 +7679,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Pan,
         column: 4,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7265,6 +7698,7 @@ static VINTAGE_PITCH: [FxSlot; 12] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::HighCut,
         column: 5,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7289,6 +7723,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 0,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7307,6 +7742,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 1,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7327,6 +7763,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Time,
+        glyph: Glyph::Curve,
         column: 2,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7347,6 +7784,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Size,
         column: 3,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7367,6 +7805,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Position,
+        glyph: Glyph::Pan,
         column: 4,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7387,6 +7826,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Depth,
+        glyph: Glyph::Mix,
         column: 5,
         row: 0,
         #[cfg(feature = "descriptions")]
@@ -7407,6 +7847,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Switch,
+        glyph: Glyph::Switch,
         column: 0,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -7425,6 +7866,7 @@ static ROTARY_SPKR: [FxSlot; 8] = [
         modulatable: true,
         enable: false,
         quantity: Quantity::Frequency,
+        glyph: Glyph::Rate,
         column: 1,
         row: 1,
         #[cfg(feature = "descriptions")]
@@ -8432,8 +8874,540 @@ static MARK_ROTARY: [Stroke; 2] = [
     },
 ];
 
-/// Side of the one-bit grid each family's mark is drawn again on.
-pub const MARK_PIXEL_SIDE: usize = 7;
+/// The family's source and its wavefront, and the wall they meet: a corner at the right.
+static VARIANT_ROOM_STROKES: [Stroke; 3] = [
+    Stroke::Dot {
+        centre: Point::new(0.15, 0.5),
+        radius: 0.06,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.3,
+        start: -0.15,
+        sweep: 0.3,
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.62, 0.12),
+            Point::new(0.88, 0.12),
+            Point::new(0.88, 0.88),
+            Point::new(0.62, 0.88),
+        ],
+    },
+];
+
+/// The family's wavefronts a long way from their source: a big space.
+static VARIANT_HALL_STROKES: [Stroke; 3] = [
+    Stroke::Dot {
+        centre: Point::new(0.15, 0.5),
+        radius: 0.06,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.56,
+        start: -0.11,
+        sweep: 0.22,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.8,
+        start: -0.075,
+        sweep: 0.15,
+    },
+];
+
+/// The family's wavefronts leaving a plate rather than a point.
+static VARIANT_PLATE_STROKES: [Stroke; 3] = [
+    Stroke::Line {
+        points: &[Point::new(0.14, 0.14), Point::new(0.14, 0.86)],
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.3,
+        start: -0.15,
+        sweep: 0.3,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.62,
+        start: -0.11,
+        sweep: 0.22,
+    },
+];
+
+/// The family's source and wavefront, and a wall the tail stops at.
+static VARIANT_GATED_STROKES: [Stroke; 3] = [
+    Stroke::Dot {
+        centre: Point::new(0.15, 0.5),
+        radius: 0.06,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.3,
+        start: -0.15,
+        sweep: 0.3,
+    },
+    Stroke::Line {
+        points: &[Point::new(0.72, 0.12), Point::new(0.72, 0.88)],
+    },
+];
+
+/// The family's mark turned round: wavefronts closing in on the source.
+static VARIANT_REVERSE_STROKES: [Stroke; 3] = [
+    Stroke::Dot {
+        centre: Point::new(0.85, 0.5),
+        radius: 0.06,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.9, 0.5),
+        radius: 0.3,
+        start: 0.35,
+        sweep: 0.3,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.9, 0.5),
+        radius: 0.62,
+        start: 0.39,
+        sweep: 0.22,
+    },
+];
+
+/// The family's wavefronts leaving a wave rather than a point: a chorus or a flanger in front of a reverb.
+static VARIANT_CHORUSED_STROKES: [Stroke; 3] = [
+    Stroke::Wave {
+        start: Point::new(0.08, 0.5),
+        end: Point::new(0.32, 0.5),
+        amplitude: 0.12,
+        cycles: 1.0,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.3,
+        start: -0.15,
+        sweep: 0.3,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.1, 0.5),
+        radius: 0.62,
+        start: -0.11,
+        sweep: 0.22,
+    },
+];
+
+/// The family's source twice, a repeat beside it, and the wavefronts leaving both.
+static VARIANT_REPEATED_STROKES: [Stroke; 4] = [
+    Stroke::Dot {
+        centre: Point::new(0.15, 0.5),
+        radius: 0.06,
+    },
+    Stroke::Dot {
+        centre: Point::new(0.33, 0.5),
+        radius: 0.06,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.22, 0.5),
+        radius: 0.3,
+        start: -0.15,
+        sweep: 0.3,
+    },
+    Stroke::Arc {
+        centre: Point::new(0.22, 0.5),
+        radius: 0.58,
+        start: -0.11,
+        sweep: 0.22,
+    },
+];
+
+/// The family's falling marks, four of them.
+static VARIANT_FOUR_TAPS_STROKES: [Stroke; 4] = [
+    Stroke::Line {
+        points: &[Point::new(0.1, 0.12), Point::new(0.1, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.37, 0.36), Point::new(0.37, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.63, 0.58), Point::new(0.63, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.9, 0.74), Point::new(0.9, 0.88)],
+    },
+];
+
+/// A can going round and the family's repeats coming off it: a ring, then two falling marks.
+static VARIANT_OIL_CAN_STROKES: [Stroke; 3] = [
+    Stroke::Arc {
+        centre: Point::new(0.28, 0.5),
+        radius: 0.2,
+        start: 0.0,
+        sweep: 1.0,
+    },
+    Stroke::Line {
+        points: &[Point::new(0.64, 0.4), Point::new(0.64, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.88, 0.66), Point::new(0.88, 0.88)],
+    },
+];
+
+/// The family's repeats with their tops joined in steps: repeats that come out coarser.
+static VARIANT_DECIMATED_STROKES: [Stroke; 4] = [
+    Stroke::Line {
+        points: &[Point::new(0.14, 0.12), Point::new(0.14, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.5, 0.4), Point::new(0.5, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.86, 0.66), Point::new(0.86, 0.88)],
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.14, 0.12),
+            Point::new(0.32, 0.12),
+            Point::new(0.32, 0.4),
+            Point::new(0.68, 0.4),
+            Point::new(0.68, 0.66),
+            Point::new(0.86, 0.66),
+        ],
+    },
+];
+
+/// Two of the family's repeats and a wavefront leaving the last: a delay in front of a reverb.
+static VARIANT_INTO_REVERB_STROKES: [Stroke; 3] = [
+    Stroke::Line {
+        points: &[Point::new(0.14, 0.12), Point::new(0.14, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.44, 0.4), Point::new(0.44, 0.88)],
+    },
+    Stroke::Arc {
+        centre: Point::new(0.44, 0.6),
+        radius: 0.34,
+        start: -0.14,
+        sweep: 0.28,
+    },
+];
+
+/// The family's wave twice, one under the other: a voice and its copy a little apart.
+static VARIANT_DOUBLED_STROKES: [Stroke; 2] = [
+    Stroke::Wave {
+        start: Point::new(0.08, 0.32),
+        end: Point::new(0.92, 0.32),
+        amplitude: 0.18,
+        cycles: 1.5,
+    },
+    Stroke::Wave {
+        start: Point::new(0.08, 0.68),
+        end: Point::new(0.92, 0.68),
+        amplitude: 0.18,
+        cycles: 1.5,
+    },
+];
+
+/// The family's wave and its inverse through each other: a copy fed back against the original.
+static VARIANT_BRAIDED_STROKES: [Stroke; 3] = [
+    Stroke::Wave {
+        start: Point::new(0.08, 0.5),
+        end: Point::new(0.92, 0.5),
+        amplitude: 0.36,
+        cycles: 1.0,
+    },
+    Stroke::Wave {
+        start: Point::new(0.5, 0.5),
+        end: Point::new(0.08, 0.5),
+        amplitude: 0.36,
+        cycles: 0.5,
+    },
+    Stroke::Wave {
+        start: Point::new(0.5, 0.5),
+        end: Point::new(0.92, 0.5),
+        amplitude: 0.36,
+        cycles: 0.5,
+    },
+];
+
+/// A level with two notches cut into it: the family's sweep, seen as the response it leaves.
+static VARIANT_NOTCHED_STROKES: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.34),
+        Point::new(0.2, 0.34),
+        Point::new(0.3, 0.7),
+        Point::new(0.4, 0.34),
+        Point::new(0.6, 0.34),
+        Point::new(0.7, 0.7),
+        Point::new(0.8, 0.34),
+        Point::new(0.92, 0.34),
+    ],
+}];
+
+/// A level with a band lifted and a band cut: the family's corner, made into bands.
+static VARIANT_EQUALISER_STROKES: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.5),
+        Point::new(0.2, 0.5),
+        Point::new(0.32, 0.22),
+        Point::new(0.44, 0.5),
+        Point::new(0.56, 0.5),
+        Point::new(0.68, 0.78),
+        Point::new(0.8, 0.5),
+        Point::new(0.92, 0.5),
+    ],
+}];
+
+/// The family's corner with a peak standing up before the fall.
+static VARIANT_RESONANT_STROKES: [Stroke; 1] = [Stroke::Line {
+    points: &[
+        Point::new(0.08, 0.44),
+        Point::new(0.34, 0.44),
+        Point::new(0.48, 0.14),
+        Point::new(0.6, 0.52),
+        Point::new(0.92, 0.86),
+    ],
+}];
+
+/// The family's floor and a level over it, with what falls under the line stopped.
+static VARIANT_GATE_STROKES: [Stroke; 4] = [
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.88), Point::new(0.92, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.6), Point::new(0.92, 0.6)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.34, 0.12), Point::new(0.34, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.66, 0.7), Point::new(0.66, 0.88)],
+    },
+];
+
+/// A cabinet: a box with a driver in it.
+static VARIANT_AMPLIFIER_STROKES: [Stroke; 2] = [
+    Stroke::Line {
+        points: &[
+            Point::new(0.12, 0.14),
+            Point::new(0.88, 0.14),
+            Point::new(0.88, 0.86),
+            Point::new(0.12, 0.86),
+            Point::new(0.12, 0.14),
+        ],
+    },
+    Stroke::Arc {
+        centre: Point::new(0.5, 0.5),
+        radius: 0.2,
+        start: 0.0,
+        sweep: 1.0,
+    },
+];
+
+/// The family's driven levels as three bands standing on a floor.
+static VARIANT_BANDED_STROKES: [Stroke; 4] = [
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.88), Point::new(0.92, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.2, 0.54), Point::new(0.2, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.5, 0.14), Point::new(0.5, 0.88)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.8, 0.36), Point::new(0.8, 0.88)],
+    },
+];
+
+/// The family's span with a wave along it: a position that moves.
+static VARIANT_PANNING_STROKES: [Stroke; 3] = [
+    Stroke::Wave {
+        start: Point::new(0.08, 0.5),
+        end: Point::new(0.92, 0.5),
+        amplitude: 0.16,
+        cycles: 1.0,
+    },
+    Stroke::Line {
+        points: &[Point::new(0.08, 0.28), Point::new(0.08, 0.72)],
+    },
+    Stroke::Line {
+        points: &[Point::new(0.92, 0.28), Point::new(0.92, 0.72)],
+    },
+];
+
+/// The family's step twice, one up and one down from the note.
+static VARIANT_TWO_INTERVALS_STROKES: [Stroke; 2] = [
+    Stroke::Line {
+        points: &[
+            Point::new(0.08, 0.5),
+            Point::new(0.42, 0.5),
+            Point::new(0.42, 0.2),
+            Point::new(0.92, 0.2),
+        ],
+    },
+    Stroke::Line {
+        points: &[
+            Point::new(0.42, 0.5),
+            Point::new(0.42, 0.8),
+            Point::new(0.92, 0.8),
+        ],
+    },
+];
+
+/// Number of marks drawn for a kind of effect within a family.
+pub const VARIANT_COUNT: usize = 21;
+
+/// The mark for each variant, in the order `spec/marks.toml` draws them.
+pub(super) static VARIANTS: [Mark; VARIANT_COUNT] = [
+    // Room: RoomRev, ChamberRev, VintageRev.
+    Mark {
+        strokes: &VARIANT_ROOM_STROKES,
+        pixels: Pixels::new([
+            0b110_0000, 0b100_0100, 0b100_1000, 0b100_1001, 0b100_1000, 0b100_0100, 0b110_0000,
+        ]),
+    },
+    // Hall: HallRev.
+    Mark {
+        strokes: &VARIANT_HALL_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b010_0000, 0b101_0000, 0b101_0001, 0b101_0000, 0b010_0000, 0b000_0000,
+        ]),
+    },
+    // Plate: PlateRev, RichPltRev.
+    Mark {
+        strokes: &VARIANT_PLATE_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b001_0101, 0b010_1001, 0b010_1001, 0b010_1001, 0b001_0101, 0b000_0000,
+        ]),
+    },
+    // Gated: GatedRev.
+    Mark {
+        strokes: &VARIANT_GATED_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b010_0100, 0b010_1000, 0b010_1001, 0b010_1000, 0b010_0100, 0b000_0000,
+        ]),
+    },
+    // Reverse: Reverse.
+    Mark {
+        strokes: &VARIANT_REVERSE_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b001_0100, 0b000_1010, 0b100_1010, 0b000_1010, 0b001_0100, 0b000_0000,
+        ]),
+    },
+    // Chorused: ChorusVerb, FlangVerb.
+    Mark {
+        strokes: &VARIANT_CHORUSED_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b001_0100, 0b010_1001, 0b010_1010, 0b010_1000, 0b001_0100, 0b000_0000,
+        ]),
+    },
+    // Repeated: DelayVerb.
+    Mark {
+        strokes: &VARIANT_REPEATED_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b010_1000, 0b101_0000, 0b101_0101, 0b101_0000, 0b010_1000, 0b000_0000,
+        ]),
+    },
+    // Four taps: 4TapDelay.
+    Mark {
+        strokes: &VARIANT_FOUR_TAPS_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0001, 0b000_0001, 0b000_0101, 0b000_0101, 0b001_0101, 0b101_0101,
+        ]),
+    },
+    // Oil can: T-RayDelay.
+    Mark {
+        strokes: &VARIANT_OIL_CAN_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0010, 0b000_0101, 0b001_0101, 0b001_0101, 0b101_0010, 0b101_0000,
+        ]),
+    },
+    // Decimated: DecimDelay.
+    Mark {
+        strokes: &VARIANT_DECIMATED_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0011, 0b000_1101, 0b000_1001, 0b011_1001, 0b100_1001, 0b100_1001,
+        ]),
+    },
+    // Into reverb: ModDlyRev.
+    Mark {
+        strokes: &VARIANT_INTO_REVERB_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0001, 0b010_0001, 0b100_1001, 0b100_1001, 0b010_1001, 0b000_1001,
+        ]),
+    },
+    // Doubled: Chorus, Chorus-D.
+    Mark {
+        strokes: &VARIANT_DOUBLED_STROKES,
+        pixels: Pixels::new([
+            0b000_0010, 0b101_0101, 0b010_1000, 0b000_0000, 0b000_0010, 0b101_0101, 0b010_1000,
+        ]),
+    },
+    // Braided: Flanger.
+    Mark {
+        strokes: &VARIANT_BRAIDED_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b011_0110, 0b100_1001, 0b100_1001, 0b011_0110, 0b000_0000, 0b000_0000,
+        ]),
+    },
+    // Notched: Phaser.
+    Mark {
+        strokes: &VARIANT_NOTCHED_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b101_1101, 0b010_0010, 0b010_0010, 0b000_0000, 0b000_0000, 0b000_0000,
+        ]),
+    },
+    // Equaliser: MidasEQ, Enhancer.
+    Mark {
+        strokes: &VARIANT_EQUALISER_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0100, 0b000_1010, 0b101_0001, 0b010_0000, 0b000_0000, 0b000_0000,
+        ]),
+    },
+    // Resonant: MoodFilter.
+    Mark {
+        strokes: &VARIANT_RESONANT_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_1000, 0b001_0100, 0b010_0011, 0b100_0000, 0b000_0000, 0b000_0000,
+        ]),
+    },
+    // Gate: NoiseGate.
+    Mark {
+        strokes: &VARIANT_GATE_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0100, 0b000_0100, 0b000_0100, 0b111_1111, 0b001_0100, 0b111_1111,
+        ]),
+    },
+    // Amplifier: RackAmp.
+    Mark {
+        strokes: &VARIANT_AMPLIFIER_STROKES,
+        pixels: Pixels::new([
+            0b111_1111, 0b101_1101, 0b110_0011, 0b110_1011, 0b110_0011, 0b101_1101, 0b111_1111,
+        ]),
+    },
+    // Banded: MulBndDist.
+    Mark {
+        strokes: &VARIANT_BANDED_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_1000, 0b000_1000, 0b010_1000, 0b010_1000, 0b010_1010, 0b111_1111,
+        ]),
+    },
+    // Panning: Auto Pan.
+    Mark {
+        strokes: &VARIANT_PANNING_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b000_0000, 0b100_0101, 0b110_1011, 0b101_0001, 0b000_0000, 0b000_0000,
+        ]),
+    },
+    // Two intervals: DualPitch, Vintage Pitch.
+    Mark {
+        strokes: &VARIANT_TWO_INTERVALS_STROKES,
+        pixels: Pixels::new([
+            0b000_0000, 0b111_1000, 0b000_1000, 0b000_1111, 0b000_1000, 0b111_1000, 0b000_0000,
+        ]),
+    },
+];
+/// Side of the one-bit grid each family's mark is drawn again on, which is
+/// the crate's one pixel grid.
+pub const MARK_PIXEL_SIDE: usize = crate::pixels::SIDE;
 
 /// Each family's name, in the order `Family::ALL` gives them.
 pub(super) static FAMILY_NAMES: [&str; FAMILY_COUNT] = [
@@ -8505,3 +9479,195 @@ pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
         ]),
     },
 ];
+/// Number of characters an algorithm may have.
+pub const CHARACTER_COUNT: usize = 9;
+
+/// What kind of thing an effect is, beside what it does.
+///
+/// A [`Family`] is one per algorithm and says what it does to a signal;
+/// an algorithm has any number of these, and they say what it is like. A host
+/// with four engines on one page has four more ways to tell them apart than
+/// the family gives it: a vintage unit drawn as one, a stereo pair drawn as a
+/// pair, two effects in one engine drawn as two.
+///
+/// Every membership in `spec/characters.toml` carries its reason, and the
+/// reasons are the manual's own name for the effect, the slots it gives it, or
+/// the unit a name refers to. Nothing is a character because of how it sounds.
+/// [`Algorithm::characters`] is how they are read.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum Character {
+    /// Named vintage, or named for a unit from before effects were digital.
+    Vintage,
+    /// Named for a specific product or maker, so its panel is a picture of that unit.
+    Modelled,
+    /// Two channels, with a control per side or a job that is the stereo field itself.
+    Stereo,
+    /// Two of the same processor in one engine, each with its own slots.
+    Dual,
+    /// Splits the signal into bands and treats each on its own.
+    Multiband,
+    /// Two effects in one engine, one after the other.
+    Combined,
+    /// Degrades the signal on purpose.
+    LoFi,
+    /// Something inside it moves on its own: an LFO, a spin or a motor.
+    Modulated,
+    /// Listens to the level of what goes in and moves with it.
+    Dynamic,
+}
+
+impl Character {
+    /// Every character, in the order the specification declares them.
+    pub const ALL: [Self; CHARACTER_COUNT] = [
+        Self::Vintage,
+        Self::Modelled,
+        Self::Stereo,
+        Self::Dual,
+        Self::Multiband,
+        Self::Combined,
+        Self::LoFi,
+        Self::Modulated,
+        Self::Dynamic,
+    ];
+
+    /// Returns the character's name, as the specification writes it.
+    #[must_use]
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Vintage => "Vintage",
+            Self::Modelled => "Modelled",
+            Self::Stereo => "Stereo",
+            Self::Dual => "Dual",
+            Self::Multiband => "Multiband",
+            Self::Combined => "Combined",
+            Self::LoFi => "LoFi",
+            Self::Modulated => "Modulated",
+            Self::Dynamic => "Dynamic",
+        }
+    }
+}
+
+/// The characters TC Deep Reverb has.
+static TC_DEEP_VRB_CHARACTERS: [Character; 1] = [Character::Modelled];
+
+/// The characters Ambient Reverb has.
+static AMB_VERB_CHARACTERS: [Character; 1] = [Character::Modulated];
+
+/// The characters Room Reverb has.
+static ROOM_REV_CHARACTERS: [Character; 1] = [Character::Modulated];
+
+/// The characters Vintage Room Reverb has.
+static VINTAGE_REV_CHARACTERS: [Character; 1] = [Character::Vintage];
+
+/// The characters Hall Reverb has.
+static HALL_REV_CHARACTERS: [Character; 1] = [Character::Modulated];
+
+/// The characters Chamber Reverb has.
+static CHAMBER_REV_CHARACTERS: [Character; 1] = [Character::Modulated];
+
+/// The characters Plate Reverb has.
+static PLATE_REV_CHARACTERS: [Character; 1] = [Character::Modulated];
+
+/// The characters Rich Plate Reverb has.
+static RICH_PLT_REV_CHARACTERS: [Character; 1] = [Character::Modulated];
+
+/// The characters Gated Reverb has.
+static GATED_REV_CHARACTERS: [Character; 0] = [];
+
+/// The characters Reverse Reverb has.
+static REVERSE_CHARACTERS: [Character; 0] = [];
+
+/// The characters Chorus and Reverb has.
+static CHORUS_VERB_CHARACTERS: [Character; 2] = [Character::Combined, Character::Modulated];
+
+/// The characters Delay and Reverb has.
+static DELAY_VERB_CHARACTERS: [Character; 1] = [Character::Combined];
+
+/// The characters Flanger and Reverb has.
+static FLANG_VERB_CHARACTERS: [Character; 2] = [Character::Combined, Character::Modulated];
+
+/// The characters Midas Equaliser has.
+static MIDAS_EQ_CHARACTERS: [Character; 2] = [Character::Modelled, Character::Multiband];
+
+/// The characters Enhancing EQ has.
+static ENHANCER_CHARACTERS: [Character; 1] = [Character::Multiband];
+
+/// The characters Compressor has.
+static FAIR_COMP_CHARACTERS: [Character; 5] = [
+    Character::Vintage,
+    Character::Modelled,
+    Character::Stereo,
+    Character::Dual,
+    Character::Dynamic,
+];
+
+/// The characters Multiband Distortion has.
+static MUL_BND_DIST_CHARACTERS: [Character; 1] = [Character::Multiband];
+
+/// The characters Rack Amplifier has.
+static RACK_AMP_CHARACTERS: [Character; 0] = [];
+
+/// The characters Stereo Imaging has.
+static EDISON_EX1_CHARACTERS: [Character; 2] = [Character::Modelled, Character::Stereo];
+
+/// The characters Auto Panning has.
+static AUTO_PAN_CHARACTERS: [Character; 3] =
+    [Character::Stereo, Character::Modulated, Character::Dynamic];
+
+/// The characters Noise Gate has.
+static NOISE_GATE_CHARACTERS: [Character; 1] = [Character::Dynamic];
+
+/// The characters Stereo Delay has.
+static DELAY_CHARACTERS: [Character; 1] = [Character::Stereo];
+
+/// The characters `3-Tap` Delay has.
+static THREE_TAP_DELAY_CHARACTERS: [Character; 0] = [];
+
+/// The characters `4-Tap` Delay has.
+static FOUR_TAP_DELAY_CHARACTERS: [Character; 0] = [];
+
+/// The characters `Tel-Ray` Delay has.
+static T_RAY_DELAY_CHARACTERS: [Character; 3] =
+    [Character::Vintage, Character::Modelled, Character::LoFi];
+
+/// The characters Decimator Delay has.
+static DECIM_DELAY_CHARACTERS: [Character; 1] = [Character::LoFi];
+
+/// The characters Modulation, Delay and Reverb has.
+static MOD_DLY_REV_CHARACTERS: [Character; 2] = [Character::Combined, Character::Modulated];
+
+/// The characters Stereo Chorus has.
+static CHORUS_CHARACTERS: [Character; 2] = [Character::Stereo, Character::Modulated];
+
+/// The characters Dimensional Chorus has.
+static CHORUS_D_CHARACTERS: [Character; 3] = [
+    Character::Vintage,
+    Character::Modelled,
+    Character::Modulated,
+];
+
+/// The characters Stereo Flanger has.
+static FLANGER_CHARACTERS: [Character; 2] = [Character::Stereo, Character::Modulated];
+
+/// The characters Stereo Phaser has.
+static PHASER_CHARACTERS: [Character; 3] =
+    [Character::Stereo, Character::Modulated, Character::Dynamic];
+
+/// The characters `Moog-Type` Filter has.
+static MOOD_FILTER_CHARACTERS: [Character; 4] = [
+    Character::Vintage,
+    Character::Modelled,
+    Character::Modulated,
+    Character::Dynamic,
+];
+
+/// The characters Dual Pitch Shifter has.
+static DUAL_PITCH_CHARACTERS: [Character; 1] = [Character::Dual];
+
+/// The characters Dual Pitch Shifter has.
+static VINTAGE_PITCH_CHARACTERS: [Character; 2] = [Character::Vintage, Character::Dual];
+
+/// The characters Rotary Speaker has.
+static ROTARY_SPKR_CHARACTERS: [Character; 2] = [Character::Vintage, Character::Modulated];

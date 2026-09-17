@@ -86,6 +86,8 @@ pub fn generate(spec: &Spec, root: &Path, check: bool) -> Result<Vec<String>, St
             EFFECTS_PATH,
             vec![
                 ("grid", render_grid(spec)),
+                ("glyphs", render_glyphs(spec)),
+                ("characters", render_characters(spec)),
                 ("effect-index", render_effect_index(spec)),
                 ("effects", render_effects(spec, &drawings)),
                 ("effect-corrections", render_effect_corrections(spec)),
@@ -287,8 +289,8 @@ fn render_parameters(spec: &Spec) -> String {
             let _ = write!(
                 out,
                 "\n### {group}\n\n\
-                 | Offset | Parameter | Raw | Values | Shows as | What it does |\n\
-                 |---|---|---|---|---|---|\n"
+                 | Offset | Parameter | Raw | Values | Shows as | Glyph | What it does |\n\
+                 |---|---|---|---|---|---|---|\n"
             );
         }
         let values = match (&parameter.kind, &parameter.value_table, &parameter.note) {
@@ -307,12 +309,13 @@ fn render_parameters(spec: &Spec) -> String {
         };
         let _ = writeln!(
             out,
-            "| {} | {} | {}-{} | {values} | {} | {} |",
+            "| {} | {} | {}-{} | {values} | {} | {} | {} |",
             parameter.offset,
             cell(&parameter.name),
             parameter.min,
             parameter.max,
             cell(parameter.display.as_deref().unwrap_or("")),
+            glyph_link(parameter.glyph.as_deref()),
             cell(parameter.description.as_deref().unwrap_or("")),
         );
     }
@@ -422,29 +425,49 @@ fn render_value_tables(spec: &Spec) -> String {
                 "> Unconfirmed. This mapping is inferred and needs checking against hardware.\n\n",
             );
         }
-        // Only the modulation destinations join to the parameter table today,
-        // so the column appears where there is something in it rather than as
-        // an empty one on all twenty-odd tables.
+        // The cells are drawn once, beside the table the newest firmware reads.
+        if crate::spec::Firmware::range_covers(table.firmware.as_deref(), default)
+            && table
+                .entries
+                .iter()
+                .any(|entry| spec.cell_for(table, entry).is_some())
+        {
+            let _ = write!(
+                out,
+                "<img src=\"diagrams/cells.svg\" alt=\"{}\" width=\"{}\">\n\n",
+                diagrams::CELLS_ALT,
+                diagrams::cells_width(spec)
+            );
+        }
+        // Only the modulation destinations join to the parameter table, and
+        // only the sources swing, so each column appears where there is
+        // something in it rather than as an empty one on all twenty-odd tables.
         let joins = table
             .entries
             .iter()
             .any(|entry| !entry.parameters.is_empty());
+        let swings = table.entries.iter().any(|entry| entry.swing.is_some());
+        let mut header = String::from("| Value | Name |");
         if joins {
-            out.push_str("| Value | Name | Moves | Notes |\n|---|---|---|---|\n");
-        } else {
-            out.push_str("| Value | Name | Notes |\n|---|---|---|\n");
+            header.push_str(" Moves |");
         }
+        if swings {
+            header.push_str(" Swing |");
+        }
+        header.push_str(" Notes |");
+        let rule = "|---".repeat(header.matches('|').count() - 1) + "|";
+        let _ = writeln!(out, "{header}\n{rule}");
         for entry in &table.entries {
-            let moves = if joins {
-                format!("{} | ", cell(&entry.parameters.join(", ")))
-            } else {
-                String::new()
-            };
+            let mut row = format!("| {} | {} |", entry.value, cell(&entry.name));
+            if joins {
+                let _ = write!(row, " {} |", cell(&entry.parameters.join(", ")));
+            }
+            if swings {
+                let _ = write!(row, " {} |", entry.swing.as_deref().unwrap_or(""));
+            }
             let _ = writeln!(
                 out,
-                "| {} | {} | {moves}{} |",
-                entry.value,
-                cell(&entry.name),
+                "{row} {} |",
                 cell(entry.description.as_deref().unwrap_or(""))
             );
         }
@@ -500,11 +523,11 @@ fn render_controllers(spec: &Spec) -> String {
         if kind == "parameter" {
             out.push_str(" Offset |");
         }
-        out.push_str(" Notes |\n|---|---|");
+        out.push_str(" Glyph | Notes |\n|---|---|");
         if kind == "parameter" {
             out.push_str("---|");
         }
-        out.push_str("---|\n");
+        out.push_str("---|---|\n");
 
         for controller in rows {
             let mut notes = cell(controller.note.as_deref().unwrap_or(""));
@@ -521,7 +544,95 @@ fn render_controllers(spec: &Spec) -> String {
                         .map_or_else(|| "-".to_owned(), |o| o.to_string())
                 );
             }
-            let _ = writeln!(out, " {notes} |");
+            // A controller that drives a parameter is pictured as the
+            // parameter is, which is what the library's table carries too.
+            let glyph = controller.glyph.as_deref().or_else(|| {
+                let offset = usize::from(controller.parameter?);
+                spec.parameters.get(offset)?.glyph.as_deref()
+            });
+            let _ = writeln!(out, " {} | {notes} |", glyph_link(glyph));
+        }
+    }
+    out
+}
+
+/// Renders a glyph's name as a link to its row in the effects document's
+/// catalogue, or nothing for a parameter that has none.
+fn glyph_link(name: Option<&str>) -> String {
+    name.map_or_else(String::new, |name| {
+        format!("[{name}](effects.md#glyph-{})", glyph_anchor(name))
+    })
+}
+
+/// The anchor a glyph's row in the catalogue carries.
+fn glyph_anchor(name: &str) -> String {
+    name.replace(' ', "-")
+}
+
+/// Renders the glyph catalogue: the drawing of every glyph, then a row per
+/// glyph saying what it pictures and how many slots and parameters carry it.
+fn render_glyphs(spec: &Spec) -> String {
+    let mut out = format!(
+        "<img src=\"diagrams/glyphs.svg\" alt=\"{}\" width=\"{}\">\n\n\
+         | Glyph | Picture of | Effect slots | Parameters | Controllers |\n|---|---|---|---|---|\n",
+        diagrams::GLYPHS_ALT,
+        diagrams::glyphs_width(spec)
+    );
+    for glyph in &spec.glyphs {
+        let slots = spec
+            .panels
+            .iter()
+            .flat_map(|panel| panel.slots.iter())
+            .filter(|slot| slot.glyph == glyph.name)
+            .count();
+        let parameters = spec
+            .parameters
+            .iter()
+            .filter(|parameter| parameter.glyph.as_deref() == Some(glyph.name.as_str()))
+            .count();
+        let controllers = spec
+            .controllers
+            .iter()
+            .filter(|controller| controller.glyph.as_deref() == Some(glyph.name.as_str()))
+            .count();
+        let _ = writeln!(
+            out,
+            "| <a id=\"glyph-{}\"></a>`{}` | {} | {} | {} | {} |",
+            glyph_anchor(&glyph.name),
+            glyph.name,
+            cell(&glyph.description),
+            slots,
+            parameters,
+            controllers
+        );
+    }
+    out
+}
+
+/// Renders the characters: what each means, and which algorithms have it,
+/// each with the reason it is listed.
+fn render_characters(spec: &Spec) -> String {
+    let mut out = String::new();
+    for character in &spec.characters {
+        let _ = write!(
+            out,
+            "\n#### {}\n\n{}\n\n| Algorithm | Because |\n|---|---|\n",
+            character.name,
+            cell(&character.description)
+        );
+        for member in &character.algorithms {
+            let effect = spec.effects.iter().find(|e| e.name == member.name);
+            let link = effect.map_or_else(
+                || cell(&member.name),
+                |effect| {
+                    format!(
+                        "[{}](#{})",
+                        cell(&member.name),
+                        fx::stem(effect.r#type, &effect.full_name)
+                    )
+                },
+            );
+            let _ = writeln!(out, "| {link} | {} |", cell(&member.because));
         }
     }
     out
@@ -713,23 +824,41 @@ fn render_effects(spec: &Spec, drawings: &[fx::Drawing]) -> String {
                 cell(&drawing.title),
             );
         }
+        let family = spec
+            .families
+            .iter()
+            .find(|f| f.algorithms.iter().any(|a| a == &effect.name));
+        let mark = match (spec.variant_of(&effect.name), family) {
+            (Some(variant), Some(family)) => format!(
+                ", drawn with the {} mark of the {} family",
+                variant.name.to_lowercase(),
+                family.name.to_lowercase()
+            ),
+            (None, Some(family)) => {
+                format!(", drawn with the {} mark", family.name.to_lowercase())
+            }
+            _ => String::new(),
+        };
+        let characters: Vec<String> = spec
+            .characters_of(&effect.name)
+            .iter()
+            .map(|character| format!("[{}](#{})", character.name, character.name.to_lowercase()))
+            .collect();
+        let characters = if characters.is_empty() {
+            String::new()
+        } else {
+            format!(" Characters: {}.", characters.join(", "))
+        };
         let _ = write!(
             out,
-            "`FX Type` {}{}{}. {} slots{}.\n\n\
-             | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | \
-             Description |\n|---|---|---|---|---|---|---|---|---|\n",
+            "`FX Type` {}{}{mark}. {} slots{}.{characters}\n\n\
+             | Slot | Ref | Parameter | Reads as | Control | Group | Range | Mod | Glyph | \
+             Description |\n|---|---|---|---|---|---|---|---|---|---|\n",
             effect.r#type,
             layout.map_or(String::new(), |l| format!(
                 ", {}",
                 l.category.to_lowercase()
             )),
-            spec.families
-                .iter()
-                .find(|f| f.algorithms.iter().any(|a| a == &effect.name))
-                .map_or(String::new(), |f| format!(
-                    ", drawn with the {} mark",
-                    f.name.to_lowercase()
-                )),
             effect.parameters.len(),
             layout.map_or(String::new(), |l| format!(", drawn as {}s", l.control)),
         );
@@ -754,7 +883,7 @@ fn render_effects(spec: &Spec, drawings: &[fx::Drawing]) -> String {
             };
             let _ = writeln!(
                 out,
-                "| {} | `{}` | {} | {} | {} | {} | {range} | {} | {} |",
+                "| {} | `{}` | {} | {} | {} | {} | {range} | {} | {} | {} |",
                 parameter.slot,
                 cell(&parameter.r#ref),
                 cell(&parameter.name),
@@ -762,6 +891,8 @@ fn render_effects(spec: &Spec, drawings: &[fx::Drawing]) -> String {
                 slot.map_or("", |s| s.kind.as_str()),
                 slot.and_then(|s| s.group.as_deref()).unwrap_or(""),
                 if parameter.mod_dest { "yes" } else { "" },
+                slot.map_or(String::new(), |s| glyph_link(Some(&s.glyph))
+                    .replace("effects.md#", "#")),
                 cell(parameter.description.as_deref().unwrap_or(""))
             );
         }

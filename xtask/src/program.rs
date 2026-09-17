@@ -642,6 +642,7 @@ mod tests {
                     name: (*name).to_owned(),
                     description: None,
                     parameters: Vec::new(),
+                    swing: None,
                 })
                 .collect(),
         }

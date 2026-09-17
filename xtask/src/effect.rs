@@ -33,6 +33,7 @@ use super::{
     Panel, Pixels, Point, Quantity, Routing, Row, Source, Stroke,
 };
 use crate::param::{Kind, ParamId};
+use crate::pixels::Glyph;
 
 ";
 
@@ -50,12 +51,113 @@ pub fn render(spec: &Spec, idents: &Identifiers) -> Result<String, String> {
     render_counts(spec, &mut out);
     render_engines(spec, idents, &mut out)?;
     render_algorithms(spec, &statics, &mut out)?;
-    render_slots(spec, &statics, &mut out)?;
+    render_slots(spec, idents, &statics, &mut out)?;
     render_grid(spec, &mut out);
     render_panels(spec, &statics, &mut out)?;
     render_routings(spec, &mut out)?;
     render_marks(spec, &mut out)?;
+    render_characters(spec, &statics, &mut out)?;
     Ok(out)
+}
+
+/// Renders the characters, and the ones each algorithm has.
+///
+/// The enum is generated, with the file's description as each variant's doc,
+/// because a character is a closed set the specification owns the way it owns
+/// the families; the slice per algorithm is what `Algorithm::characters`
+/// reads, and it is empty for an algorithm with nothing to say.
+fn render_characters(
+    spec: &Spec,
+    statics: &BTreeMap<u16, String>,
+    out: &mut String,
+) -> Result<(), String> {
+    let _ = writeln!(
+        out,
+        "\
+/// Number of characters an algorithm may have.
+pub const CHARACTER_COUNT: usize = {};
+
+/// What kind of thing an effect is, beside what it does.
+///
+/// A [`Family`] is one per algorithm and says what it does to a signal;
+/// an algorithm has any number of these, and they say what it is like. A host
+/// with four engines on one page has four more ways to tell them apart than
+/// the family gives it: a vintage unit drawn as one, a stereo pair drawn as a
+/// pair, two effects in one engine drawn as two.
+///
+/// Every membership in `spec/characters.toml` carries its reason, and the
+/// reasons are the manual's own name for the effect, the slots it gives it, or
+/// the unit a name refers to. Nothing is a character because of how it sounds.
+/// [`Algorithm::characters`] is how they are read.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = \"serde\", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum Character {{",
+        spec.characters.len()
+    );
+    for character in &spec.characters {
+        let _ = writeln!(
+            out,
+            "    /// {}\n    {},",
+            doc(&character.description),
+            variant_of("characters.toml", "character", &character.name)?
+        );
+    }
+    out.push_str(
+        "\
+}
+
+impl Character {
+    /// Every character, in the order the specification declares them.
+    pub const ALL: [Self; CHARACTER_COUNT] = [
+",
+    );
+    for character in &spec.characters {
+        let _ = writeln!(
+            out,
+            "        Self::{},",
+            variant_of("characters.toml", "character", &character.name)?
+        );
+    }
+    out.push_str(
+        "\
+    ];
+
+    /// Returns the character's name, as the specification writes it.
+    #[must_use]
+    pub const fn name(self) -> &'static str {
+        match self {
+",
+    );
+    for character in &spec.characters {
+        let _ = writeln!(
+            out,
+            "            Self::{} => {:?},",
+            variant_of("characters.toml", "character", &character.name)?,
+            character.name
+        );
+    }
+    out.push_str("        }\n    }\n}\n\n");
+
+    for effect in &spec.effects {
+        let name = statics.get(&effect.r#type).map_or("", String::as_str);
+        let members: Vec<String> = spec
+            .characters_of(&effect.name)
+            .into_iter()
+            .map(|character| {
+                variant_of("characters.toml", "character", &character.name)
+                    .map(|variant| format!("Character::{variant}"))
+            })
+            .collect::<Result<_, _>>()?;
+        let _ = writeln!(
+            out,
+            "/// The characters {} has.\nstatic {name}_CHARACTERS: [Character; {}] = [{}];\n",
+            doc(&effect.full_name),
+            members.len(),
+            members.join(", ")
+        );
+    }
+    Ok(())
 }
 
 /// The static's name for each algorithm, by `FX Type` value.
@@ -169,9 +271,14 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
             .find(|family| family.algorithms.iter().any(|a| a == &effect.name))
             .map_or(Ok("Reverb"), |family| variant(&family.name))?;
         let name = statics.get(&effect.r#type).map_or("", String::as_str);
+        let variant = spec
+            .variants
+            .iter()
+            .position(|variant| variant.algorithms.iter().any(|a| a == &effect.name))
+            .map_or("None".to_owned(), |index| format!("Some({index})"));
         let _ = writeln!(
             out,
-            "    Algorithm {{ index: {}, name: {:?}, full_name: {:?}, category: {category:?}, family: Family::{family}, slots: &{name} }},",
+            "    Algorithm {{ index: {}, name: {:?}, full_name: {:?}, category: {category:?}, family: Family::{family}, variant: {variant}, slots: &{name}, characters: &{name}_CHARACTERS }},",
             effect.r#type, effect.name, effect.full_name,
         );
     }
@@ -192,6 +299,7 @@ pub(super) static ALGORITHMS: [Algorithm; ALGORITHM_COUNT] = [
 /// has already checked and which would otherwise be a silent `0, 0`.
 fn render_slots(
     spec: &Spec,
+    idents: &Identifiers,
     statics: &BTreeMap<u16, String>,
     out: &mut String,
 ) -> Result<(), String> {
@@ -221,6 +329,15 @@ fn render_slots(
             let switch = panel.is_some_and(|slot| slot.kind == "switch");
             let enable = panel.is_some_and(|slot| slot.enable);
             let quantity = quantity(panel.map_or("shape", |slot| slot.quantity.as_str()))?;
+            let glyph = panel
+                .map(|slot| crate::glyph::ident(idents, &slot.glyph))
+                .transpose()?
+                .ok_or_else(|| {
+                    format!(
+                        "panels.toml: {} slot {} has no glyph",
+                        effect.name, parameter.slot
+                    )
+                })?;
             // The description is a field behind a `cfg`, not a table beside
             // the slots: with the feature off it is not in the struct at all,
             // so a build without it carries neither the prose nor a pointer to
@@ -231,7 +348,7 @@ fn render_slots(
             );
             let _ = writeln!(
                 out,
-                "    FxSlot {{ slot: {}, reference: {:?}, title: {title:?}, kind: {}, values: {}, unit: {}, min: {}, max: {}, group: {}, modulatable: {}, enable: {enable}, quantity: {quantity}, column: {column}, row: {row}, {description} }},",
+                "    FxSlot {{ slot: {}, reference: {:?}, title: {title:?}, kind: {}, values: {}, unit: {}, min: {}, max: {}, group: {}, modulatable: {}, enable: {enable}, quantity: {quantity}, glyph: Glyph::{glyph}, column: {column}, row: {row}, {description} }},",
                 parameter.slot,
                 parameter.r#ref,
                 if switch {
@@ -559,15 +676,35 @@ fn align(name: &str) -> Result<String, String> {
 ///
 /// As [`render_marks`], when a family's name makes no Rust variant.
 fn render_mark_strokes(spec: &Spec, out: &mut String) -> Result<(), String> {
-    for family in &spec.families {
+    let variants = variant_statics(spec)?;
+    let marks = spec
+        .families
+        .iter()
+        .map(|family| {
+            variant(&family.name).map(|name| {
+                (
+                    family.description.as_str(),
+                    format!("MARK_{}", name.to_ascii_uppercase()),
+                    family.strokes.as_slice(),
+                )
+            })
+        })
+        .chain(spec.variants.iter().zip(&variants).map(|(variant, name)| {
+            Ok((
+                variant.description.as_str(),
+                format!("{name}_STROKES"),
+                variant.strokes.as_slice(),
+            ))
+        }));
+    for mark in marks {
+        let (description, name, strokes) = mark?;
         let _ = writeln!(
             out,
-            "/// {}\nstatic MARK_{}: [Stroke; {}] = [",
-            doc(&family.description),
-            variant(&family.name)?.to_ascii_uppercase(),
-            family.strokes.len(),
+            "/// {}\nstatic {name}: [Stroke; {}] = [",
+            doc(description),
+            strokes.len(),
         );
-        for stroke in &family.strokes {
+        for stroke in strokes {
             match (&stroke.line, &stroke.arc) {
                 (Some(points), _) => {
                     let points: Vec<String> = points
@@ -616,13 +753,50 @@ fn render_mark_strokes(spec: &Spec, out: &mut String) -> Result<(), String> {
                 }
                 // Unreachable: the spec loader rejects a stroke that is neither.
                 (None, None) => {
-                    return Err(format!("marks.toml: {} has an empty stroke", family.name));
+                    return Err(format!("marks.toml: {name} has an empty stroke"));
                 }
             }
         }
         out.push_str("];\n\n");
     }
+
+    // The variants are marks of their own, in one table an algorithm indexes
+    // by the variant it is drawn with, or not at all.
+    let _ = writeln!(
+        out,
+        "/// Number of marks drawn for a kind of effect within a family.\npub const VARIANT_COUNT: usize = {};\n",
+        spec.variants.len()
+    );
+    out.push_str(
+        "/// The mark for each variant, in the order `spec/marks.toml` draws them.\n\
+         pub(super) static VARIANTS: [Mark; VARIANT_COUNT] = [\n",
+    );
+    for (variant, name) in spec.variants.iter().zip(&variants) {
+        let _ = writeln!(
+            out,
+            "    // {}: {}.\n    Mark {{ strokes: &{name}_STROKES, pixels: {} }},",
+            variant.name,
+            variant.algorithms.join(", "),
+            crate::codegen::pixels(&variant.pixels),
+        );
+    }
+    out.push_str("];\n");
     Ok(())
+}
+
+/// The static's name for each variant's mark, in file order.
+///
+/// # Errors
+///
+/// Returns a message when a variant's name makes no identifier, or two make
+/// the same one.
+fn variant_statics(spec: &Spec) -> Result<Vec<String>, String> {
+    Ok(
+        snake_identifiers(spec.variants.iter().map(|v| v.name.as_str()), "variant")?
+            .into_iter()
+            .map(|name| format!("VARIANT_{}", name.to_ascii_uppercase()))
+            .collect(),
+    )
 }
 
 /// Renders the mark each family is drawn with, as strokes in a unit box.
@@ -648,15 +822,13 @@ pub const FAMILY_COUNT: usize = {};
 
     render_mark_strokes(spec, out)?;
 
-    let _ = writeln!(
-        out,
+    out.push_str(
         "\
-/// Side of the one-bit grid each family's mark is drawn again on.
-pub const MARK_PIXEL_SIDE: usize = {};
+/// Side of the one-bit grid each family's mark is drawn again on, which is
+/// the crate's one pixel grid.
+pub const MARK_PIXEL_SIDE: usize = crate::pixels::SIDE;
+
 ",
-        spec.families
-            .first()
-            .map_or(0, |family| family.pixels.len())
     );
 
     out.push_str(
@@ -677,30 +849,11 @@ pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
 ",
     );
     for family in &spec.families {
-        // A row of the grid is a bit per pixel, bit 0 leftmost, which is the
-        // order a host blitting left to right wants.
-        let rows: Vec<String> = family
-            .pixels
-            .iter()
-            .map(|row| {
-                let bits: u8 = row
-                    .chars()
-                    .enumerate()
-                    .filter(|&(_, pixel)| pixel == '#')
-                    .map(|(x, _)| 1_u8 << x)
-                    .sum();
-                // Grouped from the right, because a seven-digit binary
-                // literal without a separator is unreadable to clippy and to a
-                // reader. The picture is still legible in the bits, which is
-                // the whole reason these are binary and not hexadecimal.
-                format!("0b{:03b}_{:04b}", bits >> 4, bits & 0xf)
-            })
-            .collect();
         let _ = writeln!(
             out,
-            "    Mark {{ strokes: &MARK_{}, pixels: Pixels::new([{}]) }},",
+            "    Mark {{ strokes: &MARK_{}, pixels: {} }},",
             variant(&family.name)?.to_ascii_uppercase(),
-            rows.join(", "),
+            crate::codegen::pixels(&family.pixels),
         );
     }
     out.push_str("];\n");
@@ -714,6 +867,11 @@ pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
 /// not is a codegen error here, rather than a generated file that does not
 /// compile with a message about the spec nowhere in it.
 fn variant(name: &str) -> Result<&str, String> {
+    variant_of("marks.toml", "family", name)
+}
+
+/// As [`variant`], for any file whose names are meant to be variants as written.
+fn variant_of<'a>(file: &str, what: &str, name: &'a str) -> Result<&'a str, String> {
     let usable = name
         .chars()
         .next()
@@ -723,7 +881,7 @@ fn variant(name: &str) -> Result<&str, String> {
         Ok(name)
     } else {
         Err(format!(
-            "marks.toml: family {name:?} is not one capitalised word, so it makes no Family variant"
+            "{file}: {what} {name:?} is not one capitalised word, so it makes no variant"
         ))
     }
 }

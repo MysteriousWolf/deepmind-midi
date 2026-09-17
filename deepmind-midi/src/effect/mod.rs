@@ -69,11 +69,19 @@
 mod generated;
 
 pub use generated::{
-    ALGORITHM_COUNT, ENGINE_COUNT, FAMILY_COUNT, MARK_PIXEL_SIDE, MODE_COUNT, ROUTING_COUNT,
-    SLOTS_PER_ENGINE,
+    ALGORITHM_COUNT, CHARACTER_COUNT, Character, ENGINE_COUNT, FAMILY_COUNT, MARK_PIXEL_SIDE,
+    MODE_COUNT, ROUTING_COUNT, SLOTS_PER_ENGINE, VARIANT_COUNT,
 };
 
-use generated::{ALGORITHMS, ENGINES, FAMILY_NAMES, GRID, MARKS, MODES, PANELS, ROUTINGS};
+/// The grid a mark's [`pixels`](Mark::pixels) are on, which is the crate's one
+/// pixel grid: the modulation sources' cells are drawn on the same one.
+pub use crate::pixels::Pixels;
+
+use crate::pixels::Glyph;
+
+use generated::{
+    ALGORITHMS, ENGINES, FAMILY_NAMES, GRID, MARKS, MODES, PANELS, ROUTINGS, VARIANTS,
+};
 
 use core::fmt;
 
@@ -269,12 +277,24 @@ pub struct Algorithm {
     /// [`Algorithm::family`](Self::family) is how it is read.
     #[cfg_attr(feature = "serde", serde(skip))]
     pub(crate) family: Family,
+    /// Which of the variant marks is its own, where its kind is something a
+    /// symbol can carry.
+    ///
+    /// [`Algorithm::own_mark`](Self::own_mark) is how it is read, and
+    /// [`Algorithm::mark`](Self::mark) is how it is drawn.
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) variant: Option<u8>,
     /// The slots it uses, in slot order.
     ///
     /// Shorter than [`SLOTS_PER_ENGINE`] where the algorithm has fewer
     /// parameters, which is how a host learns not to draw controls that do
     /// nothing.
     pub slots: &'static [FxSlot],
+    /// What kind of thing it is, beside what it does.
+    ///
+    /// [`Algorithm::characters`](Self::characters) is how it is read.
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) characters: &'static [Character],
 }
 
 impl Algorithm {
@@ -374,15 +394,73 @@ impl Algorithm {
         self.family
     }
 
+    /// Returns what kind of thing this effect is, beside what it does.
+    ///
+    /// Any number of [`Character`]s, in the order the specification declares
+    /// them, and empty for an algorithm with nothing to say beyond its
+    /// [`family`](Self::family): the plain reverbs and the noise gate. A host
+    /// reads these to draw a vintage unit as one, a stereo pair as a pair, two
+    /// effects in one engine as two, and it reads them here rather than
+    /// matching on `Vintage` in a name.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::{Algorithm, Character};
+    ///
+    /// let tel_ray = Algorithm::by_name("T-RayDelay").expect("a Tel-Ray Delay");
+    /// assert!(tel_ray.characters().contains(&Character::Vintage));
+    /// assert!(tel_ray.characters().contains(&Character::LoFi));
+    ///
+    /// let hall = Algorithm::by_name("HallRev").expect("a Hall Reverb");
+    /// assert!(!hall.characters().contains(&Character::Vintage));
+    /// assert!(hall.has(Character::Modulated));
+    /// ```
+    #[must_use]
+    pub const fn characters(&self) -> &'static [Character] {
+        self.characters
+    }
+
+    /// Returns whether this effect has `character`.
+    #[must_use]
+    pub fn has(&self, character: Character) -> bool {
+        self.characters.contains(&character)
+    }
+
     /// Returns the mark to draw for this effect.
     ///
-    /// Its [`family`](Self::family)'s mark: nine marks across the 35, because
-    /// the difference between a Hall Reverb and a Plate Reverb is not something
-    /// a symbol carries and a drawing that implied it would be inventing one.
-    /// The name is what tells those two apart.
+    /// Its [own](Self::own_mark) where it has one, and its
+    /// [`family`](Self::family)'s otherwise: a plate reverb is drawn as a plate
+    /// with wavefronts leaving it, a hall as wavefronts far from their source,
+    /// and an ambient reverb, which is a reverb and nothing a symbol can add
+    /// to, as the family's source and two wavefronts. Either way it is the
+    /// same language, so the four engines read as one set whichever marks
+    /// they land on.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::{Algorithm, Family};
+    ///
+    /// let plate = Algorithm::by_name("PlateRev").expect("a Plate Reverb");
+    /// let ambient = Algorithm::by_name("AmbVerb").expect("an Ambient Reverb");
+    ///
+    /// assert!(plate.own_mark().is_some());
+    /// assert!(ambient.own_mark().is_none());
+    /// assert_eq!(ambient.mark(), Family::Reverb.mark());
+    /// assert_ne!(plate.mark(), Family::Reverb.mark());
+    /// ```
     #[must_use]
     pub fn mark(&self) -> &'static Mark {
-        self.family.mark()
+        self.own_mark().unwrap_or_else(|| self.family.mark())
+    }
+
+    /// Returns the mark drawn for this effect's kind, where its kind is
+    /// something a symbol can carry.
+    ///
+    /// `None` for an algorithm whose family says everything a symbol can: a
+    /// host that wants to know whether the mark it is about to draw is the
+    /// family's or finer asks here. `spec/marks.toml` says which kinds are
+    /// drawn and why.
+    #[must_use]
+    pub fn own_mark(&self) -> Option<&'static Mark> {
+        VARIANTS.get(usize::from(self.variant?))
     }
 
     /// Returns the slot an engine's `parameter` is, under this algorithm.
@@ -472,6 +550,11 @@ pub struct FxSlot {
     /// [`FxSlot::quantity`](Self::quantity) is how it is read.
     #[cfg_attr(feature = "serde", serde(skip))]
     pub(crate) quantity: Quantity,
+    /// The picture of what this slot does.
+    ///
+    /// [`FxSlot::glyph`](Self::glyph) is how it is read.
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub(crate) glyph: Glyph,
     /// Column of the FX page's grid this slot is drawn in, counting from 0.
     #[cfg_attr(feature = "serde", serde(skip))]
     pub(crate) column: u8,
@@ -536,6 +619,36 @@ impl FxSlot {
     #[must_use]
     pub const fn quantity(&self) -> Quantity {
         self.quantity
+    }
+
+    /// Returns the picture of what this slot does, the size of a character.
+    ///
+    /// Finer than [`quantity`](Self::quantity), and for a screen rather than
+    /// for grouping: a pre-delay and a decay are both a [`Quantity::Time`],
+    /// and a host with room for a picture beside each of the twelve wants the
+    /// gap drawn on one and the tail on the other. Every slot has one, because
+    /// what a slot does is the one thing the algorithm always knows about it;
+    /// `spec/glyphs.toml` says how each was chosen.
+    ///
+    /// The same [`Glyph`] serves every slot that does the same thing, so a
+    /// `Low Cut` on a reverb and one on a delay are one picture, and so is
+    /// the [`ParamId`] a program parameter doing the same thing carries.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::Algorithm;
+    /// use deepmind_midi::pixels::Glyph;
+    ///
+    /// let room = Algorithm::by_name("RoomRev").expect("a Room Reverb");
+    /// assert_eq!(room.slot(1).expect("Pre-Delay").glyph(), Glyph::PreDelay);
+    /// assert_eq!(room.slot(2).expect("Decay").glyph(), Glyph::Decay);
+    /// assert_eq!(room.slot(7).expect("Low Cut").glyph(), Glyph::LowCut);
+    ///
+    /// let amp = Algorithm::by_name("RackAmp").expect("a Rack Amplifier");
+    /// assert_eq!(amp.slot(9).expect("Cabinet").glyph(), Glyph::Cabinet);
+    /// ```
+    #[must_use]
+    pub const fn glyph(&self) -> Glyph {
+        self.glyph
     }
 
     /// Returns whether this slot switches the whole effect in and out of
@@ -843,6 +956,31 @@ impl fmt::Display for Family {
     }
 }
 
+impl Character {
+    /// Returns every algorithm that has this character, in `FX Type` order.
+    ///
+    /// ```
+    /// use deepmind_midi::effect::Character;
+    ///
+    /// let combined: Vec<&str> = Character::Combined
+    ///     .algorithms()
+    ///     .map(|algorithm| algorithm.name)
+    ///     .collect();
+    /// assert_eq!(combined, ["ChorusVerb", "DelayVerb", "FlangVerb", "ModDlyRev"]);
+    /// ```
+    pub fn algorithms(self) -> impl Iterator<Item = &'static Algorithm> {
+        ALGORITHMS
+            .iter()
+            .filter(move |algorithm| algorithm.characters.contains(&self))
+    }
+}
+
+impl fmt::Display for Character {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.name())
+    }
+}
+
 /// A mark for an effect, drawn in the host's own materials.
 ///
 /// Reached through [`Algorithm::mark`] or [`Family::mark`]. The data a drawing
@@ -900,10 +1038,8 @@ impl Mark {
     /// effect name, or a hardware panel. Above about sixteen pixels a host
     /// wants [`strokes`](Self::strokes) instead, which has no size of its own.
     ///
-    /// Drawn by hand rather than reduced from the strokes. At forty-nine pixels
-    /// which pixels are lit is the whole of the design, and a one-pixel stroke
-    /// put through a rasteriser at this size comes out as a smear with the idea
-    /// gone.
+    /// Drawn by hand rather than reduced from the strokes, for the reason the
+    /// [`pixels`](crate::pixels) module gives.
     ///
     /// ```
     /// use deepmind_midi::effect::{Algorithm, MARK_PIXEL_SIDE};
@@ -920,71 +1056,6 @@ impl Mark {
     #[must_use]
     pub const fn pixels(&self) -> &Pixels {
         &self.pixels
-    }
-}
-
-/// A [`Mark`] drawn on a square one-bit grid, for a display too small to stroke.
-///
-/// Reached through [`Mark::pixels`]. [`MARK_PIXEL_SIDE`] is how wide and how
-/// tall, and the origin is the top left, matching the unit box the strokes are
-/// in.
-///
-/// ```
-/// use deepmind_midi::effect::{Algorithm, MARK_PIXEL_SIDE};
-///
-/// let filter = Algorithm::by_name("MoodFilter").expect("a Mood Filter");
-/// let pixels = filter.mark().pixels();
-///
-/// // Blitting it is a walk over the grid.
-/// let mut lit = 0;
-/// for y in 0..MARK_PIXEL_SIDE as u8 {
-///     for x in 0..MARK_PIXEL_SIDE as u8 {
-///         if pixels.is_lit(x, y) {
-///             lit += 1;
-///         }
-///     }
-/// }
-/// assert!(lit > 0);
-/// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Pixels {
-    rows: [u8; MARK_PIXEL_SIDE],
-}
-
-impl Pixels {
-    /// Builds a grid from its rows, a bit a pixel and bit 0 leftmost.
-    #[must_use]
-    pub const fn new(rows: [u8; MARK_PIXEL_SIDE]) -> Self {
-        Self { rows }
-    }
-
-    /// Returns whether the pixel at `x`, `y` is lit, counting from the top
-    /// left.
-    ///
-    /// `false` outside the grid, so a host walking a larger box than the mark
-    /// gets blank rather than an answer it has to bounds-check itself.
-    #[must_use]
-    pub fn is_lit(&self, x: u8, y: u8) -> bool {
-        if usize::from(x) >= MARK_PIXEL_SIDE {
-            return false;
-        }
-        self.row(y) & (1 << x) != 0
-    }
-
-    /// Returns one row as its low [`MARK_PIXEL_SIDE`] bits, bit 0 leftmost.
-    ///
-    /// What a host blitting a row at a time wants. Zero past the bottom of the
-    /// grid.
-    #[must_use]
-    pub fn row(&self, y: u8) -> u8 {
-        self.rows.get(usize::from(y)).copied().unwrap_or(0)
-    }
-
-    /// Returns every row, top to bottom.
-    #[must_use]
-    pub const fn rows(&self) -> &[u8; MARK_PIXEL_SIDE] {
-        &self.rows
     }
 }
 
@@ -1652,7 +1723,8 @@ fn fraction(program: &Program, engine: Engine, slot: u8) -> Option<f32> {
 mod tests {
     use super::{
         ALGORITHM_COUNT, Algorithm, Align, Engine, Family, MARK_PIXEL_SIDE, MODE_COUNT, Mode,
-        Point, Quantity, ROUTING_COUNT, Routing, SLOTS_PER_ENGINE, Source, Stroke, grid,
+        Point, Quantity, ROUTING_COUNT, Routing, SLOTS_PER_ENGINE, Source, Stroke, VARIANT_COUNT,
+        VARIANTS, grid,
     };
     use crate::ids::ProtocolVersion;
     use crate::param::{DEFAULT_FIRMWARE, Group, Kind, ParamId, TableId};
@@ -2084,17 +2156,33 @@ mod tests {
         assert_eq!((power.min, power.max), (Some("ON"), Some("OFF")));
     }
 
-    /// Every algorithm reaches a mark, and the nine families between them
-    /// account for all 35 with none left over.
+    /// Every algorithm reaches a mark, its own or its family's, and the nine
+    /// families between them account for all 35 with none left over.
     #[test]
     fn every_algorithm_has_a_family_and_a_mark() {
+        let mut own = 0;
         for algorithm in Algorithm::all() {
             assert!(
                 !algorithm.mark().strokes().is_empty(),
                 "{algorithm} has an empty mark"
             );
-            assert_eq!(algorithm.mark(), algorithm.family().mark());
+            match algorithm.own_mark() {
+                Some(mark) => {
+                    own += 1;
+                    assert_eq!(algorithm.mark(), mark, "{algorithm}");
+                    assert_ne!(mark, algorithm.family().mark(), "{algorithm}");
+                }
+                None => assert_eq!(algorithm.mark(), algorithm.family().mark(), "{algorithm}"),
+            }
         }
+        // The variants are the finer marks, and they are drawn for the kinds
+        // a symbol can carry: most of the 35, and not all of them.
+        assert!(
+            own > ALGORITHM_COUNT / 2,
+            "{own} algorithms with a mark of their own"
+        );
+        assert!(own < ALGORITHM_COUNT, "every algorithm has its own mark");
+        assert_eq!(VARIANTS.len(), VARIANT_COUNT);
 
         let counted: usize = Family::ALL
             .into_iter()
@@ -2259,16 +2347,23 @@ mod tests {
         }
     }
 
-    /// The nine grids are nine different pictures. Two families blitting the
-    /// same pixels would be a symbol that cannot do its one job.
+    /// The grids are all different pictures, the families' and the variants'
+    /// together. Two marks blitting the same pixels would be a symbol that
+    /// cannot do its one job.
     #[test]
-    fn no_two_families_blit_the_same_pixels() {
-        for (index, family) in Family::ALL.into_iter().enumerate() {
-            for other in Family::ALL.into_iter().skip(index + 1) {
+    fn no_two_marks_blit_the_same_pixels() {
+        let marks = || {
+            Family::ALL
+                .iter()
+                .map(|family| family.mark())
+                .chain(VARIANTS.iter())
+        };
+        for (index, mark) in marks().enumerate() {
+            for other in marks().skip(index + 1) {
                 assert_ne!(
-                    family.mark().pixels().rows(),
-                    other.mark().pixels().rows(),
-                    "{family} and {other} draw the same grid"
+                    mark.pixels().rows(),
+                    other.pixels().rows(),
+                    "mark {index} draws the same grid as another"
                 );
             }
         }
