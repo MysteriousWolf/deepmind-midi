@@ -43,8 +43,9 @@ filter responses, what each oscillator is putting out, the arpeggiator's gates
 — as functions a host samples into its own screen, saying in the type where an
 axis is published and where it is only an ordering, where the shape rests, and
 where along it the things a player is editing fall. The modulation sources say
-which way they swing and carry a dot-matrix cell each, so a patch bay can be
-drawn in pictures; every effect slot, most parameters and the standard
+which way they swing, and both ends of the matrix carry a dot-matrix cell —
+every source, and every destination the parameter table cannot picture — so a
+patch bay can be drawn in pictures; every effect slot, most parameters and the standard
 controllers carry a glyph of what they do, so a tiny display can show a
 picture and a bar; and each effect has a mark, its family's or a finer one of
 its own, and the characters that say what kind of thing it is. The `descriptions` feature adds a sentence per parameter and

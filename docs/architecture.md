@@ -165,7 +165,7 @@ error     one error type; every rejection carries the offending value
 wire      MIDI bytes: message decode, running status, SysEx reassembly
 sysex     DeepMind framing, packed MS-bit codec, typed Message enum
 param     the parameter table: IDs, NRPN numbers, ranges, enums, formatting
-pixels    the one-bit grid the effect marks and the source cells are drawn on
+pixels    the one-bit grid the effect marks and the matrix cells are drawn on
 effect    the effect panels: what an engine's twelve bytes are, per algorithm
 front     what the instrument's own front panel puts a control under
 program   Program: the dump's bytes, typed accessors, names, value types
@@ -196,7 +196,7 @@ lets NRPN edits, dump parsing and dump building share a single table.
 | `spec/layout.toml` | where each slot sits on the FX page, and the panel colours |
 | `spec/front.toml` | which parameters the instrument's own front panel puts a control under |
 | `spec/marks.toml` | a mark per effect family and a variant per kind a symbol can carry, as strokes in a unit box and as a pixel grid |
-| `spec/cells.toml` | a dot-matrix cell per modulation source, on the same grid |
+| `spec/cells.toml` | a dot-matrix cell per modulation source, and per destination the parameter table cannot picture, on the same grid |
 | `spec/glyphs.toml` | a glyph per thing a parameter does, on the same grid, named by every effect slot and most parameters and controllers |
 | `spec/characters.toml` | what kind of thing each effect is, beside its family, with a reason per membership |
 | `spec/mapping.toml` | how an address and a value become bytes |
@@ -617,8 +617,8 @@ reasons the effect panels give.
 ## Three things drawn dot by dot
 
 Three kinds of picture in this crate are not geometry: the pixel grid of an
-effect's mark, the cell of a modulation source, and the glyph of what a
-parameter does. All are seven dots by seven, the size the instrument's own
+effect's mark, the cell of a modulation source or destination, and the glyph
+of what a parameter does. All are seven dots by seven, the size the instrument's own
 display has room for beside a name, and all are one type, `pixels::Pixels`, so
 a host blits any of them with the same code. They are drawn by hand in
 `spec/marks.toml`, `spec/cells.toml` and `spec/glyphs.toml` rather than
@@ -643,21 +643,29 @@ one per control: every low cut is one glyph, whether on a reverb, a delay or
 the voice's own filter, and a controller that drives a parameter carries the
 parameter's. The pedals are where the catalogue says what a cell could not:
 the foot controller is a treadle, expression the same treadle carrying a
-level, and the sustain pedal a switch under a foot. A cell may name a glyph
+level, the breath controller air down a tube, and the sustain pedal a switch
+under a foot. A cell may name a glyph
 instead of drawing its own, so the mod wheel is one drawing wherever it is
 met.
 
-The cells are reached through `ValueTable::cell_of`, and `None` where nobody
-has drawn one, which is four of the sources and all of the destinations. A host
-draws the name it already prints. `spec/cells.toml` says why each of the four
-is blank, and the reason is the same one the marks give for having a variant
-only where a symbol can carry the difference: an icon that is nearly right is
-worse than a word, because a word is honest about being a word.
+The cells are reached through `ValueTable::cell_of`. Every source is drawn and
+so is every destination a host cannot reach a picture through: the eight that
+name no program parameter, and the eleven that name a set of them with no one
+of the set the narrowest, such as `All Attack`. A destination that names one
+parameter is pictured by that parameter's own glyph instead, which keeps the
+drawing in one place. `None` is left where a picture would be a guess — the
+`Off` at each end of the matrix, which is the table saying this end is not
+wired, and the 48 `FX n Param m` destinations, whose picture depends on the
+algorithm the engine is running and is the slot's own glyph under it. A host
+draws the name it already prints for those, and the reason is the one the marks
+give for having a variant only where a symbol can carry the difference: an icon
+that is nearly right is worse than a word, because a word is honest about being
+a word.
 
 They sit beside a table's entries rather than on them, as `ValueTable::cells`,
 a value-ordered slice the accessor searches. A cell on every `ValueEntry` would
 have been an `Option<Pixels>` on some five hundred entries across thirty
-tables, eight bytes each, to carry forty cells; that is the argument the prose
+tables, eight bytes each, to carry forty-three cells; that is the argument the prose
 accessors were split out of `Parameter` on, and it applies to a picture as
 much as to a sentence. A source's swing does go on the entry, because a byte
 fits in the padding the entry already has.

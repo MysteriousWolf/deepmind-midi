@@ -440,7 +440,7 @@ Ordinary MIDI controllers, answered in the usual way.
 | CC | Controls | Glyph | Notes |
 |---|---|---|---|
 | 1 | Modulation Wheel | [mod wheel](effects.md#glyph-mod-wheel) |  |
-| 2 | Breath Controller |  |  |
+| 2 | Breath Controller | [breath](effects.md#glyph-breath) |  |
 | 4 | Foot Controller | [pedal](effects.md#glyph-pedal) |  |
 | 6 | Data Entry MSB |  |  |
 | 7 | Channel Volume | [level](effects.md#glyph-level) |  |
@@ -1331,7 +1331,7 @@ Firmware 1.1+.
 
 The Swing column says which way a source moves what it reaches. `centred` swings either side of where the destination sits: an LFO, the pitch bender, which rests in the middle of its travel, and the control sequencer, whose steps are signed about their centre. `rising` moves it one way from where it sits and back: an envelope, a fade, an LFO taken unipolar, a wheel or a pedal that rests at one end of its travel, and a velocity or a pressure, which start from nothing. The instrument's own display prints the difference: the manual's screenshot of a pitch modulation depth reads `+/-4.5 semitones` from an LFO and `+7.8 semitones` from a unipolar source, which `measurements.toml` records at offset 21. A blank is a source the specification does not settle: where a note number or a voice number counts from is not printed anywhere, and a guess would be drawn as confidently as a fact.
 
-<img src="diagrams/cells.svg" alt="The modulation source cells, magnified and at one dot per dot" width="596">
+<img src="diagrams/cells-mod-source.svg" alt="The modulation matrix source cells, magnified and at one dot per dot" width="596">
 
 | Value | Name | Swing | Notes |
 |---|---|---|---|
@@ -1402,6 +1402,8 @@ Value 0 selects Off.
 Firmware 1.1+.
 
 The Moves column joins each destination to the program parameters it reaches, so that a host holding `Mod 3 Destination = 20` can say that the byte it addresses is offset 39. It is this project's reading of the abbreviations the display prints, checked against the parameter table, not a mapping the manual publishes. A blank there is deliberate: the destination names something no program parameter holds, such as the pitch a key is playing or the amplitude of one voice, and the Notes column says which. Several destinations plainly move more than one parameter, which is why this is a list.
+
+<img src="diagrams/cells-mod-destination.svg" alt="The modulation matrix destination cells, magnified and at one dot per dot" width="596">
 
 | Value | Name | Moves | Notes |
 |---|---|---|---|

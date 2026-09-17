@@ -11,6 +11,11 @@
 # the instrument's own display, and on the small one a controller has beside
 # each of its knobs, a picture and a bar say what a sentence has no room to.
 #
+# The order here is the order of the `pixels::Glyph` variants, and a variant's
+# discriminant is public: a glyph added in the middle moves every glyph after it
+# and is a breaking change. New glyphs go at the end of this file, whatever they
+# are a picture of.
+#
 # Three tables reach these. Every effect slot names one in panels.toml, because
 # what a slot does depends on the algorithm and the algorithm is the only thing
 # that knows. A program parameter names one in parameters.toml where one fits.
@@ -730,4 +735,17 @@ pixels = [
     "##...##",
     "#.###.#",
     "#######",
+]
+
+[[glyph]]
+name = "breath"
+description = "Breath down a tube: a flow between two walls."
+pixels = [
+    ".......",
+    "#######",
+    "....#..",
+    ".#####.",
+    "....#..",
+    "#######",
+    ".......",
 ]

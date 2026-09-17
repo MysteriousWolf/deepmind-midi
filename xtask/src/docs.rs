@@ -425,18 +425,20 @@ fn render_value_tables(spec: &Spec) -> String {
                 "> Unconfirmed. This mapping is inferred and needs checking against hardware.\n\n",
             );
         }
-        // The cells are drawn once, beside the table the newest firmware reads.
-        if crate::spec::Firmware::range_covers(table.firmware.as_deref(), default)
-            && table
-                .entries
-                .iter()
-                .any(|entry| spec.cell_for(table, entry).is_some())
-        {
+        // A table's cells are drawn once, beside the table the newest firmware
+        // reads, so that the sources and the destinations are two sheets.
+        let drawn = table
+            .entries
+            .iter()
+            .filter(|entry| spec.cell_for(table, entry).is_some())
+            .count();
+        if drawn > 0 && crate::spec::Firmware::range_covers(table.firmware.as_deref(), default) {
             let _ = write!(
                 out,
-                "<img src=\"diagrams/cells.svg\" alt=\"{}\" width=\"{}\">\n\n",
-                diagrams::CELLS_ALT,
-                diagrams::cells_width(spec)
+                "<img src=\"diagrams/{}.svg\" alt=\"{}\" width=\"{}\">\n\n",
+                diagrams::cells_id(&table.id),
+                diagrams::cells_alt(table),
+                diagrams::cells_width(drawn),
             );
         }
         // Only the modulation destinations join to the parameter table, and
@@ -570,11 +572,16 @@ fn glyph_anchor(name: &str) -> String {
 }
 
 /// Renders the glyph catalogue: the drawing of every glyph, then a row per
-/// glyph saying what it pictures and how many slots and parameters carry it.
+/// glyph saying what it pictures and what carries it.
+///
+/// The four columns are the four things that name a glyph: an effect slot, a
+/// program parameter, a controller, and a modulation matrix cell drawn by a
+/// glyph rather than by its own dots.
 fn render_glyphs(spec: &Spec) -> String {
     let mut out = format!(
         "<img src=\"diagrams/glyphs.svg\" alt=\"{}\" width=\"{}\">\n\n\
-         | Glyph | Picture of | Effect slots | Parameters | Controllers |\n|---|---|---|---|---|\n",
+         | Glyph | Picture of | Effect slots | Parameters | Controllers | Matrix cells |\n\
+         |---|---|---|---|---|---|\n",
         diagrams::GLYPHS_ALT,
         diagrams::glyphs_width(spec)
     );
@@ -595,15 +602,21 @@ fn render_glyphs(spec: &Spec) -> String {
             .iter()
             .filter(|controller| controller.glyph.as_deref() == Some(glyph.name.as_str()))
             .count();
+        let cells = spec
+            .cells
+            .iter()
+            .filter(|drawn| drawn.glyph.as_deref() == Some(glyph.name.as_str()))
+            .count();
         let _ = writeln!(
             out,
-            "| <a id=\"glyph-{}\"></a>`{}` | {} | {} | {} | {} |",
+            "| <a id=\"glyph-{}\"></a>`{}` | {} | {} | {} | {} | {} |",
             glyph_anchor(&glyph.name),
             glyph.name,
             cell(&glyph.description),
             slots,
             parameters,
-            controllers
+            controllers,
+            cells
         );
     }
     out

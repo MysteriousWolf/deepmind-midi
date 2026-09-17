@@ -3523,21 +3523,39 @@ impl ParamId {
 impl ParamId {
     /// Returns the picture of what this parameter does, where one fits.
     ///
-    /// 177 of the 242 carry one. The rest are the effect slots, whose
-    /// picture depends on the algorithm the engine is running and is
-    /// [`FxSlot::glyph`](crate::effect::FxSlot::glyph), and the program name's
-    /// characters, which are letters and not a control. A host draws the name
-    /// it already prints for those.
+    /// 177 of the 242 carry one. The other 65 answer `None`
+    /// by design rather than by omission, and they are two families.
+    ///
+    /// The 48 effect slots are one: what `FX 1 Param 3` does depends on which
+    /// algorithm its engine is running, so a picture fixed to the parameter
+    /// would be wrong five times out of six. The right one is the slot's own
+    /// [`FxSlot::glyph`](crate::effect::FxSlot::glyph) under the loaded
+    /// algorithm, which [`Engine::of`](crate::effect::Engine::of) and
+    /// [`Algorithm::slot_of`](crate::effect::Algorithm::slot_of) reach from this
+    /// parameter, and the coarser one is that algorithm's
+    /// [`mark`](crate::effect::Algorithm::mark). Both are facts about the engine
+    /// rather than about the parameter, so neither is answered here.
+    ///
+    /// The program name's 17 characters are the other: they are letters
+    /// and not a control, and a host draws the name it already prints.
     ///
     /// Which glyph a parameter carries is this crate's reading of what the
     /// parameter does; `spec/glyphs.toml` says how it was decided.
     ///
     /// ```
+    /// use deepmind_midi::effect::{Algorithm, Engine};
     /// use deepmind_midi::param::ParamId;
     /// use deepmind_midi::pixels::Glyph;
     ///
     /// assert_eq!(ParamId::VcfResonance.glyph(), Some(Glyph::Resonance));
-    /// assert_eq!(ParamId::Fx1Param1.glyph(), None);
+    ///
+    /// // An effect slot is `None` here, and a picture under the algorithm
+    /// // the engine is running.
+    /// assert_eq!(ParamId::Fx1Param2.glyph(), None);
+    /// let engine = Engine::of(ParamId::Fx1Param2).expect("engine one");
+    /// let room = Algorithm::by_name("RoomRev").expect("a Room Reverb");
+    /// let slot = room.slot_of(engine, ParamId::Fx1Param2).expect("a Decay slot");
+    /// assert_eq!(slot.glyph(), Glyph::Decay);
     /// ```
     #[must_use]
     pub const fn glyph(self) -> Option<Glyph> {
@@ -5353,6 +5371,12 @@ static MOD_SOURCE_FW_1_1: ValueTable = ValueTable {
             ]),
         ),
         (
+            4,
+            Pixels::new([
+                0b000_0000, 0b111_1111, 0b001_0000, 0b011_1110, 0b001_0000, 0b111_1111, 0b000_0000,
+            ]),
+        ),
+        (
             5,
             Pixels::new([
                 0b000_1000, 0b000_1000, 0b011_1110, 0b001_1100, 0b000_1000, 0b000_0000, 0b111_1111,
@@ -5440,6 +5464,18 @@ static MOD_SOURCE_FW_1_1: ValueTable = ValueTable {
             19,
             Pixels::new([
                 0b101_0000, 0b000_0000, 0b111_0000, 0b000_1000, 0b000_0100, 0b000_0010, 0b000_0001,
+            ]),
+        ),
+        (
+            20,
+            Pixels::new([
+                0b000_0000, 0b111_1111, 0b101_1101, 0b101_1101, 0b101_1101, 0b111_1111, 0b000_0000,
+            ]),
+        ),
+        (
+            21,
+            Pixels::new([
+                0b011_1110, 0b010_0010, 0b011_1110, 0b011_1110, 0b011_1110, 0b010_0010, 0b011_1110,
             ]),
         ),
         (
@@ -5628,6 +5664,12 @@ static MOD_SOURCE_FW_1_0: ValueTable = ValueTable {
             ]),
         ),
         (
+            4,
+            Pixels::new([
+                0b000_0000, 0b111_1111, 0b001_0000, 0b011_1110, 0b001_0000, 0b111_1111, 0b000_0000,
+            ]),
+        ),
+        (
             5,
             Pixels::new([
                 0b000_1000, 0b000_1000, 0b011_1110, 0b001_1100, 0b000_1000, 0b000_0000, 0b111_1111,
@@ -5709,6 +5751,12 @@ static MOD_SOURCE_FW_1_0: ValueTable = ValueTable {
             18,
             Pixels::new([
                 0b000_0000, 0b000_1000, 0b001_1100, 0b011_1110, 0b010_1010, 0b010_1010, 0b000_1000,
+            ]),
+        ),
+        (
+            19,
+            Pixels::new([
+                0b000_0000, 0b111_1111, 0b101_1101, 0b101_1101, 0b101_1101, 0b111_1111, 0b000_0000,
             ]),
         ),
         (
@@ -6590,7 +6638,122 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
             swing: None,
         },
     ],
-    cells: &[],
+    cells: &[
+        (
+            9,
+            Pixels::new([
+                0b001_0000, 0b011_0000, 0b101_0000, 0b001_0000, 0b001_0000, 0b001_1110, 0b001_1110,
+            ]),
+        ),
+        (
+            10,
+            Pixels::new([
+                0b000_0000, 0b010_0110, 0b001_1001, 0b000_0000, 0b010_0110, 0b001_1001, 0b000_0000,
+            ]),
+        ),
+        (
+            11,
+            Pixels::new([
+                0b001_0000, 0b011_0000, 0b101_0000, 0b001_0000, 0b001_0000, 0b001_1110, 0b001_1110,
+            ]),
+        ),
+        (
+            12,
+            Pixels::new([
+                0b000_0000, 0b010_0110, 0b001_1001, 0b000_0000, 0b010_0110, 0b001_1001, 0b000_0000,
+            ]),
+        ),
+        (
+            14,
+            Pixels::new([
+                0b000_0000, 0b010_0110, 0b001_1001, 0b000_0000, 0b010_0110, 0b001_1001, 0b000_0000,
+            ]),
+        ),
+        (
+            24,
+            Pixels::new([
+                0b000_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            25,
+            Pixels::new([
+                0b111_1000, 0b000_1000, 0b000_0100, 0b000_0100, 0b000_0010, 0b000_0010, 0b000_0001,
+            ]),
+        ),
+        (
+            26,
+            Pixels::new([
+                0b000_0001, 0b000_0001, 0b000_0010, 0b000_0010, 0b000_0100, 0b001_1000, 0b110_0000,
+            ]),
+        ),
+        (
+            27,
+            Pixels::new([
+                0b000_0000, 0b111_1111, 0b000_0000, 0b000_0000, 0b000_0000, 0b100_0001, 0b100_0001,
+            ]),
+        ),
+        (
+            28,
+            Pixels::new([
+                0b000_1111, 0b001_0000, 0b001_0000, 0b010_0000, 0b010_0000, 0b100_0000, 0b100_0000,
+            ]),
+        ),
+        (
+            29,
+            Pixels::new([
+                0b100_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            30,
+            Pixels::new([
+                0b101_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            31,
+            Pixels::new([
+                0b101_0100, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            32,
+            Pixels::new([
+                0b100_0000, 0b000_0000, 0b010_0000, 0b011_0000, 0b001_1000, 0b000_0110, 0b000_0011,
+            ]),
+        ),
+        (
+            33,
+            Pixels::new([
+                0b101_0000, 0b000_0000, 0b010_0000, 0b011_0000, 0b001_1000, 0b000_0110, 0b000_0011,
+            ]),
+        ),
+        (
+            34,
+            Pixels::new([
+                0b101_0100, 0b000_0000, 0b010_0000, 0b011_0000, 0b001_1000, 0b000_0110, 0b000_0011,
+            ]),
+        ),
+        (
+            59,
+            Pixels::new([
+                0b000_0000, 0b000_0000, 0b101_0101, 0b101_0101, 0b101_0101, 0b101_0101, 0b111_1111,
+            ]),
+        ),
+        (
+            60,
+            Pixels::new([
+                0b000_0000, 0b000_0000, 0b001_0000, 0b001_0000, 0b001_0000, 0b101_0101, 0b111_1111,
+            ]),
+        ),
+        (
+            63,
+            Pixels::new([
+                0b000_0000, 0b000_0000, 0b010_0010, 0b110_1011, 0b010_0010, 0b000_0000, 0b000_0000,
+            ]),
+        ),
+    ],
 };
 
 static FX_TYPE_FW_1_1: ValueTable = ValueTable {
@@ -7653,7 +7816,104 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
             swing: None,
         },
     ],
-    cells: &[],
+    cells: &[
+        (
+            9,
+            Pixels::new([
+                0b001_0000, 0b011_0000, 0b101_0000, 0b001_0000, 0b001_0000, 0b001_1110, 0b001_1110,
+            ]),
+        ),
+        (
+            10,
+            Pixels::new([
+                0b001_0000, 0b011_0000, 0b101_0000, 0b001_0000, 0b001_0000, 0b001_1110, 0b001_1110,
+            ]),
+        ),
+        (
+            21,
+            Pixels::new([
+                0b000_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            22,
+            Pixels::new([
+                0b111_1000, 0b000_1000, 0b000_0100, 0b000_0100, 0b000_0010, 0b000_0010, 0b000_0001,
+            ]),
+        ),
+        (
+            23,
+            Pixels::new([
+                0b000_0001, 0b000_0001, 0b000_0010, 0b000_0010, 0b000_0100, 0b001_1000, 0b110_0000,
+            ]),
+        ),
+        (
+            24,
+            Pixels::new([
+                0b000_0000, 0b111_1111, 0b000_0000, 0b000_0000, 0b000_0000, 0b100_0001, 0b100_0001,
+            ]),
+        ),
+        (
+            25,
+            Pixels::new([
+                0b000_1111, 0b001_0000, 0b001_0000, 0b010_0000, 0b010_0000, 0b100_0000, 0b100_0000,
+            ]),
+        ),
+        (
+            26,
+            Pixels::new([
+                0b100_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            27,
+            Pixels::new([
+                0b101_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            28,
+            Pixels::new([
+                0b101_0100, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            29,
+            Pixels::new([
+                0b100_0000, 0b000_0000, 0b010_0000, 0b011_0000, 0b001_1000, 0b000_0110, 0b000_0011,
+            ]),
+        ),
+        (
+            30,
+            Pixels::new([
+                0b101_0000, 0b000_0000, 0b010_0000, 0b011_0000, 0b001_1000, 0b000_0110, 0b000_0011,
+            ]),
+        ),
+        (
+            31,
+            Pixels::new([
+                0b101_0100, 0b000_0000, 0b010_0000, 0b011_0000, 0b001_1000, 0b000_0110, 0b000_0011,
+            ]),
+        ),
+        (
+            56,
+            Pixels::new([
+                0b000_0000, 0b000_0000, 0b101_0101, 0b101_0101, 0b101_0101, 0b101_0101, 0b111_1111,
+            ]),
+        ),
+        (
+            57,
+            Pixels::new([
+                0b000_0000, 0b000_0000, 0b001_0000, 0b001_0000, 0b001_0000, 0b101_0101, 0b111_1111,
+            ]),
+        ),
+        (
+            60,
+            Pixels::new([
+                0b000_0000, 0b000_0000, 0b010_0010, 0b110_1011, 0b010_0010, 0b000_0000, 0b000_0000,
+            ]),
+        ),
+    ],
 };
 
 static FX_TYPE_FW_1_0: ValueTable = ValueTable {
@@ -7888,7 +8148,7 @@ pub const CONTROLLERS: [Controller; CONTROLLER_COUNT] = [
         name: "Breath Controller",
         kind: ControllerKind::Standard,
         parameter: None,
-        glyph: None,
+        glyph: Some(Glyph::Breath),
     },
     Controller {
         cc: 4,
