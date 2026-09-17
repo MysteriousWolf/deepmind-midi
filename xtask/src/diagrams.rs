@@ -92,6 +92,12 @@ pub fn all(spec: &Spec) -> Result<Vec<Diagram>, String> {
             source: envelope(),
         },
         Diagram {
+            id: "cells",
+            title: "Modulation source cells",
+            kind: Kind::Svg,
+            source: cells(spec),
+        },
+        Diagram {
             id: "marks",
             title: "Effect family marks",
             kind: Kind::Svg,
@@ -487,6 +493,107 @@ fn marks(spec: &Spec) -> String {
             out,
             "  <text class=\"name\" x=\"{centre:.1}\" y=\"{label_top:.1}\">{}</text>",
             family.name,
+        );
+    }
+    out.push_str("</svg>\n");
+    out
+}
+
+/// The alt text of the cells drawing, shared with the document that embeds it.
+pub const CELLS_ALT: &str = "The modulation source cells, magnified and at one dot per dot";
+
+/// Cells per row of the cells drawing.
+const CELLS_ACROSS: usize = 10;
+
+/// Side of a magnified dot in the cells drawing, in the SVG's own units.
+const CELL_DOT: usize = 6;
+
+/// Space around each column of the cells drawing.
+const CELL_PAD: usize = 16;
+
+/// Returns the width the cells drawing is rendered at, for the `<img>` that
+/// embeds it.
+///
+/// Integer arithmetic on the same numbers [`cells`] lays the drawing out with,
+/// so the two cannot disagree by a rounding.
+pub fn cells_width(spec: &Spec) -> usize {
+    let pitch = crate::spec::PIXEL_SIDE * CELL_DOT + CELL_PAD;
+    pitch * spec.cells.len().min(CELLS_ACROSS) + CELL_PAD
+}
+
+/// The cells, each drawn magnified and again at one dot per dot.
+///
+/// The same proof the marks drawing is: these are the bits a host blits,
+/// straight out of `spec/cells.toml`, so a cell that reads badly here reads
+/// badly in a host too.
+fn cells(spec: &Spec) -> String {
+    let side = count(crate::spec::PIXEL_SIDE);
+    let dot = count(CELL_DOT);
+    let pad = count(CELL_PAD);
+    let grid = side * dot;
+    let pitch = grid + pad;
+    let rows = spec.cells.len().div_ceil(CELLS_ACROSS);
+    let width = cells_width(spec);
+
+    let true_gap = 10.0;
+    let label_gap = 14.0;
+    let row_height = grid + true_gap + side + label_gap + pad;
+    let height = pad + row_height * count(rows);
+
+    let mut out = format!(
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width} {height}\" \
+         width=\"{width}\" height=\"{height}\" role=\"img\" aria-label=\"{CELLS_ALT}\">\n\
+         <style>\n\
+         .lit {{ fill: #2b2f38; }}\n\
+         .unlit {{ fill: #e7e9ed; }}\n\
+         .name {{ font: 500 9px system-ui, sans-serif; fill: #6b7280; text-anchor: middle; }}\n\
+         @media (prefers-color-scheme: dark) {{\n\
+         .lit {{ fill: #d8dbe2; }}\n\
+         .unlit {{ fill: #31353d; }}\n\
+         .name {{ fill: #9aa2b1; }}\n\
+         }}\n\
+         </style>\n"
+    );
+
+    for (index, cell) in spec.cells.iter().enumerate() {
+        let column = index % CELLS_ACROSS;
+        let row = index / CELLS_ACROSS;
+        let left = pad + pitch * count(column);
+        let centre = left + grid / 2.0;
+        let grid_top = pad + row_height * count(row);
+        let true_top = grid_top + grid + true_gap;
+        let label_top = true_top + side + label_gap;
+        // On whole units, so the one-dot rectangles land on pixels rather
+        // than straddling two of them.
+        let true_left = (centre - side / 2.0).round();
+
+        for (y, line) in cell.pixels.iter().enumerate() {
+            for (x, pixel) in line.chars().enumerate() {
+                let class = if pixel == '#' { "lit" } else { "unlit" };
+                let _ = writeln!(
+                    out,
+                    "  <rect class=\"{class}\" x=\"{:.1}\" y=\"{:.1}\" \
+                     width=\"{:.1}\" height=\"{:.1}\" />",
+                    left + count(x) * dot,
+                    grid_top + count(y) * dot,
+                    dot - 1.0,
+                    dot - 1.0,
+                );
+                if pixel == '#' {
+                    let _ = writeln!(
+                        out,
+                        "  <rect class=\"lit\" x=\"{:.1}\" y=\"{:.1}\" width=\"1\" \
+                         height=\"1\" />",
+                        true_left + count(x),
+                        true_top + count(y),
+                    );
+                }
+            }
+        }
+        let _ = writeln!(
+            out,
+            "  <text class=\"name\" x=\"{centre:.1}\" y=\"{label_top:.1}\">{}</text>",
+            cell.name.replace('&', "&amp;"),
         );
     }
     out.push_str("</svg>\n");

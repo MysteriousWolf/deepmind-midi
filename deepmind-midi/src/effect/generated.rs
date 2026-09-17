@@ -8432,8 +8432,9 @@ static MARK_ROTARY: [Stroke; 2] = [
     },
 ];
 
-/// Side of the one-bit grid each family's mark is drawn again on.
-pub const MARK_PIXEL_SIDE: usize = 7;
+/// Side of the one-bit grid each family's mark is drawn again on, which is
+/// the crate's one pixel grid.
+pub const MARK_PIXEL_SIDE: usize = crate::pixels::SIDE;
 
 /// Each family's name, in the order `Family::ALL` gives them.
 pub(super) static FAMILY_NAMES: [&str; FAMILY_COUNT] = [

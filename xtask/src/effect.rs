@@ -648,15 +648,13 @@ pub const FAMILY_COUNT: usize = {};
 
     render_mark_strokes(spec, out)?;
 
-    let _ = writeln!(
-        out,
+    out.push_str(
         "\
-/// Side of the one-bit grid each family's mark is drawn again on.
-pub const MARK_PIXEL_SIDE: usize = {};
+/// Side of the one-bit grid each family's mark is drawn again on, which is
+/// the crate's one pixel grid.
+pub const MARK_PIXEL_SIDE: usize = crate::pixels::SIDE;
+
 ",
-        spec.families
-            .first()
-            .map_or(0, |family| family.pixels.len())
     );
 
     out.push_str(
@@ -677,30 +675,11 @@ pub(super) static MARKS: [Mark; FAMILY_COUNT] = [
 ",
     );
     for family in &spec.families {
-        // A row of the grid is a bit per pixel, bit 0 leftmost, which is the
-        // order a host blitting left to right wants.
-        let rows: Vec<String> = family
-            .pixels
-            .iter()
-            .map(|row| {
-                let bits: u8 = row
-                    .chars()
-                    .enumerate()
-                    .filter(|&(_, pixel)| pixel == '#')
-                    .map(|(x, _)| 1_u8 << x)
-                    .sum();
-                // Grouped from the right, because a seven-digit binary
-                // literal without a separator is unreadable to clippy and to a
-                // reader. The picture is still legible in the bits, which is
-                // the whole reason these are binary and not hexadecimal.
-                format!("0b{:03b}_{:04b}", bits >> 4, bits & 0xf)
-            })
-            .collect();
         let _ = writeln!(
             out,
-            "    Mark {{ strokes: &MARK_{}, pixels: Pixels::new([{}]) }},",
+            "    Mark {{ strokes: &MARK_{}, pixels: {} }},",
             variant(&family.name)?.to_ascii_uppercase(),
-            rows.join(", "),
+            crate::codegen::pixels(&family.pixels),
         );
     }
     out.push_str("];\n");

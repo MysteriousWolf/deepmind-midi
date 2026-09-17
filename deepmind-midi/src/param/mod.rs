@@ -36,6 +36,10 @@
 //! abbreviation the display prints, and [`ParamId::targets`] is which parameters
 //! that abbreviation moves. It is empty where the destination names something no
 //! program parameter addresses, which the specification records beside the entry.
+//! [`ValueTable::values_naming`] is the same join read backwards, most specific
+//! destination first, for a host that starts from the control. A source carries
+//! which way it moves what it reaches, as [`ValueTable::swing_of`], and a
+//! picture of itself the size of a character, as [`ValueTable::cell_of`].
 //!
 //! It carries what a raw value means beyond its range, wherever the manual says:
 //! [`ParamId::shape`] is the point a bipolar parameter is read about,
@@ -96,6 +100,7 @@ use generated::{CONTROLLER_OF_PARAMETER, NO_CONTROLLER};
 use core::fmt;
 
 use crate::error::{Error, Result};
+use crate::pixels::Pixels;
 use crate::sysex::inquiry::Version;
 use crate::wire::{Channel, ChannelMessage};
 
@@ -110,6 +115,18 @@ pub const DATA_ENTRY_MSB: u8 = 6;
 
 /// Controller that carries the low seven bits of a value (CC 38).
 pub const DATA_ENTRY_LSB: u8 = 38;
+
+/// The eight modulation depths, one per bus, in bus order.
+const MOD_DEPTHS: [ParamId; 8] = [
+    ParamId::Mod1Depth,
+    ParamId::Mod2Depth,
+    ParamId::Mod3Depth,
+    ParamId::Mod4Depth,
+    ParamId::Mod5Depth,
+    ParamId::Mod6Depth,
+    ParamId::Mod7Depth,
+    ParamId::Mod8Depth,
+];
 
 /// Everything the specification says about one parameter.
 ///
@@ -175,6 +192,31 @@ pub enum Shape {
     },
 }
 
+/// Which way a modulation source moves the destination it reaches.
+///
+/// Reached through [`ValueTable::swing_of`] and [`ValueEntry::swing`]. It is a
+/// fact about the source and the same for every routing that uses it: the sign
+/// of a `Mod n Depth` says which way round the routing applies the source, and
+/// an inverted LFO is still an LFO.
+///
+/// A host drawing how far the routings reaching a control can push it starts
+/// the band here: either side of where the control sits for a
+/// [`Centred`](Self::Centred) source, from where it sits one way for a
+/// [`Rising`](Self::Rising) one.
+///
+/// `non_exhaustive` because a source may yet turn out to do a third thing.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum Swing {
+    /// About the value: an LFO at depth moves its destination up and down, and
+    /// so does the pitch bender, which rests in the middle of its travel.
+    Centred,
+    /// Up from the value and back: an envelope, a fade, an LFO taken unipolar,
+    /// a wheel resting at one end of its travel, a velocity or a pressure.
+    Rising,
+}
+
 /// One value of an enumerated parameter.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
@@ -198,6 +240,12 @@ pub struct ValueEntry {
     /// established. `docs/midi-spec.md` prints the reason beside the
     /// destinations that have one.
     pub parameters: &'static [ParamId],
+    /// Which way this value, as a modulation source, moves what it reaches.
+    ///
+    /// `None` for every table but the modulation sources, and for a source
+    /// the specification does not settle: where a note number counts from is
+    /// not printed anywhere, and `Off` moves nothing.
+    pub swing: Option<Swing>,
 }
 
 /// A named set of values, as of one firmware version.
@@ -223,6 +271,18 @@ pub struct ValueTable {
     pub partial: bool,
     /// The values themselves, in value order.
     pub entries: &'static [ValueEntry],
+    /// A dot-matrix cell per value that has one, in value order.
+    ///
+    /// The modulation sources have them: a picture of `LFO 1` or `Mod Wheel`
+    /// the size of a character, for a patch bay drawn in pictures rather than
+    /// in abbreviations. Empty for every other table, and missing a value
+    /// nobody has drawn, for which a host draws the name it already prints.
+    /// `spec/cells.toml` says which are drawn and why the rest are not.
+    ///
+    /// Beside the entries rather than on them, so that the twenty-odd tables
+    /// with no cells do not carry a blank per entry; reached through
+    /// [`ValueTable::cell_of`].
+    pub cells: &'static [(u16, Pixels)],
 }
 
 impl ValueTable {
@@ -245,6 +305,105 @@ impl ValueTable {
     #[must_use]
     pub fn parameters_of(&self, value: u16) -> &'static [ParamId] {
         self.entry(value).map_or(&[], |entry| entry.parameters)
+    }
+
+    /// Returns which way this table's `value`, as a modulation source, moves
+    /// what it reaches.
+    ///
+    /// `None` for a value this table does not list, for a table that is not
+    /// the modulation sources, and for a source the specification does not
+    /// settle; see [`ValueEntry::swing`].
+    ///
+    /// ```
+    /// use deepmind_midi::param::{Swing, TableId};
+    /// use deepmind_midi::program::ModSource;
+    ///
+    /// let sources = TableId::ModSource.table();
+    /// let value = |source: ModSource| u16::from(source.raw());
+    /// assert_eq!(sources.swing_of(value(ModSource::Lfo1)), Some(Swing::Centred));
+    /// assert_eq!(sources.swing_of(value(ModSource::Env1)), Some(Swing::Rising));
+    /// assert_eq!(sources.swing_of(value(ModSource::Off)), None);
+    /// ```
+    #[must_use]
+    pub fn swing_of(&self, value: u16) -> Option<Swing> {
+        self.entry(value)?.swing
+    }
+
+    /// Returns the dot-matrix cell drawn for this table's `value`, where one
+    /// has been; see [`ValueTable::cells`].
+    ///
+    /// ```
+    /// use deepmind_midi::param::TableId;
+    /// use deepmind_midi::program::ModSource;
+    ///
+    /// let sources = TableId::ModSource.table();
+    /// let lfo = sources.cell_of(u16::from(ModSource::Lfo1.raw())).expect("LFO 1 is drawn");
+    /// assert!(lfo.rows().iter().any(|row| *row != 0));
+    /// assert!(sources.cell_of(u16::from(ModSource::Off.raw())).is_none());
+    /// ```
+    #[must_use]
+    pub fn cell_of(&self, value: u16) -> Option<&'static Pixels> {
+        let index = self
+            .cells
+            .binary_search_by_key(&value, |&(drawn, _)| drawn)
+            .ok()?;
+        self.cells.get(index).map(|(_, cell)| cell)
+    }
+
+    /// Returns the values of this table that address `parameter`, most
+    /// specific first.
+    ///
+    /// The join of [`ValueEntry::parameters`] read backwards: which
+    /// destinations a host should offer when somebody points at a control.
+    /// `VCF Envelope Attack Time` is moved by `Env2 Attack`, which moves only
+    /// it, and by `All Attack`, which moves the three envelopes' attacks
+    /// together, and somebody who took hold of the filter envelope's attack
+    /// meant the filter's. So the order is by how many parameters a
+    /// destination moves, fewest first, and `.next()` is the answer for a
+    /// host wanting one destination. Two destinations moving the same number
+    /// of parameters come in value order: `All Attack` moves three attacks
+    /// and `Env2 Rates` moves the filter envelope's three times, and nothing
+    /// in the specification makes one of those the narrower, so it says so
+    /// rather than implying a preference.
+    ///
+    /// Empty for a parameter nothing in this table addresses, matching
+    /// [`parameters_of`](Self::parameters_of). It is a search over the
+    /// forward slices rather than a second table, which costs a walk over
+    /// the entries per value yielded and runs once per control a host lights
+    /// up.
+    ///
+    /// ```
+    /// use deepmind_midi::param::{ParamId, TableId};
+    ///
+    /// let destinations = TableId::ModDestination.table();
+    /// let mut naming = destinations.values_naming(ParamId::VcfEnvelopeAttackTime);
+    ///
+    /// // The one that moves only this, then the ones that move it with others.
+    /// assert_eq!(naming.next().and_then(|v| destinations.name_of(v)), Some("Env2 Attack"));
+    /// assert_eq!(naming.next().and_then(|v| destinations.name_of(v)), Some("All Attack"));
+    /// assert_eq!(naming.next().and_then(|v| destinations.name_of(v)), Some("Env2 Rates"));
+    /// assert_eq!(naming.next().and_then(|v| destinations.name_of(v)), Some("Env Rates"));
+    /// assert_eq!(naming.next(), None);
+    ///
+    /// // A parameter the matrix cannot reach.
+    /// assert_eq!(destinations.values_naming(ParamId::ArpPattern).next(), None);
+    /// ```
+    pub fn values_naming(&self, parameter: ParamId) -> impl Iterator<Item = u16> + 'static {
+        let entries = self.entries;
+        // The key each value is ordered by: how many parameters it moves, then
+        // the value itself. Each step yields the smallest key past the last
+        // one, which needs no buffer and so no bound on how many there are.
+        let mut last: Option<(usize, u16)> = None;
+        core::iter::from_fn(move || {
+            let next = entries
+                .iter()
+                .filter(|entry| entry.parameters.contains(&parameter))
+                .map(|entry| (entry.parameters.len(), entry.value))
+                .filter(|key| last.is_none_or(|last| *key > last))
+                .min()?;
+            last = Some(next);
+            Some(next.1)
+        })
     }
 
     /// Returns this table's entry for `value`.
@@ -569,6 +728,51 @@ impl ParamId {
             Kind::Continuous | Kind::Switch => &[],
             Kind::Enumerated(table) => table.table_for(firmware).parameters_of(value),
         }
+    }
+
+    /// Returns how much of `destination`'s own range a full modulation depth
+    /// on this parameter covers, where the specification establishes it.
+    ///
+    /// `self` is one of the eight `Mod n Depth` parameters and `destination`
+    /// is a program parameter the matrix can reach. The answer is `None` for
+    /// any other pair, and `None` for every pair today: the manual prints the
+    /// depth's range, `-128` to `+127` about its centre, and nothing that
+    /// relates a depth to what it does to the bytes at the other end of the
+    /// routing. Whether full depth sweeps a destination over its whole range,
+    /// half of it, or something that depends on the destination is not
+    /// printed and has not been measured.
+    ///
+    /// The accessor exists so that a host has somewhere to ask, and keeps its
+    /// assumption marked until the answer is a number rather than a guess. A
+    /// measurement, when one is made, belongs in `spec/measurements.toml`
+    /// beside the other readings and lands here.
+    ///
+    /// ```
+    /// use deepmind_midi::param::ParamId;
+    ///
+    /// // Not established, so a host keeps saying so.
+    /// assert_eq!(ParamId::Mod1Depth.modulation_reach(ParamId::VcfFrequency), None);
+    /// // Not a depth, or not something the matrix reaches.
+    /// assert_eq!(ParamId::VcfFrequency.modulation_reach(ParamId::VcfFrequency), None);
+    /// assert_eq!(ParamId::Mod1Depth.modulation_reach(ParamId::ArpPattern), None);
+    /// ```
+    #[must_use]
+    pub fn modulation_reach(self, destination: Self) -> Option<f32> {
+        /// What has been established: nothing yet. A row is a destination and
+        /// the fraction of its range a full depth covers.
+        const REACH: [(ParamId, f32); 0] = [];
+
+        if !MOD_DEPTHS.contains(&self) {
+            return None;
+        }
+        TableId::ModDestination
+            .table()
+            .values_naming(destination)
+            .next()?;
+        REACH
+            .iter()
+            .find(|&&(reached, _)| reached == destination)
+            .map(|&(_, fraction)| fraction)
     }
 
     /// Builds an NRPN edit setting this parameter to `value`.
@@ -968,6 +1172,147 @@ mod tests {
             .count();
         // Four engines of twelve slots, and the four output gains.
         assert_eq!(slots, 4 * 12 + 4);
+    }
+
+    /// The reverse join agrees with a scan of the forward one, parameter by
+    /// parameter, and comes out narrowest first.
+    #[test]
+    fn the_destinations_naming_a_parameter_come_narrowest_first() {
+        let table = TableId::ModDestination.table();
+        for parameter in ParamId::ALL.iter().copied() {
+            let mut previous: Option<(usize, u16)> = None;
+            let mut yielded = 0;
+            for value in table.values_naming(parameter) {
+                let entry = table.entry(value).expect("a listed value");
+                assert!(
+                    entry.parameters.contains(&parameter),
+                    "{parameter} by {value}"
+                );
+                let key = (entry.parameters.len(), value);
+                assert!(
+                    previous.is_none_or(|last| key > last),
+                    "{parameter} out of order"
+                );
+                previous = Some(key);
+                yielded += 1;
+            }
+            let scanned = table
+                .entries
+                .iter()
+                .filter(|entry| entry.parameters.contains(&parameter))
+                .count();
+            assert_eq!(yielded, scanned, "{parameter}");
+        }
+
+        // The narrowest destination for an envelope time is the one that
+        // moves only it, whatever its value.
+        let one = table
+            .values_naming(ParamId::ModEnvelopeReleaseTime)
+            .next()
+            .expect("the matrix reaches it");
+        assert_eq!(table.parameters_of(one), &[ParamId::ModEnvelopeReleaseTime]);
+        // And the firmware 1.0 table answers with its own numbering.
+        let old = TableId::ModDestination.table_for(FIRMWARE_1_0);
+        let first = old
+            .values_naming(ParamId::VcfFrequency)
+            .next()
+            .expect("VCF Freq is on 1.0 too");
+        assert_eq!(old.name_of(first), Some("VCF Freq"));
+        assert_ne!(
+            first,
+            table
+                .values_naming(ParamId::VcfFrequency)
+                .next()
+                .expect("and on 1.1")
+        );
+    }
+
+    /// A source swings one way or the other where the specification settles
+    /// it, on both firmware numberings, and the tables that are not sources
+    /// swing nowhere.
+    #[test]
+    fn a_source_says_which_way_it_swings() {
+        let sources = TableId::ModSource.table();
+        assert_eq!(sources.swing_of(7), Some(Swing::Centred)); // LFO1
+        assert_eq!(sources.swing_of(16), Some(Swing::Rising)); // LFO1 (Uni)
+        assert_eq!(sources.swing_of(1), Some(Swing::Centred)); // Pitch Bend
+        assert_eq!(sources.swing_of(2), Some(Swing::Rising)); // Mod Wheel
+        assert_eq!(sources.swing_of(0), None); // Off
+        assert_eq!(sources.swing_of(12), None); // Note Num
+        assert_eq!(sources.swing_of(200), None);
+
+        let old = TableId::ModSource.table_for(FIRMWARE_1_0);
+        assert_eq!(old.name_of(6), Some("LFO1"));
+        assert_eq!(old.swing_of(6), Some(Swing::Centred));
+
+        for id in TableId::ALL.iter().copied() {
+            if id == TableId::ModSource {
+                continue;
+            }
+            assert!(
+                id.table().entries.iter().all(|entry| entry.swing.is_none()),
+                "{id:?} swings"
+            );
+        }
+    }
+
+    /// The sources carry cells and nothing else does; a cell is a drawing
+    /// rather than a blank; and the two firmware tables draw a source the same
+    /// way, whatever number it has.
+    #[test]
+    fn a_source_carries_a_cell_where_one_was_drawn() {
+        let sources = TableId::ModSource.table();
+        assert!(sources.cells.len() >= 16, "{} cells", sources.cells.len());
+        assert!(sources.cell_of(0).is_none(), "Off is nothing to draw");
+        let lfo1 = sources.cell_of(7).expect("LFO1 is drawn");
+        assert!(lfo1.rows().iter().any(|row| *row != 0));
+        assert!(lfo1.rows().iter().any(|row| *row != 0x7f));
+        // Every cell is drawn for a value the table lists, and the values
+        // ascend, which is what lets `cell_of` search rather than scan.
+        for (left, right) in sources.cells.iter().zip(sources.cells.iter().skip(1)) {
+            assert!(left.0 < right.0, "cells out of order at {}", right.0);
+        }
+        for &(value, _) in sources.cells {
+            assert!(
+                sources.entry(value).is_some(),
+                "a cell for nothing at {value}"
+            );
+        }
+
+        let old = TableId::ModSource.table_for(FIRMWARE_1_0);
+        for entry in sources.entries {
+            let Some(twin) = old.entries.iter().find(|e| e.name == entry.name) else {
+                continue;
+            };
+            assert_eq!(
+                sources.cell_of(entry.value),
+                old.cell_of(twin.value),
+                "{}",
+                entry.name
+            );
+        }
+
+        for id in TableId::ALL.iter().copied() {
+            if id == TableId::ModSource {
+                continue;
+            }
+            assert!(id.table().cells.is_empty(), "{id:?} carries a cell");
+        }
+    }
+
+    /// Nothing relates a depth to a destination's range yet, and the accessor
+    /// says so for every pair rather than for some.
+    #[test]
+    fn no_modulation_reach_is_established() {
+        for depth in MOD_DEPTHS {
+            for destination in ParamId::ALL.iter().copied() {
+                assert_eq!(depth.modulation_reach(destination), None);
+            }
+        }
+        assert_eq!(
+            ParamId::Mod1Source.modulation_reach(ParamId::VcfFrequency),
+            None
+        );
     }
 
     /// A destination naming a parameter twice, or naming one that does not

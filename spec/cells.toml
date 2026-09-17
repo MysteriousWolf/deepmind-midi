@@ -1,0 +1,318 @@
+# A dot-matrix cell per modulation source, for a patch bay drawn in pictures.
+#
+# Generated documentation is built from this file. Edit it here, then run
+# `cargo xtask docs` to refresh docs/midi-spec.md and docs/diagrams/cells.svg,
+# and `cargo xtask codegen` to refresh the value tables that carry the cells.
+#
+# A modulation source has a name the display prints and, from here, a picture:
+# seven dots by seven, one bit a dot, the size the instrument's own 128 by 64
+# display has room for beside a name and the size a host lays down at any scale
+# without resampling anything. It is the same grid the effect family marks are
+# drawn again on in marks.toml, reached through the same `Pixels` type, and it
+# reaches a host through `ValueTable::cell_of`.
+
+[meta]
+purpose = """
+Eight rows of source, destination and depth read one sentence each. A patch \
+bay with the sources down one side and the destinations down the other adds \
+the shape: that one LFO drives three things, that two routings are fighting \
+over the filter corner, that the aftertouch goes nowhere. Two columns of \
+abbreviations with lines between them is read word by word; two columns of \
+pictures is read at a glance. A picture of `LFO 1` is a fact about the \
+instrument, so it is published here and every host draws the same one."""
+addressing = """
+A cell names its table and its entry by the name the entry carries, which is \
+how the value tables join across firmware versions: `Note Off Vel` on 1.1 and \
+`NoteOff Vel` on 1.0 are one entry and one cell. The loader checks that every \
+cell lands on an entry that exists and that no entry is drawn twice."""
+language = """
+Cells and not marks: a stroke drawing rasterised into forty-nine dots is a \
+drawing whose author never saw what it came out as, so these are drawn dot by \
+dot, the way the pixel grids in marks.toml are. Where a source has a number, \
+the number is a count of dots in the top right corner: one for `LFO1`, two for \
+`LFO2`, three for `Env 3`. A digit does not fit beside a picture at this size, \
+and a count reads at a glance where a digit would be read.
+
+An LFO is a sine crossing the middle; taken unipolar it is an arch on a floor, \
+which is what riding up from the floor looks like. An envelope rises fast and \
+falls slowly; a fade rises and stays up, which is the whole difference between \
+the two. The wheels are a wheel seen from the side with its rest position \
+filled: the pitch bender's in the middle, the modulation wheel's at the bottom. \
+A velocity is an arrow with motion beside it, a pressure is an arrow pressing \
+on a key, a release velocity is the first arrow turned round. The note number \
+is a note, the sequencer is a row of steps, and the three axes of the joystick \
+are the letters the display prints for them, because `X` is the picture of \
+`X`."""
+undrawn = """
+Five sources have no cell, and a host draws the name it already prints. `Off` \
+is nothing to draw. `Expression` is a pedal, and a second pedal beside the foot \
+controller's would be one picture saying less than the two names do. \
+`BreathCtrl`, `Voice Num` and `Uni Voice` have no picture that would be told \
+from another at this size, and an icon that is nearly right is worse than a \
+word, because a word is honest about being a word.
+
+The 130 destinations have none either, for now. Most of them name a parameter, \
+and a host that wants a picture for one has `ValueEntry::parameters` to find \
+the control it moves; the ones that name no parameter — a played pitch, a \
+voice's amplitude — are the ones worth drawing and the ones this file does not \
+yet."""
+
+[[cell]]
+table = "mod_source"
+name = "Pitch Bend"
+pixels = [
+    "..###..",
+    ".#...#.",
+    ".#...#.",
+    ".#####.",
+    ".#...#.",
+    ".#...#.",
+    "..###..",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Mod Wheel"
+pixels = [
+    "..###..",
+    ".#...#.",
+    ".#...#.",
+    ".#...#.",
+    ".#####.",
+    ".#####.",
+    "..###..",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Foot Ctrl"
+pixels = [
+    ".......",
+    ".....##",
+    "...##.#",
+    ".##...#",
+    "#.....#",
+    "#######",
+    ".......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Pressure"
+pixels = [
+    "...#...",
+    "...#...",
+    ".#####.",
+    "..###..",
+    "...#...",
+    ".......",
+    "#######",
+]
+
+[[cell]]
+table = "mod_source"
+name = "LFO1"
+pixels = [
+    "......#",
+    ".#.....",
+    "#.#....",
+    "...#...",
+    "....#.#",
+    ".....#.",
+    ".......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "LFO2"
+pixels = [
+    "....#.#",
+    ".#.....",
+    "#.#....",
+    "...#...",
+    "....#.#",
+    ".....#.",
+    ".......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Env 1"
+pixels = [
+    "......#",
+    "..#....",
+    ".#.#...",
+    ".#..#..",
+    "#....#.",
+    "......#",
+    ".......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Env 2"
+pixels = [
+    "....#.#",
+    "..#....",
+    ".#.#...",
+    ".#..#..",
+    "#....#.",
+    "......#",
+    ".......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Env 3"
+pixels = [
+    "..#.#.#",
+    "..#....",
+    ".#.#...",
+    ".#..#..",
+    "#....#.",
+    "......#",
+    ".......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Note Num"
+pixels = [
+    "...##..",
+    "...#.#.",
+    "...#..#",
+    "...#...",
+    ".###...",
+    "####...",
+    ".##....",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Note Vel"
+pixels = [
+    "...#...",
+    ".#.#.#.",
+    ".#.#.#.",
+    ".#####.",
+    "..###..",
+    "...#...",
+    ".......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Note Off Vel"
+pixels = [
+    ".......",
+    "...#...",
+    "..###..",
+    ".#####.",
+    ".#.#.#.",
+    ".#.#.#.",
+    "...#...",
+]
+
+[[cell]]
+table = "mod_source"
+name = "Ctrl Seq"
+pixels = [
+    ".......",
+    "..#....",
+    "..#...#",
+    "#.#...#",
+    "#.#.#.#",
+    "#.#.#.#",
+    "#######",
+]
+
+[[cell]]
+table = "mod_source"
+name = "LFO1 (Uni)"
+pixels = [
+    "......#",
+    ".......",
+    "...#...",
+    "..#.#..",
+    ".#...#.",
+    "#.....#",
+    "#######",
+]
+
+[[cell]]
+table = "mod_source"
+name = "LFO2 (Uni)"
+pixels = [
+    "....#.#",
+    ".......",
+    "...#...",
+    "..#.#..",
+    ".#...#.",
+    "#.....#",
+    "#######",
+]
+
+[[cell]]
+table = "mod_source"
+name = "LFO1 (Fade)"
+pixels = [
+    "......#",
+    ".......",
+    "....###",
+    "...#...",
+    "..#....",
+    ".#.....",
+    "#......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "LFO2 (Fade)"
+pixels = [
+    "....#.#",
+    ".......",
+    "....###",
+    "...#...",
+    "..#....",
+    ".#.....",
+    "#......",
+]
+
+[[cell]]
+table = "mod_source"
+name = "CC X (115)"
+pixels = [
+    ".#...#.",
+    ".#...#.",
+    "..#.#..",
+    "...#...",
+    "..#.#..",
+    ".#...#.",
+    ".#...#.",
+]
+
+[[cell]]
+table = "mod_source"
+name = "CC Y (116)"
+pixels = [
+    ".#...#.",
+    ".#...#.",
+    "..#.#..",
+    "...#...",
+    "...#...",
+    "...#...",
+    "...#...",
+]
+
+[[cell]]
+table = "mod_source"
+name = "CC Z (117)"
+pixels = [
+    ".#####.",
+    ".....#.",
+    "....#..",
+    "...#...",
+    "..#....",
+    ".#.....",
+    ".#####.",
+]

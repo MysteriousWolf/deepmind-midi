@@ -19,6 +19,8 @@
 //! | [`param`]     | The 242 program parameters: names, ranges, value tables, NRPN      |
 //! | [`effect`]    | What an effect engine's twelve bytes are, per algorithm            |
 //! | [`front`]     | What the instrument's own front panel puts a control under         |
+//! | [`generator`] | The shapes a set of parameters makes, for a host that draws them   |
+//! | [`pixels`]    | The one-bit grid the marks and the source cells are drawn on       |
 //! | [`program`]   | A program: the 242 bytes, typed accessors, names, value types      |
 //! | [`syx`]       | `.syx` files: the programs a preset pack carries, and building one |
 //! | [`device`]    | The state machine: what the synthesizer holds, and what to send    |
@@ -86,6 +88,7 @@ pub mod ids;
 mod math;
 mod nrpn;
 pub mod param;
+pub mod pixels;
 pub mod program;
 mod queue;
 #[cfg(feature = "sim")]

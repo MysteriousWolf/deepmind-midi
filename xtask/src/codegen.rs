@@ -176,7 +176,10 @@ const HEADER: &str = "\
 // chunks to satisfy a length lint would only hide what it is.
 #![expect(clippy::too_many_lines, reason = \"a generated table, not logic\")]
 
-use super::{Controller, ControllerKind, Kind, Parameter, Shape, ValueEntry, ValueTable};
+use super::{
+    Controller, ControllerKind, Kind, Parameter, Shape, Swing, ValueEntry, ValueTable,
+};
+use crate::pixels::Pixels;
 use crate::sysex::inquiry::Version;
 
 ";
@@ -787,17 +790,59 @@ pub enum TableId {
             table.partial
         );
         for entry in &table.entries {
+            let swing = match entry.swing.as_deref() {
+                None => "None",
+                Some("centred") => "Some(Swing::Centred)",
+                Some("rising") => "Some(Swing::Rising)",
+                Some(other) => return Err(format!("enums.toml: unknown swing {other:?}")),
+            };
             let _ = writeln!(
                 out,
-                "    ValueEntry {{ value: {}, name: {:?}, parameters: {} }},",
+                "    ValueEntry {{ value: {}, name: {:?}, parameters: {}, swing: {swing} }},",
                 entry.value,
                 entry.name,
                 parameter_slice(&by_name, &entry.parameters)?
             );
         }
-        out.push_str("] };\n\n");
+        // The entries are in value order, so the cells drawn for them are too,
+        // which is what lets the library search them rather than scan.
+        let cells: Vec<String> = table
+            .entries
+            .iter()
+            .filter_map(|entry| spec.cell_for(table, entry).map(|cell| (entry, cell)))
+            .map(|(entry, cell)| format!("\n    ({}, {}),", entry.value, pixels(&cell.pixels)))
+            .collect();
+        let _ = writeln!(
+            out,
+            "], cells: &[{}{}] }};\n",
+            cells.concat(),
+            if cells.is_empty() { "" } else { "\n" }
+        );
     }
     Ok(())
+}
+
+/// Renders a pixel grid from the spec as the `Pixels::new` call that builds it.
+///
+/// A row of the grid is a bit per pixel, bit 0 leftmost, which is the order a
+/// host blitting left to right wants. The literals are grouped from the right,
+/// because a seven-digit binary literal without a separator is unreadable to
+/// clippy and to a reader; the picture is still legible in the bits, which is
+/// the whole reason they are binary and not hexadecimal.
+pub fn pixels(rows: &[String]) -> String {
+    let rows: Vec<String> = rows
+        .iter()
+        .map(|row| {
+            let bits: u8 = row
+                .chars()
+                .enumerate()
+                .filter(|&(_, pixel)| pixel == '#')
+                .map(|(x, _)| 1_u8 << x)
+                .sum();
+            format!("0b{:03b}_{:04b}", bits >> 4, bits & 0xf)
+        })
+        .collect();
+    format!("Pixels::new([{}])", rows.join(", "))
 }
 
 /// Renders the parameters a value table entry names, as a `ParamId` slice.

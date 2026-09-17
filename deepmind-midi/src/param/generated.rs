@@ -8,7 +8,8 @@
 // chunks to satisfy a length lint would only hide what it is.
 #![expect(clippy::too_many_lines, reason = "a generated table, not logic")]
 
-use super::{Controller, ControllerKind, Kind, Parameter, Shape, ValueEntry, ValueTable};
+use super::{Controller, ControllerKind, Kind, Parameter, Shape, Swing, ValueEntry, ValueTable};
+use crate::pixels::Pixels;
 use crate::sysex::inquiry::Version;
 
 /// Number of program parameters. Offsets run `0..PARAMETER_COUNT`.
@@ -3679,38 +3680,46 @@ static LFO_SHAPE: ValueTable = ValueTable {
             value: 0,
             name: "Sine",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Triangle",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Square",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "Ramp Up",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "Ramp Down",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "Sample & Hold",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "Sample & Glide",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static OSC_RANGE: ValueTable = ValueTable {
@@ -3723,18 +3732,22 @@ static OSC_RANGE: ValueTable = ValueTable {
             value: 0,
             name: "16'",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "8'",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "4'",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static PWM_SOURCE: ValueTable = ValueTable {
@@ -3747,33 +3760,40 @@ static PWM_SOURCE: ValueTable = ValueTable {
             value: 0,
             name: "Manual",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "LFO 1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "LFO 2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "VCA Env",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "VCF Env",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "Mod Env",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static TONE_MOD_SOURCE: ValueTable = ValueTable {
@@ -3786,33 +3806,40 @@ static TONE_MOD_SOURCE: ValueTable = ValueTable {
             value: 0,
             name: "Manual",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "LFO 1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "LFO 2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "VCA Env",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "VCF Env",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "Mod Env",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static PITCH_MOD_SOURCE: ValueTable = ValueTable {
@@ -3825,38 +3852,46 @@ static PITCH_MOD_SOURCE: ValueTable = ValueTable {
             value: 0,
             name: "LFO 1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "LFO 2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "VCA Env",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "VCF Env",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "Mod Env",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "LFO 1 Unipolar",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "LFO 2 Unipolar",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static PORTAMENTO_MODE: ValueTable = ValueTable {
@@ -3869,73 +3904,88 @@ static PORTAMENTO_MODE: ValueTable = ValueTable {
             value: 0,
             name: "Normal",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Fingered",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Fixed Rate",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "Fixed Rate Fingered",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "Exponential",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "Exponential Fingered",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "Fixed +2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "Fixed -2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "Fixed +5",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "Fixed -5",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "Fixed +12",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "Fixed -12",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "Fixed +24",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 13,
             name: "Fixed -24",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static OSC1_PITCH_MOD_MODE: ValueTable = ValueTable {
@@ -3948,13 +3998,16 @@ static OSC1_PITCH_MOD_MODE: ValueTable = ValueTable {
             value: 0,
             name: "OSC 1 + 2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "OSC 1 only",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static VCF_LFO_SELECT: ValueTable = ValueTable {
@@ -3967,13 +4020,16 @@ static VCF_LFO_SELECT: ValueTable = ValueTable {
             value: 0,
             name: "LFO 1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "LFO 2",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static VCF_ENVELOPE_POLARITY: ValueTable = ValueTable {
@@ -3986,13 +4042,16 @@ static VCF_ENVELOPE_POLARITY: ValueTable = ValueTable {
             value: 0,
             name: "Negative",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Positive",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static VCF_POLE_MODE: ValueTable = ValueTable {
@@ -4005,13 +4064,16 @@ static VCF_POLE_MODE: ValueTable = ValueTable {
             value: 0,
             name: "4 Pole",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "2 Pole",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static ENVELOPE_TRIGGER: ValueTable = ValueTable {
@@ -4024,28 +4086,34 @@ static ENVELOPE_TRIGGER: ValueTable = ValueTable {
             value: 0,
             name: "Key",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "LFO 1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "LFO 2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "Loop",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "Control Sequencer Step",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static VOICE_PRIORITY: ValueTable = ValueTable {
@@ -4058,18 +4126,22 @@ static VOICE_PRIORITY: ValueTable = ValueTable {
             value: 0,
             name: "Lowest",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Highest",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Last",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static POLYPHONY_MODE: ValueTable = ValueTable {
@@ -4082,68 +4154,82 @@ static POLYPHONY_MODE: ValueTable = ValueTable {
             value: 0,
             name: "Poly",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Unison 2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Unison 3",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "Unison 4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "Unison 6",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "Unison 12",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "Mono",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "Mono 2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "Mono 3",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "Mono 4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "Mono 6",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "Poly 6",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "Poly 8",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static KEY_ASSIGN_MODE: ValueTable = ValueTable {
@@ -4156,23 +4242,28 @@ static KEY_ASSIGN_MODE: ValueTable = ValueTable {
             value: 0,
             name: "Mono",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Re-Trigger",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Legato",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "One-Shot",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static SEQUENCER_SYNC: ValueTable = ValueTable {
@@ -4185,18 +4276,22 @@ static SEQUENCER_SYNC: ValueTable = ValueTable {
             value: 0,
             name: "Loop on",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Key sync on",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Loop and key sync on",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static ARP_MODE: ValueTable = ValueTable {
@@ -4209,58 +4304,70 @@ static ARP_MODE: ValueTable = ValueTable {
             value: 0,
             name: "Up",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Down",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Up & Down",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "Up Inv",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "Down Inv",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "Up & Down Inv",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "Up Alt",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "Down Alt",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "Random",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "As Played",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "Chord",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static FX_ROUTING: ValueTable = ValueTable {
@@ -4273,53 +4380,64 @@ static FX_ROUTING: ValueTable = ValueTable {
             value: 0,
             name: "Serial 1-2-3-4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Parallel 1/2, serial 3-4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Parallel 1/2, parallel 3/4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "Parallel 1/2/3/4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "Parallel 1/2/3, serial 4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "Serial 1-2, parallel 3/4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "Serial 1, parallel 2/3/4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "Parallel (serial 1-2-3)/4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "Serial 3-4 feedback 4(1-2)",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "Serial 4 feedback 4(1-2-3)",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static FX_MODE: ValueTable = ValueTable {
@@ -4332,18 +4450,22 @@ static FX_MODE: ValueTable = ValueTable {
             value: 0,
             name: "Insert",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Send",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Bypass",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static PROGRAM_CATEGORY: ValueTable = ValueTable {
@@ -4356,88 +4478,106 @@ static PROGRAM_CATEGORY: ValueTable = ValueTable {
             value: 0,
             name: "None",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Bass",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "Pad",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "Lead",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "Mono",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "Poly",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "Stab",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "SFX",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "Arp",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "Seq",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "Perc",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "Ambient",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "Modular",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 13,
             name: "User-1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 14,
             name: "User-2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 15,
             name: "User-3",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 16,
             name: "User-4",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static LFO_MONO_MODE: ValueTable = ValueTable {
@@ -4450,18 +4590,22 @@ static LFO_MONO_MODE: ValueTable = ValueTable {
             value: 0,
             name: "Poly",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Mono",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "SPREAD-1",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static ARP_PATTERN: ValueTable = ValueTable {
@@ -4474,18 +4618,22 @@ static ARP_PATTERN: ValueTable = ValueTable {
             value: 0,
             name: "None",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Preset-1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 33,
             name: "User-1",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static ARP_CLOCK: ValueTable = ValueTable {
@@ -4498,68 +4646,82 @@ static ARP_CLOCK: ValueTable = ValueTable {
             value: 0,
             name: "1/2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "3/8",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "1/3",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "1/4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "3/16",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "1/6",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "1/8",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "3/32",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "1/12",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "1/16",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "1/24",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "1/32",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "1/48",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static SEQUENCER_CLOCK: ValueTable = ValueTable {
@@ -4572,103 +4734,124 @@ static SEQUENCER_CLOCK: ValueTable = ValueTable {
             value: 0,
             name: "4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "3",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "1/2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "3/8",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "1/3",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "1/4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "3/16",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "1/6",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "1/8",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "3/32",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "1/12",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 13,
             name: "1/16",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 14,
             name: "3/64",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 15,
             name: "1/24",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 16,
             name: "1/32",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 17,
             name: "3/128",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 18,
             name: "1/48",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 19,
             name: "1/64",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static LFO_CLOCK: ValueTable = ValueTable {
@@ -4681,103 +4864,124 @@ static LFO_CLOCK: ValueTable = ValueTable {
             value: 0,
             name: "4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "3",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "1/2",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "3/8",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "1/3",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "1/4",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "3/16",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "1/6",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "1/8",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "3/32",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "1/12",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 13,
             name: "1/16",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 14,
             name: "3/64",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 15,
             name: "1/24",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 16,
             name: "1/32",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 17,
             name: "3/128",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 18,
             name: "1/48",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 19,
             name: "1/64",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static MOD_SOURCE_FW_1_1: ValueTable = ValueTable {
@@ -4790,127 +4994,274 @@ static MOD_SOURCE_FW_1_1: ValueTable = ValueTable {
             value: 0,
             name: "Off",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Pitch Bend",
             parameters: &[],
+            swing: Some(Swing::Centred),
         },
         ValueEntry {
             value: 2,
             name: "Mod Wheel",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 3,
             name: "Foot Ctrl",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 4,
             name: "BreathCtrl",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 5,
             name: "Pressure",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 6,
             name: "Expression",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 7,
             name: "LFO1",
             parameters: &[],
+            swing: Some(Swing::Centred),
         },
         ValueEntry {
             value: 8,
             name: "LFO2",
             parameters: &[],
+            swing: Some(Swing::Centred),
         },
         ValueEntry {
             value: 9,
             name: "Env 1",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 10,
             name: "Env 2",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 11,
             name: "Env 3",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 12,
             name: "Note Num",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 13,
             name: "Note Vel",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 14,
             name: "Note Off Vel",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 15,
             name: "Ctrl Seq",
             parameters: &[],
+            swing: Some(Swing::Centred),
         },
         ValueEntry {
             value: 16,
             name: "LFO1 (Uni)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 17,
             name: "LFO2 (Uni)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 18,
             name: "LFO1 (Fade)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 19,
             name: "LFO2 (Fade)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 20,
             name: "Voice Num",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 21,
             name: "Uni Voice",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 22,
             name: "CC X (115)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 23,
             name: "CC Y (116)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 24,
             name: "CC Z (117)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
+    ],
+    cells: &[
+        (
+            1,
+            Pixels::new([
+                0b001_1100, 0b010_0010, 0b010_0010, 0b011_1110, 0b010_0010, 0b010_0010, 0b001_1100,
+            ]),
+        ),
+        (
+            2,
+            Pixels::new([
+                0b001_1100, 0b010_0010, 0b010_0010, 0b010_0010, 0b011_1110, 0b011_1110, 0b001_1100,
+            ]),
+        ),
+        (
+            3,
+            Pixels::new([
+                0b000_0000, 0b110_0000, 0b101_1000, 0b100_0110, 0b100_0001, 0b111_1111, 0b000_0000,
+            ]),
+        ),
+        (
+            5,
+            Pixels::new([
+                0b000_1000, 0b000_1000, 0b011_1110, 0b001_1100, 0b000_1000, 0b000_0000, 0b111_1111,
+            ]),
+        ),
+        (
+            7,
+            Pixels::new([
+                0b100_0000, 0b000_0010, 0b000_0101, 0b000_1000, 0b101_0000, 0b010_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            8,
+            Pixels::new([
+                0b101_0000, 0b000_0010, 0b000_0101, 0b000_1000, 0b101_0000, 0b010_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            9,
+            Pixels::new([
+                0b100_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            10,
+            Pixels::new([
+                0b101_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            11,
+            Pixels::new([
+                0b101_0100, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            12,
+            Pixels::new([
+                0b001_1000, 0b010_1000, 0b100_1000, 0b000_1000, 0b000_1110, 0b000_1111, 0b000_0110,
+            ]),
+        ),
+        (
+            13,
+            Pixels::new([
+                0b000_1000, 0b010_1010, 0b010_1010, 0b011_1110, 0b001_1100, 0b000_1000, 0b000_0000,
+            ]),
+        ),
+        (
+            14,
+            Pixels::new([
+                0b000_0000, 0b000_1000, 0b001_1100, 0b011_1110, 0b010_1010, 0b010_1010, 0b000_1000,
+            ]),
+        ),
+        (
+            15,
+            Pixels::new([
+                0b000_0000, 0b000_0100, 0b100_0100, 0b100_0101, 0b101_0101, 0b101_0101, 0b111_1111,
+            ]),
+        ),
+        (
+            16,
+            Pixels::new([
+                0b100_0000, 0b000_0000, 0b000_1000, 0b001_0100, 0b010_0010, 0b100_0001, 0b111_1111,
+            ]),
+        ),
+        (
+            17,
+            Pixels::new([
+                0b101_0000, 0b000_0000, 0b000_1000, 0b001_0100, 0b010_0010, 0b100_0001, 0b111_1111,
+            ]),
+        ),
+        (
+            18,
+            Pixels::new([
+                0b100_0000, 0b000_0000, 0b111_0000, 0b000_1000, 0b000_0100, 0b000_0010, 0b000_0001,
+            ]),
+        ),
+        (
+            19,
+            Pixels::new([
+                0b101_0000, 0b000_0000, 0b111_0000, 0b000_1000, 0b000_0100, 0b000_0010, 0b000_0001,
+            ]),
+        ),
+        (
+            22,
+            Pixels::new([
+                0b010_0010, 0b010_0010, 0b001_0100, 0b000_1000, 0b001_0100, 0b010_0010, 0b010_0010,
+            ]),
+        ),
+        (
+            23,
+            Pixels::new([
+                0b010_0010, 0b010_0010, 0b001_0100, 0b000_1000, 0b000_1000, 0b000_1000, 0b000_1000,
+            ]),
+        ),
+        (
+            24,
+            Pixels::new([
+                0b011_1110, 0b010_0000, 0b001_0000, 0b000_1000, 0b000_0100, 0b000_0010, 0b011_1110,
+            ]),
+        ),
     ],
 };
 
@@ -4924,117 +5275,262 @@ static MOD_SOURCE_FW_1_0: ValueTable = ValueTable {
             value: 0,
             name: "Off",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "Pitch Bend",
             parameters: &[],
+            swing: Some(Swing::Centred),
         },
         ValueEntry {
             value: 2,
             name: "Mod Wheel",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 3,
             name: "Foot Ctrl",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 4,
             name: "BreathCtrl",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 5,
             name: "Pressure",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 6,
             name: "LFO1",
             parameters: &[],
+            swing: Some(Swing::Centred),
         },
         ValueEntry {
             value: 7,
             name: "LFO2",
             parameters: &[],
+            swing: Some(Swing::Centred),
         },
         ValueEntry {
             value: 8,
             name: "Env 1",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 9,
             name: "Env 2",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 10,
             name: "Env 3",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 11,
             name: "Note Num",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "Note Vel",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 13,
             name: "Ctrl Seq",
             parameters: &[],
+            swing: Some(Swing::Centred),
         },
         ValueEntry {
             value: 14,
             name: "LFO1 (Uni)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 15,
             name: "LFO2 (Uni)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 16,
             name: "LFO1 (Fade)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 17,
             name: "LFO2 (Fade)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 18,
             name: "NoteOff Vel",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 19,
             name: "Voice Num",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 20,
             name: "CC X (114)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 21,
             name: "CC Y (115)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
         ValueEntry {
             value: 22,
             name: "CC Z (116)",
             parameters: &[],
+            swing: Some(Swing::Rising),
         },
+    ],
+    cells: &[
+        (
+            1,
+            Pixels::new([
+                0b001_1100, 0b010_0010, 0b010_0010, 0b011_1110, 0b010_0010, 0b010_0010, 0b001_1100,
+            ]),
+        ),
+        (
+            2,
+            Pixels::new([
+                0b001_1100, 0b010_0010, 0b010_0010, 0b010_0010, 0b011_1110, 0b011_1110, 0b001_1100,
+            ]),
+        ),
+        (
+            3,
+            Pixels::new([
+                0b000_0000, 0b110_0000, 0b101_1000, 0b100_0110, 0b100_0001, 0b111_1111, 0b000_0000,
+            ]),
+        ),
+        (
+            5,
+            Pixels::new([
+                0b000_1000, 0b000_1000, 0b011_1110, 0b001_1100, 0b000_1000, 0b000_0000, 0b111_1111,
+            ]),
+        ),
+        (
+            6,
+            Pixels::new([
+                0b100_0000, 0b000_0010, 0b000_0101, 0b000_1000, 0b101_0000, 0b010_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            7,
+            Pixels::new([
+                0b101_0000, 0b000_0010, 0b000_0101, 0b000_1000, 0b101_0000, 0b010_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            8,
+            Pixels::new([
+                0b100_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            9,
+            Pixels::new([
+                0b101_0000, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            10,
+            Pixels::new([
+                0b101_0100, 0b000_0100, 0b000_1010, 0b001_0010, 0b010_0001, 0b100_0000, 0b000_0000,
+            ]),
+        ),
+        (
+            11,
+            Pixels::new([
+                0b001_1000, 0b010_1000, 0b100_1000, 0b000_1000, 0b000_1110, 0b000_1111, 0b000_0110,
+            ]),
+        ),
+        (
+            12,
+            Pixels::new([
+                0b000_1000, 0b010_1010, 0b010_1010, 0b011_1110, 0b001_1100, 0b000_1000, 0b000_0000,
+            ]),
+        ),
+        (
+            13,
+            Pixels::new([
+                0b000_0000, 0b000_0100, 0b100_0100, 0b100_0101, 0b101_0101, 0b101_0101, 0b111_1111,
+            ]),
+        ),
+        (
+            14,
+            Pixels::new([
+                0b100_0000, 0b000_0000, 0b000_1000, 0b001_0100, 0b010_0010, 0b100_0001, 0b111_1111,
+            ]),
+        ),
+        (
+            15,
+            Pixels::new([
+                0b101_0000, 0b000_0000, 0b000_1000, 0b001_0100, 0b010_0010, 0b100_0001, 0b111_1111,
+            ]),
+        ),
+        (
+            16,
+            Pixels::new([
+                0b100_0000, 0b000_0000, 0b111_0000, 0b000_1000, 0b000_0100, 0b000_0010, 0b000_0001,
+            ]),
+        ),
+        (
+            17,
+            Pixels::new([
+                0b101_0000, 0b000_0000, 0b111_0000, 0b000_1000, 0b000_0100, 0b000_0010, 0b000_0001,
+            ]),
+        ),
+        (
+            18,
+            Pixels::new([
+                0b000_0000, 0b000_1000, 0b001_1100, 0b011_1110, 0b010_1010, 0b010_1010, 0b000_1000,
+            ]),
+        ),
+        (
+            20,
+            Pixels::new([
+                0b010_0010, 0b010_0010, 0b001_0100, 0b000_1000, 0b001_0100, 0b010_0010, 0b010_0010,
+            ]),
+        ),
+        (
+            21,
+            Pixels::new([
+                0b010_0010, 0b010_0010, 0b001_0100, 0b000_1000, 0b000_1000, 0b000_1000, 0b000_1000,
+            ]),
+        ),
+        (
+            22,
+            Pixels::new([
+                0b011_1110, 0b010_0000, 0b001_0000, 0b000_1000, 0b000_0100, 0b000_0010, 0b011_1110,
+            ]),
+        ),
     ],
 };
 
@@ -5048,121 +5544,145 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
             value: 0,
             name: "Off",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "LFO1 Rate",
             parameters: &[ParamId::Lfo1Rate],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "LFO1 Delay",
             parameters: &[ParamId::Lfo1DelayFade],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "LFO1 Slew",
             parameters: &[ParamId::Lfo1SlewRate],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "LFO1 Shape",
             parameters: &[ParamId::Lfo1Shape],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "LFO2 Rate",
             parameters: &[ParamId::Lfo2Rate],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "LFO2 Delay",
             parameters: &[ParamId::Lfo2DelayFade],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "LFO2 Slew",
             parameters: &[ParamId::Lfo2SlewRate],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "LFO2 Shape",
             parameters: &[ParamId::Lfo2Shape],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "OSC1+2 Pit",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "OSC1+2 Fine",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "OSC1 Pitch",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "OSC1 Fine",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 13,
             name: "OSC2 Pitch",
             parameters: &[ParamId::Osc2Pitch],
+            swing: None,
         },
         ValueEntry {
             value: 14,
             name: "OSC2 Fine",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 15,
             name: "OSC1 PM Dep",
             parameters: &[ParamId::Osc1PitchModDepth],
+            swing: None,
         },
         ValueEntry {
             value: 16,
             name: "PWM Depth",
             parameters: &[ParamId::Osc1PwmDepth],
+            swing: None,
         },
         ValueEntry {
             value: 17,
             name: "TMod Depth",
             parameters: &[ParamId::Osc2ToneModDepth],
+            swing: None,
         },
         ValueEntry {
             value: 18,
             name: "OSC2 PM Dep",
             parameters: &[ParamId::Osc2PitchModDepth],
+            swing: None,
         },
         ValueEntry {
             value: 19,
             name: "Porta Time",
             parameters: &[ParamId::PortamentoTime],
+            swing: None,
         },
         ValueEntry {
             value: 20,
             name: "VCF Freq",
             parameters: &[ParamId::VcfFrequency],
+            swing: None,
         },
         ValueEntry {
             value: 21,
             name: "VCF Res",
             parameters: &[ParamId::VcfResonance],
+            swing: None,
         },
         ValueEntry {
             value: 22,
             name: "VCF Env",
             parameters: &[ParamId::VcfEnvelopeDepth],
+            swing: None,
         },
         ValueEntry {
             value: 23,
             name: "VCF LFO",
             parameters: &[ParamId::VcfLfoDepth],
+            swing: None,
         },
         ValueEntry {
             value: 24,
@@ -5178,6 +5698,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::ModEnvelopeDecayTime,
                 ParamId::ModEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 25,
@@ -5187,6 +5708,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeAttackTime,
                 ParamId::ModEnvelopeAttackTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 26,
@@ -5196,6 +5718,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeDecayTime,
                 ParamId::ModEnvelopeDecayTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 27,
@@ -5205,6 +5728,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeSustainLevel,
                 ParamId::ModEnvelopeSustainLevel,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 28,
@@ -5214,6 +5738,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeReleaseTime,
                 ParamId::ModEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 29,
@@ -5223,6 +5748,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::VcaEnvelopeDecayTime,
                 ParamId::VcaEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 30,
@@ -5232,6 +5758,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeDecayTime,
                 ParamId::VcfEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 31,
@@ -5241,6 +5768,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::ModEnvelopeDecayTime,
                 ParamId::ModEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 32,
@@ -5251,6 +5779,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::VcaEnvelopeSustainCurve,
                 ParamId::VcaEnvelopeReleaseCurve,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 33,
@@ -5261,6 +5790,7 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeSustainCurve,
                 ParamId::VcfEnvelopeReleaseCurve,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 34,
@@ -5271,498 +5801,598 @@ static MOD_DESTINATION_FW_1_1: ValueTable = ValueTable {
                 ParamId::ModEnvelopeSustainCurve,
                 ParamId::ModEnvelopeReleaseCurve,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 35,
             name: "Env1 Attack",
             parameters: &[ParamId::VcaEnvelopeAttackTime],
+            swing: None,
         },
         ValueEntry {
             value: 36,
             name: "Env1 Decay",
             parameters: &[ParamId::VcaEnvelopeDecayTime],
+            swing: None,
         },
         ValueEntry {
             value: 37,
             name: "Env1 Sus",
             parameters: &[ParamId::VcaEnvelopeSustainLevel],
+            swing: None,
         },
         ValueEntry {
             value: 38,
             name: "Env1 Rel",
             parameters: &[ParamId::VcaEnvelopeReleaseTime],
+            swing: None,
         },
         ValueEntry {
             value: 39,
             name: "Env1 AtCur",
             parameters: &[ParamId::VcaEnvelopeAttackCurve],
+            swing: None,
         },
         ValueEntry {
             value: 40,
             name: "Env1 DcyCur",
             parameters: &[ParamId::VcaEnvelopeDecayCurve],
+            swing: None,
         },
         ValueEntry {
             value: 41,
             name: "Env1 SuSCur",
             parameters: &[ParamId::VcaEnvelopeSustainCurve],
+            swing: None,
         },
         ValueEntry {
             value: 42,
             name: "Env1 RelCur",
             parameters: &[ParamId::VcaEnvelopeReleaseCurve],
+            swing: None,
         },
         ValueEntry {
             value: 43,
             name: "Env2 Attack",
             parameters: &[ParamId::VcfEnvelopeAttackTime],
+            swing: None,
         },
         ValueEntry {
             value: 44,
             name: "Env2 Decay",
             parameters: &[ParamId::VcfEnvelopeDecayTime],
+            swing: None,
         },
         ValueEntry {
             value: 45,
             name: "Env2 Sus",
             parameters: &[ParamId::VcfEnvelopeSustainLevel],
+            swing: None,
         },
         ValueEntry {
             value: 46,
             name: "Env2 Rel",
             parameters: &[ParamId::VcfEnvelopeReleaseTime],
+            swing: None,
         },
         ValueEntry {
             value: 47,
             name: "Env2 AtCur",
             parameters: &[ParamId::VcfEnvelopeAttackCurve],
+            swing: None,
         },
         ValueEntry {
             value: 48,
             name: "Env2 DcyCur",
             parameters: &[ParamId::VcfEnvelopeDecayCurve],
+            swing: None,
         },
         ValueEntry {
             value: 49,
             name: "Env2 SuSCur",
             parameters: &[ParamId::VcfEnvelopeSustainCurve],
+            swing: None,
         },
         ValueEntry {
             value: 50,
             name: "Env2 RelCur",
             parameters: &[ParamId::VcfEnvelopeReleaseCurve],
+            swing: None,
         },
         ValueEntry {
             value: 51,
             name: "Env3 Attack",
             parameters: &[ParamId::ModEnvelopeAttackTime],
+            swing: None,
         },
         ValueEntry {
             value: 52,
             name: "Env3 Decay",
             parameters: &[ParamId::ModEnvelopeDecayTime],
+            swing: None,
         },
         ValueEntry {
             value: 53,
             name: "Env3 Sus",
             parameters: &[ParamId::ModEnvelopeSustainLevel],
+            swing: None,
         },
         ValueEntry {
             value: 54,
             name: "Env3 Rel",
             parameters: &[ParamId::ModEnvelopeReleaseTime],
+            swing: None,
         },
         ValueEntry {
             value: 55,
             name: "Env3 AtCur",
             parameters: &[ParamId::ModEnvelopeAttackCurve],
+            swing: None,
         },
         ValueEntry {
             value: 56,
             name: "Env3 DcyCur",
             parameters: &[ParamId::ModEnvelopeDecayCurve],
+            swing: None,
         },
         ValueEntry {
             value: 57,
             name: "Env3 SuSCur",
             parameters: &[ParamId::ModEnvelopeSustainCurve],
+            swing: None,
         },
         ValueEntry {
             value: 58,
             name: "Env3 RelCur",
             parameters: &[ParamId::ModEnvelopeReleaseCurve],
+            swing: None,
         },
         ValueEntry {
             value: 59,
             name: "VCA All",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 60,
             name: "VCA Active",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 61,
             name: "VCA EnvDep",
             parameters: &[ParamId::VcaEnvelopeDepth],
+            swing: None,
         },
         ValueEntry {
             value: 62,
             name: "Pan Spread",
             parameters: &[ParamId::VcaPanSpread],
+            swing: None,
         },
         ValueEntry {
             value: 63,
             name: "VCA Pan",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 64,
             name: "OSC2 Lvl",
             parameters: &[ParamId::Osc2Level],
+            swing: None,
         },
         ValueEntry {
             value: 65,
             name: "Noise Lvl",
             parameters: &[ParamId::NoiseLevel],
+            swing: None,
         },
         ValueEntry {
             value: 66,
             name: "HP Freq",
             parameters: &[ParamId::VcfHighPassFrequency],
+            swing: None,
         },
         ValueEntry {
             value: 67,
             name: "Uni Detune",
             parameters: &[ParamId::UnisonDetune],
+            swing: None,
         },
         ValueEntry {
             value: 68,
             name: "OSC Drift",
             parameters: &[ParamId::VoiceDrift],
+            swing: None,
         },
         ValueEntry {
             value: 69,
             name: "Param Drift",
             parameters: &[ParamId::ParameterDrift],
+            swing: None,
         },
         ValueEntry {
             value: 70,
             name: "Drift Rate",
             parameters: &[ParamId::DriftRate],
+            swing: None,
         },
         ValueEntry {
             value: 71,
             name: "Arp Gate",
             parameters: &[ParamId::ArpGateTime],
+            swing: None,
         },
         ValueEntry {
             value: 72,
             name: "Seq Slew",
             parameters: &[ParamId::SlewRate],
+            swing: None,
         },
         ValueEntry {
             value: 73,
             name: "Mod 1 Dep",
             parameters: &[ParamId::Mod1Depth],
+            swing: None,
         },
         ValueEntry {
             value: 74,
             name: "Mod 2 Dep",
             parameters: &[ParamId::Mod2Depth],
+            swing: None,
         },
         ValueEntry {
             value: 75,
             name: "Mod 3 Dep",
             parameters: &[ParamId::Mod3Depth],
+            swing: None,
         },
         ValueEntry {
             value: 76,
             name: "Mod 4 Dep",
             parameters: &[ParamId::Mod4Depth],
+            swing: None,
         },
         ValueEntry {
             value: 77,
             name: "Mod 5 Dep",
             parameters: &[ParamId::Mod5Depth],
+            swing: None,
         },
         ValueEntry {
             value: 78,
             name: "Mod 6 Dep",
             parameters: &[ParamId::Mod6Depth],
+            swing: None,
         },
         ValueEntry {
             value: 79,
             name: "Mod 7 Dep",
             parameters: &[ParamId::Mod7Depth],
+            swing: None,
         },
         ValueEntry {
             value: 80,
             name: "Mod 8 Dep",
             parameters: &[ParamId::Mod8Depth],
+            swing: None,
         },
         ValueEntry {
             value: 81,
             name: "Fx 1 Param 1",
             parameters: &[ParamId::Fx1Param1],
+            swing: None,
         },
         ValueEntry {
             value: 82,
             name: "Fx 1 Param 2",
             parameters: &[ParamId::Fx1Param2],
+            swing: None,
         },
         ValueEntry {
             value: 83,
             name: "Fx 1 Param 3",
             parameters: &[ParamId::Fx1Param3],
+            swing: None,
         },
         ValueEntry {
             value: 84,
             name: "Fx 1 Param 4",
             parameters: &[ParamId::Fx1Param4],
+            swing: None,
         },
         ValueEntry {
             value: 85,
             name: "Fx 1 Param 5",
             parameters: &[ParamId::Fx1Param5],
+            swing: None,
         },
         ValueEntry {
             value: 86,
             name: "Fx 1 Param 6",
             parameters: &[ParamId::Fx1Param6],
+            swing: None,
         },
         ValueEntry {
             value: 87,
             name: "Fx 1 Param 7",
             parameters: &[ParamId::Fx1Param7],
+            swing: None,
         },
         ValueEntry {
             value: 88,
             name: "Fx 1 Param 8",
             parameters: &[ParamId::Fx1Param8],
+            swing: None,
         },
         ValueEntry {
             value: 89,
             name: "Fx 1 Param 9",
             parameters: &[ParamId::Fx1Param9],
+            swing: None,
         },
         ValueEntry {
             value: 90,
             name: "Fx 1 Param 10",
             parameters: &[ParamId::Fx1Param10],
+            swing: None,
         },
         ValueEntry {
             value: 91,
             name: "Fx 1 Param 11",
             parameters: &[ParamId::Fx1Param11],
+            swing: None,
         },
         ValueEntry {
             value: 92,
             name: "Fx 1 Param 12",
             parameters: &[ParamId::Fx1Param12],
+            swing: None,
         },
         ValueEntry {
             value: 93,
             name: "Fx 2 Param 1",
             parameters: &[ParamId::Fx2Param1],
+            swing: None,
         },
         ValueEntry {
             value: 94,
             name: "Fx 2 Param 2",
             parameters: &[ParamId::Fx2Param2],
+            swing: None,
         },
         ValueEntry {
             value: 95,
             name: "Fx 2 Param 3",
             parameters: &[ParamId::Fx2Param3],
+            swing: None,
         },
         ValueEntry {
             value: 96,
             name: "Fx 2 Param 4",
             parameters: &[ParamId::Fx2Param4],
+            swing: None,
         },
         ValueEntry {
             value: 97,
             name: "Fx 2 Param 5",
             parameters: &[ParamId::Fx2Param5],
+            swing: None,
         },
         ValueEntry {
             value: 98,
             name: "Fx 2 Param 6",
             parameters: &[ParamId::Fx2Param6],
+            swing: None,
         },
         ValueEntry {
             value: 99,
             name: "Fx 2 Param 7",
             parameters: &[ParamId::Fx2Param7],
+            swing: None,
         },
         ValueEntry {
             value: 100,
             name: "Fx 2 Param 8",
             parameters: &[ParamId::Fx2Param8],
+            swing: None,
         },
         ValueEntry {
             value: 101,
             name: "Fx 2 Param 9",
             parameters: &[ParamId::Fx2Param9],
+            swing: None,
         },
         ValueEntry {
             value: 102,
             name: "Fx 2 Param 10",
             parameters: &[ParamId::Fx2Param10],
+            swing: None,
         },
         ValueEntry {
             value: 103,
             name: "Fx 2 Param 11",
             parameters: &[ParamId::Fx2Param11],
+            swing: None,
         },
         ValueEntry {
             value: 104,
             name: "Fx 2 Param 12",
             parameters: &[ParamId::Fx2Param12],
+            swing: None,
         },
         ValueEntry {
             value: 105,
             name: "Fx 3 Param 1",
             parameters: &[ParamId::Fx3Param1],
+            swing: None,
         },
         ValueEntry {
             value: 106,
             name: "Fx 3 Param 2",
             parameters: &[ParamId::Fx3Param2],
+            swing: None,
         },
         ValueEntry {
             value: 107,
             name: "Fx 3 Param 3",
             parameters: &[ParamId::Fx3Param3],
+            swing: None,
         },
         ValueEntry {
             value: 108,
             name: "Fx 3 Param 4",
             parameters: &[ParamId::Fx3Param4],
+            swing: None,
         },
         ValueEntry {
             value: 109,
             name: "Fx 3 Param 5",
             parameters: &[ParamId::Fx3Param5],
+            swing: None,
         },
         ValueEntry {
             value: 110,
             name: "Fx 3 Param 6",
             parameters: &[ParamId::Fx3Param6],
+            swing: None,
         },
         ValueEntry {
             value: 111,
             name: "Fx 3 Param 7",
             parameters: &[ParamId::Fx3Param7],
+            swing: None,
         },
         ValueEntry {
             value: 112,
             name: "Fx 3 Param 8",
             parameters: &[ParamId::Fx3Param8],
+            swing: None,
         },
         ValueEntry {
             value: 113,
             name: "Fx 3 Param 9",
             parameters: &[ParamId::Fx3Param9],
+            swing: None,
         },
         ValueEntry {
             value: 114,
             name: "Fx 3 Param 10",
             parameters: &[ParamId::Fx3Param10],
+            swing: None,
         },
         ValueEntry {
             value: 115,
             name: "Fx 3 Param 11",
             parameters: &[ParamId::Fx3Param11],
+            swing: None,
         },
         ValueEntry {
             value: 116,
             name: "Fx 3 Param 12",
             parameters: &[ParamId::Fx3Param12],
+            swing: None,
         },
         ValueEntry {
             value: 117,
             name: "Fx 4 Param 1",
             parameters: &[ParamId::Fx4Param1],
+            swing: None,
         },
         ValueEntry {
             value: 118,
             name: "Fx 4 Param 2",
             parameters: &[ParamId::Fx4Param2],
+            swing: None,
         },
         ValueEntry {
             value: 119,
             name: "Fx 4 Param 3",
             parameters: &[ParamId::Fx4Param3],
+            swing: None,
         },
         ValueEntry {
             value: 120,
             name: "Fx 4 Param 4",
             parameters: &[ParamId::Fx4Param4],
+            swing: None,
         },
         ValueEntry {
             value: 121,
             name: "Fx 4 Param 5",
             parameters: &[ParamId::Fx4Param5],
+            swing: None,
         },
         ValueEntry {
             value: 122,
             name: "Fx 4 Param 6",
             parameters: &[ParamId::Fx4Param6],
+            swing: None,
         },
         ValueEntry {
             value: 123,
             name: "Fx 4 Param 7",
             parameters: &[ParamId::Fx4Param7],
+            swing: None,
         },
         ValueEntry {
             value: 124,
             name: "Fx 4 Param 8",
             parameters: &[ParamId::Fx4Param8],
+            swing: None,
         },
         ValueEntry {
             value: 125,
             name: "Fx 4 Param 9",
             parameters: &[ParamId::Fx4Param9],
+            swing: None,
         },
         ValueEntry {
             value: 126,
             name: "Fx 4 Param 10",
             parameters: &[ParamId::Fx4Param10],
+            swing: None,
         },
         ValueEntry {
             value: 127,
             name: "Fx 4 Param 11",
             parameters: &[ParamId::Fx4Param11],
+            swing: None,
         },
         ValueEntry {
             value: 128,
             name: "Fx 4 Param 12",
             parameters: &[ParamId::Fx4Param12],
+            swing: None,
         },
         ValueEntry {
             value: 129,
             name: "Fx 1 Level",
             parameters: &[ParamId::Fx1OutputGain],
+            swing: None,
         },
         ValueEntry {
             value: 130,
             name: "Fx 2 Level",
             parameters: &[ParamId::Fx2OutputGain],
+            swing: None,
         },
         ValueEntry {
             value: 131,
             name: "Fx 3 Level",
             parameters: &[ParamId::Fx3OutputGain],
+            swing: None,
         },
         ValueEntry {
             value: 132,
             name: "Fx 4 Level",
             parameters: &[ParamId::Fx4OutputGain],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static FX_TYPE_FW_1_1: ValueTable = ValueTable {
@@ -5775,178 +6405,214 @@ static FX_TYPE_FW_1_1: ValueTable = ValueTable {
             value: 0,
             name: "TC-DeepVRB",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "AmbVerb",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "RoomRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "VintageRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "HallRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "ChamberRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "PlateRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "RichPltRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "GatedRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "Reverse",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "ChorusVerb",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "DelayVerb",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "FlangVerb",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 13,
             name: "MidasEQ",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 14,
             name: "Enhancer",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 15,
             name: "FairComp",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 16,
             name: "MulBndDist",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 17,
             name: "RackAmp",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 18,
             name: "EdisonEX1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 19,
             name: "Auto Pan",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 20,
             name: "NoiseGate",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 21,
             name: "Delay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 22,
             name: "3TapDelay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 23,
             name: "4TapDelay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 24,
             name: "T-RayDelay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 25,
             name: "DecimDelay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 26,
             name: "ModDlyRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 27,
             name: "Chorus",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 28,
             name: "Chorus-D",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 29,
             name: "Flanger",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 30,
             name: "Phaser",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 31,
             name: "MoodFilter",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 32,
             name: "DualPitch",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 33,
             name: "Vintage Pitch",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 34,
             name: "RotarySpkr",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
@@ -5959,106 +6625,127 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
             value: 0,
             name: "Off",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "LFO1 Rate",
             parameters: &[ParamId::Lfo1Rate],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "LFO1 Delay",
             parameters: &[ParamId::Lfo1DelayFade],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "LFO1 Slew",
             parameters: &[ParamId::Lfo1SlewRate],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "LFO1 Shape",
             parameters: &[ParamId::Lfo1Shape],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "LFO2 Rate",
             parameters: &[ParamId::Lfo2Rate],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "LFO2 Delay",
             parameters: &[ParamId::Lfo2DelayFade],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "LFO2 Slew",
             parameters: &[ParamId::Lfo2SlewRate],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "LFO2 Shape",
             parameters: &[ParamId::Lfo2Shape],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "OSC1+2 Pit",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "OSC1 Pitch",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "OSC2 Pitch",
             parameters: &[ParamId::Osc2Pitch],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "OSC1 PM Dep",
             parameters: &[ParamId::Osc1PitchModDepth],
+            swing: None,
         },
         ValueEntry {
             value: 13,
             name: "PWM Depth",
             parameters: &[ParamId::Osc1PwmDepth],
+            swing: None,
         },
         ValueEntry {
             value: 14,
             name: "TMod Depth",
             parameters: &[ParamId::Osc2ToneModDepth],
+            swing: None,
         },
         ValueEntry {
             value: 15,
             name: "OSC2 PM Dep",
             parameters: &[ParamId::Osc2PitchModDepth],
+            swing: None,
         },
         ValueEntry {
             value: 16,
             name: "Porta Time",
             parameters: &[ParamId::PortamentoTime],
+            swing: None,
         },
         ValueEntry {
             value: 17,
             name: "VCF Freq",
             parameters: &[ParamId::VcfFrequency],
+            swing: None,
         },
         ValueEntry {
             value: 18,
             name: "VCF Res",
             parameters: &[ParamId::VcfResonance],
+            swing: None,
         },
         ValueEntry {
             value: 19,
             name: "VCF Env",
             parameters: &[ParamId::VcfEnvelopeDepth],
+            swing: None,
         },
         ValueEntry {
             value: 20,
             name: "VCF LFO",
             parameters: &[ParamId::VcfLfoDepth],
+            swing: None,
         },
         ValueEntry {
             value: 21,
@@ -6074,6 +6761,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::ModEnvelopeDecayTime,
                 ParamId::ModEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 22,
@@ -6083,6 +6771,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeAttackTime,
                 ParamId::ModEnvelopeAttackTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 23,
@@ -6092,6 +6781,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeDecayTime,
                 ParamId::ModEnvelopeDecayTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 24,
@@ -6101,6 +6791,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeSustainLevel,
                 ParamId::ModEnvelopeSustainLevel,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 25,
@@ -6110,6 +6801,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeReleaseTime,
                 ParamId::ModEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 26,
@@ -6119,6 +6811,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::VcaEnvelopeDecayTime,
                 ParamId::VcaEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 27,
@@ -6128,6 +6821,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeDecayTime,
                 ParamId::VcfEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 28,
@@ -6137,6 +6831,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::ModEnvelopeDecayTime,
                 ParamId::ModEnvelopeReleaseTime,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 29,
@@ -6147,6 +6842,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::VcaEnvelopeSustainCurve,
                 ParamId::VcaEnvelopeReleaseCurve,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 30,
@@ -6157,6 +6853,7 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::VcfEnvelopeSustainCurve,
                 ParamId::VcfEnvelopeReleaseCurve,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 31,
@@ -6167,498 +6864,598 @@ static MOD_DESTINATION_FW_1_0: ValueTable = ValueTable {
                 ParamId::ModEnvelopeSustainCurve,
                 ParamId::ModEnvelopeReleaseCurve,
             ],
+            swing: None,
         },
         ValueEntry {
             value: 32,
             name: "Env1 Attack",
             parameters: &[ParamId::VcaEnvelopeAttackTime],
+            swing: None,
         },
         ValueEntry {
             value: 33,
             name: "Env1 Decay",
             parameters: &[ParamId::VcaEnvelopeDecayTime],
+            swing: None,
         },
         ValueEntry {
             value: 34,
             name: "Env1 Sus",
             parameters: &[ParamId::VcaEnvelopeSustainLevel],
+            swing: None,
         },
         ValueEntry {
             value: 35,
             name: "Env1 Rel",
             parameters: &[ParamId::VcaEnvelopeReleaseTime],
+            swing: None,
         },
         ValueEntry {
             value: 36,
             name: "Env1 AtCur",
             parameters: &[ParamId::VcaEnvelopeAttackCurve],
+            swing: None,
         },
         ValueEntry {
             value: 37,
             name: "Env1 DcyCur",
             parameters: &[ParamId::VcaEnvelopeDecayCurve],
+            swing: None,
         },
         ValueEntry {
             value: 38,
             name: "Env1 SuSCur",
             parameters: &[ParamId::VcaEnvelopeSustainCurve],
+            swing: None,
         },
         ValueEntry {
             value: 39,
             name: "Env1 RelCur",
             parameters: &[ParamId::VcaEnvelopeReleaseCurve],
+            swing: None,
         },
         ValueEntry {
             value: 40,
             name: "Env2 Attack",
             parameters: &[ParamId::VcfEnvelopeAttackTime],
+            swing: None,
         },
         ValueEntry {
             value: 41,
             name: "Env2 Decay",
             parameters: &[ParamId::VcfEnvelopeDecayTime],
+            swing: None,
         },
         ValueEntry {
             value: 42,
             name: "Env2 Sus",
             parameters: &[ParamId::VcfEnvelopeSustainLevel],
+            swing: None,
         },
         ValueEntry {
             value: 43,
             name: "Env2 Rel",
             parameters: &[ParamId::VcfEnvelopeReleaseTime],
+            swing: None,
         },
         ValueEntry {
             value: 44,
             name: "Env2 AtCur",
             parameters: &[ParamId::VcfEnvelopeAttackCurve],
+            swing: None,
         },
         ValueEntry {
             value: 45,
             name: "Env2 DcyCur",
             parameters: &[ParamId::VcfEnvelopeDecayCurve],
+            swing: None,
         },
         ValueEntry {
             value: 46,
             name: "Env2 SuSCur",
             parameters: &[ParamId::VcfEnvelopeSustainCurve],
+            swing: None,
         },
         ValueEntry {
             value: 47,
             name: "Env2 RelCur",
             parameters: &[ParamId::VcfEnvelopeReleaseCurve],
+            swing: None,
         },
         ValueEntry {
             value: 48,
             name: "Env3 Attack",
             parameters: &[ParamId::ModEnvelopeAttackTime],
+            swing: None,
         },
         ValueEntry {
             value: 49,
             name: "Env3 Decay",
             parameters: &[ParamId::ModEnvelopeDecayTime],
+            swing: None,
         },
         ValueEntry {
             value: 50,
             name: "Env3 Sus",
             parameters: &[ParamId::ModEnvelopeSustainLevel],
+            swing: None,
         },
         ValueEntry {
             value: 51,
             name: "Env3 Rel",
             parameters: &[ParamId::ModEnvelopeReleaseTime],
+            swing: None,
         },
         ValueEntry {
             value: 52,
             name: "Env3 AtCur",
             parameters: &[ParamId::ModEnvelopeAttackCurve],
+            swing: None,
         },
         ValueEntry {
             value: 53,
             name: "Env3 DcyCur",
             parameters: &[ParamId::ModEnvelopeDecayCurve],
+            swing: None,
         },
         ValueEntry {
             value: 54,
             name: "Env3 SuSCur",
             parameters: &[ParamId::ModEnvelopeSustainCurve],
+            swing: None,
         },
         ValueEntry {
             value: 55,
             name: "Env3 RelCur",
             parameters: &[ParamId::ModEnvelopeReleaseCurve],
+            swing: None,
         },
         ValueEntry {
             value: 56,
             name: "VCA All",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 57,
             name: "VCA Active",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 58,
             name: "VCA EnvDep",
             parameters: &[ParamId::VcaEnvelopeDepth],
+            swing: None,
         },
         ValueEntry {
             value: 59,
             name: "Pan Spread",
             parameters: &[ParamId::VcaPanSpread],
+            swing: None,
         },
         ValueEntry {
             value: 60,
             name: "VCA Pan",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 61,
             name: "OSC2 Lvl",
             parameters: &[ParamId::Osc2Level],
+            swing: None,
         },
         ValueEntry {
             value: 62,
             name: "Noise Lvl",
             parameters: &[ParamId::NoiseLevel],
+            swing: None,
         },
         ValueEntry {
             value: 63,
             name: "HP Freq",
             parameters: &[ParamId::VcfHighPassFrequency],
+            swing: None,
         },
         ValueEntry {
             value: 64,
             name: "Uni Detune",
             parameters: &[ParamId::UnisonDetune],
+            swing: None,
         },
         ValueEntry {
             value: 65,
             name: "OSC Drift",
             parameters: &[ParamId::VoiceDrift],
+            swing: None,
         },
         ValueEntry {
             value: 66,
             name: "Param Drift",
             parameters: &[ParamId::ParameterDrift],
+            swing: None,
         },
         ValueEntry {
             value: 67,
             name: "Drift Rate",
             parameters: &[ParamId::DriftRate],
+            swing: None,
         },
         ValueEntry {
             value: 68,
             name: "Arp Gate",
             parameters: &[ParamId::ArpGateTime],
+            swing: None,
         },
         ValueEntry {
             value: 69,
             name: "Seq Slew",
             parameters: &[ParamId::SlewRate],
+            swing: None,
         },
         ValueEntry {
             value: 70,
             name: "Mod 1 Dep",
             parameters: &[ParamId::Mod1Depth],
+            swing: None,
         },
         ValueEntry {
             value: 71,
             name: "Mod 2 Dep",
             parameters: &[ParamId::Mod2Depth],
+            swing: None,
         },
         ValueEntry {
             value: 72,
             name: "Mod 3 Dep",
             parameters: &[ParamId::Mod3Depth],
+            swing: None,
         },
         ValueEntry {
             value: 73,
             name: "Mod 4 Dep",
             parameters: &[ParamId::Mod4Depth],
+            swing: None,
         },
         ValueEntry {
             value: 74,
             name: "Mod 5 Dep",
             parameters: &[ParamId::Mod5Depth],
+            swing: None,
         },
         ValueEntry {
             value: 75,
             name: "Mod 6 Dep",
             parameters: &[ParamId::Mod6Depth],
+            swing: None,
         },
         ValueEntry {
             value: 76,
             name: "Mod 7 Dep",
             parameters: &[ParamId::Mod7Depth],
+            swing: None,
         },
         ValueEntry {
             value: 77,
             name: "Mod 8 Dep",
             parameters: &[ParamId::Mod8Depth],
+            swing: None,
         },
         ValueEntry {
             value: 78,
             name: "Fx 1 Param 1",
             parameters: &[ParamId::Fx1Param1],
+            swing: None,
         },
         ValueEntry {
             value: 79,
             name: "Fx 1 Param 2",
             parameters: &[ParamId::Fx1Param2],
+            swing: None,
         },
         ValueEntry {
             value: 80,
             name: "Fx 1 Param 3",
             parameters: &[ParamId::Fx1Param3],
+            swing: None,
         },
         ValueEntry {
             value: 81,
             name: "Fx 1 Param 4",
             parameters: &[ParamId::Fx1Param4],
+            swing: None,
         },
         ValueEntry {
             value: 82,
             name: "Fx 1 Param 5",
             parameters: &[ParamId::Fx1Param5],
+            swing: None,
         },
         ValueEntry {
             value: 83,
             name: "Fx 1 Param 6",
             parameters: &[ParamId::Fx1Param6],
+            swing: None,
         },
         ValueEntry {
             value: 84,
             name: "Fx 1 Param 7",
             parameters: &[ParamId::Fx1Param7],
+            swing: None,
         },
         ValueEntry {
             value: 85,
             name: "Fx 1 Param 8",
             parameters: &[ParamId::Fx1Param8],
+            swing: None,
         },
         ValueEntry {
             value: 86,
             name: "Fx 1 Param 9",
             parameters: &[ParamId::Fx1Param9],
+            swing: None,
         },
         ValueEntry {
             value: 87,
             name: "Fx 1 Param 10",
             parameters: &[ParamId::Fx1Param10],
+            swing: None,
         },
         ValueEntry {
             value: 88,
             name: "Fx 1 Param 11",
             parameters: &[ParamId::Fx1Param11],
+            swing: None,
         },
         ValueEntry {
             value: 89,
             name: "Fx 1 Param 12",
             parameters: &[ParamId::Fx1Param12],
+            swing: None,
         },
         ValueEntry {
             value: 90,
             name: "Fx 2 Param 1",
             parameters: &[ParamId::Fx2Param1],
+            swing: None,
         },
         ValueEntry {
             value: 91,
             name: "Fx 2 Param 2",
             parameters: &[ParamId::Fx2Param2],
+            swing: None,
         },
         ValueEntry {
             value: 92,
             name: "Fx 2 Param 3",
             parameters: &[ParamId::Fx2Param3],
+            swing: None,
         },
         ValueEntry {
             value: 93,
             name: "Fx 2 Param 4",
             parameters: &[ParamId::Fx2Param4],
+            swing: None,
         },
         ValueEntry {
             value: 94,
             name: "Fx 2 Param 5",
             parameters: &[ParamId::Fx2Param5],
+            swing: None,
         },
         ValueEntry {
             value: 95,
             name: "Fx 2 Param 6",
             parameters: &[ParamId::Fx2Param6],
+            swing: None,
         },
         ValueEntry {
             value: 96,
             name: "Fx 2 Param 7",
             parameters: &[ParamId::Fx2Param7],
+            swing: None,
         },
         ValueEntry {
             value: 97,
             name: "Fx 2 Param 8",
             parameters: &[ParamId::Fx2Param8],
+            swing: None,
         },
         ValueEntry {
             value: 98,
             name: "Fx 2 Param 9",
             parameters: &[ParamId::Fx2Param9],
+            swing: None,
         },
         ValueEntry {
             value: 99,
             name: "Fx 2 Param 10",
             parameters: &[ParamId::Fx2Param10],
+            swing: None,
         },
         ValueEntry {
             value: 100,
             name: "Fx 2 Param 11",
             parameters: &[ParamId::Fx2Param11],
+            swing: None,
         },
         ValueEntry {
             value: 101,
             name: "Fx 2 Param 12",
             parameters: &[ParamId::Fx2Param12],
+            swing: None,
         },
         ValueEntry {
             value: 102,
             name: "Fx 3 Param 1",
             parameters: &[ParamId::Fx3Param1],
+            swing: None,
         },
         ValueEntry {
             value: 103,
             name: "Fx 3 Param 2",
             parameters: &[ParamId::Fx3Param2],
+            swing: None,
         },
         ValueEntry {
             value: 104,
             name: "Fx 3 Param 3",
             parameters: &[ParamId::Fx3Param3],
+            swing: None,
         },
         ValueEntry {
             value: 105,
             name: "Fx 3 Param 4",
             parameters: &[ParamId::Fx3Param4],
+            swing: None,
         },
         ValueEntry {
             value: 106,
             name: "Fx 3 Param 5",
             parameters: &[ParamId::Fx3Param5],
+            swing: None,
         },
         ValueEntry {
             value: 107,
             name: "Fx 3 Param 6",
             parameters: &[ParamId::Fx3Param6],
+            swing: None,
         },
         ValueEntry {
             value: 108,
             name: "Fx 3 Param 7",
             parameters: &[ParamId::Fx3Param7],
+            swing: None,
         },
         ValueEntry {
             value: 109,
             name: "Fx 3 Param 8",
             parameters: &[ParamId::Fx3Param8],
+            swing: None,
         },
         ValueEntry {
             value: 110,
             name: "Fx 3 Param 9",
             parameters: &[ParamId::Fx3Param9],
+            swing: None,
         },
         ValueEntry {
             value: 111,
             name: "Fx 3 Param 10",
             parameters: &[ParamId::Fx3Param10],
+            swing: None,
         },
         ValueEntry {
             value: 112,
             name: "Fx 3 Param 11",
             parameters: &[ParamId::Fx3Param11],
+            swing: None,
         },
         ValueEntry {
             value: 113,
             name: "Fx 3 Param 12",
             parameters: &[ParamId::Fx3Param12],
+            swing: None,
         },
         ValueEntry {
             value: 114,
             name: "Fx 4 Param 1",
             parameters: &[ParamId::Fx4Param1],
+            swing: None,
         },
         ValueEntry {
             value: 115,
             name: "Fx 4 Param 2",
             parameters: &[ParamId::Fx4Param2],
+            swing: None,
         },
         ValueEntry {
             value: 116,
             name: "Fx 4 Param 3",
             parameters: &[ParamId::Fx4Param3],
+            swing: None,
         },
         ValueEntry {
             value: 117,
             name: "Fx 4 Param 4",
             parameters: &[ParamId::Fx4Param4],
+            swing: None,
         },
         ValueEntry {
             value: 118,
             name: "Fx 4 Param 5",
             parameters: &[ParamId::Fx4Param5],
+            swing: None,
         },
         ValueEntry {
             value: 119,
             name: "Fx 4 Param 6",
             parameters: &[ParamId::Fx4Param6],
+            swing: None,
         },
         ValueEntry {
             value: 120,
             name: "Fx 4 Param 7",
             parameters: &[ParamId::Fx4Param7],
+            swing: None,
         },
         ValueEntry {
             value: 121,
             name: "Fx 4 Param 8",
             parameters: &[ParamId::Fx4Param8],
+            swing: None,
         },
         ValueEntry {
             value: 122,
             name: "Fx 4 Param 9",
             parameters: &[ParamId::Fx4Param9],
+            swing: None,
         },
         ValueEntry {
             value: 123,
             name: "Fx 4 Param 10",
             parameters: &[ParamId::Fx4Param10],
+            swing: None,
         },
         ValueEntry {
             value: 124,
             name: "Fx 4 Param 11",
             parameters: &[ParamId::Fx4Param11],
+            swing: None,
         },
         ValueEntry {
             value: 125,
             name: "Fx 4 Param 12",
             parameters: &[ParamId::Fx4Param12],
+            swing: None,
         },
         ValueEntry {
             value: 126,
             name: "Fx 1 Level",
             parameters: &[ParamId::Fx1OutputGain],
+            swing: None,
         },
         ValueEntry {
             value: 127,
             name: "Fx 2 Level",
             parameters: &[ParamId::Fx2OutputGain],
+            swing: None,
         },
         ValueEntry {
             value: 128,
             name: "Fx 3 Level",
             parameters: &[ParamId::Fx3OutputGain],
+            swing: None,
         },
         ValueEntry {
             value: 129,
             name: "Fx 4 Level",
             parameters: &[ParamId::Fx4OutputGain],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 static FX_TYPE_FW_1_0: ValueTable = ValueTable {
@@ -6671,173 +7468,208 @@ static FX_TYPE_FW_1_0: ValueTable = ValueTable {
             value: 0,
             name: "TC-DeepVRB",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 1,
             name: "AmbVerb",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 2,
             name: "RoomRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 3,
             name: "VintageRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 4,
             name: "HallRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 5,
             name: "ChamberRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 6,
             name: "PlateRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 7,
             name: "RichPltRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 8,
             name: "GatedRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 9,
             name: "Reverse",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 10,
             name: "ChorusVerb",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 11,
             name: "DelayVerb",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 12,
             name: "FlangVerb",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 13,
             name: "MidasEQ",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 14,
             name: "Enhancer",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 15,
             name: "FairComp",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 16,
             name: "MulBndDist",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 17,
             name: "RackAmp",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 18,
             name: "EdisonEX1",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 19,
             name: "Auto Pan",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 20,
             name: "NoiseGate",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 21,
             name: "Delay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 22,
             name: "3TapDelay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 23,
             name: "4TapDelay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 24,
             name: "T-RayDelay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 25,
             name: "DecimDelay",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 26,
             name: "ModDlyRev",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 27,
             name: "Chorus",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 28,
             name: "Chorus-D",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 29,
             name: "Flanger",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 30,
             name: "Phaser",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 31,
             name: "MoodFilter",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 32,
             name: "DualPitch",
             parameters: &[],
+            swing: None,
         },
         ValueEntry {
             value: 33,
             name: "RotarySpkr",
             parameters: &[],
+            swing: None,
         },
     ],
+    cells: &[],
 };
 
 /// Every controller the synthesizer answers, in controller number order.

@@ -9,6 +9,8 @@ use std::path::Path;
 
 use serde::Deserialize;
 
+use crate::codegen::pascal;
+
 /// A program parameter.
 ///
 /// `offset` is both the parameter's 14-bit NRPN number and its byte offset in an
@@ -91,6 +93,30 @@ pub struct EnumEntry {
     /// addresses", and the two are told apart by the entry's description.
     #[serde(default)]
     pub parameters: Vec<String>,
+    /// Which way this value, as a modulation source, moves what it reaches:
+    /// one of [`SWINGS`]. Absent where the specification does not settle it.
+    #[serde(default)]
+    pub swing: Option<String>,
+}
+
+/// The swings a modulation source may declare.
+///
+/// `centred` swings either side of where the destination sits; `rising` moves
+/// it one way from there and back. The reasons are in the table's own note.
+pub const SWINGS: [&str; 2] = ["centred", "rising"];
+
+/// A dot-matrix cell for one entry of one value table.
+///
+/// The modulation sources are what has them: a picture the size of a character,
+/// for a patch bay drawn in pictures rather than in abbreviations.
+#[derive(Debug, Deserialize)]
+pub struct Cell {
+    /// The value table, by its `enums.toml` id.
+    pub table: String,
+    /// The entry, by the name it carries; see `meta.addressing` in cells.toml.
+    pub name: String,
+    /// The cell, one string per row, `#` for a lit dot and `.` for an unlit one.
+    pub pixels: Vec<String>,
 }
 
 /// A firmware version that changes the protocol.
@@ -555,44 +581,58 @@ impl Family {
     /// characters, when a character is neither `#` nor `.`, or when the grid is
     /// empty or completely full, both of which draw nothing.
     fn validate_pixels(&self, side: usize) -> Result<(), String> {
-        if self.pixels.len() != side {
+        validate_pixels("marks.toml", &self.name, &self.pixels, side)
+    }
+}
+
+/// Side of the grid every pixel drawing is on: the marks and the cells both.
+///
+/// The library's `pixels::SIDE` is the same number, and a grid here that was
+/// not this wide would not fit the type there.
+pub const PIXEL_SIDE: usize = 7;
+
+/// Checks that a pixel grid is `side` rows of `side` characters, each `#` or
+/// `.`, and draws something a reader could tell from anything else.
+///
+/// # Errors
+///
+/// Returns a message naming `file` and `what` when the grid is the wrong
+/// shape, uses another character, or is empty or completely full, both of
+/// which draw nothing.
+fn validate_pixels(file: &str, what: &str, rows: &[String], side: usize) -> Result<(), String> {
+    if rows.len() != side {
+        return Err(format!(
+            "{file}: {what} has {} pixel rows, not {side}",
+            rows.len()
+        ));
+    }
+    let mut lit = 0;
+    for (y, row) in rows.iter().enumerate() {
+        if row.chars().count() != side {
             return Err(format!(
-                "marks.toml: {} has {} pixel rows, not {side}",
-                self.name,
-                self.pixels.len()
+                "{file}: {what} pixel row {y} is {} characters, not {side}",
+                row.chars().count()
             ));
         }
-        let mut lit = 0;
-        for (y, row) in self.pixels.iter().enumerate() {
-            if row.chars().count() != side {
-                return Err(format!(
-                    "marks.toml: {} pixel row {y} is {} characters, not {side}",
-                    self.name,
-                    row.chars().count()
-                ));
-            }
-            for (x, pixel) in row.chars().enumerate() {
-                match pixel {
-                    '#' => lit += 1,
-                    '.' => {}
-                    other => {
-                        return Err(format!(
-                            "marks.toml: {} pixel ({x}, {y}) is {other:?}, not '#' or '.'",
-                            self.name
-                        ));
-                    }
+        for (x, pixel) in row.chars().enumerate() {
+            match pixel {
+                '#' => lit += 1,
+                '.' => {}
+                other => {
+                    return Err(format!(
+                        "{file}: {what} pixel ({x}, {y}) is {other:?}, not '#' or '.'"
+                    ));
                 }
             }
         }
-        if lit == 0 || lit == side * side {
-            return Err(format!(
-                "marks.toml: {} lights {lit} pixels of {}, which draws nothing",
-                self.name,
-                side * side
-            ));
-        }
-        Ok(())
     }
+    if lit == 0 || lit == side * side {
+        return Err(format!(
+            "{file}: {what} lights {lit} pixels of {}, which draws nothing",
+            side * side
+        ));
+    }
+    Ok(())
 }
 
 /// One stroke of a mark: a polyline, a circular arc or a filled dot.
@@ -867,6 +907,11 @@ struct Marks {
 }
 
 #[derive(Debug, Deserialize)]
+struct Cells {
+    cell: Vec<Cell>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Layouts {
     meta: LayoutMeta,
     grid: Grid,
@@ -972,6 +1017,8 @@ pub struct Spec {
     pub quantities: Vec<String>,
     /// What each effect does to a signal, with the mark it is drawn with.
     pub families: Vec<Family>,
+    /// The dot-matrix cells drawn for value table entries, as written.
+    pub cells: Vec<Cell>,
     /// How the four engines can be wired, ordered by `FX Routing` value.
     pub routings: Vec<Routing>,
     /// What each `FX Mode` setting does to the analog and digital paths.
@@ -1007,6 +1054,7 @@ impl Spec {
         let mapping: Mapping = read(&spec.join("mapping.toml"))?;
         let panels: Panels = read(&spec.join("panels.toml"))?;
         let marks: Marks = read(&spec.join("marks.toml"))?;
+        let cells: Cells = read(&spec.join("cells.toml"))?;
         let layouts: Layouts = read(&spec.join("layout.toml"))?;
         let routings: Routings = read(&spec.join("routing.toml"))?;
         let measurements: Measurements = read(&spec.join("measurements.toml"))?;
@@ -1030,6 +1078,7 @@ impl Spec {
             panels: panels.panel,
             quantities: panels.meta.quantities,
             families: marks.family,
+            cells: cells.cell,
             routings: routings.routing,
             fx_modes: routings.mode,
             measurements: measurements.measurement,
@@ -1083,10 +1132,26 @@ impl Spec {
         versions
     }
 
+    /// Returns the cell drawn for `entry` of `table`, if one has been.
+    ///
+    /// Joined by the name as an identifier, the way the value types join the
+    /// versions of a renumbered table, so one cell serves `Note Off Vel` and
+    /// `NoteOff Vel` alike.
+    #[must_use]
+    pub fn cell_for(&self, table: &ValueTable, entry: &EnumEntry) -> Option<&Cell> {
+        let wanted = pascal(&entry.name);
+        self.cells
+            .iter()
+            .find(|cell| cell.table == table.id && pascal(&cell.name) == wanted)
+    }
+
     fn validate(&self) -> Result<(), String> {
         self.validate_firmware()?;
         self.validate_parameters()?;
         self.validate_enum_parameters()?;
+        self.validate_swings()?;
+        self.validate_twins()?;
+        self.validate_cells()?;
         self.validate_controllers()?;
         self.validate_effects()?;
         self.validate_engines()?;
@@ -1264,12 +1329,10 @@ impl Spec {
 
     /// Checks the parameters a value table's entries name.
     ///
-    /// Three things, all of which are how this table stays maintained rather
-    /// than transcribed: every name has to resolve, an entry must not name the
-    /// same parameter twice, and the versions of a renumbered table have to
-    /// agree about what a name moves. The last one matters most: the firmware
-    /// 1.0 destination table is derived from the 1.1 one, so a mapping added to
-    /// one and forgotten in the other would otherwise go unnoticed.
+    /// Two things, both of which are how this table stays maintained rather
+    /// than transcribed: every name has to resolve, and an entry must not name
+    /// the same parameter twice. That the versions of a renumbered table agree
+    /// about what a name moves is [`validate_twins`](Self::validate_twins).
     fn validate_enum_parameters(&self) -> Result<(), String> {
         let named = |name: &str| self.parameters.iter().any(|p| p.name == name);
         for table in &self.tables {
@@ -1291,13 +1354,27 @@ impl Spec {
             }
         }
 
+        Ok(())
+    }
+
+    /// Checks that the versions of a renumbered table agree about an entry:
+    /// what it moves and which way it swings.
+    ///
+    /// Joined by the name as an identifier, the way the value types are, so
+    /// `NoteOff Vel` on 1.0 is `Note Off Vel` on 1.1. This matters most for
+    /// the destinations: the firmware 1.0 table is derived from the 1.1 one, so
+    /// a mapping added to one and forgotten in the other would otherwise go
+    /// unnoticed.
+    fn validate_twins(&self) -> Result<(), String> {
         for table in &self.tables {
             for other in self.versions_of(&table.id) {
                 if core::ptr::eq(other, table) {
                     continue;
                 }
                 for entry in &table.entries {
-                    let Some(twin) = other.entries.iter().find(|e| e.name == entry.name) else {
+                    let wanted = pascal(&entry.name);
+                    let Some(twin) = other.entries.iter().find(|e| pascal(&e.name) == wanted)
+                    else {
                         continue;
                     };
                     if twin.parameters != entry.parameters {
@@ -1306,10 +1383,67 @@ impl Spec {
                             entry.name, table.name, other.name
                         ));
                     }
+                    if twin.swing != entry.swing {
+                        return Err(format!(
+                            "enums.toml: {:?} swings differently in {} and {}",
+                            entry.name, table.name, other.name
+                        ));
+                    }
                 }
             }
         }
+        Ok(())
+    }
 
+    /// Checks that a swing is one of the two named.
+    fn validate_swings(&self) -> Result<(), String> {
+        for table in &self.tables {
+            for entry in &table.entries {
+                if let Some(swing) = &entry.swing
+                    && !SWINGS.contains(&swing.as_str())
+                {
+                    return Err(format!(
+                        "enums.toml: table {} value {} ({}) swings {swing:?}, not one of {SWINGS:?}",
+                        table.id, entry.value, entry.name
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks that every cell lands on an entry that exists, that no entry is
+    /// drawn twice, and that each grid is a drawing.
+    fn validate_cells(&self) -> Result<(), String> {
+        let mut drawn: Vec<(&str, String)> = Vec::new();
+        for cell in &self.cells {
+            let versions = self.versions_of(&cell.table);
+            if versions.is_empty() {
+                return Err(format!(
+                    "cells.toml: {:?} is drawn for table {:?}, which enums.toml does not list",
+                    cell.name, cell.table
+                ));
+            }
+            let wanted = pascal(&cell.name);
+            if !versions
+                .iter()
+                .any(|table| table.entries.iter().any(|e| pascal(&e.name) == wanted))
+            {
+                return Err(format!(
+                    "cells.toml: table {} has no entry named {:?}",
+                    cell.table, cell.name
+                ));
+            }
+            let key = (cell.table.as_str(), wanted);
+            if drawn.contains(&key) {
+                return Err(format!(
+                    "cells.toml: {:?} in table {} is drawn twice",
+                    cell.name, cell.table
+                ));
+            }
+            drawn.push(key);
+            validate_pixels("cells.toml", &cell.name, &cell.pixels, PIXEL_SIDE)?;
+        }
         Ok(())
     }
 
@@ -1937,9 +2071,6 @@ impl Spec {
         /// Coordinates are kept this far inside the unit box so that a host's
         /// stroke width has somewhere to go; see `meta.geometry`.
         const MARGIN: f32 = 0.08;
-
-        /// Side of the grid each mark is drawn again on; see `meta.pixels`.
-        const PIXEL_SIDE: usize = 7;
 
         let mut claimed: BTreeMap<&str, &str> = BTreeMap::new();
         for family in &self.families {

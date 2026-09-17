@@ -422,29 +422,49 @@ fn render_value_tables(spec: &Spec) -> String {
                 "> Unconfirmed. This mapping is inferred and needs checking against hardware.\n\n",
             );
         }
-        // Only the modulation destinations join to the parameter table today,
-        // so the column appears where there is something in it rather than as
-        // an empty one on all twenty-odd tables.
+        // The cells are drawn once, beside the table the newest firmware reads.
+        if crate::spec::Firmware::range_covers(table.firmware.as_deref(), default)
+            && table
+                .entries
+                .iter()
+                .any(|entry| spec.cell_for(table, entry).is_some())
+        {
+            let _ = write!(
+                out,
+                "<img src=\"diagrams/cells.svg\" alt=\"{}\" width=\"{}\">\n\n",
+                diagrams::CELLS_ALT,
+                diagrams::cells_width(spec)
+            );
+        }
+        // Only the modulation destinations join to the parameter table, and
+        // only the sources swing, so each column appears where there is
+        // something in it rather than as an empty one on all twenty-odd tables.
         let joins = table
             .entries
             .iter()
             .any(|entry| !entry.parameters.is_empty());
+        let swings = table.entries.iter().any(|entry| entry.swing.is_some());
+        let mut header = String::from("| Value | Name |");
         if joins {
-            out.push_str("| Value | Name | Moves | Notes |\n|---|---|---|---|\n");
-        } else {
-            out.push_str("| Value | Name | Notes |\n|---|---|---|\n");
+            header.push_str(" Moves |");
         }
+        if swings {
+            header.push_str(" Swing |");
+        }
+        header.push_str(" Notes |");
+        let rule = "|---".repeat(header.matches('|').count() - 1) + "|";
+        let _ = writeln!(out, "{header}\n{rule}");
         for entry in &table.entries {
-            let moves = if joins {
-                format!("{} | ", cell(&entry.parameters.join(", ")))
-            } else {
-                String::new()
-            };
+            let mut row = format!("| {} | {} |", entry.value, cell(&entry.name));
+            if joins {
+                let _ = write!(row, " {} |", cell(&entry.parameters.join(", ")));
+            }
+            if swings {
+                let _ = write!(row, " {} |", entry.swing.as_deref().unwrap_or(""));
+            }
             let _ = writeln!(
                 out,
-                "| {} | {} | {moves}{} |",
-                entry.value,
-                cell(&entry.name),
+                "{row} {} |",
                 cell(entry.description.as_deref().unwrap_or(""))
             );
         }

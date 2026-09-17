@@ -73,6 +73,10 @@ pub use generated::{
     SLOTS_PER_ENGINE,
 };
 
+/// The grid a mark's [`pixels`](Mark::pixels) are on, which is the crate's one
+/// pixel grid: the modulation sources' cells are drawn on the same one.
+pub use crate::pixels::Pixels;
+
 use generated::{ALGORITHMS, ENGINES, FAMILY_NAMES, GRID, MARKS, MODES, PANELS, ROUTINGS};
 
 use core::fmt;
@@ -900,10 +904,8 @@ impl Mark {
     /// effect name, or a hardware panel. Above about sixteen pixels a host
     /// wants [`strokes`](Self::strokes) instead, which has no size of its own.
     ///
-    /// Drawn by hand rather than reduced from the strokes. At forty-nine pixels
-    /// which pixels are lit is the whole of the design, and a one-pixel stroke
-    /// put through a rasteriser at this size comes out as a smear with the idea
-    /// gone.
+    /// Drawn by hand rather than reduced from the strokes, for the reason the
+    /// [`pixels`](crate::pixels) module gives.
     ///
     /// ```
     /// use deepmind_midi::effect::{Algorithm, MARK_PIXEL_SIDE};
@@ -920,71 +922,6 @@ impl Mark {
     #[must_use]
     pub const fn pixels(&self) -> &Pixels {
         &self.pixels
-    }
-}
-
-/// A [`Mark`] drawn on a square one-bit grid, for a display too small to stroke.
-///
-/// Reached through [`Mark::pixels`]. [`MARK_PIXEL_SIDE`] is how wide and how
-/// tall, and the origin is the top left, matching the unit box the strokes are
-/// in.
-///
-/// ```
-/// use deepmind_midi::effect::{Algorithm, MARK_PIXEL_SIDE};
-///
-/// let filter = Algorithm::by_name("MoodFilter").expect("a Mood Filter");
-/// let pixels = filter.mark().pixels();
-///
-/// // Blitting it is a walk over the grid.
-/// let mut lit = 0;
-/// for y in 0..MARK_PIXEL_SIDE as u8 {
-///     for x in 0..MARK_PIXEL_SIDE as u8 {
-///         if pixels.is_lit(x, y) {
-///             lit += 1;
-///         }
-///     }
-/// }
-/// assert!(lit > 0);
-/// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Pixels {
-    rows: [u8; MARK_PIXEL_SIDE],
-}
-
-impl Pixels {
-    /// Builds a grid from its rows, a bit a pixel and bit 0 leftmost.
-    #[must_use]
-    pub const fn new(rows: [u8; MARK_PIXEL_SIDE]) -> Self {
-        Self { rows }
-    }
-
-    /// Returns whether the pixel at `x`, `y` is lit, counting from the top
-    /// left.
-    ///
-    /// `false` outside the grid, so a host walking a larger box than the mark
-    /// gets blank rather than an answer it has to bounds-check itself.
-    #[must_use]
-    pub fn is_lit(&self, x: u8, y: u8) -> bool {
-        if usize::from(x) >= MARK_PIXEL_SIDE {
-            return false;
-        }
-        self.row(y) & (1 << x) != 0
-    }
-
-    /// Returns one row as its low [`MARK_PIXEL_SIDE`] bits, bit 0 leftmost.
-    ///
-    /// What a host blitting a row at a time wants. Zero past the bottom of the
-    /// grid.
-    #[must_use]
-    pub fn row(&self, y: u8) -> u8 {
-        self.rows.get(usize::from(y)).copied().unwrap_or(0)
-    }
-
-    /// Returns every row, top to bottom.
-    #[must_use]
-    pub const fn rows(&self) -> &[u8; MARK_PIXEL_SIDE] {
-        &self.rows
     }
 }
 

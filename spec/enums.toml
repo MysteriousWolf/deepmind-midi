@@ -339,32 +339,45 @@ entries = [
 id = "mod_source"
 firmware = "1.1+"
 name = "Modulation Matrix Source"
+note = """
+The Swing column says which way a source moves what it reaches. `centred` \
+swings either side of where the destination sits: an LFO, the pitch bender, \
+which rests in the middle of its travel, and the control sequencer, whose \
+steps are signed about their centre. `rising` moves it one way from where it \
+sits and back: an envelope, a fade, an LFO taken unipolar, a wheel or a pedal \
+that rests at one end of its travel, and a velocity or a pressure, which start \
+from nothing. The instrument's own display prints the difference: the manual's \
+screenshot of a pitch modulation depth reads `+/-4.5 semitones` from an LFO \
+and `+7.8 semitones` from a unipolar source, which `measurements.toml` records \
+at offset 21. A blank is a source the specification does not settle: where a \
+note number or a voice number counts from is not printed anywhere, and a guess \
+would be drawn as confidently as a fact."""
 entries = [
     { value = 0, name = "Off", description = "The matrix row is switched off" },
-    { value = 1, name = "Pitch Bend", description = "Pitch bend wheel" },
-    { value = 2, name = "Mod Wheel", description = "Modulation wheel" },
-    { value = 3, name = "Foot Ctrl", description = "Foot controller" },
-    { value = 4, name = "BreathCtrl", description = "Breath controller" },
-    { value = 5, name = "Pressure", description = "Aftertouch pressure" },
-    { value = 6, name = "Expression", description = "Expression pedal" },
-    { value = 7, name = "LFO1", description = "LFO 1" },
-    { value = 8, name = "LFO2", description = "LFO 2" },
-    { value = 9, name = "Env 1", description = "VCA envelope" },
-    { value = 10, name = "Env 2", description = "VCF envelope" },
-    { value = 11, name = "Env 3", description = "Mod envelope" },
+    { value = 1, name = "Pitch Bend", swing = "centred", description = "Pitch bend wheel" },
+    { value = 2, name = "Mod Wheel", swing = "rising", description = "Modulation wheel" },
+    { value = 3, name = "Foot Ctrl", swing = "rising", description = "Foot controller" },
+    { value = 4, name = "BreathCtrl", swing = "rising", description = "Breath controller" },
+    { value = 5, name = "Pressure", swing = "rising", description = "Aftertouch pressure" },
+    { value = 6, name = "Expression", swing = "rising", description = "Expression pedal" },
+    { value = 7, name = "LFO1", swing = "centred", description = "LFO 1" },
+    { value = 8, name = "LFO2", swing = "centred", description = "LFO 2" },
+    { value = 9, name = "Env 1", swing = "rising", description = "VCA envelope" },
+    { value = 10, name = "Env 2", swing = "rising", description = "VCF envelope" },
+    { value = 11, name = "Env 3", swing = "rising", description = "Mod envelope" },
     { value = 12, name = "Note Num", description = "Note number" },
-    { value = 13, name = "Note Vel", description = "Note velocity" },
-    { value = 14, name = "Note Off Vel", description = "Note off velocity" },
-    { value = 15, name = "Ctrl Seq", description = "Control sequencer" },
-    { value = 16, name = "LFO1 (Uni)", description = "LFO 1, unipolar" },
-    { value = 17, name = "LFO2 (Uni)", description = "LFO 2, unipolar" },
-    { value = 18, name = "LFO1 (Fade)", description = "LFO 1 fade envelope" },
-    { value = 19, name = "LFO2 (Fade)", description = "LFO 2 fade envelope" },
+    { value = 13, name = "Note Vel", swing = "rising", description = "Note velocity" },
+    { value = 14, name = "Note Off Vel", swing = "rising", description = "Note off velocity" },
+    { value = 15, name = "Ctrl Seq", swing = "centred", description = "Control sequencer" },
+    { value = 16, name = "LFO1 (Uni)", swing = "rising", description = "LFO 1, unipolar" },
+    { value = 17, name = "LFO2 (Uni)", swing = "rising", description = "LFO 2, unipolar" },
+    { value = 18, name = "LFO1 (Fade)", swing = "rising", description = "LFO 1 fade envelope" },
+    { value = 19, name = "LFO2 (Fade)", swing = "rising", description = "LFO 2 fade envelope" },
     { value = 20, name = "Voice Num", description = "Voice number" },
     { value = 21, name = "Uni Voice", description = "Unison voice number" },
-    { value = 22, name = "CC X (115)", description = "Continuous controller X axis, CC 115" },
-    { value = 23, name = "CC Y (116)", description = "Continuous controller Y axis, CC 116" },
-    { value = 24, name = "CC Z (117)", description = "Continuous controller Z axis, CC 117" },
+    { value = 22, name = "CC X (115)", swing = "rising", description = "Continuous controller X axis, CC 115" },
+    { value = 23, name = "CC Y (116)", swing = "rising", description = "Continuous controller Y axis, CC 116" },
+    { value = 24, name = "CC Z (117)", swing = "rising", description = "Continuous controller Z axis, CC 117" },
 ]
 
 [[enum]]
@@ -374,28 +387,28 @@ firmware = "1.0"
 note = "Value 0 selects Off."
 entries = [
     { value = 0, name = "Off", description = "The matrix row is switched off" },
-    { value = 1, name = "Pitch Bend" },
-    { value = 2, name = "Mod Wheel" },
-    { value = 3, name = "Foot Ctrl" },
-    { value = 4, name = "BreathCtrl" },
-    { value = 5, name = "Pressure" },
-    { value = 6, name = "LFO1" },
-    { value = 7, name = "LFO2" },
-    { value = 8, name = "Env 1" },
-    { value = 9, name = "Env 2" },
-    { value = 10, name = "Env 3" },
+    { value = 1, name = "Pitch Bend", swing = "centred" },
+    { value = 2, name = "Mod Wheel", swing = "rising" },
+    { value = 3, name = "Foot Ctrl", swing = "rising" },
+    { value = 4, name = "BreathCtrl", swing = "rising" },
+    { value = 5, name = "Pressure", swing = "rising" },
+    { value = 6, name = "LFO1", swing = "centred" },
+    { value = 7, name = "LFO2", swing = "centred" },
+    { value = 8, name = "Env 1", swing = "rising" },
+    { value = 9, name = "Env 2", swing = "rising" },
+    { value = 10, name = "Env 3", swing = "rising" },
     { value = 11, name = "Note Num" },
-    { value = 12, name = "Note Vel" },
-    { value = 13, name = "Ctrl Seq" },
-    { value = 14, name = "LFO1 (Uni)" },
-    { value = 15, name = "LFO2 (Uni)" },
-    { value = 16, name = "LFO1 (Fade)" },
-    { value = 17, name = "LFO2 (Fade)" },
-    { value = 18, name = "NoteOff Vel" },
+    { value = 12, name = "Note Vel", swing = "rising" },
+    { value = 13, name = "Ctrl Seq", swing = "centred" },
+    { value = 14, name = "LFO1 (Uni)", swing = "rising" },
+    { value = 15, name = "LFO2 (Uni)", swing = "rising" },
+    { value = 16, name = "LFO1 (Fade)", swing = "rising" },
+    { value = 17, name = "LFO2 (Fade)", swing = "rising" },
+    { value = 18, name = "NoteOff Vel", swing = "rising" },
     { value = 19, name = "Voice Num" },
-    { value = 20, name = "CC X (114)" },
-    { value = 21, name = "CC Y (115)" },
-    { value = 22, name = "CC Z (116)" },
+    { value = 20, name = "CC X (114)", swing = "rising" },
+    { value = 21, name = "CC Y (115)", swing = "rising" },
+    { value = 22, name = "CC Z (116)", swing = "rising" },
 ]
 
 [[enum]]
