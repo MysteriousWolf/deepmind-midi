@@ -18,6 +18,8 @@ The host program owns the MIDI connection and feeds bytes in and out; the
 library turns them into typed messages, typed parameters and a tracked view of
 the synthesizer.
 
+# Note that this is very much in alpha stages and is not ready to use. You are welcome to try, but we take no responsibility in any damage this may cause.
+
 ```
 DeepMind <--MIDI--> host program <--bytes--> deepmind-midi
 ```
