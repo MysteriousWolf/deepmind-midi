@@ -1,5 +1,6 @@
 # The front of the synthesizer: which parameters have a physical control, what
-# is printed over each one, and which group of the panel it sits in.
+# is printed over each one, which group of the panel it sits in, and how the
+# panel presents it.
 #
 # Generated documentation is built from this file. Edit it here, then run
 # `cargo xtask docs` to refresh docs/midi-spec.md.
@@ -29,22 +30,109 @@ The legend is not the parameter's name. A silkscreen has room for `KYBD` and \
 `RES` where the parameter table says `VCF Keyboard Tracking` and `VCF \
 Resonance`, which is right for a rack slot and does not fit over a fader. Two \
 words are printed on two lines, which is what the panel does with `PITCH MOD`. \
-Every legend here is as the instrument prints it, in caps."""
+Every legend here is as the instrument prints it, in caps, except the two the \
+panel prints as a waveform rather than a word - see `drawings`."""
+drawings = """
+Two presses are printed as a waveform and not as a word: the pair at the \
+left-hand end of the oscillator block that add OSC 1's saw and its pulse to the \
+mix. `drawing` names the glyph the panel draws there, out of the same set \
+glyphs.toml gives the parameters, and a control that carries one is printed as \
+that picture with no word beside it. Its `legend` is still filled in, because a \
+host with a row of text and no room for a drawing has to print something; that \
+word is this project's and not the instrument's, which is the whole reason the \
+two are separate columns."""
 shapes = """
 The shape is not derivable from the parameter's kind. `Arp On/Off` is a button \
 and `Arp Rate (tempo)` is a fader, and to the parameter table they are a switch \
 and a sweep, which says how a byte is read and not what a hand touches. \
 `lamps` is a column of legends with one of them lit, which is how the panel \
 shows an LFO's shape."""
+clusters = """
+A wide plate is divided into the clusters its controls belong to by a thin \
+printed line: `VCF` is ruled between `RES` and `ENV`, so the filter's own are \
+separated from the three that modulate it, and `DCO 1 & 2` is ruled between its \
+two oscillators. `cluster` numbers them from the left, so a rule falls wherever \
+the number changes, and a plate that prints no line is one cluster throughout. \
+Controls are listed in cluster order for that reason.
+
+Where the rule falls is off the panel. Which cluster a press belongs to, where \
+the press sits under the faders rather than beside them, is this project's \
+reading of what the press does: `POLES` is the filter's own character and goes \
+with `FREQ` and `RES`, `INVERT` turns the envelope over and goes with `ENV`."""
+lamps = """
+The instrument has three lamp colours and spends them on a rule. **Amber** goes \
+under a press that changes what the display is showing (`EDIT`, `PROG`, `FX`, \
+`GLOBAL`, `COMPARE`, `WRITE`). **Cyan** goes under one that changes what the \
+*other* controls mean (`CHORD`, `POLY CHORD`, `TAP/HOLD`, `MOD`, `CURVES`). \
+**White** goes under everything else, which is why a press without a `lamp` \
+here is white.
+
+Of the cyan ones, `Arp Hold` is the only one that is also a program parameter; \
+the rest are presses, and two of them are in this file. A fader is not lit and \
+a column of lamps says which value is selected rather than what kind of press \
+it is, so neither carries a colour."""
+banners = """
+The largest colour on the instrument: the strip across the top of each plate \
+with the section's name printed on it. Every plate is one of three, named in \
+the `banner` tables below and measured off the product photographs. Red is the \
+panel's own colour and what a plate is unless it is said otherwise here.
+
+Note that `VCF` and `HPF` are two sections of one `Group` printed on two \
+different colours, which is why the banner belongs to the section."""
+presses = """
+Not every button on the front sends a parameter. `CHORD` and `POLY CHORD` latch \
+what the keyboard is playing: a player reaches for them, they sit in the \
+arpeggiator's own row of buttons, and there is no byte in the edit buffer for \
+either. A `press` is that button - a legend, a lamp, a cluster, and what \
+pressing it puts on the wire.
+
+`sends` is the part worth publishing. `nothing` means no cable can press it, \
+which is a better answer for a window to draw than a gap where a button should \
+be. A press that a controller number reaches names it instead.
+
+The rest of the front's non-parameter buttons are left out for the reason the \
+`omissions` note gives: a program that is drawing the instrument's panel is \
+already the display, and has no use for a press whose whole function is to \
+change what the instrument's own display is showing."""
 omissions = """
 Three controls on the panel are deliberately absent, because none of them \
 addresses a program byte: the `DATA ENTRY` fader, which edits whatever the \
 display is showing; the encoder that selects programs; and the row of twelve \
 lamps over `POLY`, which counts the voices that are sounding. A table that \
 carried them would be describing a workflow rather than a sound. The buttons \
-that open another section are absent for the same reason."""
+that open another section are absent for the same reason, as are `WRITE` and \
+`COMPARE`, which act on the edit buffer a host is keeping its own copy of."""
 rows = 2
 shape_kinds = ["fader", "button", "lamps"]
+lamp_colours = ["amber", "cyan", "white"]
+
+# The three colours a section's name is printed on, measured off the product
+# photographs. A section without a `banner` is red.
+
+[[banner]]
+name = "red"
+plate = "#c8172e"
+ink = "#ffffff"
+description = """
+The panel's own colour, and what a plate is unless it is said otherwise: a \
+photograph of a DeepMind is a dark front with a row of red stripes across it."""
+
+[[banner]]
+name = "blue"
+plate = "#01609b"
+ink = "#ffffff"
+description = """
+The two plates that are not a stage of the voice: the arpeggiator, which is \
+what plays it, and the high-pass, which the whole instrument passes through \
+after the voices are mixed."""
+
+[[banner]]
+name = "white"
+plate = "#f2f3f0"
+ink = "#000000"
+description = """
+The envelopes, the one plate whose faders address a section the panel's own \
+buttons choose rather than a section of their own."""
 
 # Row 0 is what a player reaches for between notes: the arpeggiator, the two
 # LFOs, and the voicing, with the display between the LFOs and POLY.
@@ -53,17 +141,33 @@ shape_kinds = ["fader", "button", "lamps"]
 name = "ARP / SEQ"
 row = 0
 group = "Arpeggiator"
+banner = "blue"
 controls = [
     { parameter = "Arp Rate (tempo)", legend = "RATE", shape = "fader" },
     { parameter = "Arp Gate Time", legend = "GATE TIME", shape = "fader" },
     { parameter = "Arp On/Off", legend = "ON/OFF", shape = "button" },
-    { parameter = "Arp Hold", legend = "HOLD", shape = "button" },
+    { parameter = "Arp Hold", legend = "HOLD", shape = "button", lamp = "cyan" },
+]
+presses = [
+    { legend = "CHORD", shape = "button", lamp = "cyan", sends = "nothing", note = """
+Latches the chord the keyboard is holding and plays it from one key. What it \
+plays from is readable: `Chord Memory Dump Request` (`0x1B`) returns the \
+memory. Pressing it is not - no controller number reaches it, and no `SysEx` \
+message the manual gives presses a button.""" },
+    { legend = "POLY CHORD", shape = "button", lamp = "cyan", sends = "nothing", note = """
+The same, with a chord under every key rather than one chord transposed. \
+`Poly Chord Memory Dump Request` (`0x1D`) returns that memory; the press \
+itself is local to the instrument.""" },
 ]
 
 [[section]]
 name = "LFO 1"
 row = 0
 group = "LFO 1"
+note = """
+The panel rules one plate between its two LFOs rather than printing two. They \
+are two sections here because they are two groups of the parameter table, and a \
+section carries one group: a host drawing the front puts them side by side."""
 controls = [
     { parameter = "LFO 1 Rate", legend = "RATE", shape = "fader" },
     { parameter = "LFO 1 Delay / Fade", legend = "DELAY TIME", shape = "fader" },
@@ -99,28 +203,38 @@ controls = [
 name = "DCO 1 & 2"
 row = 1
 group = "Oscillators"
+note = """
+Ruled between its two oscillators. The two waveform presses are on OSC 1's side \
+of the rule, which is what makes them OSC 1's and not the pair the parameter \
+table also gives OSC 2."""
 controls = [
-    { parameter = "OSC 1 Pitch Mod Depth", legend = "PITCH MOD", shape = "fader" },
-    { parameter = "OSC 1 PWM Depth", legend = "PWM", shape = "fader" },
-    { parameter = "OSC 2 Pitch Mod Depth", legend = "PITCH MOD", shape = "fader" },
-    { parameter = "OSC 2 Tone Mod Depth", legend = "TONE MOD", shape = "fader" },
-    { parameter = "OSC 2 Pitch", legend = "PITCH", shape = "fader" },
-    { parameter = "OSC 2 Level", legend = "LEVEL", shape = "fader" },
-    { parameter = "Noise Level", legend = "NOISE", shape = "fader" },
-    { parameter = "OSC Sync Enable", legend = "SYNC", shape = "button" },
+    { parameter = "OSC 1 Pitch Mod Depth", legend = "PITCH MOD", shape = "fader", cluster = 0 },
+    { parameter = "OSC 1 PWM Depth", legend = "PWM", shape = "fader", cluster = 0 },
+    { parameter = "OSC 1 Saw Enable", legend = "SAW", drawing = "saw", shape = "button", cluster = 0 },
+    { parameter = "OSC 1 Pulse Enable", legend = "PULSE", drawing = "square", shape = "button", cluster = 0 },
+    { parameter = "OSC Sync Enable", legend = "SYNC", shape = "button", cluster = 0 },
+    { parameter = "OSC 2 Pitch Mod Depth", legend = "PITCH MOD", shape = "fader", cluster = 1 },
+    { parameter = "OSC 2 Tone Mod Depth", legend = "TONE MOD", shape = "fader", cluster = 1 },
+    { parameter = "OSC 2 Pitch", legend = "PITCH", shape = "fader", cluster = 1 },
+    { parameter = "OSC 2 Level", legend = "LEVEL", shape = "fader", cluster = 1 },
+    { parameter = "Noise Level", legend = "NOISE", shape = "fader", cluster = 1 },
 ]
 
 [[section]]
 name = "VCF"
 row = 1
 group = "VCF"
+note = """
+Ruled between `RES` and `ENV`: the filter's own controls on one side, the three \
+that modulate it on the other."""
 controls = [
-    { parameter = "VCF Frequency", legend = "FREQ", shape = "fader" },
-    { parameter = "VCF Resonance", legend = "RES", shape = "fader" },
-    { parameter = "VCF Envelope Depth", legend = "ENV", shape = "fader" },
-    { parameter = "VCF LFO Depth", legend = "LFO", shape = "fader" },
-    { parameter = "VCF Keyboard Tracking", legend = "KYBD", shape = "fader" },
-    { parameter = "VCF 2 Pole Mode", legend = "POLES", shape = "button" },
+    { parameter = "VCF Frequency", legend = "FREQ", shape = "fader", cluster = 0 },
+    { parameter = "VCF Resonance", legend = "RES", shape = "fader", cluster = 0 },
+    { parameter = "VCF 2 Pole Mode", legend = "POLES", shape = "button", cluster = 0 },
+    { parameter = "VCF Envelope Depth", legend = "ENV", shape = "fader", cluster = 1 },
+    { parameter = "VCF LFO Depth", legend = "LFO", shape = "fader", cluster = 1 },
+    { parameter = "VCF Keyboard Tracking", legend = "KYBD", shape = "fader", cluster = 1 },
+    { parameter = "VCF Envelope Polarity", legend = "INVERT", shape = "button", cluster = 1 },
 ]
 
 [[section]]
@@ -135,9 +249,11 @@ controls = [
 name = "HPF"
 row = 1
 group = "VCF"
+banner = "blue"
 note = """
 The high-pass has a plate of its own on the panel and its two parameters are in \
-the VCF group of the table, which is why a section's group is not a key."""
+the VCF group of the table, which is why a section's group is not a key. It is \
+also printed on a different colour from the filter it shares that group with."""
 controls = [
     { parameter = "VCF HighPass Frequency", legend = "FREQ", shape = "fader" },
     { parameter = "VCF Bass Boost", legend = "BOOST", shape = "button" },
@@ -147,6 +263,7 @@ controls = [
 name = "ENVELOPES"
 row = 1
 group = "VCA Envelope"
+banner = "white"
 note = """
 Four faders shared by three envelopes: the panel's own `VCA`, `VCF` and `MOD` \
 buttons choose which one they address, and the group here is the one they \

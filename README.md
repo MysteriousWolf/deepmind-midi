@@ -34,10 +34,13 @@ device.edit(|p| p.set_vcf_frequency(200))?;        // becomes one NRPN message
 ```
 
 It also answers the questions an editor has to ask before it can draw anything:
-what the instrument prints over each of its own faders, where an effect's
-controls sit and what colour its panel is, how the four effect engines are
-wired, and which parameters are read about a centre rather than from the bottom
-of their range. `generator` goes one step further and publishes the shapes a
+what the instrument prints over each of its own faders, where the panel rules a
+line between them, what colour the plate's banner and each button's lamp are,
+which two presses are printed as a waveform rather than a word, which buttons
+latch the keyboard rather than move a parameter and whether a cable can press
+them, where an effect's controls sit and what colour its panel is, how the four
+effect engines are wired, and which parameters are read about a centre rather
+than from the bottom of their range. `generator` goes one step further and publishes the shapes a
 set of parameters makes — the envelopes, the LFO waves and fades, the two
 filter responses, what each oscillator is putting out, the arpeggiator's gates
 — as functions a host samples into its own screen, saying in the type where an

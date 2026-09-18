@@ -608,23 +608,33 @@ fn engine(slot: u8) -> Result<String, String> {
 }
 
 /// Renders a `#rrggbb` colour as its three components.
-fn colour(hex: &str) -> Result<String, String> {
+///
+/// # Errors
+///
+/// Returns a message naming `file` when the string is not six hex digits behind
+/// a `#`.
+pub fn colour_of(file: &str, hex: &str) -> Result<String, String> {
     let digits = hex
         .strip_prefix('#')
         .filter(|digits| digits.len() == 6)
-        .ok_or_else(|| format!("layout.toml: {hex:?} is not an #rrggbb colour"))?;
+        .ok_or_else(|| format!("{file}: {hex:?} is not an #rrggbb colour"))?;
     let mut parts = Vec::with_capacity(3);
     for index in 0..3 {
         let pair = digits
             .get(index * 2..index * 2 + 2)
-            .ok_or_else(|| format!("layout.toml: {hex:?} is not an #rrggbb colour"))?;
+            .ok_or_else(|| format!("{file}: {hex:?} is not an #rrggbb colour"))?;
         parts.push(
             u8::from_str_radix(pair, 16)
-                .map_err(|e| format!("layout.toml: {hex:?}: {e}"))?
+                .map_err(|e| format!("{file}: {hex:?}: {e}"))?
                 .to_string(),
         );
     }
     Ok(format!("Colour::new({})", parts.join(", ")))
+}
+
+/// Renders a `#rrggbb` colour out of `layout.toml`.
+fn colour(hex: &str) -> Result<String, String> {
+    colour_of("layout.toml", hex)
 }
 
 /// Renders what a slot does to a signal.

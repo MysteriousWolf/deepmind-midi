@@ -873,59 +873,97 @@ value table gets its own firmware range.
 
 <!-- generated:front-panel -->
 
-32 of the 242 parameters have a control on the front of the instrument, across 9 plates in 2 rows.
+35 of the 242 parameters have a control on the front of the instrument, across 9 plates in 2 rows, and 2 more presses move no parameter at all.
 
 #### Row 0
 
 `ARP / SEQ`, `LFO 1`, `LFO 2`, `POLY`, left to right.
 
-| Plate | Printed | Control | Parameter | Offset |
-|---|---|---|---|---|
-| ARP / SEQ | `RATE` | fader | Arp Rate (tempo) | 157 |
-| ARP / SEQ | `GATE TIME` | fader | Arp Gate Time | 160 |
-| ARP / SEQ | `ON/OFF` | button | Arp On/Off | 155 |
-| ARP / SEQ | `HOLD` | button | Arp Hold | 161 |
-| LFO 1 | `RATE` | fader | LFO 1 Rate | 0 |
-| LFO 1 | `DELAY TIME` | fader | LFO 1 Delay / Fade | 1 |
-| LFO 1 | `SHAPE` | lamps | LFO 1 Shape | 2 |
-| LFO 2 | `RATE` | fader | LFO 2 Rate | 7 |
-| LFO 2 | `DELAY TIME` | fader | LFO 2 Delay / Fade | 8 |
-| LFO 2 | `SHAPE` | lamps | LFO 2 Shape | 9 |
-| POLY | `UNISON DETUNE` | fader | Unison Detune | 87 |
+| Plate | Printed | Control | Lamp | Cluster | Parameter | Offset |
+|---|---|---|---|---|---|---|
+| ARP / SEQ | `RATE` | fader | - | 0 | Arp Rate (tempo) | 157 |
+| ARP / SEQ | `GATE TIME` | fader | - | 0 | Arp Gate Time | 160 |
+| ARP / SEQ | `ON/OFF` | button | white | 0 | Arp On/Off | 155 |
+| ARP / SEQ | `HOLD` | button | cyan | 0 | Arp Hold | 161 |
+| LFO 1 | `RATE` | fader | - | 0 | LFO 1 Rate | 0 |
+| LFO 1 | `DELAY TIME` | fader | - | 0 | LFO 1 Delay / Fade | 1 |
+| LFO 1 | `SHAPE` | lamps | - | 0 | LFO 1 Shape | 2 |
+| LFO 2 | `RATE` | fader | - | 0 | LFO 2 Rate | 7 |
+| LFO 2 | `DELAY TIME` | fader | - | 0 | LFO 2 Delay / Fade | 8 |
+| LFO 2 | `SHAPE` | lamps | - | 0 | LFO 2 Shape | 9 |
+| POLY | `UNISON DETUNE` | fader | - | 0 | Unison Detune | 87 |
 
-- **POLY.** One fader, where the instrument has two. The other is `DATA ENTRY`, which edits whatever the display is showing rather than a parameter of its own.
+- **ARP / SEQ.** Printed on blue.
+
+- **LFO 1.** Printed on red. The panel rules one plate between its two LFOs rather than printing two. They are two sections here because they are two groups of the parameter table, and a section carries one group: a host drawing the front puts them side by side.
+
+- **LFO 2.** Printed on red.
+
+- **POLY.** Printed on red. One fader, where the instrument has two. The other is `DATA ENTRY`, which edits whatever the display is showing rather than a parameter of its own.
 
 #### Row 1
 
 `DCO 1 & 2`, `VCF`, `VCA`, `HPF`, `ENVELOPES`, left to right.
 
-| Plate | Printed | Control | Parameter | Offset |
-|---|---|---|---|---|
-| DCO 1 & 2 | `PITCH MOD` | fader | OSC 1 Pitch Mod Depth | 21 |
-| DCO 1 & 2 | `PWM` | fader | OSC 1 PWM Depth | 25 |
-| DCO 1 & 2 | `PITCH MOD` | fader | OSC 2 Pitch Mod Depth | 29 |
-| DCO 1 & 2 | `TONE MOD` | fader | OSC 2 Tone Mod Depth | 28 |
-| DCO 1 & 2 | `PITCH` | fader | OSC 2 Pitch | 27 |
-| DCO 1 & 2 | `LEVEL` | fader | OSC 2 Level | 26 |
-| DCO 1 & 2 | `NOISE` | fader | Noise Level | 33 |
-| DCO 1 & 2 | `SYNC` | button | OSC Sync Enable | 20 |
-| VCF | `FREQ` | fader | VCF Frequency | 39 |
-| VCF | `RES` | fader | VCF Resonance | 41 |
-| VCF | `ENV` | fader | VCF Envelope Depth | 42 |
-| VCF | `LFO` | fader | VCF LFO Depth | 45 |
-| VCF | `KYBD` | fader | VCF Keyboard Tracking | 49 |
-| VCF | `POLES` | button | VCF 2 Pole Mode | 51 |
-| VCA | `LEVEL` | fader | VCA Level | 80 |
-| HPF | `FREQ` | fader | VCF HighPass Frequency | 40 |
-| HPF | `BOOST` | button | VCF Bass Boost | 52 |
-| ENVELOPES | `A` | fader | VCA Envelope Attack Time | 53 |
-| ENVELOPES | `D` | fader | VCA Envelope Decay Time | 54 |
-| ENVELOPES | `S` | fader | VCA Envelope Sustain Level | 55 |
-| ENVELOPES | `R` | fader | VCA Envelope Release Time | 56 |
+| Plate | Printed | Control | Lamp | Cluster | Parameter | Offset |
+|---|---|---|---|---|---|---|
+| DCO 1 & 2 | `PITCH MOD` | fader | - | 0 | OSC 1 Pitch Mod Depth | 21 |
+| DCO 1 & 2 | `PWM` | fader | - | 0 | OSC 1 PWM Depth | 25 |
+| DCO 1 & 2 | a saw wave, no word | button | white | 0 | OSC 1 Saw Enable | 19 |
+| DCO 1 & 2 | a square wave, no word | button | white | 0 | OSC 1 Pulse Enable | 18 |
+| DCO 1 & 2 | `SYNC` | button | white | 0 | OSC Sync Enable | 20 |
+| DCO 1 & 2 | `PITCH MOD` | fader | - | 1 | OSC 2 Pitch Mod Depth | 29 |
+| DCO 1 & 2 | `TONE MOD` | fader | - | 1 | OSC 2 Tone Mod Depth | 28 |
+| DCO 1 & 2 | `PITCH` | fader | - | 1 | OSC 2 Pitch | 27 |
+| DCO 1 & 2 | `LEVEL` | fader | - | 1 | OSC 2 Level | 26 |
+| DCO 1 & 2 | `NOISE` | fader | - | 1 | Noise Level | 33 |
+| VCF | `FREQ` | fader | - | 0 | VCF Frequency | 39 |
+| VCF | `RES` | fader | - | 0 | VCF Resonance | 41 |
+| VCF | `POLES` | button | white | 0 | VCF 2 Pole Mode | 51 |
+| VCF | `ENV` | fader | - | 1 | VCF Envelope Depth | 42 |
+| VCF | `LFO` | fader | - | 1 | VCF LFO Depth | 45 |
+| VCF | `KYBD` | fader | - | 1 | VCF Keyboard Tracking | 49 |
+| VCF | `INVERT` | button | white | 1 | VCF Envelope Polarity | 50 |
+| VCA | `LEVEL` | fader | - | 0 | VCA Level | 80 |
+| HPF | `FREQ` | fader | - | 0 | VCF HighPass Frequency | 40 |
+| HPF | `BOOST` | button | white | 0 | VCF Bass Boost | 52 |
+| ENVELOPES | `A` | fader | - | 0 | VCA Envelope Attack Time | 53 |
+| ENVELOPES | `D` | fader | - | 0 | VCA Envelope Decay Time | 54 |
+| ENVELOPES | `S` | fader | - | 0 | VCA Envelope Sustain Level | 55 |
+| ENVELOPES | `R` | fader | - | 0 | VCA Envelope Release Time | 56 |
 
-- **HPF.** The high-pass has a plate of its own on the panel and its two parameters are in the VCF group of the table, which is why a section's group is not a key.
+- **DCO 1 & 2.** Printed on red, ruled into 2 clusters. Ruled between its two oscillators. The two waveform presses are on OSC 1's side of the rule, which is what makes them OSC 1's and not the pair the parameter table also gives OSC 2.
 
-- **ENVELOPES.** Four faders shared by three envelopes: the panel's own `VCA`, `VCF` and `MOD` buttons choose which one they address, and the group here is the one they address when the instrument is switched on.
+- **VCF.** Printed on red, ruled into 2 clusters. Ruled between `RES` and `ENV`: the filter's own controls on one side, the three that modulate it on the other.
+
+- **VCA.** Printed on red.
+
+- **HPF.** Printed on blue. The high-pass has a plate of its own on the panel and its two parameters are in the VCF group of the table, which is why a section's group is not a key. It is also printed on a different colour from the filter it shares that group with.
+
+- **ENVELOPES.** Printed on white. Four faders shared by three envelopes: the panel's own `VCA`, `VCF` and `MOD` buttons choose which one they address, and the group here is the one they address when the instrument is switched on.
+
+#### Presses that are not a parameter
+
+A button whose press latches what the keyboard is playing rather than setting a byte. `Sends` is what a cable can do about it.
+
+| Plate | Printed | Lamp | Sends |
+|---|---|---|---|
+| ARP / SEQ | `CHORD` | cyan | nothing |
+| ARP / SEQ | `POLY CHORD` | cyan | nothing |
+
+- **CHORD.** Latches the chord the keyboard is holding and plays it from one key. What it plays from is readable: `Chord Memory Dump Request` (`0x1B`) returns the memory. Pressing it is not - no controller number reaches it, and no `SysEx` message the manual gives presses a button.
+
+- **POLY CHORD.** The same, with a chord under every key rather than one chord transposed. `Poly Chord Memory Dump Request` (`0x1D`) returns that memory; the press itself is local to the instrument.
+
+#### Banners
+
+The strip across the top of a plate with the section's name on it, measured off the product photographs. A plate that says nothing is red.
+
+| Colour | Plate | Ink | Printed on |
+|---|---|---|---|
+| red | `#c8172e` | `#ffffff` | `LFO 1`, `LFO 2`, `POLY`, `DCO 1 & 2`, `VCF`, `VCA` |
+| blue | `#01609b` | `#ffffff` | `ARP / SEQ`, `HPF` |
+| white | `#f2f3f0` | `#000000` | `ENVELOPES` |
 
 <!-- /generated:front-panel -->
 
