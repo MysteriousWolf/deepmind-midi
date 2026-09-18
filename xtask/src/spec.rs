@@ -696,6 +696,51 @@ fn validate_pixels(file: &str, what: &str, rows: &[String], side: usize) -> Resu
     Ok(())
 }
 
+/// Checks that a legend is printed the way a front panel prints one: caps, and
+/// short enough for the lane it sits over.
+///
+/// # Errors
+///
+/// Returns a message naming `file` when the legend is blank, is not in caps, or
+/// carries a word too long to print over a fader.
+fn validate_legend(file: &str, legend: &str) -> Result<(), String> {
+    if legend.trim().is_empty() || legend.to_uppercase() != legend {
+        return Err(format!(
+            "{file}: {legend:?} is not printed the way a panel prints one"
+        ));
+    }
+    if legend.split(' ').any(|word| word.len() > 6) {
+        return Err(format!(
+            "{file}: {legend:?} is too long a word to print over a fader"
+        ));
+    }
+    Ok(())
+}
+
+/// Checks that a plate's clusters are the runs a printed rule divides it into.
+///
+/// They number from 0, they never go backwards, and they leave no gap: a rule
+/// falls wherever the number changes, so a cluster that appeared, stopped and
+/// came back would be asking for two rules around controls the panel prints in
+/// one block.
+///
+/// # Errors
+///
+/// Returns a message naming `section` when the numbering does either.
+fn validate_clusters(section: &str, clusters: impl Iterator<Item = u8>) -> Result<(), String> {
+    let mut current = 0;
+    for cluster in clusters {
+        if cluster == current || cluster == current + 1 {
+            current = cluster;
+        } else {
+            return Err(format!(
+                "front.toml: {section} rules a cluster {cluster} after {current}"
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// One stroke of a mark: a polyline, a circular arc or a filled dot.
 ///
 /// Exactly one of the three is set, which the loader checks; TOML has no tagged
@@ -835,9 +880,60 @@ pub struct FrontControl {
     /// The program parameter it moves, by its `parameters.toml` name.
     pub parameter: String,
     /// What the panel prints over it, as the silkscreen has it.
+    ///
+    /// This project's word for it where `drawing` says the panel prints a
+    /// waveform and no word at all.
     pub legend: String,
+    /// The glyph the panel draws over it instead of a word, where it draws one.
+    #[serde(default)]
+    pub drawing: Option<String>,
     /// What a hand touches: `fader`, `button` or `lamps`.
     pub shape: String,
+    /// Which cluster of its plate it is in, counting from the left.
+    ///
+    /// A thin printed rule falls wherever the number changes, so a plate that
+    /// prints none leaves this at 0 throughout.
+    #[serde(default)]
+    pub cluster: u8,
+    /// The colour of the lamp behind it, where the panel lights it.
+    ///
+    /// Left out for the white the rule gives everything it does not name, and
+    /// for a control that is not a press.
+    #[serde(default)]
+    pub lamp: Option<String>,
+}
+
+/// One press the front panel carries that is not a parameter change.
+#[derive(Debug, Deserialize)]
+pub struct FrontPress {
+    /// What the panel prints over it, as the silkscreen has it.
+    pub legend: String,
+    /// What a hand touches, which for a press is `button`.
+    pub shape: String,
+    /// The colour of the lamp behind it, left out for white.
+    #[serde(default)]
+    pub lamp: Option<String>,
+    /// What pressing it puts on the wire: `nothing`, or a controller's name.
+    pub sends: String,
+    /// Which cluster of its plate it is in, counting from the left.
+    #[serde(default)]
+    pub cluster: u8,
+    /// Free-form note.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+/// One of the colours a section's name is printed on.
+#[derive(Debug, Deserialize)]
+pub struct Banner {
+    /// The colour's name, as a section names it.
+    pub name: String,
+    /// The strip itself, as `#rrggbb`.
+    pub plate: String,
+    /// What the name is printed in, as `#rrggbb`.
+    pub ink: String,
+    /// Which plates are printed on it, and why.
+    pub description: String,
 }
 
 /// One group of controls as the front panel prints it, such as `VCF`.
@@ -849,11 +945,20 @@ pub struct Section {
     pub row: u8,
     /// The group of the parameter table its controls belong to.
     pub group: String,
+    /// The colour the name is printed on, by its `banner` name.
+    ///
+    /// Left out for the panel's own red, which is what a plate is unless it is
+    /// said otherwise.
+    #[serde(default)]
+    pub banner: Option<String>,
     /// Free-form note.
     #[serde(default)]
     pub note: Option<String>,
     /// The controls, in the order the panel puts them.
     pub controls: Vec<FrontControl>,
+    /// The presses that are not a parameter change, in the same order.
+    #[serde(default)]
+    pub presses: Vec<FrontPress>,
 }
 
 /// One field of a transport's byte pattern.
@@ -1044,6 +1149,7 @@ struct Globals {
 #[derive(Debug, Deserialize)]
 struct Front {
     meta: FrontMeta,
+    banner: Vec<Banner>,
     section: Vec<Section>,
 }
 
@@ -1051,6 +1157,7 @@ struct Front {
 struct FrontMeta {
     rows: u8,
     shape_kinds: Vec<String>,
+    lamp_colours: Vec<String>,
 }
 
 /// Everything in `spec/`, loaded and validated.
@@ -1111,6 +1218,10 @@ pub struct Spec {
     pub panel_rows: u8,
     /// The control shapes a front panel control may declare.
     pub shape_kinds: Vec<String>,
+    /// The lamp colours a front panel press may declare.
+    pub lamp_colours: Vec<String>,
+    /// The colours a section's name is printed on, as written.
+    pub banners: Vec<Banner>,
 }
 
 impl Spec {
@@ -1170,6 +1281,8 @@ impl Spec {
             sections: front.section,
             panel_rows: front.meta.rows,
             shape_kinds: front.meta.shape_kinds,
+            lamp_colours: front.meta.lamp_colours,
+            banners: front.banner,
         };
         this.validate_glyphs()?;
         this.resolve_cells()?;
@@ -1667,6 +1780,151 @@ impl Spec {
         Ok(())
     }
 
+    /// Checks the colours a section's name may be printed on.
+    ///
+    /// Three of them, one named `red`, because red is what a plate is unless a
+    /// section says otherwise and a default that is not in the table would be a
+    /// colour nothing could look up.
+    fn validate_banners(&self) -> Result<(), String> {
+        if !self.banners.iter().any(|banner| banner.name == "red") {
+            return Err("front.toml: no `red` banner for a plate to fall back to".to_owned());
+        }
+        let mut seen: Vec<&str> = Vec::new();
+        for banner in &self.banners {
+            if seen.contains(&banner.name.as_str()) {
+                return Err(format!("front.toml: {:?} is measured twice", banner.name));
+            }
+            seen.push(&banner.name);
+            if banner.description.trim().is_empty() {
+                return Err(format!("front.toml: {} says what it prints", banner.name));
+            }
+            for colour in [&banner.plate, &banner.ink] {
+                if colour.len() != 7
+                    || !colour.starts_with('#')
+                    || !colour[1..].chars().all(|c| c.is_ascii_hexdigit())
+                {
+                    return Err(format!(
+                        "front.toml: {} has {colour:?}, which is not an #rrggbb colour",
+                        banner.name
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Checks that a lamp is one of the three the instrument has.
+    fn validate_lamp(&self, what: &str, lamp: &str) -> Result<(), String> {
+        if self.lamp_colours.iter().any(|known| known == lamp) {
+            return Ok(());
+        }
+        Err(format!(
+            "front.toml: {what:?} has lamp {lamp:?}, which meta.lamp_colours does not list"
+        ))
+    }
+
+    /// Checks one control of a plate, and returns the parameter it moves.
+    ///
+    /// The parameter has to exist and to be in the group the plate's name
+    /// claims, which is what catches a parameter moved between groups by a
+    /// later reading of the manual.
+    fn validate_control<'a>(
+        &'a self,
+        section: &Section,
+        control: &FrontControl,
+    ) -> Result<&'a str, String> {
+        let parameter = self
+            .parameters
+            .iter()
+            .find(|p| p.name == control.parameter)
+            .ok_or_else(|| {
+                format!(
+                    "front.toml: {} names unknown parameter {:?}",
+                    section.name, control.parameter
+                )
+            })?;
+        if parameter.group != section.group {
+            return Err(format!(
+                "front.toml: {} is on the {} plate and parameters.toml puts it in {}",
+                parameter.name, section.name, parameter.group
+            ));
+        }
+        if !self.shape_kinds.contains(&control.shape) {
+            return Err(format!(
+                "front.toml: {} has shape {:?}, which meta.shape_kinds does not list",
+                control.legend, control.shape
+            ));
+        }
+        // A legend is a silkscreen: caps, and short enough for a lane.
+        validate_legend("front.toml", &control.legend)?;
+        // A column of lit legends is only worth drawing for a parameter that
+        // has names to light.
+        if control.shape == "lamps" && parameter.value_table.is_none() {
+            return Err(format!(
+                "front.toml: {} is drawn as lamps and names no value table",
+                parameter.name
+            ));
+        }
+        if let Some(drawing) = &control.drawing {
+            if !self.glyphs.iter().any(|glyph| &glyph.name == drawing) {
+                return Err(format!(
+                    "front.toml: {} is printed as {drawing:?}, which is not a glyph",
+                    parameter.name
+                ));
+            }
+        }
+        // Only a press carries a cap the lamp rule colours: a fader is not lit,
+        // and a column of lamps says which value is selected.
+        if let Some(lamp) = &control.lamp {
+            self.validate_lamp(&control.legend, lamp)?;
+            if control.shape != "button" {
+                return Err(format!(
+                    "front.toml: {} is not a press and carries a lamp",
+                    parameter.name
+                ));
+            }
+        }
+        Ok(parameter.name.as_str())
+    }
+
+    /// Checks the presses a plate carries that are not a parameter change.
+    ///
+    /// A press is in the table because it does something a cable or a player
+    /// can see, so what it sends has to be either a controller the synthesizer
+    /// answers or an honest nothing with the sentence that makes it an answer.
+    fn validate_presses(&self, section: &Section) -> Result<(), String> {
+        for press in &section.presses {
+            if press.shape != "button" {
+                return Err(format!(
+                    "front.toml: {:?} is a press and has shape {:?}",
+                    press.legend, press.shape
+                ));
+            }
+            if let Some(lamp) = &press.lamp {
+                self.validate_lamp(&press.legend, lamp)?;
+            }
+            validate_legend("front.toml", &press.legend)?;
+            if press.sends == "nothing" {
+                if press.note.is_none() {
+                    return Err(format!(
+                        "front.toml: {:?} sends nothing and says nothing about why",
+                        press.legend
+                    ));
+                }
+            } else if !self
+                .controllers
+                .iter()
+                .any(|controller| controller.name == press.sends)
+            {
+                return Err(format!(
+                    "front.toml: {:?} sends {:?}, which is neither nothing nor a controller",
+                    press.legend, press.sends
+                ));
+            }
+        }
+        Ok(())
+    }
+
     /// Checks the front panel against the parameter table it names.
     ///
     /// The panel is the one part of this specification that cannot be read off
@@ -1681,7 +1939,16 @@ impl Spec {
         if self.sections.is_empty() {
             return Err("front.toml: no sections".to_owned());
         }
+        self.validate_banners()?;
         for section in &self.sections {
+            if let Some(banner) = &section.banner {
+                if !self.banners.iter().any(|known| &known.name == banner) {
+                    return Err(format!(
+                        "front.toml: {} is printed on {banner:?}, which is not a banner colour",
+                        section.name
+                    ));
+                }
+            }
             if section.row >= self.panel_rows {
                 return Err(format!(
                     "front.toml: {} is in row {}, the panel has {}",
@@ -1698,59 +1965,23 @@ impl Spec {
                 return Err(format!("front.toml: {} has no controls", section.name));
             }
             for control in &section.controls {
-                let parameter = self
-                    .parameters
-                    .iter()
-                    .find(|p| p.name == control.parameter)
-                    .ok_or_else(|| {
-                        format!(
-                            "front.toml: {} names unknown parameter {:?}",
-                            section.name, control.parameter
-                        )
-                    })?;
-                if parameter.group != section.group {
+                let parameter = self.validate_control(section, control)?;
+                if claimed.contains(&parameter) {
                     return Err(format!(
-                        "front.toml: {} is on the {} plate and parameters.toml puts it in {}",
-                        parameter.name, section.name, parameter.group
+                        "front.toml: {parameter} has a control on the panel twice"
                     ));
                 }
-                if claimed.contains(&parameter.name.as_str()) {
-                    return Err(format!(
-                        "front.toml: {} has a control on the panel twice",
-                        parameter.name
-                    ));
-                }
-                claimed.push(parameter.name.as_str());
-                if !self.shape_kinds.contains(&control.shape) {
-                    return Err(format!(
-                        "front.toml: {} has shape {:?}, which meta.shape_kinds does not list",
-                        control.legend, control.shape
-                    ));
-                }
-                // A legend is a silkscreen: caps, and short enough for a lane.
-                if control.legend.trim().is_empty()
-                    || control.legend.to_uppercase() != control.legend
-                {
-                    return Err(format!(
-                        "front.toml: {} is not printed the way a panel prints one",
-                        section.name
-                    ));
-                }
-                if control.legend.split(' ').any(|word| word.len() > 6) {
-                    return Err(format!(
-                        "front.toml: {:?} is too long a word to print over a fader",
-                        control.legend
-                    ));
-                }
-                // A column of lit legends is only worth drawing for a parameter
-                // that has names to light.
-                if control.shape == "lamps" && parameter.value_table.is_none() {
-                    return Err(format!(
-                        "front.toml: {} is drawn as lamps and names no value table",
-                        parameter.name
-                    ));
-                }
+                claimed.push(parameter);
             }
+            validate_clusters(
+                &section.name,
+                section
+                    .controls
+                    .iter()
+                    .map(|control| control.cluster)
+                    .chain(section.presses.iter().map(|press| press.cluster)),
+            )?;
+            self.validate_presses(section)?;
         }
         // Not a second rack: the panel is the handful a player reaches for, and
         // a table that grew past a fraction of the instrument would have stopped

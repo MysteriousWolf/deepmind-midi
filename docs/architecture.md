@@ -167,7 +167,7 @@ sysex     DeepMind framing, packed MS-bit codec, typed Message enum
 param     the parameter table: IDs, NRPN numbers, ranges, enums, formatting
 pixels    the one-bit grid the effect marks and the matrix cells are drawn on
 effect    the effect panels: what an engine's twelve bytes are, per algorithm
-front     what the instrument's own front panel puts a control under
+front     the instrument's own front panel: controls, presses, how it prints them
 program   Program: the dump's bytes, typed accessors, names, value types
 generator the shapes a program makes: envelopes, waves, responses, gates
 device    the sans-IO state machine: requests, timeouts, known state, events
@@ -194,7 +194,7 @@ lets NRPN edits, dump parsing and dump building share a single table.
 | `spec/effects.toml` | 371 effect parameters across 35 algorithms |
 | `spec/panels.toml` | how those 371 slots present themselves |
 | `spec/layout.toml` | where each slot sits on the FX page, and the panel colours |
-| `spec/front.toml` | which parameters the instrument's own front panel puts a control under |
+| `spec/front.toml` | which parameters the instrument's own front panel puts a control under, how it presents them, and the two presses that move no parameter |
 | `spec/marks.toml` | a mark per effect family and a variant per kind a symbol can carry, as strokes in a unit box and as a pixel grid |
 | `spec/cells.toml` | a dot-matrix cell per modulation source, and per destination the parameter table cannot picture, on the same grid |
 | `spec/glyphs.toml` | a glyph per thing a parameter does, on the same grid, named by every effect slot and most parameters and controllers |
@@ -412,12 +412,36 @@ exist, may carry one control and not two, and has to be in the group its plate
 claims. That last check is what would catch a parameter moved between groups by
 a later reading.
 
-Three controls of the instrument are deliberately missing, because none of them
-addresses a program byte: the `DATA ENTRY` fader, which edits whatever the
-display is showing; the encoder that selects programs; and the row of twelve
-lamps over `POLY`, which counts sounding voices. The buttons that open a
-section on the display are missing for the same reason. A table that carried
-them would be describing a workflow rather than a sound.
+Which control is on the front is one question, and how the front *presents* it
+is another. Four answers to the second are in the same file, because each of
+them is read off the same photograph: the thin rule that divides a wide plate
+into clusters, numbered so that a rule falls wherever the number changes; the
+colour of the lamp behind a press, which the instrument spends on a rule of its
+own — amber where the display is about to change, cyan where the other controls
+are about to mean something else, white everywhere else; the colour a plate's
+name is printed on, one of three measured off the product photographs; and the
+two presses whose silkscreen is a waveform rather than a word, which a
+`&'static str` cannot answer and a glyph can.
+
+Not every button on the front sends a parameter. `CHORD` and `POLY CHORD` latch
+what the keyboard is playing: a player reaches for them, they sit in the
+arpeggiator's own row of buttons, and a sweep over all 242 parameters turns up
+no byte for either. A `PanelControl` is keyed by the parameter it moves, so it
+cannot name them however the table grows, and a second kind of entry carries
+them — a legend, a lamp, a cluster, and what the press puts on the wire. For
+both of those that is nothing: no controller reaches them and no message in the
+manual presses a button. Saying so is the point. A host that knows `CHORD`
+cannot be pressed over MIDI draws it disabled with a sentence; one that knows
+nothing draws nothing, which reads as an oversight.
+
+The rest of the instrument's buttons and both of its other data-entry controls
+are deliberately missing, because none of them addresses a program byte or
+changes what the keys do: the `DATA ENTRY` fader, which edits whatever the
+display is showing; the encoder that selects programs; the row of twelve lamps
+over `POLY`, which counts sounding voices; the buttons that open a section on
+the display; and `WRITE` and `COMPARE`, which act on an edit buffer a host is
+keeping its own copy of. A program drawing this panel is already the display. A
+table that carried them would be describing a workflow rather than a sound.
 
 What it does not carry is pixels. Which row, which order within a plate, and
 what is printed over each control are facts off the instrument; how wide a lane

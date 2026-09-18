@@ -659,9 +659,11 @@ fn render_characters(spec: &Spec) -> String {
 /// to right in the order the signal takes it.
 fn render_front(spec: &Spec) -> String {
     let controls: usize = spec.sections.iter().map(|s| s.controls.len()).sum();
+    let presses: usize = spec.sections.iter().map(|s| s.presses.len()).sum();
     let mut out = format!(
         "{controls} of the {} parameters have a control on the front of the \
-         instrument, across {} plates in {} rows.\n",
+         instrument, across {} plates in {} rows, and {presses} more presses \
+         move no parameter at all.\n",
         spec.parameters.len(),
         spec.sections.len(),
         spec.panel_rows,
@@ -682,18 +684,24 @@ fn render_front(spec: &Spec) -> String {
         let _ = write!(
             out,
             "\n#### Row {row}\n\n{}, left to right.\n\n\
-             | Plate | Printed | Control | Parameter | Offset |\n|---|---|---|---|---|\n",
+             | Plate | Printed | Control | Lamp | Cluster | Parameter | Offset |\n\
+             |---|---|---|---|---|---|---|\n",
             names.join(", ")
         );
         for section in plates {
             for control in &section.controls {
                 let parameter = spec.parameters.iter().find(|p| p.name == control.parameter);
+                let printed = control.drawing.as_ref().map_or_else(
+                    || format!("`{}`", cell(&control.legend)),
+                    |drawing| format!("a {} wave, no word", cell(drawing)),
+                );
                 let _ = writeln!(
                     out,
-                    "| {} | `{}` | {} | {} | {} |",
+                    "| {} | {printed} | {} | {} | {} | {} | {} |",
                     cell(&section.name),
-                    cell(&control.legend),
                     control.shape,
+                    lamp(control.lamp.as_deref(), &control.shape),
+                    control.cluster,
                     parameter.map_or_else(
                         || cell(&control.parameter),
                         |parameter| cell(&parameter.name)
@@ -704,16 +712,125 @@ fn render_front(spec: &Spec) -> String {
             }
         }
         for section in spec.sections.iter().filter(|s| s.row == row) {
+            let banner = section.banner.as_deref().unwrap_or("red");
+            let divisions = clusters(section);
+            let ruled = if divisions > 1 {
+                format!(", ruled into {divisions} clusters")
+            } else {
+                String::new()
+            };
+            let _ = write!(
+                out,
+                "\n- **{}.** Printed on {banner}{ruled}.",
+                cell(&section.name)
+            );
             if let Some(note) = &section.note {
-                let _ = writeln!(out, "\n- **{}.** {}", cell(&section.name), cell(note));
+                let _ = write!(out, " {}", cell(note));
             }
+            out.push('\n');
         }
     }
+    render_presses(spec, &mut out);
+    render_banners(spec, &mut out);
     out
 }
 
+/// Renders the presses the panel carries that are not a parameter change, and
+/// what each one puts on the wire.
+fn render_presses(spec: &Spec, out: &mut String) {
+    let all: Vec<(&str, &crate::spec::FrontPress)> = spec
+        .sections
+        .iter()
+        .flat_map(|section| {
+            section
+                .presses
+                .iter()
+                .map(move |press| (section.name.as_str(), press))
+        })
+        .collect();
+    if all.is_empty() {
+        return;
+    }
+    out.push_str(
+        "\n#### Presses that are not a parameter\n\n\
+         A button whose press latches what the keyboard is playing rather than \
+         setting a byte. `Sends` is what a cable can do about it.\n\n\
+         | Plate | Printed | Lamp | Sends |\n|---|---|---|---|\n",
+    );
+    for (plate, press) in &all {
+        let _ = writeln!(
+            out,
+            "| {} | `{}` | {} | {} |",
+            cell(plate),
+            cell(&press.legend),
+            lamp(press.lamp.as_deref(), &press.shape),
+            if press.sends == "nothing" {
+                "nothing".to_owned()
+            } else {
+                format!("`{}`", cell(&press.sends))
+            }
+        );
+    }
+    for (_, press) in &all {
+        if let Some(note) = &press.note {
+            let _ = writeln!(out, "\n- **{}.** {}", cell(&press.legend), cell(note));
+        }
+    }
+}
+
+/// Renders the three colours a plate's name is printed on.
+fn render_banners(spec: &Spec, out: &mut String) {
+    if spec.banners.is_empty() {
+        return;
+    }
+    out.push_str(
+        "\n#### Banners\n\n\
+         The strip across the top of a plate with the section's name on it, \
+         measured off the product photographs. A plate that says nothing is \
+         red.\n\n\
+         | Colour | Plate | Ink | Printed on |\n|---|---|---|---|\n",
+    );
+    for banner in &spec.banners {
+        let plates: Vec<String> = spec
+            .sections
+            .iter()
+            .filter(|section| section.banner.as_deref().unwrap_or("red") == banner.name)
+            .map(|section| format!("`{}`", cell(&section.name)))
+            .collect();
+        let _ = writeln!(
+            out,
+            "| {} | `{}` | `{}` | {} |",
+            cell(&banner.name),
+            cell(&banner.plate),
+            cell(&banner.ink),
+            plates.join(", ")
+        );
+    }
+}
+
+/// Returns how many clusters a printed rule divides a plate into.
+fn clusters(section: &crate::spec::Section) -> u8 {
+    section
+        .controls
+        .iter()
+        .map(|control| control.cluster)
+        .chain(section.presses.iter().map(|press| press.cluster))
+        .max()
+        .map_or(1, |last| last + 1)
+}
+
+/// Returns the colour of the lamp behind a control, as the table prints it.
+///
+/// White is the rule's own answer for a press it does not name; a fader and a
+/// column of lamps are not a press and carry none.
+fn lamp(colour: Option<&str>, shape: &str) -> String {
+    if shape != "button" {
+        return "-".to_owned();
+    }
+    colour.unwrap_or("white").to_owned()
+}
+
 /// Renders the measured grid, so the numbers the drawings are built from are
-/// readable next to them./// Renders the measured grid, so the numbers the drawings are built from are
 /// readable next to them.
 fn render_grid(spec: &Spec) -> String {
     let grid = &spec.grid;
